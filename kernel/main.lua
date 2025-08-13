@@ -1,5 +1,6 @@
-local state = require("engine.state")
 require("engine.kernel.globals")
+local state = require("engine.state")
+
 
 local systems = require("engine.systems")
 for callback_name, _ in pairs(
