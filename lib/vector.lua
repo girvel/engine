@@ -21,6 +21,16 @@ vector.own = function(t)
   return setmetatable(t, vector.mt)
 end
 
+--- @param size integer
+--- @param f fun(): number
+vector.filled = function(size, f)
+  local result = {}
+  for i = 1, size do
+    result[i] = f()
+  end
+  return vector.own(result)
+end
+
 vector.zero = vector.new(0, 0)
 vector.one = vector.new(1, 1)
 vector.up = vector.new(0, -1)
@@ -110,6 +120,31 @@ vector.mt.__tostring = function(self)
   end
   return result
 end
+
+vector.mt.__le = function(self, other)
+  assert(#self == #other)
+  for i, value in ipairs(self) do
+    if value > other[i] then return false end
+  end
+  return true
+end
+
+vector.mt.__lt = function(self, other)
+  assert(#self == #other)
+  for i, value in ipairs(self) do
+    if value >= other[i] then return false end
+  end
+  return true
+end
+
+vector.mt.__ge = function(self, other)
+  return other <= self
+end
+
+vector.mt.__gt = function(self, other)
+  return other < self
+end
+
 
 --- @generic T
 --- @param self T
