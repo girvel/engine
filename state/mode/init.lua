@@ -9,8 +9,8 @@ local STATES = {
 --- @class state_mode
 --- @field _mode state_mode_name
 local methods = {
-  gui = function(self)
-    return STATES[self._mode].gui()
+  draw_gui = function(self)
+    return STATES[self._mode].draw_gui()
   end,
 
   --- @param mode state_mode_name

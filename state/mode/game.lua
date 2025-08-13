@@ -3,7 +3,7 @@ local ui = require("engine.tech.ui")
 
 local game = {}
 
-game.gui = function()
+game.draw_gui = function()
   ui.text("<game>")
 end
 

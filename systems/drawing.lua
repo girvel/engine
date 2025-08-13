@@ -5,7 +5,7 @@ return Tiny.system {
   base_callback = "draw",
   update = function()
     ui.start()
-    State.mode:gui()
+    State.mode:draw_gui()
     ui.finish()
   end,
 }

@@ -3,7 +3,7 @@ local ui = require("engine.tech.ui")
 
 local start_menu = {}
 
-start_menu.gui = function()
+start_menu.draw_gui = function()
   local choice = ui.choice({
     "New game",
     "Load game",
