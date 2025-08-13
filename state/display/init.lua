@@ -3,6 +3,7 @@ local display = {}
 --- @enum (key) state_display_mode
 local STATES = {
   state_menu = require("engine.state.display.start_menu"),
+  game = require("engine.state.display.game"),
 }
 
 --- @class state_display

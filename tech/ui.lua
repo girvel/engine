@@ -17,6 +17,11 @@ ui.start = function()
   model.selection.max_i = 0
 end
 
+--- @param text string
+ui.text = function(text)
+  love.graphics.print(text, 0, 0)
+end
+
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)
