@@ -10,7 +10,7 @@ start_menu.gui = function()
   })
 
   if choice == 1 then
-    State.display:transition("game")
+    State.mode:transition("game")
     Log.info("Start a new game")
   elseif choice == 2 then
     Log.info("Load a save")
