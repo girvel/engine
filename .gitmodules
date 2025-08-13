@@ -1,0 +1,3 @@
+[submodule "vendor/ldump"]
+	path = vendor/ldump
+	url = https://github.com/girvel/ldump
