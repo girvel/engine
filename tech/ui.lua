@@ -5,14 +5,25 @@ local ui = {}
 local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 20)
 love.graphics.setFont(FONT)
 
-local current_choice = 1
-local return_pressed = false
+local model = {
+  selection = {
+    i = 1,
+    max_i = 0,
+    is_pressed = false,
+  },
+}
+
+ui.start = function()
+  model.selection.max_i = 0
+end
 
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)
+  local is_selected = false
   for i, option in ipairs(options) do
-    if i == current_choice then
+    if model.selection.max_i + i == model.selection.i then
+      is_selected = true
       option = "> " .. option
     else
       option = "  " .. option
@@ -20,23 +31,25 @@ ui.choice = function(options)
     love.graphics.print(option, 0, 20 * (i - 1))
   end
 
-  if return_pressed then
-    return current_choice
+  model.selection.max_i = model.selection.max_i + #options
+
+  if model.selection.is_pressed and is_selected then
+    return model.selection.i
   end
 end
 
 ui.finish = function()
-  return_pressed = false
+  model.selection.is_pressed = false
 end
 
 ui.push_keypress = function(key)
   if key == "w" then
-    current_choice = current_choice - 1
+    model.selection.i = Math.loopmod(model.selection.i - 1, model.selection.max_i)
   elseif key == "s" then
-    current_choice = current_choice + 1
+    model.selection.i = Math.loopmod(model.selection.i + 1, model.selection.max_i)
   elseif key == "return" then
-    return_pressed = true
+    model.selection.is_pressed = true
   end
 end
 
-return ui
+return Ldump.mark(ui, {}, ...)

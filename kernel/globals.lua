@@ -7,6 +7,8 @@ Fun = require("engine.lib.fun")
 Grid = require("engine.lib.grid")
 Ldump.mark_module("engine.lib.grid", "const")
 
+Math = require("engine.lib.math")
+
 Tiny = require("engine.lib.tiny")
 -- TODO does it need a tiny_dump_patch?
 

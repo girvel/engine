@@ -4,6 +4,8 @@ return Tiny.system {
   codename = "display",
   base_callback = "draw",
   update = function()
+    ui.start()
+
     local choice = ui.choice({
       "New game",
       "Load game",
