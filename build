@@ -1,0 +1,46 @@
+#!/usr/bin/env lua
+
+local argparse = require("engine.lib.argparse")
+
+local read_run = function(command)
+  local f = assert(io.popen("zsh -c '" .. command .. "'"))
+  local result = f:read("*a")
+  f:close()
+  return result
+end
+
+local parse_cli = function()
+  local parser = argparse()
+    :description("Fallen engine's build tool")
+    :command_target("command")
+
+  parser:command("stat")
+    :description("Display project line count")
+
+  return parser:parse()
+end
+
+local VENDOR_LIBS = {
+  "argparse",
+  "fun",
+  "inspect",
+  "tiny",
+}
+
+local FALLEN_TOTAL = 12482
+
+local cli = {
+  stat = function(args)
+    local excessive_total = read_run("cat **/*.lua | wc -l")
+    local vendor = read_run(
+      ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
+    )
+    local total = excessive_total - vendor
+    print("Total:", total)
+    print("Fallen total:", FALLEN_TOTAL)
+    print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+  end,
+}
+
+local args = parse_cli()
+cli[args.command](args)
