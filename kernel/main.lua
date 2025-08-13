@@ -16,6 +16,15 @@ for callback_name, _ in pairs(
 end
 
 love.load = function()
+  Log.info("Started love.load")
+
   State = state.new(systems)
-  --Log.info("Engine finished love.load")
+
+  Log.info("Finished love.load")
 end
+
+love.quit = function()
+  Log.info("Exited smoothly")
+end
+
+Log.info("Initialized kernel setup")
