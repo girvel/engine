@@ -25,6 +25,16 @@ local state_methods = {
     Query(entity):on_add()
     return entity
   end,
+
+  --- @param path string
+  load_level = function(self, path)
+    self:add {
+      sprite = {
+        image = love.graphics.newImage("engine/assets/sprites/moose_dude.png"),
+      },
+      position = V(64, 64),
+    }
+  end,
 }
 state.mt = {__index = state_methods}
 

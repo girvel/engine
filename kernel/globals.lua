@@ -9,6 +9,8 @@ Ldump.mark_module("engine.lib.grid", "const")
 
 Math = require("engine.lib.math")
 
+require("engine.lib.string")
+
 Table = require("engine.lib.table")
 
 Tiny = require("engine.lib.tiny")

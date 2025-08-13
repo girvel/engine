@@ -10,13 +10,7 @@ start_menu.draw_gui = function()
   })
 
   if choice == 1 then
-    State:add {
-      sprite = {
-        image = love.graphics.newImage("engine/assets/sprites/moose_dude.png"),
-      },
-      position = V(64, 64),
-    }
-    State.mode:transition("game")
+    State.mode:transition("loading_screen")
     Log.info("Start a new game")
   elseif choice == 2 then
     Log.info("Load a save")

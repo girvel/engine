@@ -4,6 +4,7 @@ local mode = {}
 local STATES = {
   state_menu = require("engine.state.mode.start_menu"),
   game = require("engine.state.mode.game"),
+  loading_screen = require("engine.state.mode.loading_screen"),
 }
 
 --- @class state_mode

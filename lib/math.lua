@@ -1,3 +1,6 @@
+--- Math extension module
+---
+--- Contains additional math functions
 local mathx = {}
 
 --- Returns 1 if x is positive, -1 if negative, 0 if 0
