@@ -3,7 +3,29 @@ local state = {}
 --- @class state
 --- @field mode state_mode
 --- @field _world table
-local state_methods
+--- @field _entities table
+local state_methods = {
+  --- Modifies entity
+  --- @generic T
+  --- @param self state
+  --- @param entity T
+  --- @param ... table extensions
+  --- @return T
+  add = function(self, entity, ...)
+    Table.extend(entity, ...)
+    self._world:add(entity)
+    self._entities[entity] = true
+    -- if entity.position and entity.layer then
+    --   level.put(entity)
+    -- end
+    -- if entity.inventory then
+    --   Fun.iter(entity.inventory)
+    --     :each(function(slot, it) self:add(it) end)
+    -- end
+    Query(entity):on_add()
+    return entity
+  end,
+}
 state.mt = {__index = state_methods}
 
 --- @param systems table[]
@@ -13,6 +35,7 @@ state.new = function(systems)
     mode = require("engine.state.mode").new(),
 
     _world = Tiny.world(unpack(systems)),
+    _entities = {},
   }, state.mt)
 end
 

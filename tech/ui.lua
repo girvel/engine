@@ -1,6 +1,8 @@
 --- Immediate mode UI
 local ui = {}
 
+-- TODO learn about transforms
+
 -- TODO move to initialization
 local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 20)
 love.graphics.setFont(FONT)
