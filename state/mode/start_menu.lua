@@ -12,6 +12,9 @@ start_menu.new = function()
 end
 
 methods.draw_gui = function()
+  ui.font_size(48)
+
+  ui.rect(100, 100)
   local choice = ui.choice({
     "New game",
     "Load game",

@@ -15,6 +15,8 @@ Ldump.mark_module("engine.lib.grid", "const")
 
 Math = require("engine.lib.math")
 
+Memoize = require("engine.lib.memoize")
+
 require("engine.lib.string")
 
 Table = require("engine.lib.table")

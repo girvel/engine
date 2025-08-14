@@ -12,22 +12,24 @@ local model = {
     is_pressed = false,
   },
   mouse = {
-    position = Vector.zero,
+    x = 0,
+    y = 0,
     button_pressed = nil,
   },
   rect = {},
-  font = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 20),
+  font = nil --[[@as love.Font]],
+  line_h = nil --[[@as integer]],
 }
 
-model.line_h = math.floor(model.font:getHeight() * 1.25)
--- TODO move to initialization
-love.graphics.setFont(model.font)
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] UI elements
 ----------------------------------------------------------------------------------------------------
 
 ui.start = function()
+  ui.font_size()
+  ui.rect()
+
   model.selection.max_i = 0
   model.rect.x = 0
   model.rect.y = 0
@@ -51,6 +53,17 @@ ui.rect = function(x, y, w, h)
   model.rect.y = (y or 0) % love.graphics.getHeight() + PADDING
   model.rect.w = w or (love.graphics.getWidth() - model.rect.x) - PADDING
   model.rect.h = h or (love.graphics.getHeight() - model.rect.y) - PADDING
+end
+
+local font = Memoize(function(size)
+  return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
+end)
+
+--- @param size? integer
+ui.font_size = function(size)
+  model.font = font(size or 20)
+  model.line_h = math.floor(model.font:getHeight() * 1.25)
+  love.graphics.setFont(model.font)
 end
 
 local wrap = function(text)
@@ -88,8 +101,10 @@ ui.choice = function(options)
     end
 
     -- TODO cursor change
-    if model.mouse.position > V(0, model.line_h * (i - 1))
-      and model.mouse.position < V(model.font:getWidth(option), model.line_h * i)
+    if model.mouse.x > model.rect.x
+      and model.mouse.y > model.rect.y
+      and model.mouse.y <= model.rect.y + model.line_h
+      and model.mouse.x <= model.rect.x + model.font:getWidth(option)
     then
       model.selection.i = model.selection.max_i + i
       if model.mouse.button_pressed then
@@ -123,12 +138,17 @@ ui.handle_keypress = function(key)
 end
 
 ui.handle_mousemove = function(x, y)
-  model.mouse.position = V(x, y)
+  model.mouse.x = x
+  model.mouse.y = y
 end
 
 ui.handle_mousepress = function(button)
   model.mouse.button_pressed = button
 end
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Footer
+----------------------------------------------------------------------------------------------------
 
 -- TODO would it retain state on loading a save?
 Ldump.mark(ui, {}, ...)
