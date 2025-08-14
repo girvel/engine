@@ -4,20 +4,20 @@ return Tiny.processingSystem {
   codename = "drawing",
   base_callback = "draw",
   filter = function(_, entity)
-    return entity.sprite and entity.position and entity.view ~= "grids"
+    return entity.sprite and entity.position and not entity.layer
   end,
 
-  preProcess = function()
-    State.mode:draw_grid()
+  preProcess = function(self, dt)
+    State.mode:draw_grid(dt)
   end,
 
-  process = function(_, entity)
-    State.mode:draw_entity(entity)
+  process = function(_, entity, dt)
+    State.mode:draw_entity(entity, dt)
   end,
 
-  postProcess = function()
+  postProcess = function(dt)
     ui.start()
-    State.mode:draw_gui()
+    State.mode:draw_gui(dt)
     ui.finish()
   end,
 }

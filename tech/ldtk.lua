@@ -3,6 +3,7 @@ local ldtk = {}
 --- @class level_config
 --- @field grid_layers string[]
 --- @field grid_complex_layers table<string, boolean>
+--- @field cell_size integer
 
 ldtk.load = function(path)
   local module = require(path)
@@ -14,7 +15,7 @@ ldtk.load = function(path)
           image = love.graphics.newImage("engine/assets/sprites/moose_dude.png"),
         },
         layer = "solids",
-        position = V(64, 64),
+        position = V(4, 4),
         view = "grids",
       },
       {
@@ -22,7 +23,7 @@ ldtk.load = function(path)
           image = love.graphics.newImage("engine/assets/sprites/moose_dude.png"),
         },
         layer = "solids",
-        position = V(32, 32),
+        position = V(2, 2),
         view = "grids",
       },
     },

@@ -1,4 +1,7 @@
 require("engine.kernel.globals")
+love.graphics.setDefaultFilter("nearest", "nearest")
+love.audio.setDistanceModel("exponent")
+
 local state = require("engine.state")
 
 
@@ -14,6 +17,12 @@ for callback_name, _ in pairs(
     State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
     State._world:refresh()
   end
+end
+
+-- TODO love.run
+local inner_draw = love.draw
+love.draw = function()
+  inner_draw(love.timer.getDelta())
 end
 
 love.load = function()

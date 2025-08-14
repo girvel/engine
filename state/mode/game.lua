@@ -7,17 +7,38 @@ local methods = {}
 local mt = {__index = methods}
 
 game.new = function()
-  return setmetatable({
-    
-  }, mt)
+  return setmetatable({}, mt)
 end
 
-methods.draw_gui = function()
+methods.draw_gui = function(self, dt)
+  State.perspective:update(dt)
   ui.text("<game>")
 end
 
 methods.draw_entity = function(self, entity)
-  love.graphics.draw(entity.sprite.image, unpack(entity.position))
+  local current_view = State.perspective.views[entity.view]
+  local offset_position = current_view:apply(entity.position)
+
+  -- TODO entity shader
+  -- if entity.shader then
+  --   love.graphics.setShader(entity.shader.love_shader)
+  --   Query(entity.shader):preprocess(entity)
+  -- else
+  --   Query(State.shader):preprocess(entity)
+  -- end
+
+  -- TODO inventory
+  -- TODO text?
+
+  if entity.layer then
+    offset_position:mul_mut(State.level.cell_size)
+  end
+  local x, y = unpack(offset_position)
+  love.graphics.draw(entity.sprite.image, x, y, 0, current_view.scale)
+
+  -- if entity.shader then
+  --   love.graphics.setShader(-Query(State.shader).love_shader)
+  -- end
 end
 
 methods.draw_grid = function(self)

@@ -9,16 +9,16 @@ local STATES = {
 --- @class state_mode
 --- @field _mode table
 local methods = {
-  draw_gui = function(self)
-    return -Query(self._mode):draw_gui()
+  draw_gui = function(self, dt)
+    return -Query(self._mode):draw_gui(dt)
   end,
 
-  draw_entity = function(self, entity)
-    return -Query(self._mode):draw_entity(entity)
+  draw_entity = function(self, entity, dt)
+    return -Query(self._mode):draw_entity(entity, dt)
   end,
 
-  draw_grid = function(self, entity)
-    return -Query(self._mode):draw_grid(entity)
+  draw_grid = function(self, entity, dt)
+    return -Query(self._mode):draw_grid(entity, dt)
   end,
 
   start_game = function(self)

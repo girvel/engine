@@ -6,6 +6,7 @@ local state = {}
 
 --- @class state
 --- @field mode state_mode
+--- @field perspective state_perspective
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_config
@@ -25,9 +26,7 @@ local state_methods = {
     Table.extend(entity, ...)
     self._world:add(entity)
     self._entities[entity] = true
-    Log.trace(entity)
     if entity.position and entity.layer then
-      Log.trace(2)
       level.put(entity)
     end
     -- if entity.inventory then
@@ -81,6 +80,7 @@ state.mt = {__index = state_methods}
 state.new = function(systems)
   return setmetatable({
     mode = require("engine.state.mode").new(),
+    perspective = require("engine.state.perspective").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},

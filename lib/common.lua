@@ -1,3 +1,4 @@
+--- Module with uncategorized utility functions
 local common = {}
 
 common.resume_logged = function(coroutine_, ...)

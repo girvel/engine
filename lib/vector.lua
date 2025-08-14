@@ -1,6 +1,14 @@
 local vector = {}
 
 --- @class vector: number[]
+--- @field x number alias for `[1]`
+--- @field y number alias for `[2]`
+--- @field z number alias for `[3]`
+--- @field w number alias for `[4]`
+--- @field r number alias for `[1]`
+--- @field g number alias for `[2]`
+--- @field b number alias for `[3]`
+--- @field a number alias for `[4]`
 --- @operator add(vector): vector
 --- @operator sub(vector): vector
 --- @operator mul(number): vector
