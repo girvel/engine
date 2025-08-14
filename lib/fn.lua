@@ -14,10 +14,11 @@ fn.identity = function(...) return ... end
 fn.curry = function(f, ...)
   local curried_args = {...}
   return function(...)
+    local args = {unpack(curried_args)}
     for i = 1, select('#', ...) do
-      table.insert(curried_args, select(i, ...))
+      table.insert(args, select(i, ...))
     end
-    return f(unpack(curried_args))
+    return f(unpack(args))
   end
 end
 
