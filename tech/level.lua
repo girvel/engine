@@ -73,4 +73,5 @@ level.remove = function(entity)
   grid[entity.position] = nil
 end
 
-return Ldump.mark(level, {}, ...)
+Ldump.mark(level, {}, ...)
+return level

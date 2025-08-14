@@ -27,4 +27,5 @@ methods.draw_gui = function(self)
   end
 end
 
-return Ldump.mark(loading_screen, {}, ...)
+Ldump.mark(loading_screen, {}, ...)
+return loading_screen

@@ -31,4 +31,5 @@ ldtk.load = function(path)
   }
 end
 
-return Ldump.mark(ldtk, {}, ...)
+Ldump.mark(ldtk, {}, ...)
+return ldtk

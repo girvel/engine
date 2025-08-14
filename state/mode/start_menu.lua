@@ -8,9 +8,7 @@ local methods = {}
 local mt = {__index = methods}
 
 start_menu.new = function()
-  return setmetatable({
-    
-  }, mt)
+  return setmetatable({}, mt)
 end
 
 methods.draw_gui = function()
@@ -26,4 +24,5 @@ methods.draw_gui = function()
   end
 end
 
-return Ldump.mark(start_menu, {}, ...)
+Ldump.mark(start_menu, {}, ...)
+return start_menu

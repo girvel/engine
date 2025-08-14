@@ -87,4 +87,5 @@ state.new = function(systems)
   }, state.mt)
 end
 
-return Ldump.mark(state, {}, ...)
+Ldump.mark(state, {}, ...)
+return state

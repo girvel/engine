@@ -10,9 +10,13 @@ game.new = function()
   return setmetatable({}, mt)
 end
 
+local SIDEBAR_W = 320
+
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
-  ui.text("<game>")
+
+  ui.rect(-SIDEBAR_W, nil, nil, nil)
+  ui.text("<sidebar>")
 end
 
 methods.draw_entity = function(self, entity)
@@ -77,4 +81,5 @@ methods.draw_grid = function(self)
   end
 end
 
-return Ldump.mark(game, {}, ...)
+Ldump.mark(game, {}, ...)
+return game

@@ -28,4 +28,5 @@ methods.inverse = function(self, v)
   return (v - self.offset) / self.scale
 end
 
-return Ldump.mark(view, {}, ...)
+Ldump.mark(view, {}, ...)
+return view

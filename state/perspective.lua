@@ -50,4 +50,5 @@ offsets.camera = function(prev, dt)
   return Vector.zero
 end
 
-return Ldump.mark(perspective, {}, ...)
+Ldump.mark(perspective, {}, ...)
+return perspective

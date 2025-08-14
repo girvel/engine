@@ -17,10 +17,15 @@ local model = {
     position = Vector.zero,
     button_pressed = nil,
   },
+  rect = {},
 }
 
 ui.start = function()
   model.selection.max_i = 0
+  model.rect.x = 0
+  model.rect.y = 0
+  model.rect.w = love.graphics.getWidth()
+  model.rect.h = love.graphics.getHeight()
 end
 
 ui.finish = function()
@@ -28,9 +33,21 @@ ui.finish = function()
   model.mouse.button_pressed = nil
 end
 
+--- @param x? integer?
+--- @param y? integer?
+--- @param w? integer?
+--- @param h? integer?
+ui.rect = function(x, y, w, h)
+  model.rect.x = (x or 0) % love.graphics.getWidth()
+  model.rect.y = (y or 0) % love.graphics.getHeight()
+  model.rect.w = w or (love.graphics.getWidth() - model.rect.x)
+  model.rect.h = h or (love.graphics.getHeight() - model.rect.y)
+end
+
 --- @param text string
 ui.text = function(text)
-  love.graphics.print(text, 0, 0)
+  love.graphics.print(text, model.rect.x, model.rect.y)
+  model.rect.y = model.rect.y + 20
 end
 
 --- @param options string[]
@@ -56,7 +73,7 @@ ui.choice = function(options)
       is_selected = true
     end
 
-    love.graphics.print(option, 0, 20 * (i - 1))
+    ui.text(option)
   end
 
   model.selection.max_i = model.selection.max_i + #options
@@ -85,4 +102,5 @@ ui.handle_mousepress = function(button)
 end
 
 -- TODO would it retain state on loading a save?
-return Ldump.mark(ui, {}, ...)
+Ldump.mark(ui, {}, ...)
+return ui

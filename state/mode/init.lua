@@ -43,4 +43,5 @@ mode.new = function()
   }, mt)
 end
 
-return Ldump.mark(mode, {}, ...)
+Ldump.mark(mode, {}, ...)
+return mode
