@@ -13,6 +13,9 @@ local model = {
     max_i = 0,
     is_pressed = false,
   },
+  mouse = {
+    position = Vector.zero,
+  },
 }
 
 ui.start = function()
@@ -29,12 +32,20 @@ end
 ui.choice = function(options)
   local is_selected = false
   for i, option in ipairs(options) do
+    -- TODO cursor change
+    if model.mouse.position > V(0, 20 * (i - 1))
+      and model.mouse.position < V(FONT:getWidth(option), 20 * i)
+    then
+      model.selection.i = model.selection.max_i + i
+    end
+
     if model.selection.max_i + i == model.selection.i then
       is_selected = true
       option = "> " .. option
     else
       option = "  " .. option
     end
+
     love.graphics.print(option, 0, 20 * (i - 1))
   end
 
@@ -49,7 +60,7 @@ ui.finish = function()
   model.selection.is_pressed = false
 end
 
-ui.push_keypress = function(key)
+ui.handle_keypress = function(key)
   if key == "w" then
     model.selection.i = Math.loopmod(model.selection.i - 1, model.selection.max_i)
   elseif key == "s" then
@@ -59,4 +70,9 @@ ui.push_keypress = function(key)
   end
 end
 
+ui.handle_mousemove = function(x, y)
+  model.mouse.position = V(x, y)
+end
+
+-- TODO would it retain state on loading a save?
 return Ldump.mark(ui, {}, ...)

@@ -4,7 +4,8 @@ local entityx = {}
 --- @class base_entity
 --- @field name? string in-game name
 --- @field codename? string in-code name
---- @field position? vector
+--- @field view? string entity's coordinate system's (offset + scale) name
+--- @field position? vector position relative to the view
 --- @field size? vector
 --- @field layer? string name of the grid layer
 
