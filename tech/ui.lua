@@ -21,6 +21,11 @@ local model = {
   line_h = nil --[[@as integer]],
 }
 
+local CURSORS = {
+  normal = love.mouse.newCursor("engine/assets/sprites/cursor.png"),
+  hand = love.mouse.getSystemCursor("hand"),  -- TODO draw our own
+}
+
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] UI elements
@@ -29,6 +34,7 @@ local model = {
 ui.start = function()
   ui.font_size()
   ui.rect()
+  love.mouse.setCursor(CURSORS.normal)
 
   model.selection.max_i = 0
   model.rect.x = 0
@@ -114,6 +120,7 @@ ui.choice = function(options)
         return model.selection.i
       end
       is_selected = true
+      love.mouse.setCursor(CURSORS.hand)
       love.graphics.setColor(.7, .7, .7)
     end
 
