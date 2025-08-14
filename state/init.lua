@@ -1,3 +1,6 @@
+local ldtk = require("engine.tech.ldtk")
+
+
 local state = {}
 
 --- @class state
@@ -29,16 +32,28 @@ local state_methods = {
   --- @async
   --- @param path string
   load_level = function(self, path)
-    self:add {
-      sprite = {
-        image = love.graphics.newImage("engine/assets/sprites/moose_dude.png"),
-      },
-      position = V(64, 64),
-    }
-    local t = love.timer.getTime()
-    while love.timer.getTime() - t < 3 do
-      coroutine.yield()
+    Log.info("Loading level %s" % {path})
+    local start_time = love.timer.getTime()
+
+    local load_data = ldtk.load(path)
+    local read_time = love.timer.getTime()
+    Log.info("Read level files in %.2f s" % {read_time - start_time})
+
+    local BATCH_SIZE = 1024
+    for i, e in ipairs(load_data.entities) do
+      e = self:add(e)
+      if e.player_flag then self.player = e end
+      Query(e):on_load()
+
+      if i % BATCH_SIZE == 0 then
+        coroutine.yield()
+      end
     end
+
+    local end_time = love.timer.getTime()
+    Log.info("Added entities in %.2f s, total time %.2f s" % {
+      end_time - read_time, end_time - start_time,
+    })
   end,
 }
 state.mt = {__index = state_methods}

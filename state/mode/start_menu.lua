@@ -21,7 +21,6 @@ methods.draw_gui = function()
 
   if choice == 1 then
     State.mode:start_game()
-    Log.info("Start a new game")
   elseif choice == 2 then
     Log.info("Load a save")
   end

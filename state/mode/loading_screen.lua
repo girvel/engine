@@ -21,7 +21,7 @@ end
 methods.draw_gui = function(self)
   local t = love.timer.getTime()
   ui.text("." * (t % 4))
-  coroutine.resume(self._loading_coroutine)
+  Common.resume_logged(self._loading_coroutine)
   if coroutine.status(self._loading_coroutine) == "dead" then
     self._next_state()
   end

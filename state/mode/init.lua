@@ -18,13 +18,15 @@ local methods = {
   end,
 
   start_game = function(self)
+    Log.info("Starting new game...")
     self._mode = STATES.loading_screen.new(
-      coroutine.create(Fn.curry(State.load_level, State, nil)),
+      coroutine.create(Fn.curry(State.load_level, State, "levels.main")),
       Fn.curry(self.start_game_finish, self)
     )
   end,
 
   start_game_finish = function(self)
+    Log.info("Game started")
     self._mode = STATES.game.new()
   end,
 }
