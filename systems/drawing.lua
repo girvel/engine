@@ -6,7 +6,7 @@ return Tiny.processingSystem {
   filter = Tiny.requireAll("sprite", "position"),
 
   process = function(_, entity)
-    love.graphics.draw(entity.sprite.image, unpack(entity.position))
+    State.mode:draw_entity(entity)
   end,
 
   postProcess = function()

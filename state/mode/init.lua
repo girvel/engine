@@ -1,22 +1,31 @@
 local mode = {}
 
---- @enum (key) state_mode_name
 local STATES = {
-  state_menu = require("engine.state.mode.start_menu"),
+  start_menu = require("engine.state.mode.start_menu"),
   game = require("engine.state.mode.game"),
   loading_screen = require("engine.state.mode.loading_screen"),
 }
 
 --- @class state_mode
---- @field _mode state_mode_name
+--- @field _mode table
 local methods = {
   draw_gui = function(self)
-    return STATES[self._mode].draw_gui()
+    return -Query(self._mode):draw_gui()
   end,
 
-  --- @param mode state_mode_name
-  transition = function(self, mode)
-    self._mode = mode
+  draw_entity = function(self, entity)
+    return -Query(self._mode):draw_entity(entity)
+  end,
+
+  start_game = function(self)
+    self._mode = STATES.loading_screen.new(
+      coroutine.create(Fn.curry(State.load_level, State, nil)),
+      Fn.curry(self.start_game_finish, self)
+    )
+  end,
+
+  start_game_finish = function(self)
+    self._mode = STATES.game.new()
   end,
 }
 
@@ -24,7 +33,7 @@ local mt = {__index = methods}
 
 mode.new = function()
   return setmetatable({
-    _mode = "state_menu",
+    _mode = STATES.start_menu.new(),
   }, mt)
 end
 

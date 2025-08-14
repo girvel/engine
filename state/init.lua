@@ -26,6 +26,7 @@ local state_methods = {
     return entity
   end,
 
+  --- @async
   --- @param path string
   load_level = function(self, path)
     self:add {
@@ -34,6 +35,10 @@ local state_methods = {
       },
       position = V(64, 64),
     }
+    local t = love.timer.getTime()
+    while love.timer.getTime() - t < 3 do
+      coroutine.yield()
+    end
   end,
 }
 state.mt = {__index = state_methods}
