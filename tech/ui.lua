@@ -101,19 +101,27 @@ ui.choice = function(options)
     end
 
     -- TODO cursor change
-    if model.mouse.x > model.rect.x
+    local is_mouse_over = (
+      model.mouse.x > model.rect.x
       and model.mouse.y > model.rect.y
       and model.mouse.y <= model.rect.y + model.line_h
       and model.mouse.x <= model.rect.x + model.font:getWidth(option)
-    then
+    )
+
+    if is_mouse_over then
       model.selection.i = model.selection.max_i + i
       if model.mouse.button_pressed then
         return model.selection.i
       end
       is_selected = true
+      love.graphics.setColor(.7, .7, .7)
     end
 
     ui.text(option)
+
+    if is_mouse_over then
+      love.graphics.setColor(1, 1, 1)
+    end
   end
 
   model.selection.max_i = model.selection.max_i + #options
