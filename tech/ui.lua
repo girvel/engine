@@ -15,11 +15,17 @@ local model = {
   },
   mouse = {
     position = Vector.zero,
+    button_pressed = nil,
   },
 }
 
 ui.start = function()
   model.selection.max_i = 0
+end
+
+ui.finish = function()
+  model.selection.is_pressed = false
+  model.mouse.button_pressed = nil
 end
 
 --- @param text string
@@ -32,18 +38,22 @@ end
 ui.choice = function(options)
   local is_selected = false
   for i, option in ipairs(options) do
-    -- TODO cursor change
-    if model.mouse.position > V(0, 20 * (i - 1))
-      and model.mouse.position < V(FONT:getWidth(option), 20 * i)
-    then
-      model.selection.i = model.selection.max_i + i
-    end
-
     if model.selection.max_i + i == model.selection.i then
       is_selected = true
       option = "> " .. option
     else
       option = "  " .. option
+    end
+
+    -- TODO cursor change
+    if model.mouse.position > V(0, 20 * (i - 1))
+      and model.mouse.position < V(FONT:getWidth(option), 20 * i)
+    then
+      model.selection.i = model.selection.max_i + i
+      if model.mouse.button_pressed then
+        return model.selection.i
+      end
+      is_selected = true
     end
 
     love.graphics.print(option, 0, 20 * (i - 1))
@@ -54,10 +64,6 @@ ui.choice = function(options)
   if model.selection.is_pressed and is_selected then
     return model.selection.i
   end
-end
-
-ui.finish = function()
-  model.selection.is_pressed = false
 end
 
 ui.handle_keypress = function(key)
@@ -72,6 +78,10 @@ end
 
 ui.handle_mousemove = function(x, y)
   model.mouse.position = V(x, y)
+end
+
+ui.handle_mousepress = function(button)
+  model.mouse.button_pressed = button
 end
 
 -- TODO would it retain state on loading a save?
