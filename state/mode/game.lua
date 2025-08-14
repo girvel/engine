@@ -16,7 +16,10 @@ methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
 
   ui.rect(-SIDEBAR_W, nil, nil, nil)
-  ui.text("<sidebar>")
+  ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
+  ui.br()
+  ui.text("Inventory:")
+  ui.text(" - Swords: 3")
 end
 
 methods.draw_entity = function(self, entity)

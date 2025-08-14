@@ -1,11 +1,9 @@
 --- Immediate mode UI
 local ui = {}
 
--- TODO learn about transforms
-
--- TODO move to initialization
-local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 20)
-love.graphics.setFont(FONT)
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Internal state
+----------------------------------------------------------------------------------------------------
 
 local model = {
   selection = {
@@ -18,7 +16,16 @@ local model = {
     button_pressed = nil,
   },
   rect = {},
+  font = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 20),
 }
+
+model.line_h = math.floor(model.font:getHeight() * 1.25)
+-- TODO move to initialization
+love.graphics.setFont(model.font)
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] UI elements
+----------------------------------------------------------------------------------------------------
 
 ui.start = function()
   model.selection.max_i = 0
@@ -33,21 +40,39 @@ ui.finish = function()
   model.mouse.button_pressed = nil
 end
 
+local PADDING = 10
+
 --- @param x? integer?
 --- @param y? integer?
 --- @param w? integer?
 --- @param h? integer?
 ui.rect = function(x, y, w, h)
-  model.rect.x = (x or 0) % love.graphics.getWidth()
-  model.rect.y = (y or 0) % love.graphics.getHeight()
-  model.rect.w = w or (love.graphics.getWidth() - model.rect.x)
-  model.rect.h = h or (love.graphics.getHeight() - model.rect.y)
+  model.rect.x = (x or 0) % love.graphics.getWidth() + PADDING
+  model.rect.y = (y or 0) % love.graphics.getHeight() + PADDING
+  model.rect.w = w or (love.graphics.getWidth() - model.rect.x) - PADDING
+  model.rect.h = h or (love.graphics.getHeight() - model.rect.y) - PADDING
+end
+
+local wrap = function(text)
+  local result = {}
+  local chars_per_line = math.floor(model.rect.w / model.font:getWidth("w"))
+  local lines = math.ceil(text:utf_len() / chars_per_line)
+  for i = 0, lines - 1 do
+    table.insert(result, text:sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
+  end
+  return result
 end
 
 --- @param text string
 ui.text = function(text)
-  love.graphics.print(text, model.rect.x, model.rect.y)
-  model.rect.y = model.rect.y + 20
+  for _, line in ipairs(wrap(text)) do
+    love.graphics.print(line, model.rect.x, model.rect.y)
+    model.rect.y = model.rect.y + model.line_h
+  end
+end
+
+ui.br = function()
+  model.rect.y = model.rect.y + model.line_h
 end
 
 --- @param options string[]
@@ -63,8 +88,8 @@ ui.choice = function(options)
     end
 
     -- TODO cursor change
-    if model.mouse.position > V(0, 20 * (i - 1))
-      and model.mouse.position < V(FONT:getWidth(option), 20 * i)
+    if model.mouse.position > V(0, model.line_h * (i - 1))
+      and model.mouse.position < V(model.font:getWidth(option), model.line_h * i)
     then
       model.selection.i = model.selection.max_i + i
       if model.mouse.button_pressed then
@@ -82,6 +107,10 @@ ui.choice = function(options)
     return model.selection.i
   end
 end
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Event handlers
+----------------------------------------------------------------------------------------------------
 
 ui.handle_keypress = function(key)
   if key == "w" then
