@@ -17,6 +17,10 @@ local methods = {
     return -Query(self._mode):draw_entity(entity)
   end,
 
+  draw_grid = function(self, entity)
+    return -Query(self._mode):draw_grid(entity)
+  end,
+
   start_game = function(self)
     Log.info("Starting new game...")
     self._mode = STATES.loading_screen.new(

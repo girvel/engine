@@ -4,6 +4,8 @@ Ldump = require("engine.lib.ldump")
 
 Common = require("engine.lib.common")
 
+Entity = require("engine.lib.entity")
+
 Fn = require("engine.lib.fn")
 
 Fun = require("engine.lib.fun")

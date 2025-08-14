@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local ldtk = require("engine.tech.ldtk")
 
 
@@ -5,22 +6,30 @@ local state = {}
 
 --- @class state
 --- @field mode state_mode
+--- @field grids table<string, grid>
+--- @field grid_size vector
+--- @field level level_config
+--- @field player player
 --- @field _world table
 --- @field _entities table
 local state_methods = {
   --- Modifies entity
-  --- @generic T
+  --- @generic T: base_entity
   --- @param self state
   --- @param entity T
   --- @param ... table extensions
   --- @return T
   add = function(self, entity, ...)
+    --- @cast entity base_entity
+
     Table.extend(entity, ...)
     self._world:add(entity)
     self._entities[entity] = true
-    -- if entity.position and entity.layer then
-    --   level.put(entity)
-    -- end
+    Log.trace(entity)
+    if entity.position and entity.layer then
+      Log.trace(2)
+      level.put(entity)
+    end
     -- if entity.inventory then
     --   Fun.iter(entity.inventory)
     --     :each(function(slot, it) self:add(it) end)
@@ -38,6 +47,15 @@ local state_methods = {
     local load_data = ldtk.load(path)
     local read_time = love.timer.getTime()
     Log.info("Read level files in %.2f s" % {read_time - start_time})
+
+    self.level = load_data.config
+    self.grid_size = load_data.size
+    self.grids = Fun.iter(self.level.grid_layers)
+      :map(function(layer) return layer, Grid.new(
+        self.grid_size,
+        self.level.grid_complex_layers[layer] and function() return {} end or nil
+      ) end)
+      :tomap()
 
     local BATCH_SIZE = 1024
     for i, e in ipairs(load_data.entities) do

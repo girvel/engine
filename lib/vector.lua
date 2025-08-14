@@ -7,7 +7,7 @@ local vector = {}
 --- @operator div(number): vector
 --- @operator unm(): vector
 local vector_methods = {}
-vector.mt = {__index = vector_methods}
+vector.mt = {}
 
 --- @param ... number
 --- @return vector
@@ -118,7 +118,7 @@ vector.mt.__tostring = function(self)
     end
     result = result .. value
   end
-  return result
+  return result .. "}"
 end
 
 vector.mt.__le = function(self, other)
@@ -261,6 +261,35 @@ vector_methods.normalized = function(self)
   local abs = self:abs()
   if abs == 0 then return vector.fill(#self, function() return 0 end) end
   return self / abs
+end
+
+local SWIZZLE_BASES = {
+  {
+    x = 1,
+    y = 2,
+    z = 3,
+    w = 4,
+  },
+  {
+    r = 1,
+    g = 2,
+    b = 3,
+    a = 4,
+  },
+}
+
+vector.mt.__index = function(self, key)
+  local method = vector_methods[key]
+  if method then return method end
+
+  for _, base in ipairs(SWIZZLE_BASES) do
+    local index = base[key]
+    if index then
+      return self[index]
+    end
+  end
+
+  error(("No .%s in vector"):format(key))
 end
 
 return vector
