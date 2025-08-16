@@ -24,7 +24,7 @@ require("engine.lib.string")
 Table = require("engine.lib.table")
 
 Tiny = require("engine.lib.tiny")
--- TODO does it need a tiny_dump_patch?
+-- NEXT does it need a tiny_dump_patch?
 
 Vector = require("engine.lib.vector")
 V = Vector.new

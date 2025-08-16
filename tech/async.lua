@@ -2,7 +2,6 @@ local async = {}
 
 local LAG_THRESHOLD_SEC = .1
 
--- TODO should crash when non-debug
 async.resume = function(coroutine_, ...)
   local t = love.timer.getTime()
   local success, result = coroutine.resume(coroutine_, ...)

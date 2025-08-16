@@ -2,7 +2,7 @@ local ldtk = {}
 
 local parser_new
 
--- TODO types
+-- NEXT! types
 -- --- @class level_definition
 -- --- @field ldtk {path: string, level: string}
 -- --- @field palette table<string, table<string, function>>
@@ -76,7 +76,7 @@ parser_new = function()
           e.layer = layer_id
           e.view = "grids"
 
-          -- TODO entity captures (after rails)
+          -- NEXT entity captures (after rails)
           -- local rails_name = -Query(to_capture)[layer_id][result.position]
           -- if rails_name then
           --   captured_entities[rails_name] = result
@@ -120,7 +120,7 @@ parser_new = function()
           entity.layer = layer_id
           entity.view = "grids"
 
-          -- TODO capturing
+          -- NEXT capturing
 
           table.insert(this_parser._entities, entity)
         end

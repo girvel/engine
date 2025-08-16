@@ -164,6 +164,6 @@ end
 -- [SECTION] Footer
 ----------------------------------------------------------------------------------------------------
 
--- TODO would it retain state on loading a save?
+-- NEXT would it retain state on loading a save?
 Ldump.mark(ui, {}, ...)
 return ui

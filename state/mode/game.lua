@@ -31,7 +31,7 @@ methods.draw_entity = function(self, entity)
   local current_view = State.perspective.views[entity.view]
   local offset_position = current_view:apply(entity.position)
 
-  -- TODO entity shader
+  -- NEXT entity shader
   -- if entity.shader then
   --   love.graphics.setShader(entity.shader.love_shader)
   --   Query(entity.shader):preprocess(entity)
@@ -39,8 +39,8 @@ methods.draw_entity = function(self, entity)
   --   Query(State.shader):preprocess(entity)
   -- end
 
-  -- TODO inventory
-  -- TODO text?
+  -- NEXT inventory
+  -- NEXT text?
 
   if entity.layer then
     offset_position:mul_mut(State.level.cell_size)
@@ -62,8 +62,8 @@ end
 methods.draw_grid = function(self)
   local start = Vector.one
   local finish = State.level.grid_size
-  -- TODO mask
-  -- TODO background
+  -- NEXT mask
+  -- NEXT background
 
   for _, layer in ipairs(State.level.layers) do
     local grid = State.grids[layer]
@@ -74,11 +74,11 @@ methods.draw_grid = function(self)
 
     for x = start.x, finish.x do
       for y = start.y, finish.y do
-        -- TODO mask apply
+        -- NEXT mask apply
         local e = grid:fast_get(x, y)
         if not e then goto continue end
 
-        -- TODO tcod
+        -- NEXT tcod
         -- local is_hidden_by_perspective = (
         --   not snapshot:is_transparent_unsafe(x, y)
         --   and e.perspective_flag

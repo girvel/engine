@@ -17,13 +17,13 @@ for callback_name, _ in pairs(
   end, {})
 ) do
   love[callback_name] = function(...)
-    -- TODO debug system
+    -- NEXT debug system
     State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
     State._world:refresh()
   end
 end
 
--- TODO love.run
+-- NEXT love.run
 local inner_draw = love.draw
 love.draw = function()
   inner_draw(love.timer.getDelta())
