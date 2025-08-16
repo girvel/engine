@@ -7,7 +7,7 @@ return Tiny.processingSystem {
     return entity.sprite and entity.position and not entity.layer
   end,
 
-  preProcess = function(self, dt)
+  preProcess = function(_, dt)
     State.mode:draw_grid(dt)
   end,
 
@@ -15,7 +15,7 @@ return Tiny.processingSystem {
     State.mode:draw_entity(entity, dt)
   end,
 
-  postProcess = function(dt)
+  postProcess = function(_, dt)
     ui.start()
     State.mode:draw_gui(dt)
     ui.finish()

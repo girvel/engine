@@ -45,7 +45,12 @@ end
 
 methods.draw_entity = function(self, entity)
   local current_view = State.perspective.views[entity.view]
-  local offset_position = current_view:apply(entity.position)
+  local offset_position = entity.position
+  if entity.layer then
+    offset_position = offset_position * State.level.cell_size
+  end
+  offset_position = current_view:apply(offset_position)
+  local x, y = unpack(offset_position)
 
   -- NEXT entity shader
   -- if entity.shader then
@@ -57,11 +62,6 @@ methods.draw_entity = function(self, entity)
 
   -- NEXT inventory
   -- NEXT text?
-
-  if entity.layer then
-    offset_position:mul_mut(State.level.cell_size)
-  end
-  local x, y = unpack(offset_position)
 
   local sprite = entity.sprite
   if sprite.type == "image" then
