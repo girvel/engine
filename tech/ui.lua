@@ -1,4 +1,4 @@
---- Immediate mode UI
+--- Immediate mode UI module
 local ui = {}
 
 ----------------------------------------------------------------------------------------------------
@@ -19,6 +19,7 @@ local model = {
   rect = {},
   font = nil --[[@as love.Font]],
   line_h = nil --[[@as integer]],
+  pressed_keys = {},
 }
 
 local CURSORS = {
@@ -46,10 +47,12 @@ end
 ui.finish = function()
   model.selection.is_pressed = false
   model.mouse.button_pressed = nil
+  model.pressed_keys = {}
 end
 
 local PADDING = 10
 
+--- Define draw region
 --- @param x? integer?
 --- @param y? integer?
 --- @param w? integer?
@@ -137,17 +140,23 @@ ui.choice = function(options)
   end
 end
 
+ui.keyboard = function(key)
+  return Table.contains(model.pressed_keys, key)
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Event handlers
 ----------------------------------------------------------------------------------------------------
 
 ui.handle_keypress = function(key)
-  if key == "w" then
+  if key == "up" then
     model.selection.i = Math.loopmod(model.selection.i - 1, model.selection.max_i)
-  elseif key == "s" then
+  elseif key == "down" then
     model.selection.i = Math.loopmod(model.selection.i + 1, model.selection.max_i)
   elseif key == "return" then
     model.selection.is_pressed = true
+  else
+    table.insert(model.pressed_keys, key)
   end
 end
 

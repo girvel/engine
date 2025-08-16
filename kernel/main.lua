@@ -2,6 +2,7 @@
 require("engine.kernel.globals")
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
+love.keyboard.setKeyRepeat(true)
 
 
 -- imports --

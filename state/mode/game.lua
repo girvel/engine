@@ -1,4 +1,5 @@
 local ui = require("engine.tech.ui")
+local level = require("engine.tech.level")
 
 local game = {}
 
@@ -21,10 +22,25 @@ methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
 
   ui.rect(-SIDEBAR_W, nil, nil, nil)
-  ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
-  ui.br()
-  ui.text("Inventory:")
-  ui.text(" - Swords: 3")
+    local player = State.player
+
+    -- NEXT (when actions) limit speed
+    for key, direction in pairs {
+      w = Vector.up,
+      a = Vector.left,
+      s = Vector.down,
+      d = Vector.right,
+    } do
+      if ui.keyboard(key) then
+        level.safe_move(player, player.position + direction)
+      end
+    end
+
+    ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
+    ui.br()
+    ui.text("Inventory:")
+    ui.text(" - Swords: 3")
+  ui.rect()
 end
 
 methods.draw_entity = function(self, entity)
