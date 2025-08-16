@@ -10,7 +10,6 @@ local parser_new
 -- 
 -- --- @class level_config
 -- --- @field grid_layers string[]
--- --- @field grid_complex_layers table<string, boolean>
 -- --- @field cell_size integer
 -- 
 -- --- @class level_info

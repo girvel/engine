@@ -75,24 +75,17 @@ methods.draw_grid = function(self)
     for x = start.x, finish.x do
       for y = start.y, finish.y do
         -- TODO mask apply
-        local cell = grid:fast_get(x, y)
-        if not cell then goto continue end
+        local e = grid:fast_get(x, y)
+        if not e then goto continue end
 
-        -- TODO consider complex layers
-        -- if not State.level.grid_complex_layers[layer] then
-        --   cell = {cell}
-        -- end
-
-        -- for _, e in ipairs(cell) do
-          -- TODO tcod
-          -- local is_hidden_by_perspective = (
-          --   not snapshot:is_transparent_unsafe(x, y)
-          --   and e.perspective_flag
-          --   and e.position[2] > State.player.position[2]
-          -- )
-          -- if not is_hidden_by_perspective then
-            self:draw_entity(cell)
-          -- end
+        -- TODO tcod
+        -- local is_hidden_by_perspective = (
+        --   not snapshot:is_transparent_unsafe(x, y)
+        --   and e.perspective_flag
+        --   and e.position[2] > State.player.position[2]
+        -- )
+        -- if not is_hidden_by_perspective then
+          self:draw_entity(e)
         -- end
 
         ::continue::
