@@ -35,6 +35,12 @@ local get_identifier = function(node)
   return node.__identifier:lower()
 end
 
+local get_field = function(instance, field_name)
+  return Fun.iter(instance.fieldInstances)
+    :filter(function(f) return get_identifier(f) == field_name end)
+    :nth(1)
+end
+
 parser_new = function()
   return {
     _entities = {},
@@ -50,23 +56,25 @@ parser_new = function()
         local layer_id = get_identifier(layer)
         local layer_palette = palette[layer_id]
 
-        table.insert(this_parser._level_info.layers, layer_id)
+        if not Table.contains(this_parser._level_info.layers, layer_id) then
+          table.insert(this_parser._level_info.layers, layer_id)
+        end
+
         this_parser._level_info.atlases[layer_id] = assert(
           layer_palette.ATLAS_IMAGE,
-          "Palette for atlas-containing layer %s doesn't have .ATLAS_IMAGE" % {layer_id}
+          "Palette for tile layer %q doesn't have .ATLAS_IMAGE" % {layer_id}
         )
 
         for _, instance in ipairs(layer.gridTiles) do
           local factory = assert(
             layer_palette[instance.t + 1],
-            "Entity factory %s is not defined for layer %s" % {instance.t + 1, layer_id}
+            "Entity factory %q is not defined for tile layer %q" % {instance.t + 1, layer_id}
           )
 
-          local e = Table.extend(factory(), {
-            position = Vector.own(instance.px) / this_parser._level_info.cell_size + Vector.one,
-            layer = layer_id,
-            view = "grids",
-          })
+          local e = factory()
+          e.position = Vector.own(instance.px) / this_parser._level_info.cell_size + Vector.one
+          e.layer = layer_id
+          e.view = "grids"
 
           -- TODO entity captures (after rails)
           -- local rails_name = -Query(to_capture)[layer_id][result.position]
@@ -76,12 +84,54 @@ parser_new = function()
           table.insert(this_parser._entities, e)
         end
       end,
+
+      entities = function(this_parser, layer, palette)
+        local layer_id, layer_palette do
+          local raw = get_identifier(layer)
+          local POSTFIX = "_entities"
+          assert(
+            raw:ends_with(POSTFIX),
+            "Entity layer name %s should end with %q" % {raw, POSTFIX}
+          )
+          layer_id = raw:sub(1, #raw - #POSTFIX)
+
+          layer_palette = palette[raw]
+        end
+
+        if not Table.contains(this_parser._level_info.layers, layer_id) then
+          table.insert(this_parser._level_info.layers, layer_id)
+        end
+
+        for _, instance in ipairs(layer.entityInstances) do
+          local codename = get_identifier(instance)
+          local factory = assert(
+            layer_palette[codename],
+            "Entity factory %q is not defined for factory layer %q" % {codename, layer_id}
+          )
+
+          local args_expression = get_field(instance, "args")
+          local entity if args_expression then
+            entity = factory(assert(loadstring("return " .. args_expression.__value)))
+          else
+            entity = factory()
+          end
+
+          entity.position = Vector.own(instance.__grid) + Vector.one
+          entity.layer = layer_id
+          entity.view = "grids"
+
+          -- TODO capturing
+
+          table.insert(this_parser._entities, entity)
+        end
+      end,
     },
 
     parse = function(self, raw, palette, cell_size)
       self._level_info.cell_size = cell_size
       self._level_info.grid_size = V(raw.pxWid, raw.pxHei) / self._level_info.cell_size
-      for _, layer in ipairs(raw.layerInstances) do
+      for i = #raw.layerInstances, 1, -1 do
+        local layer = raw.layerInstances[i]
         self._handlers[layer.__type:utf_lower()](self, layer, palette)
       end
       return {
