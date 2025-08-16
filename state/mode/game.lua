@@ -76,8 +76,16 @@ methods.draw_entity = function(self, entity)
 end
 
 methods.draw_grid = function(self)
-  local start = Vector.one
-  local finish = State.level.grid_size
+  local start, finish do
+    local view = State.perspective.views.grids
+    start = -(view.offset / view.scale / State.level.cell_size):map(math.ceil)
+    finish = start + (
+      V(love.graphics.getDimensions()) / view.scale / State.level.cell_size
+    ):map(math.ceil)
+
+    start = Vector.use(Math.median, Vector.one, start, State.level.grid_size)
+    finish = Vector.use(Math.median, Vector.one, finish, State.level.grid_size)
+  end
   -- NEXT mask
   -- NEXT background
 
