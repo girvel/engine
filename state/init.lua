@@ -1,5 +1,6 @@
 local level = require("engine.tech.level")
 local ldtk = require("engine.tech.ldtk")
+local tcod = require("engine.tech.tcod")
 
 
 local state = {}
@@ -53,6 +54,11 @@ local state_methods = {
     self.grids = Fun.iter(self.level.layers)
       :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
       :tomap()
+
+    self.grids.solids = tcod.observer(assert(
+      self.grids.solids,
+      "Missing \"solids\" layer; required for FOV and pathing to work"
+    ))
 
     local BATCH_SIZE = 1024
     for i, e in ipairs(load_data.entities) do

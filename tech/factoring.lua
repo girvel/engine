@@ -34,7 +34,7 @@ get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w
   local x = (index - 1) * cell_size
   return love.graphics.newQuad(
-    Log.trace(x % w, math.floor(x / w) * cell_size, cell_size, cell_size, atlas_w, atlas_h)
+    x % w, math.floor(x / w) * cell_size, cell_size, cell_size, atlas_w, atlas_h
   )
 end
 

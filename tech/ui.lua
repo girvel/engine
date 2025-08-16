@@ -173,6 +173,5 @@ end
 -- [SECTION] Footer
 ----------------------------------------------------------------------------------------------------
 
--- NEXT would it retain state on loading a save?
-Ldump.mark(ui, {}, ...)
+-- NOTICE no Ldump.mark, the module is never serialized
 return ui

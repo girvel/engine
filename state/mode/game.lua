@@ -1,5 +1,6 @@
 local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
+local tcod  = require("engine.tech.tcod")
 
 local game = {}
 
@@ -86,7 +87,14 @@ methods.draw_grid = function(self)
     start = Vector.use(Math.median, Vector.one, start, State.level.grid_size)
     finish = Vector.use(Math.median, Vector.one, finish, State.level.grid_size)
   end
-  -- NEXT mask
+
+  local snapshot = tcod.snapshot(State.grids.solids)
+  if State.player.fov_r == 0 then
+    self:draw_entity(State.player)
+    return
+  end
+  snapshot:refresh_fov(State.player.position, State.player.fov_r)
+
   -- NEXT background
 
   for _, layer in ipairs(State.level.layers) do
@@ -98,20 +106,19 @@ methods.draw_grid = function(self)
 
     for x = start.x, finish.x do
       for y = start.y, finish.y do
-        -- NEXT mask apply
+        if not snapshot:is_visible_unsafe(x, y) then goto continue end
+
         local e = grid:fast_get(x, y)
         if not e then goto continue end
 
-        -- NEXT tcod
-        -- local is_hidden_by_perspective = (
-        --   not snapshot:is_transparent_unsafe(x, y)
-        --   and e.perspective_flag
-        --   and e.position[2] > State.player.position[2]
-        -- )
-        -- if not is_hidden_by_perspective then
-          self:draw_entity(e)
-        -- end
+        local is_hidden_by_perspective = (
+          not snapshot:is_transparent_unsafe(x, y)
+          and e.perspective_flag
+          and e.position.y > State.player.position.y
+        )
+        if is_hidden_by_perspective then goto continue end
 
+        self:draw_entity(e)
         ::continue::
       end
     end
