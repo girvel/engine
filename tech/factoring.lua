@@ -31,10 +31,10 @@ factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
 end
 
 get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
-  local w = atlas_w / cell_size
-  index = index - 1
+  local w = atlas_w
+  local x = (index - 1) * cell_size
   return love.graphics.newQuad(
-    index % w, math.floor(index / w), cell_size, cell_size, atlas_w, atlas_h
+    x % w, math.floor(x / w), cell_size, cell_size, atlas_w, atlas_h
   )
 end
 
