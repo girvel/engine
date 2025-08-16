@@ -8,6 +8,9 @@ return {
   -- love.mousepressed
   require("engine.systems.ui_mousepressed"),
 
+  -- love.update
+  require("engine.systems.acting"),
+
   -- love.draw
   require("engine.systems.drawing"),
 }

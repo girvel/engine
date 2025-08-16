@@ -24,7 +24,7 @@ ffi_fix.load = function(name)
     if ok then return result end
   end
 
-  -- NEXT! russian characters in path
+  -- TODO russian characters in path
 end
 
 Ldump.mark(ffi_fix, {}, ...)

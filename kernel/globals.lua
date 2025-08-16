@@ -19,6 +19,8 @@ Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")
 
+Random = require("engine.lib.random")
+
 require("engine.lib.string")
 
 Table = require("engine.lib.table")
