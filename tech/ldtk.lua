@@ -1,27 +1,27 @@
+--- LDtk level parsing
 local ldtk = {}
 
 local parser_new
 
--- NEXT! types
--- --- @class level_definition
--- --- @field ldtk {path: string, level: string}
--- --- @field palette table<string, table<string, function>>
--- --- @field config level_config
--- 
--- --- @class level_config
--- --- @field grid_layers string[]
--- --- @field cell_size integer
--- 
--- --- @class level_info
--- --- @field config level_config
--- --- @field size vector
--- --- @field atlas_layers string[]
--- 
--- --- @param path string
--- --- @return {level_info: level_info, entities: base_entity[]}
+--- Level's init.lua return
+--- @class level_definition
+--- @field ldtk {path: string, level: string}
+--- @field palette table<string, table<string, function>>
+--- @field cell_size integer
 
+--- General information about the level
+--- @class level_info
+--- @field layers string[] grid layers in order
+--- @field atlases table<string, love.Image> atlas images for each layer that uses them
+--- @field cell_size integer size of a single grid cell in pixels before scaling
+--- @field grid_size vector
+
+--- Read LDtk level file
+--- @async
+--- @param path string
+--- @return {level_info: level_info, entities: base_entity[]}
 ldtk.load = function(path)
-  -- --- @type level_definition
+  --- @type level_definition
   local level_module = require(path)
 
   local raw = Fun.iter(Json.decode(love.filesystem.read(level_module.ldtk.path)).levels)
