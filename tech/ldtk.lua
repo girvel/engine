@@ -28,7 +28,7 @@ ldtk.load = function(path)
     :filter(function(l) return l.identifier == level_module.ldtk.level end)
     :nth(1)
 
-  return parser_new():parse(raw, level_module.palette)
+  return parser_new():parse(raw, level_module.palette, level_module.cell_size)
 end
 
 local get_identifier = function(node)
@@ -41,8 +41,8 @@ parser_new = function()
     _level_info = {
       layers = {},
       atlases = {},
-      cell_size = nil,
       grid_size = nil,
+      cell_size = nil,
     },
 
     _handlers = {
@@ -59,7 +59,7 @@ parser_new = function()
         for _, instance in ipairs(layer.gridTiles) do
           local factory = assert(
             layer_palette[instance.t + 1],
-            "Entity factory %s is not defined for layer %s" % {instance.t, layer_id}
+            "Entity factory %s is not defined for layer %s" % {instance.t + 1, layer_id}
           )
 
           local e = Table.extend(factory(), {
@@ -78,8 +78,8 @@ parser_new = function()
       end,
     },
 
-    parse = function(self, raw, palette)
-      self._level_info.cell_size = raw.layerInstances[1].__gridSize
+    parse = function(self, raw, palette, cell_size)
+      self._level_info.cell_size = cell_size
       self._level_info.grid_size = V(raw.pxWid, raw.pxHei) / self._level_info.cell_size
       for _, layer in ipairs(raw.layerInstances) do
         self._handlers[layer.__type:utf_lower()](self, layer, palette)

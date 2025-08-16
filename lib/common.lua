@@ -1,6 +1,7 @@
 --- Module with uncategorized utility functions
 local common = {}
 
+-- TODO should crash when non-debug
 -- TODO logs => -> tech.coroutine
 common.resume_logged = function(coroutine_, ...)
   local t = love.timer.getTime()
