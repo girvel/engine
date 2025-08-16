@@ -4,9 +4,9 @@ local factoring = {}
 local get_atlas_quad
 
 --- @param atlas_path string
---- @param codenames string[]
+--- @param codenames (string | boolean)[]
 --- @param mixin? fun(string): table
---- @return {[string | integer]: table}
+--- @return {[string | integer]: function}
 factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
   local result = {ATLAS_IMAGE = love.graphics.newImage(atlas_path)}
   local w, h = result.ATLAS_IMAGE:getDimensions()
@@ -34,7 +34,7 @@ get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w
   local x = (index - 1) * cell_size
   return love.graphics.newQuad(
-    x % w, math.floor(x / w), cell_size, cell_size, atlas_w, atlas_h
+    Log.trace(x % w, math.floor(x / w) * cell_size, cell_size, cell_size, atlas_w, atlas_h)
   )
 end
 

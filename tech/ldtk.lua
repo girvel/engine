@@ -6,7 +6,7 @@ local parser_new
 --- Level's init.lua return
 --- @class level_definition
 --- @field ldtk {path: string, level: string}
---- @field palette table<string, table<string, function>>
+--- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
 
 --- General information about the level
