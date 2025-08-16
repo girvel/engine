@@ -9,7 +9,7 @@ local state = {}
 --- @field perspective state_perspective
 --- @field grids table<string, grid>
 --- @field grid_size vector
---- @field level level_config
+--- @field level level_info
 --- @field player player
 --- @field _world table
 --- @field _entities table
@@ -47,13 +47,11 @@ local state_methods = {
     local read_time = love.timer.getTime()
     Log.info("Read level files in %.2f s" % {read_time - start_time})
 
-    self.level = load_data.config
-    self.grid_size = load_data.size
-    self.grids = Fun.iter(self.level.grid_layers)
-      :map(function(layer) return layer, Grid.new(
-        self.grid_size,
-        self.level.grid_complex_layers[layer] and function() return {} end or nil
-      ) end)
+    self.level = load_data.level_info
+    Log.info("State.level is", self.level)
+
+    self.grids = Fun.iter(self.level.layers)
+      :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
       :tomap()
 
     local BATCH_SIZE = 1024

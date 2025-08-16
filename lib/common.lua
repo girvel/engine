@@ -1,6 +1,7 @@
 --- Module with uncategorized utility functions
 local common = {}
 
+-- TODO logs => -> tech.coroutine
 common.resume_logged = function(coroutine_, ...)
   local t = love.timer.getTime()
   local success, result = coroutine.resume(coroutine_, ...)

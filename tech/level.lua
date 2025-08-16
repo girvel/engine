@@ -9,7 +9,6 @@ local level = {}
 --- @return nil
 level.move = function(entity, position)
   assert(entity.position, "Can not move an entity without the current position")
-  assert(not State.level.grid_complex_layers[entity.layer], "entities in complex layers are immovable")
 
   local grid = State.grids[entity.layer]
   if grid[position] then
@@ -49,11 +48,6 @@ end
 level.put = function(entity)
   local grid = assert(State.grids[entity.layer], "Invalid layer %s" % entity.layer)
 
-  if State.level.grid_complex_layers[entity.layer] then
-    table.insert(grid[entity.position], entity)
-    return
-  end
-
   if grid[entity.position] then
     Log.warn("Grid collision at %s[%s]: %s replaces %s" % {
       entity.layer, entity.position, Entity.name(entity), Entity.name(grid[entity.position])
@@ -66,11 +60,7 @@ end
 --- @param entity grid_positioned
 --- @return nil
 level.remove = function(entity)
-  local grid = State.grids[entity.layer]
-  if State.level.grid_complex_layers[entity.layer] then
-    return Table.remove(grid[entity.position], entity)
-  end
-  grid[entity.position] = nil
+  State.grids[entity.layer][entity.position] = nil
 end
 
 Ldump.mark(level, {}, ...)

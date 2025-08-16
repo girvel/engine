@@ -3,11 +3,16 @@ local ui = require("engine.tech.ui")
 local game = {}
 
 --- @class state_mode_game
+--- @field _sprite_batches table<string, love.SpriteBatch>
 local methods = {}
 local mt = {__index = methods}
 
 game.new = function()
-  return setmetatable({}, mt)
+  return setmetatable({
+    _sprite_batches = Fun.iter(State.level.atlases)
+      :map(function(layer, base_image) return layer, love.graphics.newSpriteBatch(base_image) end)
+      :tomap(),
+  }, mt)
 end
 
 local SIDEBAR_W = 320
@@ -41,7 +46,13 @@ methods.draw_entity = function(self, entity)
     offset_position:mul_mut(State.level.cell_size)
   end
   local x, y = unpack(offset_position)
-  love.graphics.draw(entity.sprite.image, x, y, 0, current_view.scale)
+
+  local sprite = entity.sprite
+  if sprite.type == "image" then
+    love.graphics.draw(entity.sprite.image, x, y, 0, current_view.scale)
+  elseif sprite.type == "atlas" then
+    self._sprite_batches[entity.layer]:add(sprite.quad, x, y, 0, current_view.scale)
+  end
 
   -- if entity.shader then
   --   love.graphics.setShader(-Query(State.shader).love_shader)
@@ -50,23 +61,29 @@ end
 
 methods.draw_grid = function(self)
   local start = Vector.one
-  local finish = State.grid_size
+  local finish = State.level.grid_size
   -- TODO mask
   -- TODO background
 
-  for _, layer in ipairs(State.level.grid_layers) do
+  for _, layer in ipairs(State.level.layers) do
     local grid = State.grids[layer]
+    local sprite_batch = self._sprite_batches[layer]
+    if sprite_batch then
+      sprite_batch:clear()
+    end
+
     for x = start.x, finish.x do
       for y = start.y, finish.y do
         -- TODO mask apply
         local cell = grid:fast_get(x, y)
         if not cell then goto continue end
 
-        if not State.level.grid_complex_layers[layer] then
-          cell = {cell}
-        end
+        -- TODO consider complex layers
+        -- if not State.level.grid_complex_layers[layer] then
+        --   cell = {cell}
+        -- end
 
-        for _, e in ipairs(cell) do
+        -- for _, e in ipairs(cell) do
           -- TODO tcod
           -- local is_hidden_by_perspective = (
           --   not snapshot:is_transparent_unsafe(x, y)
@@ -74,12 +91,16 @@ methods.draw_grid = function(self)
           --   and e.position[2] > State.player.position[2]
           -- )
           -- if not is_hidden_by_perspective then
-            self:draw_entity(e)
+            self:draw_entity(cell)
           -- end
-        end
+        -- end
 
         ::continue::
       end
+    end
+
+    if sprite_batch then
+      love.graphics.draw(sprite_batch)
     end
   end
 end

@@ -13,6 +13,8 @@ Fun = require("engine.lib.fun")
 Grid = require("engine.lib.grid")
 Ldump.mark_module("engine.lib.grid", "const")
 
+Json = require("engine.lib.json")
+
 Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")

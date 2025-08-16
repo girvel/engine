@@ -26,6 +26,7 @@ local VENDOR_LIBS = {
   "inspect",
   "tiny",
   "memoize",
+  "json",
 }
 
 local FALLEN_TOTAL = 12482
