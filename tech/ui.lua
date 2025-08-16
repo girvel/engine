@@ -23,7 +23,7 @@ local model = {
 
 local CURSORS = {
   normal = love.mouse.newCursor("engine/assets/sprites/cursor.png"),
-  hand = love.mouse.getSystemCursor("hand"),  -- TODO draw our own
+  hand = love.mouse.getSystemCursor("hand"),
 }
 
 
@@ -106,7 +106,6 @@ ui.choice = function(options)
       option = "  " .. option
     end
 
-    -- TODO cursor change
     local is_mouse_over = (
       model.mouse.x > model.rect.x
       and model.mouse.y > model.rect.y

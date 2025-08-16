@@ -1,0 +1,42 @@
+--- Module for simplifying palette creation
+local factoring = {}
+
+local get_atlas_quad
+
+--- @param atlas_path string
+--- @param codenames string[]
+--- @param mixin? fun(string): table
+--- @return {[string | integer]: table}
+factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
+  local result = {ATLAS_IMAGE = love.graphics.newImage(atlas_path)}
+  local w, h = result.ATLAS_IMAGE:getDimensions()
+  for i, codename in ipairs(codenames) do
+    if not codename then goto continue end
+    local current_mixin = mixin and mixin(codename) or {}
+    local factory = function()
+      return Table.extend({
+        codename = codename,
+        sprite = {
+          type = "atlas",
+          quad = get_atlas_quad(i, cell_size, w, h),
+        }
+      }, current_mixin)
+    end
+
+    result[i] = factory
+    result[codename] = factory
+    ::continue::
+  end
+  return result
+end
+
+get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
+  local w = atlas_w / cell_size
+  index = index - 1
+  return love.graphics.newQuad(
+    index % w, math.floor(index / w), cell_size, cell_size, atlas_w, atlas_h
+  )
+end
+
+Ldump.mark(factoring, {}, ...)
+return factoring
