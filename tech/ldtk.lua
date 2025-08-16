@@ -130,10 +130,15 @@ parser_new = function()
     parse = function(self, raw, palette, cell_size)
       self._level_info.cell_size = cell_size
       self._level_info.grid_size = V(raw.pxWid, raw.pxHei) / self._level_info.cell_size
+
       for i = #raw.layerInstances, 1, -1 do
         local layer = raw.layerInstances[i]
         self._handlers[layer.__type:utf_lower()](self, layer, palette)
+        if i ~= 1 then
+          coroutine.yield()
+        end
       end
+
       return {
         entities = self._entities,
         level_info = self._level_info,
