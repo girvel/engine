@@ -1,3 +1,4 @@
+local async = require("engine.tech.async")
 local ui = require("engine.tech.ui")
 
 
@@ -21,7 +22,7 @@ end
 methods.draw_gui = function(self)
   local t = love.timer.getTime()
   ui.text("." * (t % 4))
-  Common.resume_logged(self._loading_coroutine)
+  async.resume(self._loading_coroutine)
   if coroutine.status(self._loading_coroutine) == "dead" then
     self._next_state()
   end
