@@ -10,6 +10,7 @@ return {
 
   -- love.update
   require("engine.systems.acting"),
+  require("engine.systems.animation"),
 
   -- love.draw
   require("engine.systems.drawing"),

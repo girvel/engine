@@ -19,6 +19,9 @@ Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")
 
+Promise = require("engine.lib.promise")
+Ldump.mark_module("engine.lib.promise", "const")
+
 Random = require("engine.lib.random")
 
 require("engine.lib.string")
