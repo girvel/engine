@@ -109,7 +109,7 @@ methods.draw_entity = function(self, entity, dt)
   end
 end
 
-methods.draw_grid = function(self)
+methods.draw_grid = function(self, dt)
   local start, finish do
     local view = State.perspective.views.grids
     start = -(view.offset / view.scale / State.level.cell_size):map(math.ceil)
@@ -123,7 +123,7 @@ methods.draw_grid = function(self)
 
   local snapshot = tcod.snapshot(State.grids.solids)
   if State.player.fov_r == 0 then
-    self:draw_entity(State.player)
+    self:draw_entity(State.player, dt)
     return
   end
   snapshot:refresh_fov(State.player.position, State.player.fov_r)
@@ -151,7 +151,7 @@ methods.draw_grid = function(self)
         )
         if is_hidden_by_perspective then goto continue end
 
-        self:draw_entity(e)
+        self:draw_entity(e, dt)
         ::continue::
       end
     end

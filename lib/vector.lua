@@ -114,6 +114,13 @@ vector.mt.__div = function(self, other)
   return self:copy():div_mut(other)
 end
 
+vector.mt.__mod = function(self, other)
+  if type(self) == "number" then
+    self, other = other, self
+  end
+  return self:copy():mod_mut(other)
+end
+
 vector.mt.__unm = function(self)
   return vector.new(unpack(self)):unm_mut()
 end
@@ -203,6 +210,17 @@ end
 vector_methods.div_mut = function(self, other)
   for i = 1, #self do
     self[i] = self[i] / other
+  end
+  return self
+end
+
+--- @generic T
+--- @param self T
+--- @param other number
+--- @return T
+vector_methods.mod_mut = function(self, other)
+  for i = 1, #self do
+    self[i] = self[i] % other
   end
   return self
 end
