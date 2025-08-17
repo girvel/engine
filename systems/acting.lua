@@ -18,7 +18,7 @@ return Tiny.processingSystem {
   end,
 
   _process_inside_combat = function(self, entity, dt)
-    -- NEXT! timeout
+    -- NEXT! timeout (when implementing AIs/putting safety in)
     local current = State.combat:get_current()
     local ai = entity.ai
 
@@ -36,7 +36,7 @@ return Tiny.processingSystem {
       end
       State.combat:_pass_turn()
       Log.info("%s's turn" % {State.combat:get_current()})
-      -- NEXT! reset timeout
+      -- NEXT! reset timeout (when implementing AIs/putting safety in)
       -- NEXT FX and SFX for player's turn
     end
   end,
