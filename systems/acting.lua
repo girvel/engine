@@ -43,13 +43,19 @@ return Tiny.processingSystem {
 
   _process_outside_combat = function(self, entity, dt)
     local ai = entity.ai
+    if not ai.run then return end
 
-    if not ai._run_coroutine or coroutine.status(ai._run_coroutine) == "dead" then
+    if not ai._run_coroutine then
       ai._run_coroutine = coroutine.create(ai.run)
     end
 
-    if entity.ai.run then
-      entity.ai.run(entity, dt)
+    async.resume(ai._run_coroutine, entity, dt)
+
+    if coroutine.status(ai._run_coroutine) == "dead" then
+      ai._run_coroutine = nil
+      if entity.rest then
+        entity:rest("free")
+      end
     end
   end,
 }

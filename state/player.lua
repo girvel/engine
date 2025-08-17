@@ -14,11 +14,12 @@ player.base = function()
       next_action = nil,
       finish_turn = nil,
       run = function(entity, _)
-        while State.combat and not entity.ai.finish_turn do
+        while true do
           if entity.ai.next_action then
             entity.ai.next_action:run(entity)
             entity.ai.next_action = nil
           end
+          if not State.combat or entity.ai.finish_turn then break end
           coroutine.yield()
         end
         entity.ai.finish_turn = false

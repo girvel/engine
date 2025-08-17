@@ -44,27 +44,29 @@ methods.draw_gui = function(self, dt)
     end
 
     ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
+
     ui.br()
+    local max = player:get_resources("full")
+    local RESOURCE_DISPLAY_ORDER = {
+      "actions", "bonus_actions", "reactions", "movement", "hit_dice",
+    }
+
+    ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
+      :filter(function(key)
+        return player.resources[key] and (State.combat or key ~= "movement")
+      end)
+      :map(function(key)
+        return {translation.resources[key], player.resources[key] .. "/" .. max[key]}
+      end)
+      :totable())
 
     if State.combat then
+      ui.br()
       ui.text("Combat:")
       for i, entity in ipairs(State.combat.list) do
         local prefix = State.combat.current_i == i and "x " or "- "
         ui.text(prefix .. Entity.name(entity))
       end
-
-      ui.br()
-      local max = player:get_resources("full")
-      local RESOURCE_DISPLAY_ORDER = {
-        "actions", "bonus_actions", "reactions", "movement", "hit_dice",
-      }
-
-      ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
-        :filter(function(key) return player.resources[key] end)
-        :map(function(key)
-          return {translation.resources[key], player.resources[key] .. "/" .. max[key]}
-        end)
-        :totable())
     end
   ui.rect()
 end
