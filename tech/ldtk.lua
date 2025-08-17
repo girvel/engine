@@ -24,9 +24,7 @@ ldtk.load = function(path)
   --- @type level_definition
   local level_module = require(path)
 
-  local raw = Fun.iter(Json.decode(love.filesystem.read(level_module.ldtk.path)).levels)
-    :filter(function(l) return l.identifier == level_module.ldtk.level end)
-    :nth(1)
+  local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
 
   return parser_new():parse(raw, level_module.palette, level_module.cell_size)
 end
@@ -52,7 +50,7 @@ parser_new = function()
     },
 
     _handlers = {
-      tiles = function(this_parser, layer, palette)
+      tiles = function(this_parser, layer, palette, offset)
         local layer_id = get_identifier(layer)
         local layer_palette = palette[layer_id]
 
@@ -72,7 +70,10 @@ parser_new = function()
           )
 
           local e = factory()
-          e.position = Vector.own(instance.px) / this_parser._level_info.cell_size + Vector.one
+          e.position = Vector.own(instance.px)
+            :div_mut(this_parser._level_info.cell_size)
+            :add_mut(Vector.one)
+            :add_mut(offset)
           e.layer = layer_id
           e.view = "grids"
 
@@ -85,7 +86,7 @@ parser_new = function()
         end
       end,
 
-      entities = function(this_parser, layer, palette)
+      entities = function(this_parser, layer, palette, offset)
         local layer_id, layer_palette do
           local raw = get_identifier(layer)
           local POSTFIX = "_entities"
@@ -116,7 +117,9 @@ parser_new = function()
             entity = factory()
           end
 
-          entity.position = Vector.own(instance.__grid) + Vector.one
+          entity.position = Vector.own(instance.__grid)
+            :add_mut(Vector.one)
+            :add_mut(offset)
           entity.layer = layer_id
           entity.view = "grids"
 
@@ -129,13 +132,19 @@ parser_new = function()
 
     parse = function(self, raw, palette, cell_size)
       self._level_info.cell_size = cell_size
-      self._level_info.grid_size = V(raw.pxWid, raw.pxHei) / self._level_info.cell_size
+      self._level_info.grid_size = Vector.zero
 
-      for i = #raw.layerInstances, 1, -1 do
-        local layer = raw.layerInstances[i]
-        self._handlers[layer.__type:utf_lower()](self, layer, palette)
-        if i ~= 1 then
-          coroutine.yield()
+      for _, level in ipairs(raw) do
+        local offset = V(level.worldX, level.worldY) / cell_size
+        local end_point = offset + V(level.pxWid, level.pxHei) / cell_size
+        self._level_info.grid_size = Vector.use(math.max, self._level_info.grid_size, end_point)
+
+        for i = #level.layerInstances, 1, -1 do
+          local layer = level.layerInstances[i]
+          self._handlers[layer.__type:utf_lower()](self, layer, palette, offset)
+          if i ~= 1 then
+            coroutine.yield()
+          end
         end
       end
 
