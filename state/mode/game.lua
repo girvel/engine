@@ -73,7 +73,7 @@ methods.draw_gui = function(self, dt)
   ui.rect()
 end
 
-methods.draw_entity = function(self, entity)
+methods.draw_entity = function(self, entity, dt)
   local current_view = State.perspective.views[entity.view]
   local offset_position = entity.position
   if entity.layer then
@@ -92,7 +92,7 @@ methods.draw_entity = function(self, entity)
     love.graphics.setCanvas(self._temp_canvas)
     love.graphics.clear()
     if entity.shader.preprocess then
-      entity.shader:preprocess(entity)
+      entity.shader:preprocess(entity, dt)
     end
   end
 
