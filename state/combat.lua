@@ -21,7 +21,7 @@ methods.get_current = function(self)
   return self.list[self.current_i]
 end
 
-methods.pass_turn = function(self)
+methods._pass_turn = function(self)
   self.current_i = Math.loopmod(self.current_i + 1, #self.list)
 end
 

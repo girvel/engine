@@ -26,7 +26,7 @@ return Tiny.processingSystem {
     async.resume(ai._run_coroutine, entity, dt)
     if coroutine.status(ai._run_coroutine) == "dead" then
       ai._run_coroutine = nil
-      State.combat:pass_turn()
+      State.combat:_pass_turn()
       Log.info("%s's turn" % {State.combat:get_current()})
       -- NEXT! reset timeout
       -- NEXT FX and SFX for player's turn
