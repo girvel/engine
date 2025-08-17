@@ -2,6 +2,7 @@ local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
 local tcod  = require("engine.tech.tcod")
 local base_actions = require("engine.mech.base_actions")
+local translation  = require("engine.tech.translation")
 
 local game = {}
 
@@ -47,6 +48,11 @@ methods.draw_gui = function(self, dt)
         local prefix = State.combat.current_i == i and "x " or "- "
         ui.text(prefix .. Entity.name(entity))
       end
+
+      ui.br()
+      ui.table({"Ресурсы", ""}, Fun.iter(player.resources)
+        :map(function(name, amount) return {translation.resources[name], amount} end)
+        :totable())
     end
   ui.rect()
 end

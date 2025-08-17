@@ -94,7 +94,42 @@ ui.text = function(text)
 end
 
 ui.br = function()
-  model.rect.y = model.rect.y + model.line_h
+  ui.text(" ")
+end
+
+--- @param headers string[]
+--- @param content any[][]
+ui.table = function(headers, content)
+  for y, row in ipairs(content) do
+    for x, value in ipairs(row) do
+      content[y][x] = tostring(value)
+    end
+  end
+
+  local column_sizes = Fun.range(#headers)
+    :map(function(x)
+      return math.max(
+        headers[x]:utf_len(),
+        #content == 0 and 0 or Fun.range(#content)
+          :map(function(y) return content[y][x]:utf_len() end)
+          :max())
+    end)
+    :totable()
+
+  ui.text(Fun.iter(headers)
+    :enumerate()
+    :map(function(x, h) return h .. " " * (column_sizes[x] - h:utf_len()) .. "  " end)
+    :reduce(Fun.op.concat, ""))
+
+  ui.text("-" * (Fun.iter(column_sizes):sum() + 2 * #column_sizes - 2))
+
+  for _, row in ipairs(content) do
+    ui.text(Fun.iter(row)
+      :enumerate()
+      :map(function(x, v) return "  " .. v .. "  " * (column_sizes[x] - v:utf_len()) end)
+      :reduce(Fun.op.concat, "")
+      :sub(3))
+  end
 end
 
 --- @param options string[]

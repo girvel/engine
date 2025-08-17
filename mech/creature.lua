@@ -4,7 +4,7 @@ creature.new = function()
   return {
     resources = {
       movement = 6,
-    }
+    },
   }
 end
 
