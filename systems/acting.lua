@@ -1,4 +1,9 @@
 local async = require "engine.tech.async"
+
+
+--- @class ai
+--- @field run fun(base_entity, number): boolean?
+
 return Tiny.processingSystem {
   codename = "acting",
   base_callback = "update",
@@ -26,6 +31,9 @@ return Tiny.processingSystem {
     async.resume(ai._run_coroutine, entity, dt)
     if coroutine.status(ai._run_coroutine) == "dead" then
       ai._run_coroutine = nil
+      if current.rest then
+        current:rest("move")
+      end
       State.combat:_pass_turn()
       Log.info("%s's turn" % {State.combat:get_current()})
       -- NEXT! reset timeout

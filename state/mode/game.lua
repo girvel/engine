@@ -1,7 +1,7 @@
 local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
 local tcod  = require("engine.tech.tcod")
-local base_actions = require("engine.mech.base_actions")
+local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
 
 local game = {}
@@ -35,8 +35,12 @@ methods.draw_gui = function(self, dt)
       d = Vector.right,
     } do
       if ui.keyboard(key) then
-        player.ai.next_action = base_actions.move(direction)
+        player.ai.next_action = actions.move(direction)
       end
+    end
+
+    if ui.keyboard("space") then
+      player.ai.finish_turn = true
     end
 
     ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
@@ -50,8 +54,16 @@ methods.draw_gui = function(self, dt)
       end
 
       ui.br()
-      ui.table({"Ресурсы", ""}, Fun.iter(player.resources)
-        :map(function(name, amount) return {translation.resources[name], amount} end)
+      local max = player:get_resources("full")
+      local RESOURCE_DISPLAY_ORDER = {
+        "actions", "bonus_actions", "reactions", "movement", "hit_dice",
+      }
+
+      ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
+        :filter(function(key) return player.resources[key] end)
+        :map(function(key)
+          return {translation.resources[key], player.resources[key] .. "/" .. max[key]}
+        end)
         :totable())
     end
   ui.rect()

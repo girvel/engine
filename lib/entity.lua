@@ -8,6 +8,7 @@ local entityx = {}
 --- @field position? vector position relative to the view
 --- @field size? vector
 --- @field layer? string name of the grid layer
+--- @field ai? ai
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision

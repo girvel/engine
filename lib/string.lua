@@ -7,10 +7,14 @@ local utf8 = require("utf8")
 --- @param b? integer defaults to the length of the string
 --- @return string
 string.utf_sub = function(str, a, b)
-  if not b then
-    b = string.utf_len(str)
+  local utf_len = str:utf_len()
+  if a > utf_len then
+    a = utf_len
+  end
+  if not b or b > utf_len then
+    b = utf_len
   elseif b < 1 then
-    b = b + string.utf_len(str) + 1
+    b = b + utf_len + 1
   end
   return str:sub(utf8.offset(str, a), utf8.offset(str, b + 1) - 1)
 end

@@ -80,7 +80,7 @@ local wrap = function(text)
   local chars_per_line = math.floor(model.rect.w / model.font:getWidth("w"))
   local lines = math.ceil(text:utf_len() / chars_per_line)
   for i = 0, lines - 1 do
-    table.insert(result, text:sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
+    table.insert(result, text:utf_sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
   end
   return result
 end
@@ -126,9 +126,9 @@ ui.table = function(headers, content)
   for _, row in ipairs(content) do
     ui.text(Fun.iter(row)
       :enumerate()
-      :map(function(x, v) return "  " .. v .. "  " * (column_sizes[x] - v:utf_len()) end)
+      :map(function(x, v) return "  " .. v .. " " * (column_sizes[x] - v:utf_len()) end)
       :reduce(Fun.op.concat, "")
-      :sub(3))
+      :utf_sub(3))
   end
 end
 
@@ -175,6 +175,7 @@ ui.choice = function(options)
   end
 end
 
+--- @param key love.KeyConstant
 ui.keyboard = function(key)
   return Table.contains(model.pressed_keys, key)
 end

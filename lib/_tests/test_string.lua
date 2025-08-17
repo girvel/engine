@@ -15,6 +15,10 @@ describe("lib.string", function()
     it("handles negative last argument", function()
       assert.equal("ет, ми", string.utf_sub("Привет, мир!", 5, -3))
     end)
+
+    it("handles indices too large", function()
+      assert.equal("", string.utf_sub("Привет, мир!", 99, 199))
+    end)
   end)
 
   describe("utf_len", function()

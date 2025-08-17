@@ -1,4 +1,5 @@
 local combat = {}
+-- NEXT rename to round_robin
 
 --- @class state_combat
 --- @field list base_entity[]
@@ -9,7 +10,6 @@ local mt = {__index = methods}
 --- @param list base_entity[]
 --- @return state_combat
 combat.new = function(list)
-  -- NEXT! consider combat turn?
   assert(Fun.iter(list):all(function(e) return State:exists(e) end))
   return setmetatable({
     list = list,

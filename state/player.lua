@@ -1,6 +1,9 @@
 local creature = require "engine.mech.creature"
 local player = {}
 
+--- @class base_player: creature
+--- @field fov_r integer
+
 player.base = function()
   return Table.extend(creature.new(), {
     codename = "player",
@@ -18,6 +21,7 @@ player.base = function()
           end
           coroutine.yield()
         end
+        entity.ai.finish_turn = false
       end,
     },
   })
