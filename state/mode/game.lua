@@ -1,6 +1,7 @@
 local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
 local tcod  = require("engine.tech.tcod")
+local base_actions = require("engine.mech.base_actions")
 
 local game = {}
 
@@ -33,7 +34,7 @@ methods.draw_gui = function(self, dt)
       d = Vector.right,
     } do
       if ui.keyboard(key) then
-        level.safe_move(player, player.position + direction)
+        player.ai.next_action = base_actions.move(direction)
       end
     end
 
