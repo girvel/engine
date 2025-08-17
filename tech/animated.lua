@@ -81,7 +81,7 @@ load_pack = Memoize(function(folder_path)
     ::continue::
   end
 
-  return Log.trace(result)
+  return result
 end)
 
 Ldump.mark(animated, {}, ...)

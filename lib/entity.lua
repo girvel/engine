@@ -14,6 +14,7 @@ local entityx = {}
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision
 --- @field perspective_flag? true marks entities that could be seen only from below
+--- @field low_flag? true disable reflections TODO move it somewhere, it's not part of engine logic
 
 --- Check is given position over the entity's hitbox
 --- @param position vector

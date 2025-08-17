@@ -83,11 +83,6 @@ methods.draw_entity = function(self, entity, dt)
   local x, y = unpack(offset_position)
 
   if entity.shader then
-    assert(
-      entity.sprite.type ~= "atlas",
-      "Local shaders can't run with atlas-based sprite of %s" % {Entity.codename(entity)}
-    )
-
     love.graphics.setShader(entity.shader.love_shader)
     love.graphics.setCanvas(self._temp_canvas)
     love.graphics.clear()
@@ -101,7 +96,7 @@ methods.draw_entity = function(self, entity, dt)
   -- NEXT text?
 
   local sprite = entity.sprite
-  if sprite.type == "image" then
+  if sprite.type == "image" or (sprite.type == "atlas" and entity.shader) then
     love.graphics.draw(entity.sprite.image, x, y, 0, current_view.scale)
   elseif sprite.type == "atlas" then
     self._sprite_batches[entity.layer]:add(sprite.quad, x, y, 0, current_view.scale)

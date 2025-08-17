@@ -1,7 +1,6 @@
+local sprite = require "engine.tech.sprite"
 --- Module for simplifying palette creation
 local factoring = {}
-
-local get_atlas_quad
 
 --- @param atlas_path string
 --- @param codenames (string | boolean)[]
@@ -16,10 +15,7 @@ factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
     local factory = function()
       return Table.extend({
         codename = codename,
-        sprite = {
-          type = "atlas",
-          quad = get_atlas_quad(i, cell_size, w, h),
-        }
+        sprite = sprite.from_atlas(i, cell_size, result.ATLAS_IMAGE),
       }, current_mixin)
     end
 
@@ -28,14 +24,6 @@ factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
     ::continue::
   end
   return result
-end
-
-get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
-  local w = atlas_w
-  local x = (index - 1) * cell_size
-  return love.graphics.newQuad(
-    x % w, math.floor(x / w) * cell_size, cell_size, cell_size, atlas_w, atlas_h
-  )
 end
 
 Ldump.mark(factoring, {}, ...)
