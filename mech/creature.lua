@@ -20,7 +20,7 @@ end
 methods.get_resources = function(self, rest_type)
   if rest_type == "free" then
     return {
-      movement = 6,  -- NEXT race-dependent?
+      movement = 6,
       bonus_actions = 1,
     }
   end
@@ -30,7 +30,7 @@ methods.get_resources = function(self, rest_type)
       actions = 1,
       bonus_actions = 1,
       reactions = 1,
-      movement = 6,  -- NEXT race-dependent?
+      movement = 6,
     }
   end
 

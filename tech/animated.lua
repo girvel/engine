@@ -1,4 +1,6 @@
-local sprite = require "engine.tech.sprite"
+local sprite = require("engine.tech.sprite")
+
+
 local animated = {}
 
 --- @class animated_mixin
@@ -56,6 +58,7 @@ methods.animation_set_paused = function(self, value)
   -- NEXT pause items (inventory)
 end
 
+-- NEXT atlas animations (when direction)
 load_pack = Memoize(function(folder_path)
   local info = love.filesystem.getInfo(folder_path)
   assert(info, "No folder %q, unable to load animation" % {folder_path})
