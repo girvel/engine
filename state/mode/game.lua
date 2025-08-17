@@ -8,6 +8,7 @@ local game = {}
 
 --- @class state_mode_game
 --- @field _sprite_batches table<string, love.SpriteBatch>
+--- @field _temp_canvas love.Canvas
 local methods = {}
 local mt = {__index = methods}
 
@@ -16,6 +17,7 @@ game.new = function()
     _sprite_batches = Fun.iter(State.level.atlases)
       :map(function(layer, base_image) return layer, love.graphics.newSpriteBatch(base_image) end)
       :tomap(),
+    _temp_canvas = love.graphics.newCanvas(),
   }, mt)
 end
 
@@ -80,14 +82,21 @@ methods.draw_entity = function(self, entity)
   offset_position = current_view:apply(offset_position)
   local x, y = unpack(offset_position)
 
-  -- NEXT entity shader
-  -- if entity.shader then
-  --   love.graphics.setShader(entity.shader.love_shader)
-  --   Query(entity.shader):preprocess(entity)
-  -- else
-  --   Query(State.shader):preprocess(entity)
-  -- end
+  if entity.shader then
+    assert(
+      entity.sprite.type ~= "atlas",
+      "Local shaders can't run with atlas-based sprite of %s" % {Entity.codename(entity)}
+    )
 
+    love.graphics.setShader(entity.shader.love_shader)
+    love.graphics.setCanvas(self._temp_canvas)
+    love.graphics.clear()
+    if entity.shader.preprocess then
+      entity.shader:preprocess(entity)
+    end
+  end
+
+  -- NEXT global shader
   -- NEXT inventory
   -- NEXT text?
 
@@ -98,9 +107,11 @@ methods.draw_entity = function(self, entity)
     self._sprite_batches[entity.layer]:add(sprite.quad, x, y, 0, current_view.scale)
   end
 
-  -- if entity.shader then
-  --   love.graphics.setShader(-Query(State.shader).love_shader)
-  -- end
+  if entity.shader then
+    love.graphics.setCanvas()
+    love.graphics.setShader()
+    love.graphics.draw(self._temp_canvas)
+  end
 end
 
 methods.draw_grid = function(self)
