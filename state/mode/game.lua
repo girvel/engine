@@ -39,8 +39,14 @@ methods.draw_gui = function(self, dt)
 
     ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
     ui.br()
-    ui.text("Inventory:")
-    ui.text(" - Swords: 3")
+
+    if State.combat then
+      ui.text("Combat:")
+      for i, entity in ipairs(State.combat.list) do
+        local prefix = State.combat.current_i == i and "x " or "- "
+        ui.text(prefix .. Entity.name(entity))
+      end
+    end
   ui.rect()
 end
 

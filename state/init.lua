@@ -8,6 +8,7 @@ local state = {}
 --- @class state
 --- @field mode state_mode
 --- @field perspective state_perspective
+--- @field combat state_combat?
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_info
@@ -36,6 +37,10 @@ local state_methods = {
     -- end
     Query(entity):on_add()
     return entity
+  end,
+
+  exists = function(self, entity)
+    return self._entities[entity]
   end,
 
   --- @async
