@@ -23,7 +23,7 @@ local model = {
   },
 
   frame = {},
-  center = {},
+  alignment = {},
   font = {},
   padding = {},
 }
@@ -52,7 +52,7 @@ ui.start = function()
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
   }}
-  model.center = {false}
+  model.alignment = {"normal"}
   model.font = {get_font(20)}
   model.padding = {10}
 end
@@ -81,9 +81,13 @@ ui.start_frame = function(x, y, w, h)
   end
   if not w then
     w = prev.w - x
+  elseif w < 0 then
+    w = prev.w + w
   end
   if not h then
     h = prev.h - y
+  elseif h < 0 then
+    h = prev.h + h
   end
   table.insert(model.frame, {
     x = prev.x + x,
@@ -106,13 +110,13 @@ ui.finish_padding = function()
   table.remove(model.padding)
 end
 
---- @param value boolean
-ui.start_center = function(value)
-  table.insert(model.center, value)
+--- @param value "normal"|"center_x"|"center_y"|"center"
+ui.start_alignment = function(value)
+  table.insert(model.alignment, value)
 end
 
-ui.finish_center = function()
-  table.remove(model.center)
+ui.finish_alignment = function()
+  table.remove(model.alignment)
 end
 
 --- @param size? integer
@@ -146,14 +150,20 @@ ui.text = function(text)
   local frame = Table.last(model.frame)
   local padding = Table.last(model.padding)
   local font = Table.last(model.font)
-  local center = Table.last(model.center)
+  local alignment = Table.last(model.alignment)
 
-  for _, line in ipairs(wrap(text)) do
+  local wrapped = wrap(text)
+
+  for i, line in ipairs(wrapped) do
     local dx = 0
-    if center then
+    local dy = 0
+    if alignment == "center_x" or alignment == "center" then
       dx = (frame.w - font:getWidth(line)) / 2 - padding
     end
-    love.graphics.print(line, frame.x + dx + padding, frame.y + padding)
+    if alignment == "center_y" or alignment == "center" then
+      dy = (frame.h - font:getHeight() * #wrapped) / 2 - padding + font:getHeight() * (i - 1)
+    end
+    love.graphics.print(line, frame.x + dx + padding, frame.y + dy + padding)
     frame.y = frame.y + font:getHeight() * 1.25
   end
 end
@@ -260,6 +270,11 @@ ui.tile = function(path)
   batch:add(quads[9], end_x, end_y)
 
   love.graphics.draw(batch, frame.x, frame.y, 0, SCALE)
+end
+
+ui.offset = function(y)
+  local frame = Table.last(model.frame)
+  frame.y = frame.y + y
 end
 
 --- @param options string[]

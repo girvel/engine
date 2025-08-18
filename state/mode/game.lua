@@ -1,5 +1,4 @@
 local ui = require("engine.tech.ui")
-local level = require("engine.tech.level")
 local tcod  = require("engine.tech.tcod")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
@@ -23,6 +22,7 @@ end
 
 local SIDEBAR_W = 320
 local PADDING = 40
+local HP_BAR_H = 13 * 4
 
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
@@ -33,9 +33,23 @@ methods.draw_gui = function(self, dt)
 
     local player = State.player
 
-    ui.start_frame(PADDING, PADDING, SIDEBAR_W, 13 * 4)
-      ui.tile("engine/assets/sprites/hp_bar.png")
+    ui.start_frame(PADDING, PADDING, SIDEBAR_W, HP_BAR_H + 8)
+      ui.tile("engine/assets/sprites/hp_bg.png")
+      ui.start_frame(8, 8, -16, -16)
+        ui.tile("engine/assets/sprites/hp_bar.png")
+        ui.start_alignment("center")
+        ui.start_padding(0)
+        ui.start_font(32)
+          ui.text("%s/%s" % {player.hp, player:get_max_hp()})
+        ui.finish_font()
+        ui.finish_padding()
+        ui.finish_alignment()
+      ui.finish_frame()
     ui.finish_frame()
+
+    ui.offset(HP_BAR_H)
+    ui.br()
+    ui.br()
 
     -- NEXT (when actions) limit speed
     for key, direction in pairs {
