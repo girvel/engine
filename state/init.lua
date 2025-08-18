@@ -72,7 +72,7 @@ local state_methods = {
       Query(e):on_load()
 
       if i % BATCH_SIZE == 0 then
-        coroutine.yield()
+        coroutine.yield(.5 + .5 * (i / #load_data.entities))
       end
     end
 

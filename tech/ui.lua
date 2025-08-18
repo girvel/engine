@@ -17,6 +17,7 @@ local model = {
     button_pressed = nil,
   },
   rect = {},
+  center = false,
   font = nil --[[@as love.Font]],
   line_h = nil --[[@as integer]],
   pressed_keys = {},
@@ -64,6 +65,11 @@ ui.rect = function(x, y, w, h)
   model.rect.h = h or (love.graphics.getHeight() - model.rect.y) - PADDING
 end
 
+--- @param value boolean
+ui.center = function(value)
+  model.center = value
+end
+
 local font = Memoize(function(size)
   return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
 end)
@@ -88,7 +94,11 @@ end
 --- @param text string
 ui.text = function(text)
   for _, line in ipairs(wrap(text)) do
-    love.graphics.print(line, model.rect.x, model.rect.y)
+    local dx = 0
+    if model.center then
+      dx = (model.rect.w - model.font:getWidth(line)) / 2
+    end
+    love.graphics.print(line, model.rect.x + dx, model.rect.y)
     model.rect.y = model.rect.y + model.line_h
   end
 end

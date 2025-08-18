@@ -134,7 +134,10 @@ parser_new = function()
       self._level_info.cell_size = cell_size
       self._level_info.grid_size = Vector.zero
 
-      for _, level in ipairs(raw) do
+      local total_layers = Fun.iter(raw):map(function(l) return #l.layerInstances end):sum()
+      local average_layers = total_layers / #raw
+
+      for j, level in ipairs(raw) do
         local offset = V(level.worldX, level.worldY) / cell_size
         local end_point = offset + V(level.pxWid, level.pxHei) / cell_size
         self._level_info.grid_size = Vector.use(math.max, self._level_info.grid_size, end_point)
@@ -143,7 +146,7 @@ parser_new = function()
           local layer = level.layerInstances[i]
           self._handlers[layer.__type:utf_lower()](self, layer, palette, offset)
           if i ~= 1 then
-            coroutine.yield()
+            coroutine.yield(.5 * (j * average_layers - i) / total_layers)
           end
         end
       end

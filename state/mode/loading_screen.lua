@@ -19,10 +19,22 @@ loading_screen.new = function(loading_coroutine, next_state)
   }, mt)
 end
 
+local INDICATOR_LENGTH = 20
+
 methods.draw_gui = function(self)
-  local t = love.timer.getTime()
-  ui.text("." * (t % 4))
-  async.resume(self._loading_coroutine)
+  local status_bar do
+    local progress = math.floor((async.resume(self._loading_coroutine) or 1) * INDICATOR_LENGTH)
+    local done = ">" * progress
+    local remaining = "-" * (INDICATOR_LENGTH - progress)
+    status_bar = "[" .. done .. remaining .. "]"
+  end
+
+  ui.center(true)
+  ui.rect(nil, love.graphics.getHeight() * 4 / 5)
+  ui.text(status_bar)
+  ui.rect()
+  ui.center(false)
+
   if coroutine.status(self._loading_coroutine) == "dead" then
     self._next_state()
   end
