@@ -1,13 +1,17 @@
 local shaders = {}
 
-local water_love_shader = Memoize(function(palette_path)
-  local result = love.graphics.newShader [[
-    uniform vec4 palette[39];
+--- @class shader
+--- @field love_shader love.Shader
+--- @field preprocess? fun(shader, base_entity)
+
+local water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
+  local result = love.graphics.newShader(Log.trace([[
+    uniform vec4 palette[%s];
 
     vec4 match(vec4 color) {
       float min_distance = 1;
       vec4 closest_color;
-      for (int i = 0; i < 39; i++) {
+      for (int i = 0; i < %s; i++) {
           vec4 current_color = palette[i];
           float distance = (
               pow(current_color.r - color.r, 2) +
@@ -29,24 +33,23 @@ local water_love_shader = Memoize(function(palette_path)
 
     vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     {
+      vec2 reflection_coords = texture_coords;
+      reflection_coords.y = 1 - reflection_coords.y;
+
       texture_coords = mod(texture_coords - offset, 1);
       vec4 it = Texel(tex, texture_coords);
       if (!reflects) return it;
-      texture_coords.y = 1 - texture_coords.y;
-      vec4 it2 = Texel(reflection, texture_coords);
+      vec4 it2 = Texel(reflection, reflection_coords);
       if (it2.a == 0) return it;
       return match((it + it2) / 2.5);
     }
-  ]]
+  ]] % {palette_real_colors_n, palette_real_colors_n}))
 
   do
     local palette = {}
     local palette_image_data = love.image.newImageData(palette_path)
-    local w, h = palette_image_data:getDimensions()
-    for x = 0, w - 1 do
-      for y = 0, h - 1 do
-        table.insert(palette, {palette_image_data:getPixel(x, y)})
-      end
+    for x = 0, palette_real_colors_n - 1 do
+      table.insert(palette, {palette_image_data:getPixel(x, 0)})
     end
     result:send("palette", unpack(palette))
   end
@@ -54,10 +57,9 @@ local water_love_shader = Memoize(function(palette_path)
   return result
 end)
 
-shaders.water = function(palette_path)
+shaders.water = function(palette_path, palette_real_colors_n)
   return {
-    -- TODO reuse shaders
-    love_shader = water_love_shader(palette_path),
+    love_shader = water_love_shader(palette_path, palette_real_colors_n),
 
     preprocess = function(self, entity, dt)
       local offset = ((love.timer.getTime() * entity.water_velocity) % 16):map(math.floor) / 16

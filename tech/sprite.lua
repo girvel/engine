@@ -2,7 +2,9 @@ local sprite = {}
 
 local get_atlas_quad, cut_out
 
---- @class sprite_image
+--- @alias sprite sprite_image | sprite_atlas
+
+--- @class sprite_image NOTICE shared pointer, do not mutate
 --- @field type "image"
 --- @field image love.Image
 
@@ -16,11 +18,12 @@ sprite.image = function(base)
   }
 end
 
---- @class sprite_altas NOTICE shared pointer, do not mutate
+--- @class sprite_atlas NOTICE shared pointer, do not mutate
 --- @field type "atlas"
 --- @field quad love.Quad
 --- @field image love.Image
 
+--- @return sprite_atlas
 sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   local quad = get_atlas_quad(index, cell_size, atlas_image:getDimensions())
   return {

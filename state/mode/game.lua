@@ -128,8 +128,6 @@ methods.draw_grid = function(self, dt)
   end
   snapshot:refresh_fov(State.player.position, State.player.fov_r)
 
-  -- NEXT background
-
   for _, layer in ipairs(State.level.layers) do
     local grid = State.grids[layer]
     local sprite_batch = self._sprite_batches[layer]

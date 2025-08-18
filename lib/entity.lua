@@ -10,6 +10,7 @@ local entityx = {}
 --- @field layer? string name of the grid layer
 --- @field ai? ai
 --- @field shader? shader
+--- @field sprite? sprite
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision
