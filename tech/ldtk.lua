@@ -42,7 +42,10 @@ end
 local handle_tiles_or_intgrid = function(is_tiles)
   return function(this_parser, layer, palette, offset)
     local layer_id = get_identifier(layer)
-    local layer_palette = palette[layer_id]
+    local layer_palette = assert(
+      palette[layer_id],
+      "Missing palette element %q" % {layer_id}
+    )
 
     if not Table.contains(this_parser._level_info.layers, layer_id) then
       table.insert(this_parser._level_info.layers, layer_id)
@@ -107,7 +110,10 @@ parser_new = function()
           )
           layer_id = raw:sub(1, #raw - #POSTFIX)
 
-          layer_palette = palette[raw]
+          layer_palette = assert(
+            palette[raw],
+            "Missing palette element %q" % {raw}
+          )
         end
 
         if not Table.contains(this_parser._level_info.layers, layer_id) then

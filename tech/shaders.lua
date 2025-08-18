@@ -5,7 +5,7 @@ local shaders = {}
 --- @field preprocess? fun(shader, base_entity)
 
 local water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
-  local result = love.graphics.newShader(Log.trace([[
+  local result = love.graphics.newShader([[
     uniform vec4 palette[%s];
 
     vec4 match(vec4 color) {
@@ -43,7 +43,7 @@ local water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
       if (it2.a == 0) return it;
       return match((it + it2) / 2.5);
     }
-  ]] % {palette_real_colors_n, palette_real_colors_n}))
+  ]] % {palette_real_colors_n, palette_real_colors_n})
 
   do
     local palette = {}
