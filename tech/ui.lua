@@ -1,3 +1,4 @@
+local sprite = require "engine.tech.sprite"
 --- Immediate mode UI module
 local ui = {}
 
@@ -21,6 +22,7 @@ local model = {
   font = nil --[[@as love.Font]],
   line_h = nil --[[@as integer]],
   pressed_keys = {},
+  padding = 0,
 }
 
 local CURSORS = {
@@ -28,10 +30,14 @@ local CURSORS = {
   hand = love.mouse.getSystemCursor("hand"),
 }
 
+local SCALE = 4  -- TODO extract scale here & in view
+
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] UI elements
 ----------------------------------------------------------------------------------------------------
+
+local get_font, get_batch
 
 ui.start = function()
   ui.font_size()
@@ -43,6 +49,7 @@ ui.start = function()
   model.rect.y = 0
   model.rect.w = love.graphics.getWidth()
   model.rect.h = love.graphics.getHeight()
+  model.padding = 0
 end
 
 ui.finish = function()
@@ -51,18 +58,21 @@ ui.finish = function()
   model.pressed_keys = {}
 end
 
-local PADDING = 10
-
 --- Define draw region
 --- @param x? integer?
 --- @param y? integer?
 --- @param w? integer?
 --- @param h? integer?
 ui.rect = function(x, y, w, h)
-  model.rect.x = (x or 0) % love.graphics.getWidth() + PADDING
-  model.rect.y = (y or 0) % love.graphics.getHeight() + PADDING
-  model.rect.w = w or (love.graphics.getWidth() - model.rect.x) - PADDING
-  model.rect.h = h or (love.graphics.getHeight() - model.rect.y) - PADDING
+  model.rect.x = (x or 0) % love.graphics.getWidth()
+  model.rect.y = (y or 0) % love.graphics.getHeight()
+  model.rect.w = w or (love.graphics.getWidth() - model.rect.x)
+  model.rect.h = h or (love.graphics.getHeight() - model.rect.y)
+end
+
+--- @param value integer?
+ui.padding = function(value)
+  model.padding = value
 end
 
 --- @param value boolean
@@ -70,20 +80,16 @@ ui.center = function(value)
   model.center = value
 end
 
-local font = Memoize(function(size)
-  return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
-end)
-
 --- @param size? integer
 ui.font_size = function(size)
-  model.font = font(size or 20)
+  model.font = get_font(size or 20)
   model.line_h = math.floor(model.font:getHeight() * 1.25)
   love.graphics.setFont(model.font)
 end
 
 local wrap = function(text)
   local result = {}
-  local chars_per_line = math.floor(model.rect.w / model.font:getWidth("w"))
+  local chars_per_line = math.floor((model.rect.w - 2 * model.padding) / model.font:getWidth("w"))
   local lines = math.ceil(text:utf_len() / chars_per_line)
   for i = 0, lines - 1 do
     table.insert(result, text:utf_sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
@@ -96,9 +102,9 @@ ui.text = function(text)
   for _, line in ipairs(wrap(text)) do
     local dx = 0
     if model.center then
-      dx = (model.rect.w - model.font:getWidth(line)) / 2
+      dx = (model.rect.w - model.font:getWidth(line)) / 2 - model.padding
     end
-    love.graphics.print(line, model.rect.x + dx, model.rect.y)
+    love.graphics.print(line, model.rect.x + dx + model.padding, model.rect.y + model.padding)
     model.rect.y = model.rect.y + model.line_h
   end
 end
@@ -140,6 +146,68 @@ ui.table = function(headers, content)
       :reduce(Fun.op.concat, "")
       :utf_sub(3))
   end
+end
+
+--- @param path string
+ui.image = function(path)
+  local image = love.graphics.newImage(path)  -- NOTICE cached by kernel
+  love.graphics.draw(image, model.rect.x, model.rect.y, 0, SCALE)
+  model.rect.y = model.rect.y + image:getHeight() * SCALE
+end
+
+--- @param path string path to atlas file
+ui.background = function(path)
+  local batch, quads, cell_size = get_batch(path)
+  batch:clear()
+
+  local cropped_w = math.ceil(model.rect.w / cell_size / SCALE) - 2
+  local cropped_h = math.ceil(model.rect.h / cell_size / SCALE) - 2
+  local end_x = model.rect.w / SCALE - cell_size
+  local end_y = model.rect.h / SCALE - cell_size
+
+  for x = 0, cropped_w do
+    for y = 0, cropped_h do
+      local quad_i
+      if x == 0 then
+        if y == 0 then
+          quad_i = 1
+        else
+          quad_i = 4
+        end
+      else
+        if y == 0 then
+          quad_i = 2
+        else
+          quad_i = 5
+        end
+      end
+      batch:add(quads[quad_i], x * cell_size, y * cell_size)
+    end
+  end
+
+  for y = 0, cropped_h do
+    local quad_i
+    if y == 0 then
+      quad_i = 3
+    else
+      quad_i = 6
+    end
+    batch:add(quads[quad_i], end_x, y * cell_size)
+  end
+
+  for x = 0, cropped_w do
+    local quad_i
+    if x == 0 then
+      quad_i = 7
+    else
+      quad_i = 8
+    end
+    batch:add(quads[quad_i], x * cell_size, end_y)
+  end
+
+  batch:add(quads[9], end_x, end_y)
+
+  love.graphics.draw(batch, model.rect.x, model.rect.y, 0, SCALE)
 end
 
 --- @param options string[]
@@ -214,6 +282,29 @@ end
 ui.handle_mousepress = function(button)
   model.mouse.button_pressed = button
 end
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Internals
+----------------------------------------------------------------------------------------------------
+
+get_font = Memoize(function(size)
+  return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
+end)
+
+get_batch = Memoize(function(path)
+  local image = love.graphics.newImage(path)
+  local batch = love.graphics.newSpriteBatch(image)
+  local w, h = image:getDimensions()
+  assert(w == h)
+  local cell_size = w / 3
+
+  local quads = {}
+  for i = 1, 9 do
+    quads[i] = sprite.utility.get_atlas_quad(i, cell_size, w, h)
+  end
+
+  return batch, quads, cell_size
+end)
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Footer

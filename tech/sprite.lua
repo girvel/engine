@@ -1,6 +1,6 @@
-local sprite = {}
+local sprite = {utility = {}}
 
-local get_atlas_quad, cut_out
+local cut_out
 
 --- @alias sprite sprite_image | sprite_atlas
 
@@ -25,7 +25,7 @@ end
 
 --- @return sprite_atlas
 sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
-  local quad = get_atlas_quad(index, cell_size, atlas_image:getDimensions())
+  local quad = sprite.utility.get_atlas_quad(index, cell_size, atlas_image:getDimensions())
   return {
     type = "atlas",
     quad = quad,
@@ -33,7 +33,7 @@ sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   }
 end)
 
-get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
+sprite.utility.get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w
   local x = (index - 1) * cell_size
   return love.graphics.newQuad(

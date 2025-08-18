@@ -187,4 +187,16 @@ tablex.pack = function(...)
   return result
 end
 
+--- Transforms list into a set
+--- @generic T
+--- @param list T[]
+--- @return table<T, true?>
+tablex.set = function(list)
+  local result = {}
+  for _, v in ipairs(list) do
+    result[v] = true
+  end
+  return result
+end
+
 return tablex

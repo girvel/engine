@@ -22,11 +22,15 @@ game.new = function()
 end
 
 local SIDEBAR_W = 320
+local PADDING = 40
 
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
 
-  ui.rect(-SIDEBAR_W, nil, nil, nil)
+
+  ui.rect(-SIDEBAR_W - 2 * PADDING)
+  ui.padding(PADDING)
+    ui.background("assets/sprites/atlases/sidebar_bg.png")
     local player = State.player
 
     -- NEXT (when actions) limit speed
@@ -70,6 +74,7 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. Entity.name(entity))
       end
     end
+  ui.padding()
   ui.rect()
 end
 
