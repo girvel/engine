@@ -7,7 +7,7 @@ async.resume = function(coroutine_, ...)
   local success, result = coroutine.resume(coroutine_, ...)
   t = love.timer.getTime() - t
   if t > LAG_THRESHOLD_SEC then
-    Log.warn("Coroutine lags\n" .. debug.traceback())
+    Log.warn("Coroutine lags (%.2f s)\n%s" % {t, debug.traceback()})
   end
 
   if not success then

@@ -162,9 +162,8 @@ parser_new = function()
         for i = #level.layerInstances, 1, -1 do
           local layer = level.layerInstances[i]
           self._handlers[layer.__type:utf_lower()](self, layer, palette, offset)
-          if i ~= 1 then
-            coroutine.yield(.5 * (j * average_layers - i) / total_layers)
-          end
+          -- TODO time-based yield?
+          coroutine.yield(.5 * (j * average_layers - i) / total_layers)
         end
       end
 
