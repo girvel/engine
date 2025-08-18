@@ -1,14 +1,15 @@
 local creature = require "engine.mech.creature"
 local player = {}
 
---- @class base_player: creature
+--- @class base_player: creature_mixin
 --- @field fov_r integer
 
 player.base = function()
-  return Table.extend(creature.new(), {
+  local result = Table.extend(creature.mixin(), {
     codename = "player",
     player_flag = true,
     fov_r = 15,
+    base_hp = 10,
 
     ai = {
       next_action = nil,
@@ -26,6 +27,9 @@ player.base = function()
       end,
     },
   })
+
+  creature.init(result)
+  return result
 end
 
 Ldump.mark(player, {}, ...)

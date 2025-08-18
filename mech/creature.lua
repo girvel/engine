@@ -1,17 +1,25 @@
+local health = require "engine.mech.health"
 local creature = {}
 
---- @class creature
+--- @class creature_mixin
 --- @field resources table<string, integer>
+--- @field hp integer
+--- @field base_hp integer
 local methods = {}
 
---- @return creature
-creature.new = function()
+--- @return creature_mixin
+creature.mixin = function()
   local result = Table.extend({
     resources = {},
   }, methods)
 
-  result:rest("full")
   return result
+end
+
+--- @param entity creature_mixin
+creature.init = function(entity)
+  assert(entity.base_hp, "creature requires .base_hp for %s" % {Entity.codename(entity)})
+  entity:rest("full")
 end
 
 --- @alias rest_type "free"|"move"|"short"|"long"|"full"
@@ -53,8 +61,17 @@ methods.get_resources = function(self, rest_type)
   error("Unknown rest type %q" % {rest_type})
 end
 
+methods.get_max_hp = function(self)
+  -- TODO effects
+  return self.base_hp
+end
+
 --- @param rest_type rest_type
 methods.rest = function(self, rest_type)
+  if rest_type == "long" or rest_type == "full" then
+    health.set_hp(self, self:get_max_hp())
+  end
+
   Table.extend(self.resources, self:get_resources(rest_type))
   -- NEXT reset HP on long
 end
