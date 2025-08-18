@@ -7,22 +7,25 @@ local ui = {}
 ----------------------------------------------------------------------------------------------------
 
 local model = {
-  selection = {
-    i = 1,
-    max_i = 0,
-    is_pressed = false,
-  },
   mouse = {
     x = 0,
     y = 0,
     button_pressed = nil,
   },
-  rect = {},
-  center = false,
-  font = nil --[[@as love.Font]],
-  line_h = nil --[[@as integer]],
-  pressed_keys = {},
-  padding = 0,
+  keyboard = {
+    pressed = {},
+  },
+
+  selection = {
+    i = 1,
+    max_i = 0,
+    is_pressed = false,
+  },
+
+  frame = {},
+  center = {},
+  font = {},
+  padding = {},
 }
 
 local CURSORS = {
@@ -40,56 +43,97 @@ local SCALE = 4  -- TODO extract scale here & in view
 local get_font, get_batch
 
 ui.start = function()
-  ui.font_size()
-  ui.rect()
   love.mouse.setCursor(CURSORS.normal)
 
   model.selection.max_i = 0
-  model.rect.x = 0
-  model.rect.y = 0
-  model.rect.w = love.graphics.getWidth()
-  model.rect.h = love.graphics.getHeight()
-  model.padding = 0
+  model.frame = {{
+    x = 0,
+    y = 0,
+    w = love.graphics.getWidth(),
+    h = love.graphics.getHeight(),
+  }}
+  model.center = {false}
+  model.font = {get_font(20)}
+  model.padding = {10}
 end
 
 ui.finish = function()
   model.selection.is_pressed = false
   model.mouse.button_pressed = nil
-  model.pressed_keys = {}
+  model.keyboard.pressed = {}
 end
 
---- Define draw region
 --- @param x? integer?
 --- @param y? integer?
 --- @param w? integer?
 --- @param h? integer?
-ui.rect = function(x, y, w, h)
-  model.rect.x = (x or 0) % love.graphics.getWidth()
-  model.rect.y = (y or 0) % love.graphics.getHeight()
-  model.rect.w = w or (love.graphics.getWidth() - model.rect.x)
-  model.rect.h = h or (love.graphics.getHeight() - model.rect.y)
+ui.start_frame = function(x, y, w, h)
+  local prev = Table.last(model.frame)
+  if not x then
+    x = 0
+  elseif x < 0 then
+    x = x % prev.w
+  end
+  if not y then
+    y = 0
+  elseif y < 0 then
+    y = y % prev.h
+  end
+  if not w then
+    w = prev.w - x
+  end
+  if not h then
+    h = prev.h - y
+  end
+  table.insert(model.frame, {
+    x = prev.x + x,
+    y = prev.y + y,
+    w = w,
+    h = h,
+  })
+end
+
+ui.finish_frame = function()
+  table.remove(model.frame)
 end
 
 --- @param value integer?
-ui.padding = function(value)
-  model.padding = value
+ui.start_padding = function(value)
+  table.insert(model.padding, value)
+end
+
+ui.finish_padding = function()
+  table.remove(model.padding)
 end
 
 --- @param value boolean
-ui.center = function(value)
-  model.center = value
+ui.start_center = function(value)
+  table.insert(model.center, value)
+end
+
+ui.finish_center = function()
+  table.remove(model.center)
 end
 
 --- @param size? integer
-ui.font_size = function(size)
-  model.font = get_font(size or 20)
-  model.line_h = math.floor(model.font:getHeight() * 1.25)
-  love.graphics.setFont(model.font)
+ui.start_font = function(size)
+  local font = get_font(size or 20)
+  table.insert(model.font, font)
+  love.graphics.setFont(font)
+end
+
+ui.finish_font = function()
+  table.remove(model.font)
+  love.graphics.setFont(Table.last(model.font))
 end
 
 local wrap = function(text)
   local result = {}
-  local chars_per_line = math.floor((model.rect.w - 2 * model.padding) / model.font:getWidth("w"))
+
+  local effective_w = Table.last(model.frame).w - 2 * Table.last(model.padding)
+  local font_w = Table.last(model.font):getWidth("w")
+  local chars_per_line = math.floor(effective_w / font_w)
+
   local lines = math.ceil(text:utf_len() / chars_per_line)
   for i = 0, lines - 1 do
     table.insert(result, text:utf_sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
@@ -99,13 +143,18 @@ end
 
 --- @param text string
 ui.text = function(text)
+  local frame = Table.last(model.frame)
+  local padding = Table.last(model.padding)
+  local font = Table.last(model.font)
+  local center = Table.last(model.center)
+
   for _, line in ipairs(wrap(text)) do
     local dx = 0
-    if model.center then
-      dx = (model.rect.w - model.font:getWidth(line)) / 2 - model.padding
+    if center then
+      dx = (frame.w - font:getWidth(line)) / 2 - padding
     end
-    love.graphics.print(line, model.rect.x + dx + model.padding, model.rect.y + model.padding)
-    model.rect.y = model.rect.y + model.line_h
+    love.graphics.print(line, frame.x + dx + padding, frame.y + padding)
+    frame.y = frame.y + font:getHeight() * 1.25
   end
 end
 
@@ -150,20 +199,23 @@ end
 
 --- @param path string
 ui.image = function(path)
+  local frame = Table.last(model.frame)
   local image = love.graphics.newImage(path)  -- NOTICE cached by kernel
-  love.graphics.draw(image, model.rect.x, model.rect.y, 0, SCALE)
-  model.rect.y = model.rect.y + image:getHeight() * SCALE
+  love.graphics.draw(image, frame.x, frame.y, 0, SCALE)
+  frame.y = frame.y + image:getHeight() * SCALE
 end
 
 --- @param path string path to atlas file
-ui.background = function(path)
+ui.tile = function(path)
   local batch, quads, cell_size = get_batch(path)
   batch:clear()
 
-  local cropped_w = math.ceil(model.rect.w / cell_size / SCALE) - 2
-  local cropped_h = math.ceil(model.rect.h / cell_size / SCALE) - 2
-  local end_x = model.rect.w / SCALE - cell_size
-  local end_y = model.rect.h / SCALE - cell_size
+  local frame = Table.last(model.frame)
+
+  local cropped_w = math.ceil(frame.w / cell_size / SCALE) - 2
+  local cropped_h = math.ceil(frame.h / cell_size / SCALE) - 2
+  local end_x = frame.w / SCALE - cell_size
+  local end_y = frame.h / SCALE - cell_size
 
   for x = 0, cropped_w do
     for y = 0, cropped_h do
@@ -207,13 +259,16 @@ ui.background = function(path)
 
   batch:add(quads[9], end_x, end_y)
 
-  love.graphics.draw(batch, model.rect.x, model.rect.y, 0, SCALE)
+  love.graphics.draw(batch, frame.x, frame.y, 0, SCALE)
 end
 
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)
   local is_selected = false
+  local frame = Table.last(model.frame)
+  local font = Table.last(model.font)
+
   for i, option in ipairs(options) do
     if model.selection.max_i + i == model.selection.i then
       is_selected = true
@@ -223,10 +278,10 @@ ui.choice = function(options)
     end
 
     local is_mouse_over = (
-      model.mouse.x > model.rect.x
-      and model.mouse.y > model.rect.y
-      and model.mouse.y <= model.rect.y + model.line_h
-      and model.mouse.x <= model.rect.x + model.font:getWidth(option)
+      model.mouse.x > frame.x
+      and model.mouse.y > frame.y
+      and model.mouse.y <= frame.y + font:getHeight() * 1.25
+      and model.mouse.x <= frame.x + font:getWidth(option)
     )
 
     if is_mouse_over then
@@ -255,7 +310,7 @@ end
 
 --- @param key love.KeyConstant
 ui.keyboard = function(key)
-  return Table.contains(model.pressed_keys, key)
+  return Table.contains(model.keyboard.pressed, key)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -270,7 +325,7 @@ ui.handle_keypress = function(key)
   elseif key == "return" then
     model.selection.is_pressed = true
   else
-    table.insert(model.pressed_keys, key)
+    table.insert(model.keyboard.pressed, key)
   end
 end
 

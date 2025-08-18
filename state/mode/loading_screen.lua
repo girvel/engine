@@ -29,11 +29,11 @@ methods.draw_gui = function(self)
     status_bar = "[" .. done .. remaining .. "]"
   end
 
-  ui.center(true)
-  ui.rect(nil, love.graphics.getHeight() * 4 / 5)
-  ui.text(status_bar)
-  ui.rect()
-  ui.center(false)
+  ui.start_center(true)
+  ui.start_frame(nil, love.graphics.getHeight() * 4 / 5)
+    ui.text(status_bar)
+  ui.finish_frame()
+  ui.finish_center()
 
   if coroutine.status(self._loading_coroutine) == "dead" then
     self._next_state()

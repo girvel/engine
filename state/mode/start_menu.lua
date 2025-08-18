@@ -12,19 +12,20 @@ start_menu.new = function()
 end
 
 methods.draw_gui = function()
-  ui.font_size(48)
+  ui.start_font(48)
+  ui.start_frame(200, 200)
+    local choice = ui.choice({
+      "New game",
+      "Load game",
+    })
 
-  ui.rect(100, 100)
-  local choice = ui.choice({
-    "New game",
-    "Load game",
-  })
-
-  if choice == 1 then
-    State.mode:start_game()
-  elseif choice == 2 then
-    Log.info("Load a save")
-  end
+    if choice == 1 then
+      State.mode:start_game()
+    elseif choice == 2 then
+      Log.info("Load a save")
+    end
+  ui.finish_frame()
+  ui.finish_font()
 end
 
 Ldump.mark(start_menu, {}, ...)

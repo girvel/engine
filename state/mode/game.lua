@@ -27,11 +27,15 @@ local PADDING = 40
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
 
+  ui.start_frame(-SIDEBAR_W - 2 * PADDING)
+  ui.start_padding(PADDING)
+    ui.tile("assets/sprites/atlases/sidebar_bg.png")
 
-  ui.rect(-SIDEBAR_W - 2 * PADDING)
-  ui.padding(PADDING)
-    ui.background("assets/sprites/atlases/sidebar_bg.png")
     local player = State.player
+
+    ui.start_frame(PADDING, PADDING, SIDEBAR_W, 13 * 4)
+      ui.tile("engine/assets/sprites/hp_bar.png")
+    ui.finish_frame()
 
     -- NEXT (when actions) limit speed
     for key, direction in pairs {
@@ -74,8 +78,8 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. Entity.name(entity))
       end
     end
-  ui.padding()
-  ui.rect()
+  ui.finish_padding()
+  ui.finish_frame()
 end
 
 methods.draw_entity = function(self, entity, dt)
