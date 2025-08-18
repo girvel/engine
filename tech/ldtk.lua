@@ -39,6 +39,50 @@ local get_field = function(instance, field_name)
     :nth(1)
 end
 
+local handle_tiles_or_intgrid = function(is_tiles)
+  return function(this_parser, layer, palette, offset)
+    local layer_id = get_identifier(layer)
+    local layer_palette = palette[layer_id]
+
+    if not Table.contains(this_parser._level_info.layers, layer_id) then
+      table.insert(this_parser._level_info.layers, layer_id)
+    end
+
+    this_parser._level_info.atlases[layer_id] = assert(
+      layer_palette.ATLAS_IMAGE,
+      "Palette for tile layer %q doesn't have .ATLAS_IMAGE" % {layer_id}
+    )
+
+    local to_iterate if is_tiles then
+      to_iterate = layer.gridTiles
+    else
+      to_iterate = layer.autoLayerTiles
+    end
+
+    for _, instance in ipairs(to_iterate) do
+      local factory = assert(
+        layer_palette[instance.t + 1],
+        "Entity factory %q is not defined for tile layer %q" % {instance.t + 1, layer_id}
+      )
+
+      local e = factory()
+      e.position = Vector.own(instance.px)
+        :div_mut(this_parser._level_info.cell_size)
+        :add_mut(Vector.one)
+        :add_mut(offset)
+      e.layer = layer_id
+      e.view = "grids"
+
+      -- NEXT entity captures (after rails)
+      -- local rails_name = -Query(to_capture)[layer_id][result.position]
+      -- if rails_name then
+      --   captured_entities[rails_name] = result
+      -- end
+      table.insert(this_parser._entities, e)
+    end
+  end
+end
+
 parser_new = function()
   return {
     _entities = {},
@@ -50,41 +94,8 @@ parser_new = function()
     },
 
     _handlers = {
-      tiles = function(this_parser, layer, palette, offset)
-        local layer_id = get_identifier(layer)
-        local layer_palette = palette[layer_id]
-
-        if not Table.contains(this_parser._level_info.layers, layer_id) then
-          table.insert(this_parser._level_info.layers, layer_id)
-        end
-
-        this_parser._level_info.atlases[layer_id] = assert(
-          layer_palette.ATLAS_IMAGE,
-          "Palette for tile layer %q doesn't have .ATLAS_IMAGE" % {layer_id}
-        )
-
-        for _, instance in ipairs(layer.gridTiles) do
-          local factory = assert(
-            layer_palette[instance.t + 1],
-            "Entity factory %q is not defined for tile layer %q" % {instance.t + 1, layer_id}
-          )
-
-          local e = factory()
-          e.position = Vector.own(instance.px)
-            :div_mut(this_parser._level_info.cell_size)
-            :add_mut(Vector.one)
-            :add_mut(offset)
-          e.layer = layer_id
-          e.view = "grids"
-
-          -- NEXT entity captures (after rails)
-          -- local rails_name = -Query(to_capture)[layer_id][result.position]
-          -- if rails_name then
-          --   captured_entities[rails_name] = result
-          -- end
-          table.insert(this_parser._entities, e)
-        end
-      end,
+      tiles = handle_tiles_or_intgrid(true),
+      intgrid = handle_tiles_or_intgrid(false),
 
       entities = function(this_parser, layer, palette, offset)
         local layer_id, layer_palette do
