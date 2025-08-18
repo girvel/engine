@@ -16,19 +16,19 @@ sprite.image = function(base)
   }
 end
 
---- @class sprite_altas
+--- @class sprite_altas NOTICE shared pointer, do not mutate
 --- @field type "atlas"
 --- @field quad love.Quad
 --- @field image love.Image
 
-sprite.from_atlas = function(index, cell_size, atlas_image)
+sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   local quad = get_atlas_quad(index, cell_size, atlas_image:getDimensions())
   return {
     type = "atlas",
     quad = quad,
     image = cut_out(atlas_image, quad),
   }
-end
+end)
 
 get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w

@@ -1,8 +1,9 @@
 -- pre-initialization --
-require("engine.kernel.globals")
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
 love.keyboard.setKeyRepeat(true)
+require("engine.kernel.globals")
+require("engine.kernel.wrappers")
 
 
 -- imports --

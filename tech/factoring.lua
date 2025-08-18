@@ -11,12 +11,11 @@ factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
   local w, h = result.ATLAS_IMAGE:getDimensions()
   for i, codename in ipairs(codenames) do
     if not codename then goto continue end
-    local current_mixin = mixin and mixin(codename) or {}
     local factory = function()
-      return Table.extend({
-        codename = codename,
-        sprite = sprite.from_atlas(i, cell_size, result.ATLAS_IMAGE),
-      }, current_mixin)
+      local e = mixin and mixin(codename) or {}
+      e.codename = codename
+      e.sprite = sprite.from_atlas(i, cell_size, result.ATLAS_IMAGE)
+      return e
     end
 
     result[i] = factory
