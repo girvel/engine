@@ -2,6 +2,7 @@ local ui = require("engine.tech.ui")
 local tcod  = require("engine.tech.tcod")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
+local sprite       = require("engine.tech.sprite")
 
 local game = {}
 
@@ -22,34 +23,42 @@ end
 
 local SIDEBAR_W = 320
 local PADDING = 40
-local HP_BAR_H = 13 * 4
+local HP_BAR_H = 10 * 4
+
+local ICON_ATLAS = love.graphics.newImage("engine/assets/sprites/icons.png")
+local SKIP_TURN = sprite.utility.cut_out(ICON_ATLAS, sprite.utility.get_atlas_quad(1, 16, ICON_ATLAS:getDimensions()))
 
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
 
-  ui.start_frame(-SIDEBAR_W - 2 * PADDING)
-  ui.start_padding(PADDING)
+  ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - 2 * PADDING)
     ui.tile("assets/sprites/atlases/sidebar_bg.png")
+  ui.finish_frame()
 
+  ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING, PADDING, love.graphics.getHeight() - 2 * PADDING, SIDEBAR_W)
     local player = State.player
 
-    ui.start_frame(PADDING, PADDING, SIDEBAR_W, HP_BAR_H + 8)
+    ui.start_frame(nil, nil, SIDEBAR_W, HP_BAR_H + 16)
       ui.tile("engine/assets/sprites/hp_bg.png")
-      ui.start_frame(8, 8, -16, -16)
+      ui.start_frame(8, 8, SIDEBAR_W - 16, HP_BAR_H)
         ui.tile("engine/assets/sprites/hp_bar.png")
-        ui.start_alignment("center")
-        ui.start_padding(0)
+        ui.start_alignment("center", "center")
         ui.start_font(32)
           ui.text("%s/%s" % {player.hp, player:get_max_hp()})
         ui.finish_font()
-        ui.finish_padding()
         ui.finish_alignment()
       ui.finish_frame()
-    ui.finish_frame()
+    ui.finish_frame(true)
 
-    ui.offset(HP_BAR_H)
     ui.br()
     ui.br()
+
+    if State.combat then
+      local button = ui.hot_button(SKIP_TURN, "space")
+      if button.is_pressed then
+        player.ai.finish_turn = true
+      end
+    end
 
     -- NEXT (when actions) limit speed
     for key, direction in pairs {
@@ -61,10 +70,6 @@ methods.draw_gui = function(self, dt)
       if ui.keyboard(key) then
         player.ai.next_action = actions.move(direction)
       end
-    end
-
-    if ui.keyboard("space") then
-      player.ai.finish_turn = true
     end
 
     ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
@@ -92,7 +97,6 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. Entity.name(entity))
       end
     end
-  ui.finish_padding()
   ui.finish_frame()
 end
 

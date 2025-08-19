@@ -1,7 +1,5 @@
 local sprite = {utility = {}}
 
-local cut_out
-
 --- @alias sprite sprite_image | sprite_atlas
 
 --- @class sprite_image NOTICE shared pointer, do not mutate
@@ -29,10 +27,14 @@ sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   return {
     type = "atlas",
     quad = quad,
-    image = cut_out(atlas_image, quad),
+    image = sprite.utility.cut_out(atlas_image, quad),
   }
 end)
 
+--- @param index integer
+--- @param cell_size integer
+--- @param atlas_w integer
+--- @param atlas_h integer
 sprite.utility.get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w
   local x = (index - 1) * cell_size
@@ -49,7 +51,10 @@ local image_to_canvas = Memoize(function(image)
   return result
 end)
 
-cut_out = function(image, quad)
+--- @param image love.Image
+--- @param quad love.Quad
+--- @return love.Image
+sprite.utility.cut_out = function(image, quad)
   local canvas = image_to_canvas(image)
   return love.graphics.newImage(canvas:newImageData(0, nil, quad:getViewport()))
 end

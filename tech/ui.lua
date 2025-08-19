@@ -25,7 +25,6 @@ local model = {
   frame = {},
   alignment = {},
   font = {},
-  padding = {},
 }
 
 local CURSORS = {
@@ -40,7 +39,7 @@ local SCALE = 4  -- TODO extract scale here & in view
 -- [SECTION] UI elements
 ----------------------------------------------------------------------------------------------------
 
-local get_font, get_batch
+local get_font, get_batch, get_mouse_over
 
 ui.start = function()
   love.mouse.setCursor(CURSORS.normal)
@@ -52,9 +51,8 @@ ui.start = function()
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
   }}
-  model.alignment = {"normal"}
+  model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
-  model.padding = {10}
 end
 
 ui.finish = function()
@@ -71,13 +69,9 @@ ui.start_frame = function(x, y, w, h)
   local prev = Table.last(model.frame)
   if not x then
     x = 0
-  elseif x < 0 then
-    x = x % prev.w
   end
   if not y then
     y = 0
-  elseif y < 0 then
-    y = y % prev.h
   end
   if not w then
     w = prev.w - x
@@ -97,22 +91,18 @@ ui.start_frame = function(x, y, w, h)
   })
 end
 
-ui.finish_frame = function()
-  table.remove(model.frame)
+ui.finish_frame = function(push_y)
+  local pop = table.remove(model.frame)
+  if push_y then
+    Table.last(model.frame).y = pop.y + pop.h
+  end
 end
 
---- @param value integer?
-ui.start_padding = function(value)
-  table.insert(model.padding, value)
-end
-
-ui.finish_padding = function()
-  table.remove(model.padding)
-end
-
---- @param value "normal"|"center_x"|"center_y"|"center"
-ui.start_alignment = function(value)
-  table.insert(model.alignment, value)
+--- @param x? "left"|"center"|"right"
+--- @param y? "top"|"center"|"bottom"
+ui.start_alignment = function(x, y)
+  local prev = Table.last(model.alignment)
+  table.insert(model.alignment, {x = x or prev.x, y = y or prev.y})
 end
 
 ui.finish_alignment = function()
@@ -134,7 +124,7 @@ end
 local wrap = function(text)
   local result = {}
 
-  local effective_w = Table.last(model.frame).w - 2 * Table.last(model.padding)
+  local effective_w = Table.last(model.frame).w
   local font_w = Table.last(model.font):getWidth("w")
   local chars_per_line = math.floor(effective_w / font_w)
 
@@ -148,7 +138,6 @@ end
 --- @param text string
 ui.text = function(text)
   local frame = Table.last(model.frame)
-  local padding = Table.last(model.padding)
   local font = Table.last(model.font)
   local alignment = Table.last(model.alignment)
 
@@ -157,14 +146,21 @@ ui.text = function(text)
   for i, line in ipairs(wrapped) do
     local dx = 0
     local dy = 0
-    if alignment == "center_x" or alignment == "center" then
-      dx = (frame.w - font:getWidth(line)) / 2 - padding
+    if alignment.x == "center" then
+      dx = (frame.w - font:getWidth(line)) / 2
+    elseif alignment.x == "right" then
+      dx = frame.w - font:getWidth(line)
     end
-    if alignment == "center_y" or alignment == "center" then
-      dy = (frame.h - font:getHeight() * #wrapped) / 2 - padding + font:getHeight() * (i - 1)
+    if alignment.y == "center" then
+      dy = (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
+    elseif alignment.y == "bottom" then
+      dy = frame.h - font:getHeight() * #wrapped - font:getHeight() * (i - 1)
     end
-    love.graphics.print(line, frame.x + dx + padding, frame.y + dy + padding)
-    frame.y = frame.y + font:getHeight() * 1.25
+    love.graphics.print(line, frame.x + dx, frame.y + dy)
+
+    if alignment.y == "top" then
+      frame.y = frame.y + font:getHeight() * 1.25
+    end
   end
 end
 
@@ -207,12 +203,44 @@ ui.table = function(headers, content)
   end
 end
 
---- @param path string
-ui.image = function(path)
+local get_image = function(base)
+  if type(base) == "string" then
+    return love.graphics.newImage(base)  -- NOTICE cached by kernel
+  end
+  return base
+end
+
+--- @param image string|love.Image
+ui.image = function(image)
+  image = get_image(image)
   local frame = Table.last(model.frame)
-  local image = love.graphics.newImage(path)  -- NOTICE cached by kernel
   love.graphics.draw(image, frame.x, frame.y, 0, SCALE)
   frame.y = frame.y + image:getHeight() * SCALE
+end
+
+--- @param image string|love.Image
+--- @param key love.KeyConstant
+--- @return {is_pressed: boolean, is_mouse_over: boolean}
+ui.hot_button = function(image, key)
+  image = get_image(image)
+  local w = image:getWidth() * SCALE
+  local h = image:getHeight() * SCALE
+  ui.image(image)
+  ui.start_font(20)
+  ui.start_frame(nil, -h, w, h)
+  ui.start_alignment("right", "bottom")
+    ui.text(key)
+    local is_mouse_over = get_mouse_over(w, h)
+    local is_pressed = (is_mouse_over and model.mouse.button_pressed)
+      or Table.contains(model.keyboard.pressed, key)
+  ui.finish_alignment()
+  ui.finish_frame()
+  ui.finish_font()
+
+  return {
+    is_pressed = is_pressed,
+    is_mouse_over = is_mouse_over,
+  }
 end
 
 --- @param path string path to atlas file
@@ -281,7 +309,6 @@ end
 --- @return number?
 ui.choice = function(options)
   local is_selected = false
-  local frame = Table.last(model.frame)
   local font = Table.last(model.font)
 
   for i, option in ipairs(options) do
@@ -292,12 +319,7 @@ ui.choice = function(options)
       option = "  " .. option
     end
 
-    local is_mouse_over = (
-      model.mouse.x > frame.x
-      and model.mouse.y > frame.y
-      and model.mouse.y <= frame.y + font:getHeight() * 1.25
-      and model.mouse.x <= frame.x + font:getWidth(option)
-    )
+    local is_mouse_over = get_mouse_over(font:getWidth(option), font:getHeight() * 1.25)
 
     if is_mouse_over then
       model.selection.i = model.selection.max_i + i
@@ -340,6 +362,7 @@ ui.handle_keypress = function(key)
   elseif key == "return" then
     model.selection.is_pressed = true
   else
+    -- TODO remove everything besides this
     table.insert(model.keyboard.pressed, key)
   end
 end
@@ -375,6 +398,16 @@ get_batch = Memoize(function(path)
 
   return batch, quads, cell_size
 end)
+
+get_mouse_over = function(w, h)
+  local frame = Table.last(model.frame)
+  return (
+    model.mouse.x > frame.x
+    and model.mouse.y > frame.y
+    and model.mouse.x <= frame.x + w
+    and model.mouse.y <= frame.y + h
+  )
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Footer

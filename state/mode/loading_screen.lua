@@ -29,7 +29,7 @@ methods.draw_gui = function(self)
     status_bar = "[" .. done .. remaining .. "]"
   end
 
-  ui.start_alignment("center_x")
+  ui.start_alignment("center")
   ui.start_frame(nil, love.graphics.getHeight() * 4 / 5)
     ui.text(status_bar)
   ui.finish_frame()
