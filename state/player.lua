@@ -14,7 +14,7 @@ player.base = function()
     ai = {
       next_action = nil,
       finish_turn = nil,
-      run = function(entity, _)
+      control = function(entity, _)
         while true do
           if entity.ai.next_action then
             entity.ai.next_action:run(entity)

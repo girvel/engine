@@ -2,7 +2,7 @@ local async = require "engine.tech.async"
 
 
 --- @class ai
---- @field run fun(base_entity, number): boolean?
+--- @field control fun(base_entity, number): boolean?
 
 return Tiny.processingSystem {
   codename = "acting",
@@ -22,15 +22,15 @@ return Tiny.processingSystem {
     local current = State.combat:get_current()
     local ai = entity.ai
 
-    if entity ~= current or not ai.run then return end
+    if entity ~= current or not ai.control then return end
 
-    if not ai._run_coroutine then
-      ai._run_coroutine = coroutine.create(ai.run)
+    if not ai._control_coroutine then
+      ai._control_coroutine = coroutine.create(ai.control)
     end
 
-    async.resume(ai._run_coroutine, entity, dt)
-    if coroutine.status(ai._run_coroutine) == "dead" then
-      ai._run_coroutine = nil
+    async.resume(ai._control_coroutine, entity, dt)
+    if coroutine.status(ai._control_coroutine) == "dead" then
+      ai._control_coroutine = nil
       if current.rest then
         current:rest("move")
       end
@@ -43,16 +43,16 @@ return Tiny.processingSystem {
 
   _process_outside_combat = function(self, entity, dt)
     local ai = entity.ai
-    if not ai.run then return end
+    if not ai.control then return end
 
-    if not ai._run_coroutine then
-      ai._run_coroutine = coroutine.create(ai.run)
+    if not ai._control_coroutine then
+      ai._control_coroutine = coroutine.create(ai.control)
     end
 
-    async.resume(ai._run_coroutine, entity, dt)
+    async.resume(ai._control_coroutine, entity, dt)
 
-    if coroutine.status(ai._run_coroutine) == "dead" then
-      ai._run_coroutine = nil
+    if coroutine.status(ai._control_coroutine) == "dead" then
+      ai._control_coroutine = nil
       if entity.rest then
         entity:rest("free")
       end
