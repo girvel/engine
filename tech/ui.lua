@@ -225,14 +225,24 @@ ui.hot_button = function(image, key)
   image = get_image(image)
   local w = image:getWidth() * SCALE
   local h = image:getHeight() * SCALE
+  local is_mouse_over = get_mouse_over(w, h)
+  local is_pressed = (is_mouse_over and model.mouse.button_pressed)
+    or Table.contains(model.keyboard.pressed, key)
+
+  local font_size, text
+  if key:utf_len() == 1 then
+    font_size = 32
+    text = key:utf_upper()
+  else
+    font_size = 20
+    text = key
+  end
+
   ui.image(image)
-  ui.start_font(20)
-  ui.start_frame(nil, -h, w, h)
+  ui.start_font(font_size)
+  ui.start_frame(nil, -h, w - SCALE, h)
   ui.start_alignment("right", "bottom")
-    ui.text(key)
-    local is_mouse_over = get_mouse_over(w, h)
-    local is_pressed = (is_mouse_over and model.mouse.button_pressed)
-      or Table.contains(model.keyboard.pressed, key)
+    ui.text(text)
   ui.finish_alignment()
   ui.finish_frame()
   ui.finish_font()

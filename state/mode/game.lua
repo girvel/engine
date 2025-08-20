@@ -27,6 +27,7 @@ local HP_BAR_H = 10 * 4
 
 local ICON_ATLAS = love.graphics.newImage("engine/assets/sprites/icons.png")
 local SKIP_TURN = sprite.utility.cut_out(ICON_ATLAS, sprite.utility.get_atlas_quad(1, 16, ICON_ATLAS:getDimensions()))
+local JOURNAL = sprite.utility.cut_out(ICON_ATLAS, sprite.utility.get_atlas_quad(17, 16, ICON_ATLAS:getDimensions()))
 
 methods.draw_gui = function(self, dt)
   State.perspective:update(dt)
@@ -35,7 +36,10 @@ methods.draw_gui = function(self, dt)
     ui.tile("assets/sprites/atlases/sidebar_bg.png")
   ui.finish_frame()
 
-  ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING, PADDING, love.graphics.getHeight() - 2 * PADDING, SIDEBAR_W)
+  ui.start_frame(
+    love.graphics.getWidth() - SIDEBAR_W - PADDING, PADDING,
+    SIDEBAR_W, love.graphics.getHeight() - 2 * PADDING
+  )
     local player = State.player
 
     ui.start_frame(nil, nil, SIDEBAR_W, HP_BAR_H + 16)
@@ -53,12 +57,21 @@ methods.draw_gui = function(self, dt)
     ui.br()
     ui.br()
 
-    if State.combat then
+    -- if State.combat then
       local button = ui.hot_button(SKIP_TURN, "space")
       if button.is_pressed then
         player.ai.finish_turn = true
       end
+    -- end
+
+    do
+      local button = ui.hot_button(JOURNAL, "j")
+      if button.is_pressed then
+        Log.debug("Journal")
+      end
     end
+
+    ui.br()
 
     -- NEXT (when actions) limit speed
     for key, direction in pairs {
@@ -72,7 +85,7 @@ methods.draw_gui = function(self, dt)
       end
     end
 
-    ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew")
+    ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew asdfawe qwerasd fqwera asdf")
 
     ui.br()
     local max = player:get_resources("full")
