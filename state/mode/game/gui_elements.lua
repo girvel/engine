@@ -11,6 +11,8 @@ end
 
 local gui_elements = {
   skip_turn = nth(1),
+  hand_attack = nth(6),
+  offhand_attack = nth(7),
   journal = nth(17),
 
   sidebar_bg = "engine/assets/sprites/gui/sidebar_bg.png",

@@ -129,6 +129,7 @@ end
 ui.start_line = function()
   ui.start_frame()
   table.insert(model.is_linear, true)
+  table.insert(model.line_last_h, 0)
 end
 
 ui.finish_line = function()

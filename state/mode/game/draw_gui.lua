@@ -54,8 +54,21 @@ local draw_gui = function(self, dt)
       end
     ui.finish_line()
 
-    -- ui.start_line()
-    -- ui.finish_line()
+    ui.start_line()
+      do
+        local button = ui.hot_button(gui.hand_attack, "1")
+        if button.is_pressed then
+          Log.debug("Hand attack")
+        end
+      end
+
+      do
+        local button = ui.hot_button(gui.offhand_attack, "2")
+        if button.is_pressed then
+          Log.debug("Offhand attack")
+        end
+      end
+    ui.finish_line()
 
     ui.br()
 
