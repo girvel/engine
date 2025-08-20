@@ -44,6 +44,7 @@ local draw_gui = function(self, dt)
         if button.is_pressed then
           player.ai.finish_turn = true
         end
+        ui.offset(4)
       -- end
 
       do
@@ -51,8 +52,10 @@ local draw_gui = function(self, dt)
         if button.is_pressed then
           Log.debug("Journal")
         end
+        ui.offset(4)
       end
     ui.finish_line()
+    ui.offset(0, 4)
 
     ui.start_line()
       do
@@ -60,6 +63,7 @@ local draw_gui = function(self, dt)
         if button.is_pressed then
           Log.debug("Hand attack")
         end
+        ui.offset(4)
       end
 
       do
@@ -67,6 +71,7 @@ local draw_gui = function(self, dt)
         if button.is_pressed then
           Log.debug("Offhand attack")
         end
+        ui.offset(4)
       end
     ui.finish_line()
 

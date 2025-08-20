@@ -34,6 +34,8 @@ local CURSORS = {
   hand = love.mouse.getSystemCursor("hand"),
 }
 
+local FRAME = "engine/assets/sprites/gui/button_frame.png"
+
 local SCALE = 4  -- TODO extract scale here & in view
 
 
@@ -277,6 +279,12 @@ ui.hot_button = function(image, key)
     local frame_image = Table.last(model.frame)
   ui.finish_frame()
 
+  if is_mouse_over then
+    ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
+      ui.tile(FRAME)
+    ui.finish_frame()
+  end
+
   ui.start_font(font_size)
   ui.start_frame(nil, nil, w - SCALE, h + dy)
   ui.start_alignment("right", "bottom")
@@ -352,9 +360,12 @@ ui.tile = function(path)
   love.graphics.draw(batch, frame.x, frame.y, 0, SCALE)
 end
 
-ui.offset = function(y)
+--- @param x? integer
+--- @param y? integer
+ui.offset = function(x, y)
   local frame = Table.last(model.frame)
-  frame.y = frame.y + y
+  frame.x = frame.x + (x or 0)
+  frame.y = frame.y + (y or 0)
 end
 
 --- @param options string[]
