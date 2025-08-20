@@ -25,6 +25,7 @@ local model = {
   frame = {},
   alignment = {},
   font = {},
+  is_linear = {},
 }
 
 local CURSORS = {
@@ -36,7 +37,7 @@ local SCALE = 4  -- TODO extract scale here & in view
 
 
 ----------------------------------------------------------------------------------------------------
--- [SECTION] UI elements
+-- [SECTION] Context
 ----------------------------------------------------------------------------------------------------
 
 local get_font, get_batch, get_mouse_over
@@ -53,6 +54,7 @@ ui.start = function()
   }}
   model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
+  model.is_linear = {false}
 end
 
 ui.finish = function()
@@ -120,6 +122,20 @@ ui.finish_font = function()
   table.remove(model.font)
   love.graphics.setFont(Table.last(model.font))
 end
+
+ui.start_line = function()
+  ui.start_frame()
+  table.insert(model.is_linear, true)
+end
+
+ui.finish_line = function()
+  table.remove(model.is_linear)
+  ui.finish_frame(true)
+end
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] UI elements
+----------------------------------------------------------------------------------------------------
 
 local wrap = function(text)
   local result = {}
@@ -212,10 +228,16 @@ end
 
 --- @param image string|love.Image
 ui.image = function(image)
-  image = get_image(image)
   local frame = Table.last(model.frame)
+  local is_linear = Table.last(model.is_linear)
+
+  image = get_image(image)
   love.graphics.draw(image, frame.x, frame.y, 0, SCALE)
-  frame.y = frame.y + image:getHeight() * SCALE
+  if is_linear then
+    frame.x = frame.x + image:getWidth() * SCALE
+  else
+    frame.y = frame.y + image:getHeight() * SCALE
+  end
 end
 
 --- @param image string|love.Image
@@ -229,23 +251,33 @@ ui.hot_button = function(image, key)
   local is_pressed = (is_mouse_over and model.mouse.button_pressed)
     or Table.contains(model.keyboard.pressed, key)
 
-  local font_size, text
+  local font_size, text, dy
   if key:utf_len() == 1 then
-    font_size = 32
+    font_size = 36
     text = key:utf_upper()
+    dy = SCALE
   else
     font_size = 20
     text = key
+    dy = 0
   end
 
-  ui.image(image)
+  ui.start_frame()
+    ui.image(image)
+    local frame_image = Table.last(model.frame)
+  ui.finish_frame()
+
   ui.start_font(font_size)
-  ui.start_frame(nil, -h, w - SCALE, h)
+  ui.start_frame(nil, nil, w - SCALE, h + dy)
   ui.start_alignment("right", "bottom")
     ui.text(text)
   ui.finish_alignment()
   ui.finish_frame()
   ui.finish_font()
+
+  local frame = Table.last(model.frame)
+  frame.x = frame_image.x
+  frame.y = frame_image.y
 
   return {
     is_pressed = is_pressed,

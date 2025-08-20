@@ -57,19 +57,21 @@ methods.draw_gui = function(self, dt)
     ui.br()
     ui.br()
 
-    -- if State.combat then
-      local button = ui.hot_button(SKIP_TURN, "space")
-      if button.is_pressed then
-        player.ai.finish_turn = true
-      end
-    -- end
+    ui.start_line()
+      -- if State.combat then
+        local button = ui.hot_button(SKIP_TURN, "space")
+        if button.is_pressed then
+          player.ai.finish_turn = true
+        end
+      -- end
 
-    do
-      local button = ui.hot_button(JOURNAL, "j")
-      if button.is_pressed then
-        Log.debug("Journal")
+      do
+        local button = ui.hot_button(JOURNAL, "j")
+        if button.is_pressed then
+          Log.debug("Journal")
+        end
       end
-    end
+    ui.finish_line()
 
     ui.br()
 
