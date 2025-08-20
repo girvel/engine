@@ -14,7 +14,7 @@ local draw_gui = function(self, dt)
   State.perspective:update(dt)
 
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - 2 * PADDING)
-    ui.tile("assets/sprites/atlases/sidebar_bg.png")
+    ui.tile(gui.sidebar_bg)
   ui.finish_frame()
 
   ui.start_frame(
@@ -24,9 +24,9 @@ local draw_gui = function(self, dt)
     local player = State.player
 
     ui.start_frame(nil, nil, SIDEBAR_W, HP_BAR_H + 16)
-      ui.tile("engine/assets/sprites/hp_bg.png")
+      ui.tile(gui.hp_bg)
       ui.start_frame(8, 8, SIDEBAR_W - 16, HP_BAR_H)
-        ui.tile("engine/assets/sprites/hp_bar.png")
+        ui.tile(gui.hp_bar)
         ui.start_alignment("center", "center")
         ui.start_font(32)
           ui.text("%s/%s" % {player.hp, player:get_max_hp()})

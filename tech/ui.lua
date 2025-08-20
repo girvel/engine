@@ -30,7 +30,7 @@ local model = {
 }
 
 local CURSORS = {
-  normal = love.mouse.newCursor("engine/assets/sprites/cursor.png"),
+  normal = love.mouse.newCursor("engine/assets/sprites/gui/cursor.png"),
   hand = love.mouse.getSystemCursor("hand"),
 }
 
