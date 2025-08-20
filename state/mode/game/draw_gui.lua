@@ -54,6 +54,9 @@ local draw_gui = function(self, dt)
       end
     ui.finish_line()
 
+    -- ui.start_line()
+    -- ui.finish_line()
+
     ui.br()
 
     -- NEXT (when actions) limit speed

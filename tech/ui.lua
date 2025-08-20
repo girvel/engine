@@ -26,6 +26,7 @@ local model = {
   alignment = {},
   font = {},
   is_linear = {},
+  line_last_h = {},
 }
 
 local CURSORS = {
@@ -55,6 +56,7 @@ ui.start = function()
   model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
   model.is_linear = {false}
+  model.line_last_h = {0}
 end
 
 ui.finish = function()
@@ -93,6 +95,7 @@ ui.start_frame = function(x, y, w, h)
   })
 end
 
+--- @param push_y? boolean
 ui.finish_frame = function(push_y)
   local pop = table.remove(model.frame)
   if push_y then
@@ -130,7 +133,9 @@ end
 
 ui.finish_line = function()
   table.remove(model.is_linear)
-  ui.finish_frame(true)
+  local old_frame = Table.last(model.frame)
+  ui.finish_frame()
+  Table.last(model.frame).y = old_frame.y + table.remove(model.line_last_h)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -235,6 +240,10 @@ ui.image = function(image)
   love.graphics.draw(image, frame.x, frame.y, 0, SCALE)
   if is_linear then
     frame.x = frame.x + image:getWidth() * SCALE
+    model.line_last_h[#model.line_last_h] = math.max(
+      Table.last(model.line_last_h),
+      image:getHeight() * SCALE
+    )
   else
     frame.y = frame.y + image:getHeight() * SCALE
   end
