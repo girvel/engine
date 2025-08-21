@@ -54,18 +54,13 @@ methods.draw_gui = function(self, dt)
     (love.graphics.getHeight() - h) / 2,
     w, h
   )
-    ui.start_font(48)
-    ui.start_alignment("center")
-      ui.text("Журнал")
-    ui.finish_alignment()
-    ui.finish_font()
+    ui.h1("Журнал")
 
     for _, codename in ipairs(State.quests.order) do
       local quest = State.quests.items[codename]
       if not quest then goto continue end
 
       ui.start_font(36)
-        ui.br()
         ui.start_line()
           love.graphics.setColor(DIMMED)
           ui.text("# ")
@@ -99,6 +94,8 @@ methods.draw_gui = function(self, dt)
         end
 
       end
+      ui.br()
+      ui.br()
 
       ::continue::
     end

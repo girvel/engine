@@ -47,6 +47,8 @@ methods.draw_gui = function(self, dt)
     (love.graphics.getHeight() - h) / 2,
     w, h
   )
+    ui.h1("Загрузить игру")
+
     local options = Kernel:list_saves()
 
     local n = ui.choice(options)

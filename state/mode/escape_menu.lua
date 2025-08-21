@@ -27,7 +27,7 @@ methods.draw_entity = function(self, ...)
   self._prev:draw_entity(...)
 end
 
-local W = 240
+local W = 320
 local H = 140
 local PADDING = 40
 
@@ -48,10 +48,10 @@ methods.draw_gui = function(self, dt)
   )
   ui.start_font(36)
     local n = ui.choice({
-      "Continue",
-      "Save game",
-      "Load game",
-      "Exit game",
+      "Продолжить",
+      "Сохранить игру",
+      "Загрузить игру",
+      "Выход",
     })
 
     local escape_pressed = ui.keyboard("escape")

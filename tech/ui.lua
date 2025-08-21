@@ -29,6 +29,7 @@ local model = {
   frame = {},
   alignment = {},
   font = {},
+  font_size = {},
   is_linear = {},
   line_last_h = {},
 }
@@ -62,6 +63,7 @@ ui.start = function()
   }}
   model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
+  model.font_size = {20}
   model.is_linear = {false}
   model.line_last_h = {0}
 end
@@ -123,13 +125,16 @@ end
 
 --- @param size? integer
 ui.start_font = function(size)
-  local font = get_font(size or 20)
+  size = size or 20
+  local font = get_font(size)
   table.insert(model.font, font)
+  table.insert(model.font_size, size)
   love.graphics.setFont(font)
 end
 
 ui.finish_font = function()
   table.remove(model.font)
+  table.remove(model.font_size)
   love.graphics.setFont(Table.last(model.font))
 end
 
@@ -208,6 +213,18 @@ end
 
 ui.br = function()
   ui.text(" ")
+end
+
+--- @param text string
+ui.h1 = function(text)
+  local font_size = Table.last(model.font_size)
+
+  ui.start_font(font_size * 2)
+  ui.start_alignment("center")
+    ui.text(text)
+    ui.br()
+  ui.finish_alignment()
+  ui.finish_font()
 end
 
 --- @param headers string[]
