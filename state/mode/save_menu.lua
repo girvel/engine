@@ -47,6 +47,10 @@ methods.draw_gui = function(self, dt)
       Kernel:plan_save(options[n])
     end
 
+    if n and self._prev.type == "escape_menu" then
+      self._prev.has_saved = true
+    end
+
     if n or escape_pressed then
       ui.handle_selection_reset()
       State.mode:close_menu()

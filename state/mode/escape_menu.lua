@@ -7,6 +7,7 @@ local escape_menu = {}
 
 --- @class state_mode_escape_menu
 --- @field type "escape_menu"
+--- @field has_saved boolean
 --- @field _prev state_mode_game
 --- @field _display_confirmation boolean
 local methods = {}
@@ -17,6 +18,7 @@ local mt = {__index = methods}
 escape_menu.new = function(prev)
   return setmetatable({
     type = "escape_menu",
+    has_saved = false,
     _prev = prev,
     _display_confirmation = false,
   }, mt)
@@ -70,15 +72,30 @@ methods.render_menu = function(self)
   tk.finish_window()
 end
 
+local WHITE = Vector.hex("ffffff")
+local RED = Vector.hex("99152c")
+
 methods.render_confirmation = function(self)
   local W = 470
   local H = 160
+
+  if not self.has_saved then
+    H = H + 60
+  end
 
   tk.start_window("center", "center", W, H)
   ui.start_font(28)
     ui.start_alignment("center")
       ui.text("Вы действительно хотите выйти из игры?")
       ui.br()
+
+      if not self.has_saved then
+        love.graphics.setColor(RED)
+        ui.text("Игра не сохранена")
+        ui.br()
+        love.graphics.setColor(WHITE)
+      end
+
       local n = ui.choice({
         "Вернуться  ",
         "Выйти из игры  ",
