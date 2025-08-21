@@ -46,7 +46,7 @@ methods.draw_gui = function(self, dt)
     local escape_pressed = ui.keyboard("escape")
 
     if n == 1 then
-      Kernel:plan_save("save_" .. #options)
+      Kernel:plan_save("save_" .. os.date("%Y-%m-%d_%H-%M-%S"))
     elseif n then
       Kernel:plan_save(options[n])
     end
