@@ -54,7 +54,6 @@ love.run = function()
 	love.timer.step()
 	local dt = 0
 
-  local once = true  -- TODO! remove
 	return function()
     if Kernel._load then
       saves.read(Kernel._load)
@@ -87,12 +86,6 @@ love.run = function()
     if Kernel._save then
       saves.write(Kernel._save)
       Kernel._save = nil
-    end
-
-    if once then
-      saves.write("test")
-      saves.read("test")
-      once = false
     end
   end
 end
