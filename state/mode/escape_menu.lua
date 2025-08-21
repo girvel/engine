@@ -32,7 +32,6 @@ end
 
 local W = 320
 local H = 140
-local PADDING = 40
 
 local CONFIRMATION_W = 400
 local CONFIRMATION_H = 200

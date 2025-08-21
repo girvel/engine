@@ -1,5 +1,5 @@
 local ui = require("engine.tech.ui")
-local gui_elements = require("engine.state.mode.gui_elements")
+local tk = require("engine.state.mode.tk")
 
 
 local journal = {}
@@ -38,22 +38,8 @@ methods.draw_gui = function(self, dt)
   end
 
   local w = math.min(love.graphics.getWidth() - 4 * PADDING, 800)
-  local h = love.graphics.getHeight() - 4 * PADDING
 
-  ui.start_frame(
-    (love.graphics.getWidth() - w) / 2 - PADDING,
-    (love.graphics.getHeight() - h) / 2 - PADDING,
-    w + 2 * PADDING,
-    h + 2 * PADDING
-  )
-    ui.tile(gui_elements.window_bg)
-  ui.finish_frame()
-
-  ui.start_frame(
-    (love.graphics.getWidth() - w) / 2,
-    (love.graphics.getHeight() - h) / 2,
-    w, h
-  )
+  tk.start_window("center", "center", w, "max")
     ui.h1("Журнал")
 
     for _, codename in ipairs(State.quests.order) do
@@ -99,7 +85,7 @@ methods.draw_gui = function(self, dt)
 
       ::continue::
     end
-  ui.finish_frame()
+  tk.finish_window()
 end
 
 Ldump.mark(journal, {}, ...)

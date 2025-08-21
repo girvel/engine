@@ -8,11 +8,19 @@ local PADDING = 40
 
 --- @param x integer|"center"
 --- @param y integer|"center"
---- @param w integer
---- @param h integer
+--- @param w integer|"max"
+--- @param h integer|"max"
 tk.start_window = function(x, y, w, h)
   assert(x == "center")
   assert(y == "center")
+
+  if w == "max" then
+    w = love.graphics.getWidth() - 4 * PADDING
+  end
+
+  if h == "max" then
+    h = love.graphics.getHeight() - 4 * PADDING
+  end
 
   ui.start_frame(
     (love.graphics.getWidth() - w) / 2 - PADDING,
