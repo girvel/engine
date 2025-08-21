@@ -18,14 +18,18 @@ methods.draw_gui = function()
   ui.start_font(48)
   ui.start_frame(200, 200)
     local choice = ui.choice({
-      "New game",
-      "Load game",
+      "Новая игра",
+      "Загрузить игру",
+      "Выход",
     })
 
     if choice == 1 then
       State.mode:start_game()
     elseif choice == 2 then
       Log.info("Load a save")
+    elseif choice == 3 then
+      Log.info("Exiting from the main menu")
+      love.event.quit()
     end
   ui.finish_frame()
   ui.finish_font()
