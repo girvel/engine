@@ -43,6 +43,12 @@ local methods = {
     Log.info("Opening escape menu")
     self._mode = STATES.escape_menu.new(self._mode --[[@as state_mode_game]])
   end,
+
+  close_escape_menu = function(self)
+    assert(self._mode.type == "escape_menu")
+    Log.info("Closing escape menu")
+    self._mode = self._mode._game
+  end,
 }
 
 local mt = {__index = methods}

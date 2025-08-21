@@ -27,8 +27,8 @@ methods.draw_entity = function(self, ...)
   self._game:draw_entity(...)
 end
 
-local W = 300
-local H = 600
+local W = 240
+local H = 140
 local PADDING = 40
 
 methods.draw_gui = function(self, dt)
@@ -46,7 +46,26 @@ methods.draw_gui = function(self, dt)
     (love.graphics.getHeight() - H) / 2,
     W, H
   )
-    ui.text("Lorem ipsum dolor asdf ewnksl asdifojne")
+  ui.start_font(36)
+    local n = ui.choice({
+      "Continue",
+      "Save game",
+      "Load game",
+      "Exit game",
+    })
+
+    if n == 1 then
+      State.mode:close_escape_menu()
+    elseif n == 2 then
+      Log.debug("Save game")
+    elseif n == 3 then
+      Log.debug("Load game")
+    elseif n == 4 then
+      -- NEXT (save/load) make sure the game is saved
+      Log.info("Exiting the game from escape menu")
+      love.event.quit()
+    end
+  ui.finish_font()
   ui.finish_frame()
 end
 
