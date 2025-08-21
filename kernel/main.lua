@@ -26,7 +26,6 @@ for callback_name, _ in pairs(
   end
 end
 
--- NEXT love.run
 local inner_draw = love.draw
 love.draw = function()
   inner_draw(love.timer.getDelta())
@@ -46,6 +45,38 @@ end
 
 love.quit = function()
   Log.info("Exited smoothly")
+end
+
+love.run = function()
+	love.load(love.arg.parseGameArguments(arg), arg)
+
+	love.timer.step()
+	local dt = 0
+
+	return function()
+    love.event.pump()
+    for name, a,b,c,d,e,f in love.event.poll() do
+      if name == "quit" then
+        if not love.quit or not love.quit() then
+          return a or 0
+        end
+      end
+      love.handlers[name](a,b,c,d,e,f)
+    end
+
+		dt = love.timer.step()
+
+		love.update(dt)
+
+    love.graphics.origin()
+    love.graphics.clear(love.graphics.getBackgroundColor())
+
+    love.draw()
+
+    love.graphics.present()
+
+		love.timer.sleep(0.001)
+  end
 end
 
 Log.info("Initialized kernel setup")
