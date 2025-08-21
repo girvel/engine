@@ -39,6 +39,21 @@ vector.filled = function(size, f)
   return vector.own(result)
 end
 
+--- Creates vector from its hexadecimal representation; each coordinate is between 0 and 1
+--- @param hex string
+--- @param number_length? integer length of a single number, default 2
+--- @return vector
+vector.hex = function(hex, number_length)
+  number_length = number_length or 2
+  assert(#hex % number_length == 0)
+  local base = {}
+  local d = 16 ^ number_length
+  for i = 1, #hex, number_length do
+    table.insert(base, tonumber(hex:sub(i, i + number_length - 1), 16) / d)
+  end
+  return vector.own(base)
+end
+
 vector.zero = vector.new(0, 0)
 vector.one = vector.new(1, 1)
 vector.up = vector.new(0, -1)
@@ -277,7 +292,7 @@ vector_methods.normalized2 = function(self)
   elseif self[2] ~= 0 then
     return vector({0, sign(self[2])})
   else
-    error("Can not normalize Vector.zero")
+    error("Can not normalize vector.zero")
   end
 end
 

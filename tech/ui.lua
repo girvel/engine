@@ -169,8 +169,13 @@ ui.text = function(text)
   local frame = Table.last(model.frame)
   local font = Table.last(model.font)
   local alignment = Table.last(model.alignment)
+  local is_linear = Table.last(model.is_linear)
 
   local wrapped = wrap(text)
+
+  if is_linear then
+    assert(#wrapped == 1)
+  end
 
   for i, line in ipairs(wrapped) do
     local dx = 0
@@ -188,7 +193,15 @@ ui.text = function(text)
     love.graphics.print(line, frame.x + dx, frame.y + dy)
 
     if alignment.y == "top" then
-      frame.y = frame.y + font:getHeight() * 1.25
+      if is_linear then
+        frame.x = frame.x + font:getWidth(text)
+        model.line_last_h[#model.line_last_h] = math.max(
+          Table.last(model.line_last_h),
+          font:getHeight() * 1.25
+        )
+      else
+        frame.y = frame.y + font:getHeight() * 1.25
+      end
     end
   end
 end

@@ -28,6 +28,8 @@ methods.draw_entity = function(self, ...)
 end
 
 local PADDING = 40
+local DIMMED = Vector.hex("2A3E34")
+local WHITE = Vector.hex("FFFFFF")
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
@@ -62,21 +64,34 @@ methods.draw_gui = function(self, dt)
 
       ui.start_font(36)
         ui.br()
-        ui.text("# " .. quest.name)
+        ui.start_line()
+          love.graphics.setColor(DIMMED)
+          ui.text("# ")
+          love.graphics.setColor(WHITE)
+          ui.text(quest.name)
+        ui.finish_line()
       ui.finish_font()
       ui.br()
 
       for _, objective in ipairs(quest.objectives) do
         local prefix
+        local needs_color_reset = true
         if objective.status == "done" then
+          love.graphics.setColor(DIMMED)
           prefix = "+ "
         elseif objective.status == "failed" then
+          love.graphics.setColor(DIMMED)
           prefix = "x "
         else
           prefix = "- "
+          needs_color_reset = false
         end
 
         ui.text(prefix .. objective.text)
+
+        if needs_color_reset then
+          love.graphics.setColor(WHITE)
+        end
       end
     end
   ui.finish_frame()
