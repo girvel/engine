@@ -13,12 +13,6 @@ local draw_gui = function(self, dt)
   State.perspective:update(dt)
   local SIDEBAR_W = State.perspective.SIDEBAR_W - 2 * PADDING
 
-  if State.debug then
-    ui.start_frame()
-      ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
-    ui.finish_frame()
-  end
-
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - 2 * PADDING)
     ui.tile(gui.window_bg)
   ui.finish_frame()

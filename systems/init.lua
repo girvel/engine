@@ -15,4 +15,5 @@ return {
 
   -- love.draw
   require("engine.systems.drawing"),
+  require("engine.systems.draw_fps"),
 }

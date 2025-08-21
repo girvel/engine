@@ -424,7 +424,6 @@ end
 -- Can optionally add default Systems and Entities. Returns the new World along
 -- with default Entities and Systems.
 function tiny.world(...)
-    Log.trace(...)
     local ret = setmetatable({
 
         -- List of Entities to remove

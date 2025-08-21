@@ -6,6 +6,7 @@ local STATES = {
   loading_screen = require("engine.state.mode.loading_screen"),
   escape_menu = require("engine.state.mode.escape_menu"),
   journal = require("engine.state.mode.journal"),
+  save_menu = require("engine.state.mode.save_menu"),
 }
 
 --- @class state_mode
@@ -63,6 +64,18 @@ local methods = {
     self._mode = self._mode._game
     State.quests:new_content_is_read()
   end,
+
+  open_save_menu = function(self)
+    assert(self._mode.type == "escape_menu")
+    Log.info("Opening save menu")
+    self._mode = STATES.save_menu.new(self._mode)
+  end,
+
+  close_save_menu = function(self)
+    assert(self._mode.type == "save_menu")
+    Log.info("Closing save menu")
+    self._mode = self._mode._prev
+  end
 }
 
 local mt = {__index = methods}

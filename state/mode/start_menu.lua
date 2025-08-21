@@ -23,6 +23,10 @@ methods.draw_gui = function()
       "Выход",
     })
 
+    if choice then
+      ui.handle_selection_reset()
+    end
+
     if choice == 1 then
       State.mode:start_game()
     elseif choice == 2 then

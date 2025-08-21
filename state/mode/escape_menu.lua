@@ -54,11 +54,17 @@ methods.draw_gui = function(self, dt)
       "Exit game",
     })
 
-    if n == 1 or ui.keyboard("escape") then
+    local escape_pressed = ui.keyboard("escape")
+
+    if n or escape_pressed then
+      ui.handle_selection_reset()
+    end
+
+    if n == 1 or escape_pressed then
       State.mode:close_escape_menu()
     elseif n == 2 then
       -- NEXT (save/load)
-      Kernel:plan_save("test")
+      State.mode:open_save_menu()
     elseif n == 3 then
       -- NEXT (save/load)
       Kernel:plan_load("test")
