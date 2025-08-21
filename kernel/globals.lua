@@ -2,6 +2,8 @@ Log = require("engine.lib.log")
 Ldump = require("engine.lib.ldump")
 
 
+Argparse = require("engine.lib.argparse")
+
 Common = require("engine.lib.common")
 
 CompositeMap = require("engine.lib.composite_map")

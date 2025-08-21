@@ -1,3 +1,4 @@
+local cli = require "engine.kernel.cli"
 -- pre-initialization --
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
@@ -31,10 +32,14 @@ love.draw = function()
   inner_draw(love.timer.getDelta())
 end
 
-love.load = function()
+love.load = function(args)
   Log.info("Started love.load")
 
+  args = cli.parse(args)
+  Log.info("CLI args:", args)
+
   State = state.new(systems)
+  State.debug = args.debug
 
   Log.info("Finished love.load")
 end

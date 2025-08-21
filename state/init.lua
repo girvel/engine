@@ -14,6 +14,7 @@ local state = {}
 --- @field grid_size vector
 --- @field level level_info
 --- @field player player
+--- @field debug boolean
 --- @field _world table
 --- @field _entities table
 local state_methods = {
