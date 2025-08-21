@@ -30,7 +30,7 @@ methods.draw_gui = function()
     if choice == 1 then
       State.mode:start_game()
     elseif choice == 2 then
-      Log.info("Load a save")
+      State.mode:open_load_menu()
     elseif choice == 3 then
       Log.info("Exiting from the main menu")
       love.event.quit()

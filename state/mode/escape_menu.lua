@@ -25,11 +25,15 @@ escape_menu.new = function(prev)
 end
 
 methods.draw_grid = function(self, ...)
-  self._prev:draw_grid(...)
+  if self._prev.draw_grid then
+    self._prev:draw_grid(...)
+  end
 end
 
 methods.draw_entity = function(self, ...)
-  self._prev:draw_entity(...)
+  if self._prev.draw_entity then
+    self._prev:draw_entity(...)
+  end
 end
 
 methods.draw_gui = function(self, dt)
