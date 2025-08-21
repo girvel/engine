@@ -520,5 +520,5 @@ end
 -- [SECTION] Footer
 ----------------------------------------------------------------------------------------------------
 
--- NOTICE no Ldump.mark, the module is never serialized
+Ldump.mark(ui, {}, ...)
 return ui

@@ -1,0 +1,36 @@
+local saves = {}
+
+local SLASH = love.system.getOS() == "Windows" and "\\" or "/"
+
+saves.write = function(filepath)
+  love.filesystem.createDirectory("saves")
+  filepath = "saves" .. SLASH .. filepath
+
+  local base = love.filesystem.getSaveDirectory()
+  Log.info("Saving the game to %s%s%s" % {base, SLASH, filepath})
+
+  local t = love.timer.getTime()
+  love.filesystem.write(filepath, love.data.compress("string", "gzip", Ldump(State)))
+  t = love.timer.getTime() - t
+
+  Fun.iter(Ldump.get_warnings()):each(Log.warn)
+  local size_kb = love.filesystem.getInfo(filepath).size / 1024
+  Log.info("Game saved in %.2f s, file size %.2f KB" % {t, size_kb})
+end
+
+saves.read = function(filepath)
+  filepath = "saves" .. SLASH .. filepath
+
+  local base = love.filesystem.getSaveDirectory()
+  Log.info("Loading the game from %s%s%s" % {base, SLASH, filepath})
+
+  State = assert(loadstring(
+    love.data.decompress(
+      "string", "gzip", love.filesystem.read(filepath)
+    ) --[[@as string]],
+    filepath
+  ))()
+  Log.info("Game loaded")
+end
+
+return saves

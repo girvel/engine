@@ -1,4 +1,5 @@
 local cli = require "engine.kernel.cli"
+local saves = require "engine.kernel.saves"
 -- pre-initialization --
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
@@ -76,6 +77,11 @@ love.run = function()
     love.graphics.present()
 
 		love.timer.sleep(0.001)
+
+    if Kernel._save then
+       saves.write(Kernel._save)
+       Kernel._save = nil
+    end
   end
 end
 

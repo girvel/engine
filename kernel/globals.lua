@@ -2,6 +2,9 @@ Log = require("engine.lib.log")
 Ldump = require("engine.lib.ldump")
 
 
+Kernel = require("engine.kernel").new()
+
+
 Argparse = require("engine.lib.argparse")
 
 Common = require("engine.lib.common")
@@ -34,7 +37,17 @@ require("engine.lib.string")
 Table = require("engine.lib.table")
 
 Tiny = require("engine.lib.tiny")
--- NEXT does it need a tiny_dump_patch?
+Tiny.worldMetaTable.__serialize = function(self)
+  local systems = self.systems
+  local entities = self.entities
+  return function()
+    local result = Tiny.world(unpack(systems))
+    for _, e in ipairs(entities) do
+      result:add(e)
+    end
+    return result
+  end
+end
 
 Vector = require("engine.lib.vector")
 V = Vector.new
