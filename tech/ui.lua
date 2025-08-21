@@ -7,6 +7,7 @@ local ui = {}
 ----------------------------------------------------------------------------------------------------
 
 local model = {
+  -- input state --
   mouse = {
     x = 0,
     y = 0,
@@ -16,12 +17,15 @@ local model = {
     pressed = {},
   },
 
+ -- accumulated state --
   selection = {
     i = 1,
     max_i = 0,
     is_pressed = false,
   },
+  active_frames_t = CompositeMap.new(),
 
+  -- context --
   frame = {},
   alignment = {},
   font = {},
@@ -35,6 +39,7 @@ local CURSORS = {
 }
 
 local FRAME = "engine/assets/sprites/gui/button_frame.png"
+local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
 local SCALE = 4  -- TODO extract scale here & in view
 
@@ -252,6 +257,8 @@ ui.image = function(image)
   end
 end
 
+local ACTIVE_FRAME_PERIOD = .1
+
 --- @param image string|love.Image
 --- @param key love.KeyConstant
 --- @return {is_pressed: boolean, is_mouse_over: boolean}
@@ -262,6 +269,12 @@ ui.hot_button = function(image, key)
   local is_mouse_over = get_mouse_over(w, h)
   local is_pressed = (is_mouse_over and model.mouse.button_pressed)
     or Table.contains(model.keyboard.pressed, key)
+
+  if is_pressed then
+    model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
+  end
+
+  local is_active = model.active_frames_t:get(image, key)
 
   local font_size, text, dy
   if key:utf_len() == 1 then
@@ -279,9 +292,9 @@ ui.hot_button = function(image, key)
     local frame_image = Table.last(model.frame)
   ui.finish_frame()
 
-  if is_mouse_over then
+  if is_mouse_over or is_active then
     ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
-      ui.tile(FRAME)
+      ui.tile(is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()
   end
 
@@ -437,6 +450,16 @@ end
 
 ui.handle_mousepress = function(button)
   model.mouse.button_pressed = button
+end
+
+ui.handle_update = function(dt)
+  for k, v in model.active_frames_t:iter() do
+    local next_v = v - dt
+    if next_v <= 0 then
+      next_v = nil
+    end
+    model.active_frames_t:set(next_v, unpack(k))
+  end
 end
 
 ----------------------------------------------------------------------------------------------------

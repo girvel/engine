@@ -11,6 +11,7 @@ return {
   -- love.update
   require("engine.systems.acting"),
   require("engine.systems.animation"),
+  require("engine.systems.ui_update"),
 
   -- love.draw
   require("engine.systems.drawing"),
