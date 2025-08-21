@@ -1,4 +1,4 @@
-local gui_elements = require("engine.state.mode.game.gui_elements")
+local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 
 
@@ -38,7 +38,7 @@ methods.draw_gui = function(self, dt)
     W + 2 * PADDING,
     H + 2 * PADDING
   )
-    ui.tile(gui_elements.sidebar_bg)
+    ui.tile(gui_elements.window_bg)
   ui.finish_frame()
 
   ui.start_frame(

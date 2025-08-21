@@ -1,7 +1,7 @@
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
-local gui = require("engine.state.mode.game.gui_elements")
+local gui = require("engine.state.mode.gui_elements")
 
 
 local PADDING = 40
@@ -14,7 +14,7 @@ local draw_gui = function(self, dt)
   local SIDEBAR_W = State.perspective.SIDEBAR_W - 2 * PADDING
 
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - 2 * PADDING)
-    ui.tile(gui.sidebar_bg)
+    ui.tile(gui.window_bg)
   ui.finish_frame()
 
   ui.start_frame(

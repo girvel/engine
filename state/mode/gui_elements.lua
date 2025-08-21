@@ -1,4 +1,4 @@
-local sprite       = require("engine.tech.sprite")
+local sprite = require("engine.tech.sprite")
 
 
 local ICON_ATLAS = love.graphics.newImage("engine/assets/sprites/gui/icons.png")
@@ -16,7 +16,7 @@ local gui_elements = {
   journal = nth(17),
   escape_menu = nth(18),
 
-  sidebar_bg = "engine/assets/sprites/gui/sidebar_bg.png",
+  window_bg = "engine/assets/sprites/gui/window_bg.png",
   hp_bg = "engine/assets/sprites/gui/hp_bg.png",
   hp_bar = "engine/assets/sprites/gui/hp_bar.png",
 }
