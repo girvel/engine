@@ -9,7 +9,7 @@ local utf8 = require("utf8")
 string.utf_sub = function(str, a, b)
   local utf_len = str:utf_len()
   if a > utf_len then
-    a = utf_len
+    return ""
   end
   if not b or b > utf_len then
     b = utf_len

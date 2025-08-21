@@ -305,13 +305,17 @@ local SWIZZLE_BASES = {
 }
 
 vector.mt.__index = function(self, key)
+  if type(key) == "number" then
+    return rawget(self, key)
+  end
+
   local method = vector_methods[key]
   if method then return method end
 
   for _, base in ipairs(SWIZZLE_BASES) do
     local index = base[key]
     if index then
-      return self[index]
+      return rawget(self, index)
     end
   end
 
