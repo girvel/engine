@@ -39,25 +39,18 @@ local draw_gui = function(self, dt)
     ui.br()
 
     ui.start_line()
-      do
-        local button = ui.hot_button(gui.escape_menu, "escape")
-        if button.is_pressed then
-          State.mode:open_escape_menu()
-        end
-        ui.offset(4)
+      if ui.hot_button(gui.escape_menu, "escape") then
+        State.mode:open_escape_menu()
       end
+      ui.offset(4)
 
-      do
-        local button = ui.hot_button(gui.journal, "j")
-        if button.is_pressed then
-          Log.debug("Journal")
-        end
-        ui.offset(4)
+      if ui.hot_button(gui.journal, "j") then
+        Log.debug("Journal")
       end
+      ui.offset(4)
 
       if State.combat then
-        local button = ui.hot_button(gui.skip_turn, "space")
-        if button.is_pressed then
+        if ui.hot_button(gui.skip_turn, "space") then
           player.ai.finish_turn = true
         end
         ui.offset(4)
@@ -66,21 +59,15 @@ local draw_gui = function(self, dt)
     ui.offset(0, 4)
 
     ui.start_line()
-      do
-        local button = ui.hot_button(gui.hand_attack, "1")
-        if button.is_pressed then
-          Log.debug("Hand attack")
-        end
-        ui.offset(4)
+      if ui.hot_button(gui.hand_attack, "1") then
+        Log.debug("Hand attack")
       end
+      ui.offset(4)
 
-      do
-        local button = ui.hot_button(gui.offhand_attack, "2")
-        if button.is_pressed then
-          Log.debug("Offhand attack")
-        end
-        ui.offset(4)
+      if ui.hot_button(gui.offhand_attack, "2") then
+        Log.debug("Offhand attack")
       end
+      ui.offset(4)
     ui.finish_line()
 
     ui.br()

@@ -57,8 +57,10 @@ methods.draw_gui = function(self, dt)
     if n == 1 then
       State.mode:close_escape_menu()
     elseif n == 2 then
+      -- NEXT (save/load)
       Log.debug("Save game")
     elseif n == 3 then
+      -- NEXT (save/load)
       Log.debug("Load game")
     elseif n == 4 then
       -- NEXT (save/load) make sure the game is saved
