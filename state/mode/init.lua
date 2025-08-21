@@ -5,6 +5,7 @@ local STATES = {
   game = require("engine.state.mode.game"),
   loading_screen = require("engine.state.mode.loading_screen"),
   escape_menu = require("engine.state.mode.escape_menu"),
+  journal = require("engine.state.mode.journal"),
 }
 
 --- @class state_mode
@@ -47,6 +48,18 @@ local methods = {
   close_escape_menu = function(self)
     assert(self._mode.type == "escape_menu")
     Log.info("Closing escape menu")
+    self._mode = self._mode._game
+  end,
+
+  open_journal = function(self)
+    assert(self._mode.type == "game")
+    Log.info("Opening journal")
+    self._mode = STATES.journal.new(self._mode --[[@as state_mode_game]])
+  end,
+
+  close_journal = function(self)
+    assert(self._mode.type == "journal")
+    Log.info("Closing journal")
     self._mode = self._mode._game
   end,
 }

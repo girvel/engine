@@ -45,7 +45,7 @@ local draw_gui = function(self, dt)
       ui.offset(4)
 
       if ui.hot_button(gui.journal, "j") then
-        Log.debug("Journal")
+        State.mode:open_journal()
       end
       ui.offset(4)
 
