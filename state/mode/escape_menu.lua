@@ -30,13 +30,18 @@ methods.draw_entity = function(self, ...)
   self._prev:draw_entity(...)
 end
 
-local W = 320
-local H = 140
-
-local CONFIRMATION_W = 400
-local CONFIRMATION_H = 200
-
 methods.draw_gui = function(self, dt)
+  if self._display_confirmation then
+    self:render_confirmation()
+  else
+    self:render_menu()
+  end
+end
+
+methods.render_menu = function(self)
+  local W = 320
+  local H = 140
+
   tk.start_window("center", "center", W, H)
   ui.start_font(36)
     local n = ui.choice({
@@ -63,14 +68,32 @@ methods.draw_gui = function(self, dt)
     end
   ui.finish_font()
   tk.finish_window()
+end
 
-  -- if self._display_confirmation then
-  --   ui.start_frame(
-  --     (love.graphics.getWidth() - CONFIRMATION_W) / 2,
-  --     (love.graphics.getHeight() - CONFIRMATION_H) / 2
-  --       -- NEXT (save/load) make sure the game is saved
-  --       Log.info("Exiting the game from escape menu")
-  --       love.event.quit()
+methods.render_confirmation = function(self)
+  local W = 470
+  local H = 160
+
+  tk.start_window("center", "center", W, H)
+  ui.start_font(28)
+    ui.start_alignment("center")
+      ui.text("Вы действительно хотите выйти из игры?")
+      ui.br()
+      local n = ui.choice({
+        "Вернуться  ",
+        "Выйти из игры  ",
+      })
+    ui.finish_alignment()
+
+    if n == 1 then
+      self._display_confirmation = false
+    elseif n == 2 then
+      -- NEXT (save/load) make sure the game is saved
+      Log.info("Exiting the game from escape menu")
+      love.event.quit()
+    end
+  ui.finish_font()
+  tk.finish_window()
 end
 
 Ldump.mark(escape_menu, {}, ...)
