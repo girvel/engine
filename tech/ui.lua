@@ -200,13 +200,16 @@ end
 --- @param headers string[]
 --- @param content any[][]
 ui.table = function(headers, content)
+  local frame = Table.last(model.frame)
+  local font = Table.last(model.font)
+
   for y, row in ipairs(content) do
     for x, value in ipairs(row) do
       content[y][x] = tostring(value)
     end
   end
 
-  local column_sizes = Fun.range(#headers)
+  local original_column_sizes = Fun.range(#headers)
     :map(function(x)
       return math.max(
         headers[x]:utf_len(),
@@ -216,12 +219,20 @@ ui.table = function(headers, content)
     end)
     :totable()
 
+  local original_w = Fun.iter(original_column_sizes):sum()
+  local total_w = math.floor(frame.w / font:getWidth("i"))
+  local k = total_w / original_w
+
+  local column_sizes = Fun.iter(original_column_sizes)
+    :map(function(w) return math.floor(w * k) - 2 end)
+    :totable()
+
   ui.text(Fun.iter(headers)
     :enumerate()
     :map(function(x, h) return h .. " " * (column_sizes[x] - h:utf_len()) .. "  " end)
     :reduce(Fun.op.concat, ""))
 
-  ui.text("-" * (Fun.iter(column_sizes):sum() + 2 * #column_sizes - 2))
+  ui.text("-" * (total_w))
 
   for _, row in ipairs(content) do
     ui.text(Fun.iter(row)
