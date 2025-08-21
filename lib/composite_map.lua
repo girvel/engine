@@ -6,10 +6,14 @@ local composite_map = {}
 local methods = {}
 composite_map.mt = {__index = methods}
 
+--- @return composite_map
 composite_map.new = function()
   return setmetatable({_items = {}}, composite_map.mt)
 end
 
+--- @param value any
+--- @param head any
+--- @param ... any
 methods.set = function(self, value, head, ...)
   if head == nil then
     self._value = value
@@ -26,6 +30,9 @@ methods.set = function(self, value, head, ...)
   methods.set(self, value, ...)
 end
 
+
+--- @param head any
+--- @param ... any
 methods.get = function(self, head, ...)
   if head == nil then
     return self._value
@@ -41,6 +48,7 @@ end
 
 local iter
 
+--- NOTICE returned keys should not be mutated
 methods.iter = function(self)
   return coroutine.wrap(function() iter(self, {}) end)
 end

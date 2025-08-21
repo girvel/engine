@@ -40,6 +40,14 @@ local draw_gui = function(self, dt)
 
     ui.start_line()
       do
+        local button = ui.hot_button(gui.escape_menu, "escape")
+        if button.is_pressed then
+          State.mode:open_escape_menu()
+        end
+        ui.offset(4)
+      end
+
+      do
         local button = ui.hot_button(gui.journal, "j")
         if button.is_pressed then
           Log.debug("Journal")

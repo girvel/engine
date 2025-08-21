@@ -4,11 +4,14 @@ local ui = require("engine.tech.ui")
 local start_menu = {}
 
 --- @class state_mode_start_menu
+--- @field type "start_menu"
 local methods = {}
 local mt = {__index = methods}
 
 start_menu.new = function()
-  return setmetatable({}, mt)
+  return setmetatable({
+    type = "start_menu",
+  }, mt)
 end
 
 methods.draw_gui = function()

@@ -4,6 +4,7 @@ local STATES = {
   start_menu = require("engine.state.mode.start_menu"),
   game = require("engine.state.mode.game"),
   loading_screen = require("engine.state.mode.loading_screen"),
+  escape_menu = require("engine.state.mode.escape_menu"),
 }
 
 --- @class state_mode
@@ -22,6 +23,8 @@ local methods = {
   end,
 
   start_game = function(self)
+    -- TODO switch modes between frames, not in the middle
+    assert(self._mode.type == "start_menu")
     Log.info("Starting new game...")
     self._mode = STATES.loading_screen.new(
       coroutine.create(Fn.curry(State.load_level, State, "levels.main")),
@@ -30,8 +33,15 @@ local methods = {
   end,
 
   start_game_finish = function(self)
+    assert(self._mode.type == "loading_screen")
     Log.info("Game started")
     self._mode = STATES.game.new()
+  end,
+
+  open_escape_menu = function(self)
+    assert(self._mode.type == "game")
+    Log.info("Opening escape menu")
+    self._mode = STATES.escape_menu.new(self._mode --[[@as state_mode_game]])
   end,
 }
 
