@@ -97,7 +97,10 @@ local draw_gui = function(self, dt)
         return player.resources[key] and (State.combat or key ~= "movement")
       end)
       :map(function(key)
-        return {translation.resources[key], player.resources[key] .. "/" .. max[key]}
+        return {
+          translation.resources[key]:utf_capitalize(),
+          player.resources[key] .. "/" .. max[key]
+        }
       end)
       :totable())
 

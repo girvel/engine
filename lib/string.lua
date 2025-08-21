@@ -57,6 +57,13 @@ string.utf_upper = function(str)
   return str
 end
 
+--- Put the first UTF-8 character of `str` into uppercase
+--- @param str string
+--- @return string
+string.utf_capitalize = function(str)
+  return str:utf_sub(1, 1):utf_upper() .. str:utf_sub(2)
+end
+
 --- @param str string
 --- @param prefix string
 --- @return boolean
