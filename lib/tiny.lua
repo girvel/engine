@@ -292,7 +292,8 @@ end
 
 -- Use an empty table as a key for identifying Systems. Any table that contains
 -- this key is considered a System rather than an Entity.
-local systemTableKey = { "SYSTEM_TABLE_KEY" }
+tiny.systemTableKey = { "SYSTEM_TABLE_KEY" }
+local systemTableKey = tiny.systemTableKey
 
 -- Checks if a table is a System.
 local function isSystem(table)
@@ -423,6 +424,7 @@ end
 -- Can optionally add default Systems and Entities. Returns the new World along
 -- with default Entities and Systems.
 function tiny.world(...)
+    Log.trace(...)
     local ret = setmetatable({
 
         -- List of Entities to remove

@@ -2,9 +2,9 @@ local saves = {}
 
 local SLASH = love.system.getOS() == "Windows" and "\\" or "/"
 
-saves.write = function(filepath)
+saves.write = function(name)
   love.filesystem.createDirectory("saves")
-  filepath = "saves" .. SLASH .. filepath
+  local filepath = "saves" .. SLASH .. name .. ".ldump.gz"
 
   local base = love.filesystem.getSaveDirectory()
   Log.info("Saving the game to %s%s%s" % {base, SLASH, filepath})
@@ -18,19 +18,22 @@ saves.write = function(filepath)
   Log.info("Game saved in %.2f s, file size %.2f KB" % {t, size_kb})
 end
 
-saves.read = function(filepath)
-  filepath = "saves" .. SLASH .. filepath
+saves.read = function(name)
+  local filepath = "saves" .. SLASH .. name .. ".ldump.gz"
 
   local base = love.filesystem.getSaveDirectory()
   Log.info("Loading the game from %s%s%s" % {base, SLASH, filepath})
 
+  local t = love.timer.getTime()
   State = assert(loadstring(
     love.data.decompress(
       "string", "gzip", love.filesystem.read(filepath)
     ) --[[@as string]],
     filepath
   ))()
-  Log.info("Game loaded")
+  t = love.timer.getTime() - t
+
+  Log.info("Game loaded in %.2f s" % {t})
 end
 
 return saves

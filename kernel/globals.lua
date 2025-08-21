@@ -21,6 +21,8 @@ Fun = require("engine.lib.fun")
 Grid = require("engine.lib.grid")
 Ldump.mark_module("engine.lib.grid", "const")
 
+Inspect = require("engine.lib.inspect")
+
 Json = require("engine.lib.json")
 
 Math = require("engine.lib.math")
@@ -37,10 +39,16 @@ require("engine.lib.string")
 Table = require("engine.lib.table")
 
 Tiny = require("engine.lib.tiny")
+Ldump.mark_module("engine.lib.tiny", {
+  systemTableKey = {},
+})
 Tiny.worldMetaTable.__serialize = function(self)
   local systems = self.systems
   local entities = self.entities
   return function()
+    for i, s in ipairs(systems) do
+      
+    end
     local result = Tiny.world(unpack(systems))
     for _, e in ipairs(entities) do
       result:add(e)

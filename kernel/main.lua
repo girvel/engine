@@ -54,7 +54,13 @@ love.run = function()
 	love.timer.step()
 	local dt = 0
 
+  local once = true  -- TODO! remove
 	return function()
+    if Kernel._load then
+      saves.read(Kernel._load)
+      Kernel._load = nil
+    end
+
     love.event.pump()
     for name, a,b,c,d,e,f in love.event.poll() do
       if name == "quit" then
@@ -79,8 +85,14 @@ love.run = function()
 		love.timer.sleep(0.001)
 
     if Kernel._save then
-       saves.write(Kernel._save)
-       Kernel._save = nil
+      saves.write(Kernel._save)
+      Kernel._save = nil
+    end
+
+    if once then
+      saves.write("test")
+      saves.read("test")
+      once = false
     end
   end
 end

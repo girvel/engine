@@ -58,10 +58,10 @@ methods.draw_gui = function(self, dt)
       State.mode:close_escape_menu()
     elseif n == 2 then
       -- NEXT (save/load)
-      Kernel:plan_save("test.ldump.gz")
+      Kernel:plan_save("test")
     elseif n == 3 then
       -- NEXT (save/load)
-      Log.debug("Load game")
+      Kernel:plan_load("test")
     elseif n == 4 then
       -- NEXT (save/load) make sure the game is saved
       Log.info("Exiting the game from escape menu")
