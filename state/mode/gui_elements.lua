@@ -14,7 +14,8 @@ local gui_elements = {
   hand_attack = nth(6),
   offhand_attack = nth(7),
   journal = nth(17),
-  escape_menu = nth(18),
+  journal_active = nth(18),
+  escape_menu = nth(19),
 
   window_bg = "engine/assets/sprites/gui/window_bg.png",
   hp_bg = "engine/assets/sprites/gui/hp_bg.png",

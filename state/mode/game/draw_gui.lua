@@ -44,7 +44,8 @@ local draw_gui = function(self, dt)
       end
       ui.offset(4)
 
-      if ui.hot_button(gui.journal, "j") then
+      local journal_image = State.quests.has_new_content and gui.journal_active or gui.journal
+      if ui.hot_button(journal_image, "j") then
         State.mode:open_journal()
       end
       ui.offset(4)

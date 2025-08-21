@@ -61,6 +61,7 @@ local methods = {
     assert(self._mode.type == "journal")
     Log.info("Closing journal")
     self._mode = self._mode._game
+    State.quests:new_content_is_read()
   end,
 }
 

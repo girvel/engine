@@ -28,8 +28,9 @@ methods.draw_entity = function(self, ...)
 end
 
 local PADDING = 40
-local DIMMED = Vector.hex("2A3E34")
-local WHITE = Vector.hex("FFFFFF")
+local DIMMED = Vector.hex("2a3e34")
+local HIGHLIGHTED = Vector.hex("cfa867")
+local WHITE = Vector.hex("ffffff")
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
@@ -61,6 +62,7 @@ methods.draw_gui = function(self, dt)
 
     for _, codename in ipairs(State.quests.order) do
       local quest = State.quests.items[codename]
+      if not quest then goto continue end
 
       ui.start_font(36)
         ui.br()
@@ -82,6 +84,9 @@ methods.draw_gui = function(self, dt)
         elseif objective.status == "failed" then
           love.graphics.setColor(DIMMED)
           prefix = "x "
+        elseif objective.status == "new" then
+          love.graphics.setColor(HIGHLIGHTED)
+          prefix = "- "
         else
           prefix = "- "
           needs_color_reset = false
@@ -92,7 +97,10 @@ methods.draw_gui = function(self, dt)
         if needs_color_reset then
           love.graphics.setColor(WHITE)
         end
+
       end
+
+      ::continue::
     end
   ui.finish_frame()
 end
