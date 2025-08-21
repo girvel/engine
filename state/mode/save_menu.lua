@@ -61,7 +61,7 @@ methods.draw_gui = function(self, dt)
 
     if n or escape_pressed then
       ui.handle_selection_reset()
-      State.mode:close_save_menu()
+      State.mode:close_menu()
     end
   ui.finish_frame()
 end

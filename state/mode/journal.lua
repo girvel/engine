@@ -6,25 +6,25 @@ local journal = {}
 
 --- @class state_mode_journal
 --- @field type "journal"
---- @field _game state_mode_game
+--- @field _prev state_mode_game
 local methods = {}
 local mt = {__index = methods}
 
---- @param game state_mode_game
+--- @param prev state_mode_game
 --- @return state_mode_journal
-journal.new = function(game)
+journal.new = function(prev)
   return setmetatable({
     type = "journal",
-    _game = game,
+    _prev = prev,
   }, mt)
 end
 
 methods.draw_grid = function(self, ...)
-  self._game:draw_grid(...)
+  self._prev:draw_grid(...)
 end
 
 methods.draw_entity = function(self, ...)
-  self._game:draw_entity(...)
+  self._prev:draw_entity(...)
 end
 
 local PADDING = 40
@@ -34,7 +34,7 @@ local WHITE = Vector.hex("ffffff")
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
-    State.mode:close_journal()
+    State.mode:close_menu()
   end
 
   local w = math.min(love.graphics.getWidth() - 4 * PADDING, 800)

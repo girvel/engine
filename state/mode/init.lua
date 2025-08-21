@@ -46,23 +46,10 @@ local methods = {
     self._mode = STATES.escape_menu.new(self._mode --[[@as state_mode_game]])
   end,
 
-  close_escape_menu = function(self)
-    assert(self._mode.type == "escape_menu")
-    Log.info("Closing escape menu")
-    self._mode = self._mode._game
-  end,
-
   open_journal = function(self)
     assert(self._mode.type == "game")
     Log.info("Opening journal")
     self._mode = STATES.journal.new(self._mode --[[@as state_mode_game]])
-  end,
-
-  close_journal = function(self)
-    assert(self._mode.type == "journal")
-    Log.info("Closing journal")
-    self._mode = self._mode._game
-    State.quests:new_content_is_read()
   end,
 
   open_save_menu = function(self)
@@ -71,11 +58,12 @@ local methods = {
     self._mode = STATES.save_menu.new(self._mode)
   end,
 
-  close_save_menu = function(self)
-    assert(self._mode.type == "save_menu")
-    Log.info("Closing save menu")
+  close_menu = function(self)
+    local menus = Table.set {"journal", "escape_menu", "save_menu"}
+    assert(menus[self._mode.type])
+    Log.info("Closing", self._mode.type)
     self._mode = self._mode._prev
-  end
+  end,
 }
 
 local mt = {__index = methods}

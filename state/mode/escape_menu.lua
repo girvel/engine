@@ -6,25 +6,25 @@ local escape_menu = {}
 
 --- @class state_mode_escape_menu
 --- @field type "escape_menu"
---- @field _game state_mode_game
+--- @field _prev state_mode_game
 local methods = {}
 local mt = {__index = methods}
 
---- @param game state_mode_game
+--- @param prev state_mode_game
 --- @return state_mode_escape_menu
-escape_menu.new = function(game)
+escape_menu.new = function(prev)
   return setmetatable({
     type = "escape_menu",
-    _game = game,
+    _prev = prev,
   }, mt)
 end
 
 methods.draw_grid = function(self, ...)
-  self._game:draw_grid(...)
+  self._prev:draw_grid(...)
 end
 
 methods.draw_entity = function(self, ...)
-  self._game:draw_entity(...)
+  self._prev:draw_entity(...)
 end
 
 local W = 240
@@ -61,7 +61,7 @@ methods.draw_gui = function(self, dt)
     end
 
     if n == 1 or escape_pressed then
-      State.mode:close_escape_menu()
+      State.mode:close_menu()
     elseif n == 2 then
       -- NEXT (save/load)
       State.mode:open_save_menu()
