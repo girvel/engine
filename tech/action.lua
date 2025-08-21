@@ -25,5 +25,5 @@ action.base = {
   end,
 }
 
-Ldump.mark(action, {}, ...)
+Ldump.mark(action, "const", ...)
 return action
