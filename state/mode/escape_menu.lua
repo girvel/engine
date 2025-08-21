@@ -54,7 +54,7 @@ methods.draw_gui = function(self, dt)
       "Exit game",
     })
 
-    if n == 1 then
+    if n == 1 or ui.keyboard("escape") then
       State.mode:close_escape_menu()
     elseif n == 2 then
       -- NEXT (save/load)
