@@ -424,6 +424,7 @@ end
 ui.choice = function(options)
   local is_selected = false
   local font = Table.last(model.font)
+  local frame = Table.last(model.frame)
 
   for i, option in ipairs(options) do
     if model.selection.max_i + i == model.selection.i then
@@ -433,7 +434,7 @@ ui.choice = function(options)
       option = "  " .. option
     end
 
-    local is_mouse_over = get_mouse_over(font:getWidth(option), font:getHeight() * 1.25)
+    local is_mouse_over = get_mouse_over(frame.w, font:getHeight() * 1.25)
 
     if is_mouse_over then
       model.selection.i = model.selection.max_i + i
