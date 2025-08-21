@@ -7,6 +7,7 @@ local perspective = {}
 --- @field views table<string, view>
 --- @field views_order string[]
 --- @field offset_fs table<string, fun(vector, number): vector>
+--- @field SIDEBAR_W integer
 local methods = {}
 local mt = {__index = methods}
 
@@ -22,12 +23,13 @@ perspective.new = function()
     views = views,
     views_order = views_order,
     offset_fs = offset_fs,
+    SIDEBAR_W = 400,
   }, mt)
 end
 
 methods.center_camera = function(self, prev, position)
   local scene_k = State.level.cell_size * self.views.grids.scale
-  local window_size = V(love.graphics.getDimensions())
+  local window_size = V(love.graphics.getDimensions()) - V(self.SIDEBAR_W, 0)
   local border_size = (window_size / 2 - Vector.one * scene_k):map(math.floor)
   local player_position = position * scene_k
 

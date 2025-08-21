@@ -4,7 +4,6 @@ local translation  = require("engine.tech.translation")
 local gui = require("engine.state.mode.game.gui_elements")
 
 
-local SIDEBAR_W = 320
 local PADDING = 40
 local HP_BAR_H = 10 * 4
 
@@ -12,6 +11,7 @@ local HP_BAR_H = 10 * 4
 --- @param dt number
 local draw_gui = function(self, dt)
   State.perspective:update(dt)
+  local SIDEBAR_W = State.perspective.SIDEBAR_W - 2 * PADDING
 
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - 2 * PADDING)
     ui.tile(gui.sidebar_bg)
@@ -39,18 +39,18 @@ local draw_gui = function(self, dt)
     ui.br()
 
     ui.start_line()
-      -- if State.combat then
-        local button = ui.hot_button(gui.skip_turn, "space")
-        if button.is_pressed then
-          player.ai.finish_turn = true
-        end
-        ui.offset(4)
-      -- end
-
       do
         local button = ui.hot_button(gui.journal, "j")
         if button.is_pressed then
           Log.debug("Journal")
+        end
+        ui.offset(4)
+      end
+
+      if State.combat then
+        local button = ui.hot_button(gui.skip_turn, "space")
+        if button.is_pressed then
+          player.ai.finish_turn = true
         end
         ui.offset(4)
       end
