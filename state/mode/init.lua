@@ -7,6 +7,7 @@ local STATES = {
   escape_menu = require("engine.state.mode.escape_menu"),
   journal = require("engine.state.mode.journal"),
   save_menu = require("engine.state.mode.save_menu"),
+  load_menu = require("engine.state.mode.load_menu"),
 }
 
 --- @class state_mode
@@ -41,25 +42,27 @@ local methods = {
   end,
 
   open_escape_menu = function(self)
-    assert(self._mode.type == "game")
     Log.info("Opening escape menu")
     self._mode = STATES.escape_menu.new(self._mode --[[@as state_mode_game]])
   end,
 
   open_journal = function(self)
-    assert(self._mode.type == "game")
     Log.info("Opening journal")
     self._mode = STATES.journal.new(self._mode --[[@as state_mode_game]])
   end,
 
   open_save_menu = function(self)
-    assert(self._mode.type == "escape_menu")
     Log.info("Opening save menu")
     self._mode = STATES.save_menu.new(self._mode)
   end,
 
+  open_load_menu = function(self)
+    Log.info("Opening load menu")
+    self._mode = STATES.load_menu.new(self._mode)
+  end,
+
   close_menu = function(self)
-    local menus = Table.set {"journal", "escape_menu", "save_menu"}
+    local menus = Table.set {"journal", "escape_menu", "save_menu", "load_menu"}
     assert(menus[self._mode.type])
     Log.info("Closing", self._mode.type)
     self._mode = self._mode._prev

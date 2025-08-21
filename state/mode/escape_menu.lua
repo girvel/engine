@@ -63,11 +63,9 @@ methods.draw_gui = function(self, dt)
     if n == 1 or escape_pressed then
       State.mode:close_menu()
     elseif n == 2 then
-      -- NEXT (save/load)
       State.mode:open_save_menu()
     elseif n == 3 then
-      -- NEXT (save/load)
-      Kernel:plan_load("test")
+      State.mode:open_load_menu()
     elseif n == 4 then
       -- NEXT (save/load) make sure the game is saved
       Log.info("Exiting the game from escape menu")
