@@ -39,4 +39,21 @@ methods.get = function(self, head, ...)
   return methods.get(self, ...)
 end
 
+local iter
+
+methods.iter = function(self)
+  return coroutine.wrap(function() iter(self, {}) end)
+end
+
+iter = function(self, base)
+  if self._value then
+    coroutine.yield(base, self._value)
+  end
+  for k, v in pairs(self._items) do
+    table.insert(base, k)
+    iter(v, base)
+    table.remove(base)
+  end
+end
+
 return composite_map
