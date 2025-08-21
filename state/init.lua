@@ -9,6 +9,7 @@ local state = {}
 --- @field mode state_mode
 --- @field perspective state_perspective
 --- @field combat state_combat?
+--- @field quests state_quests
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_info
@@ -90,6 +91,7 @@ state.new = function(systems)
   return setmetatable({
     mode = require("engine.state.mode").new(),
     perspective = require("engine.state.perspective").new(),
+    quests = require("engine.state.quests").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},

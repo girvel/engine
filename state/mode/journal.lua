@@ -51,7 +51,34 @@ methods.draw_gui = function(self, dt)
     (love.graphics.getHeight() - h) / 2,
     w, h
   )
-    ui.text("Lorem ipsum")
+    ui.start_font(48)
+    ui.start_alignment("center")
+      ui.text("Журнал")
+    ui.finish_alignment()
+    ui.finish_font()
+
+    for _, codename in ipairs(State.quests.order) do
+      local quest = State.quests.items[codename]
+
+      ui.start_font(36)
+        ui.br()
+        ui.text("# " .. quest.name)
+      ui.finish_font()
+      ui.br()
+
+      for _, objective in ipairs(quest.objectives) do
+        local prefix
+        if objective.status == "done" then
+          prefix = "+ "
+        elseif objective.status == "failed" then
+          prefix = "x "
+        else
+          prefix = "- "
+        end
+
+        ui.text(prefix .. objective.text)
+      end
+    end
   ui.finish_frame()
 end
 
