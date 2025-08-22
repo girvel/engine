@@ -63,6 +63,11 @@ local draw_entity = function(self, entity, dt)
     end
   elseif sprite.type == "atlas" then
     self._sprite_batches[entity.layer]:add(sprite.quad, x, y, 0, current_view.scale)
+  elseif sprite.type == "text" then
+    love.graphics.setFont(sprite.font)
+    love.graphics.print({sprite.color, sprite.text}, x, y)
+  else
+    error()
   end
 
   if entity.shader then

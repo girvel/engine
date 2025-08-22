@@ -42,6 +42,15 @@ sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   }
 end)
 
+sprite.text = function(text, size, color)
+  return {
+    type = "text",
+    text = text,
+    font = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size),
+    color = color,
+  }
+end
+
 --- @param index integer
 --- @param cell_size integer
 --- @param atlas_w integer

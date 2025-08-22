@@ -1,3 +1,4 @@
+local sprite = require "engine.tech.sprite"
 local health = {}
 
 -- NEXT
@@ -19,6 +20,8 @@ local health = {}
 --   end
 -- end
 
+local floating_damage
+
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target table
 --- @param amount number
@@ -31,14 +34,13 @@ health.damage = function(target, amount, is_critical)
   -- NEXT (modifiers)
 
   amount = math.max(0, amount)
-  Log.info("%s damage to %s" % {amount, Entity.codename(target)})
+  Log.debug("%s damage to %s" % {amount, Entity.codename(target)})
 
-  -- if is_critical then
-  --   State:add(gui.floating_damage(amount .. "!", target.position))
-  -- else
-  --   State:add(gui.floating_damage(amount, target.position))
-  -- end
-  -- NEXT!
+  if is_critical then
+    State:add(floating_damage(amount .. "!", target.position))
+  else
+    State:add(floating_damage(amount, target.position))
+  end
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
@@ -57,7 +59,9 @@ health.damage = function(target, amount, is_critical)
     -- end
 
     State:remove(target)
-    Log.info(Entity.codename(target) .. " is killed")
+    if not target.boring_flag then
+      Log.info(Entity.codename(target) .. " is killed")
+    end
   end
 end
 
@@ -73,6 +77,21 @@ health.set_hp = function(target, value)
   -- if target.get_max_hp then
   --   cue.set(target, "blood", target.hp <= target:get_max_hp() / 2)
   -- end
+end
+
+floating_damage = function(number, grid_position)
+  local a = math.floor(State.level.cell_size * .25)
+  local b = math.floor(State.level.cell_size * .75)
+  return {
+    boring_flag = true,
+    codename = "floating_damage",
+    position = grid_position * State.level.cell_size
+      + V(math.random(a, b), math.random(a, b)),
+    view = "grids_fx",
+    drift = V(0, -4),
+    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
+    life_time = 3,
+  }
 end
 
 Ldump.mark(health, {}, ...)

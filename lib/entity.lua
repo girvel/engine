@@ -16,6 +16,7 @@ local entityx = {}
 --- @field transparent_flag? true marks entities that block path, but not vision
 --- @field perspective_flag? true marks entities that could be seen only from below
 --- @field low_flag? true disable reflections TODO move it somewhere, it's not part of engine logic
+--- @field boring_flag? true disable log messages about the entity because it's dull
 
 --- Check is given position over the entity's hitbox
 --- @param position vector

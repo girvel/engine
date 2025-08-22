@@ -97,10 +97,10 @@ love.run = function()
   end
 end
 
-love.errorhandler = function(msg)
-  Log.fatal(debug.traceback(msg))
-  saves.write({State}, "last_crash.ldump.gz")
-  love.window.requestAttention()
-end
+-- love.errorhandler = function(msg)
+--   Log.fatal(debug.traceback(msg))
+--   saves.write({State}, "last_crash.ldump.gz")
+--   love.window.requestAttention()
+-- end
 
 Log.info("Initialized kernel setup")

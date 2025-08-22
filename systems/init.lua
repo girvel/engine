@@ -12,6 +12,8 @@ return {
   require("engine.systems.acting"),
   require("engine.systems.animation"),
   require("engine.systems.ui_update"),
+  require("engine.systems.drifting"),     -- small
+  require("engine.systems.timed_death"),  -- small
 
   -- love.draw
   require("engine.systems.drawing"),

@@ -43,14 +43,14 @@ love.graphics.newQuad = function(...)
 end
 
 local old_newFont = love.graphics.newFont
-love.graphics.newFont = function(...)
+love.graphics.newFont = Memoize(function(...)
   local result = old_newFont(...)
   local args = {...}
   Ldump.serializer.handlers[result] = function()
     return love.graphics.newFont(unpack(args))
   end
   return result
-end
+end)
 
 local old_newSpriteBatch = love.graphics.newSpriteBatch
 love.graphics.newSpriteBatch = function(...)
