@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 
-local ffi = require("ffi")
 local argparse = require("engine.lib.argparse")
+local rl = require("engine.lib.rl")
 
 local read_run = function(command)
   local f = assert(io.popen("zsh -c '" .. command .. "'"))
@@ -48,13 +48,11 @@ local cli = {
   end,
 
   shell = function(args)
-    ffi.cdef [[
-      char *readline(const char *);
-    ]]
-
-    local lib = ffi.load("engine/lib/libreadline.so")
-    print(ffi.string(lib.readline(nil)))
-    print(123)
+    while true do
+      local command = rl.readline("> ")
+      if not command then break end
+      print(command)
+    end
   end,
 }
 
