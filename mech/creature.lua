@@ -1,14 +1,9 @@
 local health = require "engine.mech.health"
 local creature = {}
 
---- @class creature_mixin
---- @field resources table<string, integer>
---- @field inventory table<string, table>
---- @field hp integer
---- @field base_hp integer
 local methods = {}
 
---- @return creature_mixin
+--- @return entity
 creature.mixin = function()
   local result = Table.extend({
     resources = {},
@@ -18,7 +13,7 @@ creature.mixin = function()
   return result
 end
 
---- @param entity creature_mixin
+--- @param entity entity
 creature.init = function(entity)
   assert(entity.base_hp, "creature requires .base_hp for %s" % {Entity.codename(entity)})
   entity:rest("full")

@@ -2,7 +2,7 @@ local creature = require "engine.mech.creature"
 local items    = require "levels.main.palette.items"
 local player = {}
 
---- @class base_player: creature_mixin
+--- @class base_player: entity
 --- @field fov_r integer
 
 player.base = function()

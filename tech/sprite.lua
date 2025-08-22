@@ -5,7 +5,7 @@ local sprite = {utility = {}}
 
 local pull_anchors
 
---- @alias sprite sprite_image | sprite_atlas
+--- @alias sprite sprite_image | sprite_atlas | sprite_text
 
 --- @class sprite_image
 --- @field type "image"
@@ -41,6 +41,12 @@ sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
     image = love.graphics.newImage(sprite.utility.cut_out(atlas_image, quad)),
   }
 end)
+
+--- @class sprite_text
+--- @field type "text"
+--- @field text string
+--- @field font love.Font
+--- @field color vector
 
 sprite.text = function(text, size, color)
   return {

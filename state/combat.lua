@@ -2,12 +2,12 @@ local combat = {}
 -- NEXT rename to round_robin
 
 --- @class state_combat
---- @field list base_entity[]
+--- @field list entity[]
 --- @field current_i integer
 local methods = {}
 local mt = {__index = methods}
 
---- @param list base_entity[]
+--- @param list entity[]
 --- @return state_combat
 combat.new = function(list)
   assert(Fun.iter(list):all(function(e) return State:exists(e) end))

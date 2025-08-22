@@ -19,13 +19,13 @@ local state = {}
 --- @field _entities table
 local state_methods = {
   --- Modifies entity
-  --- @generic T: base_entity
+  --- @generic T: entity
   --- @param self state
   --- @param entity T
   --- @param ... table extensions
   --- @return T
   add = function(self, entity, ...)
-    --- @cast entity base_entity
+    --- @cast entity entity
 
     Table.extend(entity, ...)
     self._world:add(entity)

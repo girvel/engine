@@ -19,7 +19,7 @@ local parser_new
 --- Read LDtk level file
 --- @async
 --- @param path string
---- @return {level_info: level_info, entities: base_entity[]}
+--- @return {level_info: level_info, entities: entity[]}
 ldtk.load = function(path)
   --- @type level_definition
   local level_module = require(path)
