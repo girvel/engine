@@ -16,8 +16,6 @@ animated.mixin = function(path)
     animation = {
       pack = load_pack(path),
       paused = false,
-      current = "idle",
-      frame = 1,
       _end_promise = nil,
     },
     sprite = {},
@@ -75,11 +73,28 @@ load_pack = Memoize(function(folder_path)
       )
     end
 
-    if not result[animation_name] then
-      result[animation_name] = {}
-    end
+    local full_path = folder_path .. "/" .. file_name
 
-    result[animation_name][frame_i] = sprite.image(folder_path .. "/" .. file_name)
+    local image = love.graphics.newImage(full_path)
+    local w, h = image:getDimensions()
+
+    if w == h then
+      if not result[animation_name] then
+        result[animation_name] = {}
+      end
+
+      result[animation_name][frame_i] = sprite.image(image)
+    else
+      for i, direction in ipairs {"up", "left", "down", "right"} do
+        local full_name = animation_name .. "_" .. direction
+        if not result[full_name] then
+          result[full_name] = {}
+        end
+        result[full_name][frame_i] = sprite.image(
+          sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, h, w, h))
+        )
+      end
+    end
 
     ::continue::
   end

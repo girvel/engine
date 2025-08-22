@@ -12,7 +12,12 @@ actions.move = function(direction)
       movement = 1,
     },
     _run = function(_, entity)
-      return level.safe_move(entity, entity.position + direction)
+      entity.direction = direction
+      local result = level.safe_move(entity, entity.position + direction)
+      if result and entity.animate then
+        entity:animate("move")
+      end
+      return result
       -- NEXT reaction, animation, sound
     end,
   }, action.base)

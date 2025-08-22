@@ -5,6 +5,10 @@ return Tiny.processingSystem {
   base_callback = "update",
   filter = Tiny.requireAll("animation"),
 
+  onAdd = function(_, entity)
+    entity:animate()
+  end,
+
   --- @param entity animated_mixin
   process = function(_, entity, dt)
     local animation = entity.animation

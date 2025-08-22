@@ -6,13 +6,17 @@ local sprite = {utility = {}}
 --- @field type "image"
 --- @field image love.Image
 
---- @param base string|love.ImageData
+--- @param image string|love.ImageData|love.Image
 --- @return sprite_image
-sprite.image = function(base)
+sprite.image = function(image)
+  if type(image) == "string" or image:typeOf("ImageData") then
+    image = love.graphics.newImage(image)
+  end
+
   -- TODO anchors (when inventory)
   return {
     type = "image",
-    image = love.graphics.newImage(base),
+    image = image,
   }
 end
 
