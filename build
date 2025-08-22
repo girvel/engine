@@ -1,5 +1,6 @@
-#!/usr/bin/env lua
+#!/usr/bin/env luajit
 
+local ffi = require("ffi")
 local argparse = require("engine.lib.argparse")
 
 local read_run = function(command)
@@ -16,6 +17,9 @@ local parse_cli = function()
 
   parser:command("stat")
     :description("Display project line count")
+
+  parser:command("shell")
+    :description("Launch lua shell")
 
   return parser:parse()
 end
@@ -41,6 +45,16 @@ local cli = {
     print("Total:", total)
     print("Fallen total:", FALLEN_TOTAL)
     print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+  end,
+
+  shell = function(args)
+    ffi.cdef [[
+      char *readline(const char *);
+    ]]
+
+    local lib = ffi.load("engine/lib/libreadline.so")
+    print(ffi.string(lib.readline(nil)))
+    print(123)
   end,
 }
 
