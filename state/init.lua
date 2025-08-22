@@ -37,7 +37,9 @@ local state_methods = {
     --   Fun.iter(entity.inventory)
     --     :each(function(slot, it) self:add(it) end)
     -- end
-    Query(entity):on_add()
+    if entity.on_add then
+      entity:on_add()
+    end
     return entity
   end,
 
@@ -71,7 +73,7 @@ local state_methods = {
     for i, e in ipairs(load_data.entities) do
       e = self:add(e)
       if e.player_flag then self.player = e end
-      Query(e):on_load()
+      if e.on_load then e:on_load() end
 
       if i % BATCH_SIZE == 0 then
         coroutine.yield(.5 + .5 * (i / #load_data.entities))
