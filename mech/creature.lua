@@ -76,11 +76,10 @@ methods.rest = function(self, rest_type)
   end
 
   Table.extend(self.resources, self:get_resources(rest_type))
-  -- NEXT reset HP on long
 end
 
 methods.rotate = function(self, direction)
-  if self.direction == direction then return end
+  Log.trace(self, direction)
   self.direction = direction
   for _, item in pairs(self.inventory) do
     item.direction = direction
@@ -88,6 +87,7 @@ methods.rotate = function(self, direction)
   if self.animate then
     self:animate()
   end
+  Log.trace(self)
 end
 
 Ldump.mark(creature, {}, ...)

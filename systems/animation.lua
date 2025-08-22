@@ -15,10 +15,6 @@ return Tiny.processingSystem {
     if animation.paused then return end
 
     animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
-    if not animation.pack[animation.current] then
-      Log.trace(entity)
-      Log.trace(animation.pack)
-    end
     if math.floor(animation.frame) > #animation.pack[animation.current] then
       entity:animate("idle")
     end

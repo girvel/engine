@@ -11,7 +11,6 @@ local humanoid = {}
 humanoid.mixin = function()
   local result = animated.mixin("engine/assets/sprites/animations/humanoid")
   result.transparent_flag = true
-  result.direction = Vector.down
   return result
 end
 
