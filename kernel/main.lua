@@ -40,6 +40,7 @@ love.load = function(args)
 
   if args.recover then
     love.window.minimize()
+    State = unpack(saves.read("last_crash.ldump.gz"))
     require("engine.kernel.shell").run()
     os.exit()
   end
@@ -97,8 +98,8 @@ love.run = function()
 end
 
 love.errorhandler = function(msg)
-  -- TODO display locals
   Log.fatal(debug.traceback(msg))
+  saves.write({State}, "last_crash.ldump.gz")
   love.window.requestAttention()
 end
 

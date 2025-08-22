@@ -21,7 +21,7 @@ Fun = require("engine.lib.fun")
 Grid = require("engine.lib.grid")
 Ldump.mark_module("engine.lib.grid", "const")
 
-Inspect = require("engine.lib.inspect")
+Inspect = function(x) return require("engine.lib.inspect")(x, {keys_limit = 20}) end
 
 Json = require("engine.lib.json")
 
