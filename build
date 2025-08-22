@@ -1,7 +1,6 @@
 #!/usr/bin/env luajit
 
 local argparse = require("engine.lib.argparse")
-local shell = require("engine.lib.shell")
 
 local read_run = function(command)
   local f = assert(io.popen("zsh -c '" .. command .. "'"))
