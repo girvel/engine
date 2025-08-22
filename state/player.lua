@@ -1,4 +1,5 @@
 local creature = require "engine.mech.creature"
+local items    = require "levels.main.palette.items"
 local player = {}
 
 --- @class base_player: creature_mixin
@@ -25,6 +26,10 @@ player.base = function()
         end
         entity.ai.finish_turn = false
       end,
+    },
+
+    inventory = {
+      hand = items.knife(),
     },
   })
 
