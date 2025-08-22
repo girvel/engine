@@ -90,4 +90,10 @@ love.run = function()
   end
 end
 
+love.errorhandler = function(msg)
+  -- TODO display locals
+  Log.fatal(debug.traceback(msg))
+  love.window.requestAttention()
+end
+
 Log.info("Initialized kernel setup")
