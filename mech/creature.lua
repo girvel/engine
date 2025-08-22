@@ -3,6 +3,7 @@ local creature = {}
 
 --- @class creature_mixin
 --- @field resources table<string, integer>
+--- @field inventory table<string, table>
 --- @field hp integer
 --- @field base_hp integer
 local methods = {}
@@ -11,6 +12,7 @@ local methods = {}
 creature.mixin = function()
   local result = Table.extend({
     resources = {},
+    inventory = {},
   }, methods)
 
   return result
@@ -20,6 +22,7 @@ end
 creature.init = function(entity)
   assert(entity.base_hp, "creature requires .base_hp for %s" % {Entity.codename(entity)})
   entity:rest("full")
+  entity:rotate(entity.direction or Vector.right)
 end
 
 --- @alias rest_type "free"|"move"|"short"|"long"|"full"
@@ -74,6 +77,17 @@ methods.rest = function(self, rest_type)
 
   Table.extend(self.resources, self:get_resources(rest_type))
   -- NEXT reset HP on long
+end
+
+methods.rotate = function(self, direction)
+  if self.direction == direction then return end
+  self.direction = direction
+  for _, item in pairs(self.inventory) do
+    item.direction = direction
+  end
+  if self.animate then
+    self:animate()
+  end
 end
 
 Ldump.mark(creature, {}, ...)

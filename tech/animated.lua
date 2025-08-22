@@ -44,7 +44,13 @@ methods.animate = function(self, animation_name)
 
   animation.frame = 1
 
-  -- NEXT animate inventory
+  if self.inventory then
+    for _, item in pairs(self.inventory) do
+      if not item.animated_independently_flag then
+        item:animate(animation_name)
+      end
+    end
+  end
 
   animation._end_promise = Promise.new()
   return animation._end_promise
@@ -53,10 +59,16 @@ end
 --- @param value boolean
 methods.animation_set_paused = function(self, value)
   self.animation.paused = value
-  -- NEXT pause items (inventory)
+
+  if self.inventory then
+    for _, item in pairs(self.inventory) do
+      if not item.animated_independently_flag then
+        item.animation.paused = value
+      end
+    end
+  end
 end
 
--- NEXT atlas animations (when direction)
 load_pack = Memoize(function(folder_path)
   local info = love.filesystem.getInfo(folder_path)
   assert(info, "No folder %q, unable to load animation" % {folder_path})
