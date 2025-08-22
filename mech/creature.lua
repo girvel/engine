@@ -79,7 +79,6 @@ methods.rest = function(self, rest_type)
 end
 
 methods.rotate = function(self, direction)
-  Log.trace(self, direction)
   self.direction = direction
   for _, item in pairs(self.inventory) do
     item.direction = direction
@@ -87,7 +86,6 @@ methods.rotate = function(self, direction)
   if self.animate then
     self:animate()
   end
-  Log.trace(self)
 end
 
 Ldump.mark(creature, {}, ...)

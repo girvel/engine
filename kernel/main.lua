@@ -40,7 +40,7 @@ love.load = function(args)
 
   if args.recover then
     love.window.minimize()
-    State = unpack(saves.read("last_crash.ldump.gz"))
+    State = unpack(saves.read("last_crash.ldump.gz")) --[[@as state]]
     require("engine.kernel.shell").run()
     os.exit()
   end
@@ -63,7 +63,7 @@ love.run = function()
 
 	return function()
     if Kernel._load then
-      State = saves.read(Kernel._load)
+      State = saves.read(Kernel._load)  --[[@as state]]
       Kernel._load = nil
     end
 

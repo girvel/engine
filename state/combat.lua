@@ -21,6 +21,14 @@ methods.get_current = function(self)
   return self.list[self.current_i]
 end
 
+methods.remove = function(self, element)
+  local i = Table.index_of(self.list, element)
+  if i <= self.current_i then
+    self.current_i = self.current_i - 1
+  end
+  table.remove(self.list, i)
+end
+
 methods._pass_turn = function(self)
   self.current_i = Math.loopmod(self.current_i + 1, #self.list)
 end

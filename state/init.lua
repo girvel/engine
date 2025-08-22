@@ -43,6 +43,40 @@ local state_methods = {
     return entity
   end,
 
+  --- @generic T: table
+  --- @param self state
+  --- @param entity T
+  --- @return T
+  remove = function(self, entity)
+    --- @cast entity table
+    if not entity.boring_flag then
+      Log.debug("State:remove(%s)" % Entity.codename(entity))
+    end
+
+    self._world:remove(entity)
+    self._entities[entity] = nil
+
+    if entity.position and entity.layer then
+      level.remove(entity)
+    end
+
+    if entity.inventory then
+      for _, item in pairs(entity.inventory) do
+        self:remove(item)
+      end
+    end
+
+    if self.combat then
+      self.combat:remove(entity)
+    end
+
+    if entity.on_remove then
+      entity:on_remove()
+    end
+
+    return entity
+  end,
+
   exists = function(self, entity)
     return self._entities[entity]
   end,

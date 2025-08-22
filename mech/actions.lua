@@ -1,5 +1,6 @@
 local level = require "engine.tech.level"
 local action = require "engine.tech.action"
+local health = require "engine.mech.health"
 
 
 local actions = {}
@@ -33,8 +34,13 @@ actions.hand_attack = Table.extend({
   cost = {
     actions = 1,
   },
+  _is_available = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    return target and target.hp
+  end,
   _act = function(_, entity)
-    entity:animate("hand_attack")
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    entity:animate("hand_attack"):next(function() health.damage(target, 2, false) end)
   end,
 }, action.base)
 
