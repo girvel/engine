@@ -23,10 +23,20 @@ actions.move = function(direction)
         entity:animate("move")
       end
       return result
-      -- NEXT reaction, animation, sound
+      -- NEXT reaction, sound
     end,
   }, action.base)
 end
+
+--- @type action
+actions.hand_attack = Table.extend({
+  cost = {
+    actions = 1,
+  },
+  _run = function(_, entity)
+    entity:animate("hand_attack")
+  end,
+}, action.base)
 
 Ldump.mark(actions, {}, ...)
 return actions

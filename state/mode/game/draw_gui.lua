@@ -61,7 +61,7 @@ local draw_gui = function(self, dt)
 
     ui.start_line()
       if ui.hot_button(gui.hand_attack, "1") then
-        Log.debug("Hand attack")
+        player.ai.next_action = actions.hand_attack
       end
       ui.offset(4)
 
