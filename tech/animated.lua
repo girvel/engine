@@ -69,7 +69,10 @@ load_pack = Memoize(function(folder_path)
     local animation_name, frame_i do
       if not file_name:ends_with(".png") then goto continue end
       _, _, animation_name, frame_i = file_name:sub(1, -5):find("^(.+)_(%d+)$")
-      frame_i = assert(tonumber(frame_i))
+      frame_i = assert(
+        tonumber(frame_i),
+        "%q not in format <animation name>_<frame index>.png" % {file_name}
+      )
     end
 
     if not result[animation_name] then
