@@ -31,12 +31,8 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local PADDING = 40
-
 methods.draw_gui = function(self, dt)
-  local w = math.min(love.graphics.getWidth() - 4 * PADDING, 800)
-
-  tk.start_window("center", "center", w, "max")
+  tk.start_window("center", "center", "read_max", "max")
     ui.h1("Загрузить игру")
 
     local options = Kernel:list_saves()

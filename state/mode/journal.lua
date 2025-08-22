@@ -31,7 +31,6 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local PADDING = 40
 local DIMMED = Vector.hex("2a3e34")
 local HIGHLIGHTED = Vector.hex("cfa867")
 local WHITE = Vector.hex("ffffff")
@@ -41,9 +40,7 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
-  local w = math.min(love.graphics.getWidth() - 4 * PADDING, 800)
-
-  tk.start_window("center", "center", w, "max")
+  tk.start_window("center", "center", "read_max", "max")
     ui.h1("Журнал")
 
     for _, codename in ipairs(State.quests.order) do
