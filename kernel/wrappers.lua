@@ -42,16 +42,6 @@ love.graphics.newQuad = function(...)
   return result
 end
 
-local old_newShader = love.graphics.newShader
-love.graphics.newShader = function(...)
-  local result = old_newShader(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newShader(unpack(args))
-  end
-  return result
-end
-
 local old_newFont = love.graphics.newFont
 love.graphics.newFont = function(...)
   local result = old_newFont(...)

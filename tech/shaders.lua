@@ -4,7 +4,8 @@ local shaders = {}
 --- @field love_shader love.Shader
 --- @field preprocess? fun(shader, base_entity)
 
-local water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
+local water_love_shader
+water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
   local result = love.graphics.newShader([[
     uniform vec4 palette[%s];
 
@@ -54,6 +55,9 @@ local water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
     result:send("palette", unpack(palette))
   end
 
+  Ldump.serializer.handlers[result] = function()
+    return water_love_shader(palette_path, palette_real_colors_n)
+  end
   return result
 end)
 
@@ -78,5 +82,9 @@ shaders.water = function(palette_path, palette_real_colors_n)
   }
 end
 
-Ldump.mark(shaders, {}, ...)
+Ldump.mark(shaders, {
+  water = {
+    water_love_shader = {},
+  }
+}, ...)
 return shaders
