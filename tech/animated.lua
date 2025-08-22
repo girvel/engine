@@ -35,11 +35,16 @@ methods.animate = function(self, animation_name)
   self:animation_set_paused(false)
 
   if self.direction then
-    animation.current = animation_name .. "_" .. Vector.name_from_direction(self.direction)
-  end
-
-  if not animation.pack[animation.current] then
+    local dirname = Vector.name_from_direction(self.direction)
+    animation.current = animation_name .. "_" .. dirname
+    if not animation.pack[animation.current] then
+      animation.current = "idle_" .. dirname
+    end
+  else
     animation.current = animation_name
+    if not animation.pack[animation.current] then
+      animation.current = "idle"
+    end
   end
 
   animation.frame = 1
