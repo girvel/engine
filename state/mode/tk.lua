@@ -19,7 +19,7 @@ tk.start_window = function(x, y, w, h)
   if w == "max" then
     w = love.graphics.getWidth() - 4 * PADDING
   elseif w == "read_max" then
-    w = math.max(love.graphics.getWidth() - 4 * PADDING, MAX_READABLE_W)
+    w = math.min(love.graphics.getWidth() - 4 * PADDING, MAX_READABLE_W)
   end
 
   --- @cast h integer

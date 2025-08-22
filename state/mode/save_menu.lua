@@ -33,6 +33,7 @@ end
 
 methods.draw_gui = function(self, dt)
   tk.start_window("center", "center", "read_max", "max")
+  ui.start_font(24)
     ui.h1("Сохранить игру")
 
     local options = Kernel:list_saves()
@@ -55,6 +56,7 @@ methods.draw_gui = function(self, dt)
       ui.handle_selection_reset()
       State.mode:close_menu()
     end
+  ui.finish_font()
   tk.finish_window()
 end
 

@@ -59,6 +59,7 @@ quests.new = function()
 end
 
 methods.new_content_is_read = function(self)
+  if not self.has_new_content then return end
   for _, quest in pairs(self.items) do
     for _, objective in ipairs(quest.objectives) do
       if objective.status == "new" then

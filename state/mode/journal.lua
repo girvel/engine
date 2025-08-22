@@ -37,6 +37,7 @@ local WHITE = Vector.hex("ffffff")
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
+    State.quests:new_content_is_read()
     State.mode:close_menu()
   end
 
