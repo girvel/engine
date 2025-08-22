@@ -10,6 +10,11 @@ cli.parse = function(args)
     "Show FPS"
   )
 
+  parser:flag(
+    "-r --recover",
+    "Launch lua shell instead of the game"
+  )
+
   args[-2] = nil
   args[-1] = nil
 

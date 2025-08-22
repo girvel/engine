@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 
 local argparse = require("engine.lib.argparse")
-local rl = require("engine.lib.rl")
+local shell = require("engine.lib.shell")
 
 local read_run = function(command)
   local f = assert(io.popen("zsh -c '" .. command .. "'"))
@@ -17,9 +17,6 @@ local parse_cli = function()
 
   parser:command("stat")
     :description("Display project line count")
-
-  parser:command("shell")
-    :description("Launch lua shell")
 
   return parser:parse()
 end
@@ -45,14 +42,6 @@ local cli = {
     print("Total:", total)
     print("Fallen total:", FALLEN_TOTAL)
     print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
-  end,
-
-  shell = function(args)
-    while true do
-      local command = rl.readline("> ")
-      if not command then break end
-      print(command)
-    end
   end,
 }
 

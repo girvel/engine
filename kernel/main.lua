@@ -38,6 +38,12 @@ love.load = function(args)
   args = cli.parse(args)
   Log.info("CLI args:", args)
 
+  if args.recover then
+    love.window.minimize()
+    require("engine.kernel.shell").run()
+    os.exit()
+  end
+
   State = state.new(systems)
   State.debug = args.debug
 
