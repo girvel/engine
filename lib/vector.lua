@@ -183,6 +183,18 @@ vector_methods.copy = function(self)
   return vector.new(unpack(self))
 end
 
+-- --- @param other vector
+-- --- @return boolean
+-- vector_methods.color_eq = function(self, other)
+--   if rawequal(self, other) then return true end
+--   for i, v in ipairs(self) do
+--     if math.abs(v - (other[i] or 1)) > 1/256 then
+--       return false
+--     end
+--   end
+--   return true
+-- end
+
 --- @generic T
 --- @param self T
 --- @param other vector

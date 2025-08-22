@@ -75,16 +75,17 @@ load_pack = Memoize(function(folder_path)
 
     local full_path = folder_path .. "/" .. file_name
 
-    local image = love.graphics.newImage(full_path)
-    local w, h = image:getDimensions()
+    local data = love.image.newImageData(full_path)
+    local w, h = data:getDimensions()
 
     if w == h then
       if not result[animation_name] then
         result[animation_name] = {}
       end
 
-      result[animation_name][frame_i] = sprite.image(image)
+      result[animation_name][frame_i] = sprite.image(data)
     else
+      local image = love.graphics.newImage(data)
       for i, direction in ipairs {"up", "left", "down", "right"} do
         local full_name = animation_name .. "_" .. direction
         if not result[full_name] then
