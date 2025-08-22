@@ -13,12 +13,12 @@ end
 
 --- @param filepath string
 methods.plan_save = function(self, filepath)
-  self._save = filepath
+  self._save = "saves/" .. filepath .. ".ldump.gz"
 end
 
 --- @param filepath string
 methods.plan_load = function(self, filepath)
-  self._load = filepath
+  self._load = "saves/" .. filepath .. ".ldump.gz"
 end
 
 --- @return string[]

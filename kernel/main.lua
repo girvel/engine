@@ -62,7 +62,7 @@ love.run = function()
 
 	return function()
     if Kernel._load then
-      saves.read(Kernel._load)
+      State = saves.read(Kernel._load)
       Kernel._load = nil
     end
 
@@ -90,7 +90,7 @@ love.run = function()
 		love.timer.sleep(0.001)
 
     if Kernel._save then
-      saves.write(Kernel._save)
+      saves.write(State, Kernel._save)
       Kernel._save = nil
     end
   end

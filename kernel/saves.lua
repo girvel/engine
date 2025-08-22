@@ -2,38 +2,41 @@ local saves = {}
 
 local SLASH = love.system.getOS() == "Windows" and "\\" or "/"
 
-saves.write = function(name)
-  love.filesystem.createDirectory("saves")
-  local filepath = "saves" .. SLASH .. name .. ".ldump.gz"
+love.filesystem.createDirectory("saves")
 
+--- @param target any
+--- @param path string
+saves.write = function(target, path)
   local base = love.filesystem.getSaveDirectory()
-  Log.info("Saving the game to %s%s%s" % {base, SLASH, filepath})
+  Log.info("Saving to %s%s%s" % {base, SLASH, path})
 
   local t = love.timer.getTime()
-  love.filesystem.write(filepath, love.data.compress("string", "gzip", Ldump(State)))
+  love.filesystem.write(path, love.data.compress("string", "gzip", Ldump(target)))
   t = love.timer.getTime() - t
 
   Fun.iter(Ldump.get_warnings()):each(Log.warn)
-  local size_kb = love.filesystem.getInfo(filepath).size / 1024
-  Log.info("Game saved in %.2f s, file size %.2f KB" % {t, size_kb})
+  local size_kb = love.filesystem.getInfo(path).size / 1024
+  Log.info("Saved in %.2f s, file size %.2f KB" % {t, size_kb})
 end
 
-saves.read = function(name)
-  local filepath = "saves" .. SLASH .. name .. ".ldump.gz"
-
+--- @nodiscard
+--- @param path string
+--- @return any
+saves.read = function(path)
   local base = love.filesystem.getSaveDirectory()
-  Log.info("Loading the game from %s%s%s" % {base, SLASH, filepath})
+  Log.info("Loading from %s%s%s" % {base, SLASH, path})
 
   local t = love.timer.getTime()
-  State = assert(loadstring(
+  local result = assert(loadstring(
     love.data.decompress(
-      "string", "gzip", love.filesystem.read(filepath)
+      "string", "gzip", love.filesystem.read(path)
     ) --[[@as string]],
-    filepath
+    path
   ))()
   t = love.timer.getTime() - t
 
-  Log.info("Game loaded in %.2f s" % {t})
+  Log.info("Loaded in %.2f s" % {t})
+  return result
 end
 
 return saves
