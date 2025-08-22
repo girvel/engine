@@ -3,7 +3,7 @@ local action = {}
 --- @class action
 --- @field cost? table<string, number>
 --- @field _is_available? fun(action, table): boolean
---- @field _run? fun(action, table): boolean
+--- @field _act? fun(action, table): boolean
 action.base = {
   is_available = function(self, entity)
     if self.cost
@@ -19,9 +19,9 @@ action.base = {
     return true
   end,
 
-  run = function(self, entity)
+  act = function(self, entity)
     if not self:is_available(entity) then return false end
-    local result = self:_run(entity)
+    local result = self:_act(entity)
     if not result then return false end
     for k, v in pairs(self.cost or {}) do
       entity.resources[k] = entity.resources[k] - v

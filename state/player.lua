@@ -18,7 +18,7 @@ player.base = function()
       control = function(entity, _)
         while true do
           if entity.ai.next_action then
-            entity.ai.next_action:run(entity)
+            entity.ai.next_action:act(entity)
             entity.ai.next_action = nil
           end
           if not State.combat or entity.ai.finish_turn then break end

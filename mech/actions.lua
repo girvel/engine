@@ -11,7 +11,7 @@ actions.move = function(direction)
     cost = {
       movement = 1,
     },
-    _run = function(_, entity)
+    _act = function(_, entity)
       if entity.rotate then
         entity:rotate(direction)
       elseif entity.direction then
@@ -33,7 +33,7 @@ actions.hand_attack = Table.extend({
   cost = {
     actions = 1,
   },
-  _run = function(_, entity)
+  _act = function(_, entity)
     entity:animate("hand_attack")
   end,
 }, action.base)
