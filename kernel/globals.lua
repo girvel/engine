@@ -12,6 +12,9 @@ Common = require("engine.lib.common")
 CompositeMap = require("engine.lib.composite_map")
 Ldump.mark_module("engine.lib.composite_map", "const")
 
+D = require("engine.lib.d")
+Ldump.mark_module("engine.lib.d", "const")
+
 Entity = require("engine.lib.entity")
 
 Fn = require("engine.lib.fn")

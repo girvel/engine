@@ -40,7 +40,9 @@ actions.hand_attack = Table.extend({
   end,
   _act = function(_, entity)
     local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    entity:animate("hand_attack"):next(function() health.damage(target, 2, false) end)
+    entity:animate("hand_attack"):next(function()
+      health.attack(target, D(20), D(4) + 1)
+    end)
   end,
 }, action.base)
 

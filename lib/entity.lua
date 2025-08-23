@@ -17,9 +17,11 @@ local entityx = {}
 --- @field inventory? table<string, table>
 --- @field hp? integer current health points
 --- @field base_hp? integer base maximal HP value before modifiers
+--- @field armor? integer static armor class; less priority than :get_armor()
 --- @field rest? fun(entity, rest_type)
 --- @field rotate? fun(entity, vector)
 --- @field get_max_hp? fun(entity): integer
+--- @field get_armor? fun(entity): integer compute armor class; takes priority over .armor
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision

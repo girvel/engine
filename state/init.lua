@@ -37,9 +37,9 @@ local state_methods = {
       Fun.iter(entity.inventory)
         :each(function(slot, it) self:add(it) end)
     end
-    if entity.on_add then
-      entity:on_add()
-    end
+    -- if entity.on_add then
+    --   entity:on_add()
+    -- end
     return entity
   end,
 
@@ -70,9 +70,9 @@ local state_methods = {
       self.combat:remove(entity)
     end
 
-    if entity.on_remove then
-      entity:on_remove()
-    end
+    -- if entity.on_remove then
+    --   entity:on_remove()
+    -- end
 
     return entity
   end,
@@ -107,7 +107,7 @@ local state_methods = {
     for i, e in ipairs(load_data.entities) do
       e = self:add(e)
       if e.player_flag then self.player = e end
-      if e.on_load then e:on_load() end
+      -- if e.on_load then e:on_load() end
 
       if i % BATCH_SIZE == 0 then
         coroutine.yield(.5 + .5 * (i / #load_data.entities))

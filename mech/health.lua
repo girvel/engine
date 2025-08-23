@@ -21,7 +21,20 @@ local health = {}
 --   end
 -- end
 
-local floating_damage
+floating_damage = function(number, grid_position)
+  local a = math.floor(State.level.cell_size * .25)
+  local b = math.floor(State.level.cell_size * .75)
+  return {
+    boring_flag = true,
+    codename = "floating_damage",
+    position = grid_position * State.level.cell_size
+      + V(math.random(a, b), math.random(a, b)),
+    view = "grids_fx",
+    drift = V(0, -4),
+    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
+    life_time = 3,
+  }
+end
 
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target table
@@ -37,11 +50,12 @@ health.damage = function(target, amount, is_critical)
   amount = math.max(0, amount)
   Log.debug("%s damage to %s" % {amount, Entity.codename(target)})
 
+  local repr = tostring(amount)
   if is_critical then
-    State:add(floating_damage(amount .. "!", target.position))
-  else
-    State:add(floating_damage(amount, target.position))
+    repr = repr .. "!"
   end
+
+  State:add(floating_damage(repr, target.position))
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
@@ -79,20 +93,47 @@ health.set_hp = function(target, value)
   -- end
 end
 
-floating_damage = function(number, grid_position)
-  local a = math.floor(State.level.cell_size * .25)
-  local b = math.floor(State.level.cell_size * .75)
-  return {
-    boring_flag = true,
-    codename = "floating_damage",
-    position = grid_position * State.level.cell_size
-      + V(math.random(a, b), math.random(a, b)),
-    view = "grids_fx",
-    drift = V(0, -4),
-    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
-    life_time = 3,
-  }
+--- Attacks with given attack/damage rolls
+--- @param target entity attacked entity
+--- @param attack_roll table
+health.attack = function(target, attack_roll, damage_roll)
+  local attack = attack_roll:roll()
+  local is_nat = attack == attack_roll:max()
+  local is_nat_miss = attack == attack_roll:min()
+  local ac = target.get_armor and target:get_armor() or target.armor or 0
+
+  Log.info("%s is attacked; attack roll: %s, armor: %s" % {Entity.name(target), attack, ac})
+
+  if is_nat_miss then
+    State:add(floating_damage("!", target.position))
+    return false
+  end
+
+  if attack < ac and not is_nat then
+    State:add(floating_damage("-", target.position))
+    return false
+  end
+
+  local is_critical = is_nat and attack >= ac
+  if is_critical then
+    damage_roll = damage_roll + D.new(damage_roll.dice, 0)
+  end
+
+  health.damage(target, damage_roll:roll(), is_critical)
+  return true
 end
+
+-- health.attack_save = function(target, ability, save_dc, damage_roll)
+--   local success = abilities.saving_throw(target, ability, save_dc)
+-- 
+--   if success then
+--     State:add(gui.floating_damage("-", target.position))
+--     return false
+--   end
+-- 
+--   health.damage(target, damage_roll:roll())
+--   return true
+-- end
 
 Ldump.mark(health, {}, ...)
 return health

@@ -163,4 +163,12 @@ methods.extended = function(self, modification)
   )
 end
 
+--- @generic T: d
+--- @param self T
+--- @return T
+methods.copy = function(self)
+  --- @cast self d
+  return d.new(Table.deep_copy(self.dice), self.bonus)
+end
+
 return d

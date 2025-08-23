@@ -83,5 +83,10 @@ methods.rotate = function(self, direction)
   end
 end
 
+methods.get_armor = function(self)
+  return
+  -- NEXT (when class) use abilities
+end
+
 Ldump.mark(creature, {}, ...)
 return creature
