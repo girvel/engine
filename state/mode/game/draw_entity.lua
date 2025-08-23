@@ -23,8 +23,6 @@ local draw_entity = function(self, entity, dt)
   end
 
   -- NEXT global shader
-  -- NEXT inventory
-  -- NEXT text?
 
   local sprite = entity.sprite
   if sprite.type == "image" or (sprite.type == "atlas" and entity.shader) then

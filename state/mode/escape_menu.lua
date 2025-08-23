@@ -109,7 +109,6 @@ methods.render_confirmation = function(self)
     if n == 1 then
       self._display_confirmation = false
     elseif n == 2 then
-      -- NEXT (save/load) make sure the game is saved
       Log.info("Exiting the game from escape menu")
       love.event.quit()
     end

@@ -73,7 +73,6 @@ local draw_gui = function(self, dt)
 
     ui.br()
 
-    -- NEXT (when actions) limit speed
     for key, direction in pairs {
       w = Vector.up,
       a = Vector.left,
