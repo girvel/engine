@@ -88,5 +88,48 @@ methods.get_armor = function(self)
   -- NEXT (when class) use abilities
 end
 
+--- @param self entity
+--- @param slot string
+methods.get_melee_attack_roll = function(self, slot)
+  return D(20)
+  -- NEXT (when class)
+  -- local roll = D(20)
+  --   + experience.get_proficiency_modifier(self.level)
+  --   + abilities.get_melee_modifier(self, slot)
+
+  -- local weapon = self.inventory[slot]
+  -- if weapon then
+  --   roll = roll + weapon.bonus
+  -- end
+
+  -- return self:get_effect("modify_attack_roll", roll)
+end
+
+--- @param self entity
+--- @param slot string
+methods.get_melee_damage_roll = function(self, slot)
+  return D(4)
+  -- NEXT (class)
+  -- local weapon = self.inventory[slot]
+  -- if not weapon then
+  --   return D.roll({}, self:get_modifier("str") + 1)
+  -- end
+
+  -- local roll
+  -- if weapon.tags.versatile and not self.inventory.other_hand then
+  --   roll = D(weapon.damage_roll.dice[1].sides_n + 2)
+  -- else
+  --   roll = weapon.damage_roll
+  -- end
+
+  -- roll = roll + weapon.bonus
+
+  -- if slot == "main_hand" then
+  --   roll = roll + abilities.get_melee_modifier(self, slot)
+  -- end
+
+  -- return self:get_effect("modify_damage_roll", roll, slot)
+end
+
 Ldump.mark(creature, {}, ...)
 return creature

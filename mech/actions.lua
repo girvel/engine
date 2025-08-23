@@ -29,6 +29,35 @@ actions.move = function(direction)
   }, action.base)
 end
 
+local base_attack = function(entity, target, slot)
+  local direction = target.position - entity.position
+  assert(direction:abs() == 1)
+  entity:rotate(direction)
+
+  -- sound.play("assets/sounds/whoosh", 0.1, entity.position)
+  -- NEXT (sounds)
+
+  entity:animate(slot .. "_attack"):next(function()
+    -- State:register_aggression(entity, target)
+    -- NEXT (combat AI)
+
+    if not health.attack(
+      target,
+      entity:get_melee_attack_roll(slot),
+      entity:get_melee_damage_roll(slot)
+    ) then return end
+
+    -- if target and target.sounds and target.sounds.hit then
+    --   sound.play(target.sounds.hit, target.position)
+    -- end
+    -- NEXT (sounds)
+
+    -- if target.hardness and not -Query(entity).inventory[slot] then
+    --   attacking.attack_save(entity, "con", target.hardness, D.roll({}, 1))
+    -- end
+  end)
+end
+
 --- @type action
 actions.hand_attack = Table.extend({
   cost = {
@@ -40,9 +69,7 @@ actions.hand_attack = Table.extend({
   end,
   _act = function(_, entity)
     local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    entity:animate("hand_attack"):next(function()
-      health.attack(target, D(20), D(4) + 1)
-    end)
+    base_attack(entity, target, "hand")
   end,
 }, action.base)
 
