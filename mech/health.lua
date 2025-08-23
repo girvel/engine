@@ -1,4 +1,5 @@
 local sprite = require "engine.tech.sprite"
+local item   = require "engine.tech.item"
 local health = {}
 
 -- NEXT
@@ -47,16 +48,15 @@ health.damage = function(target, amount, is_critical)
     if target.on_death then
       target:on_death()
     end
-    -- if target.immortal_flag then return end
 
-    -- if target.inventory then
-    --   for _, slot in ipairs(item.DROPPING_SLOTS) do
-    --     local this_item = target.inventory[slot]
-    --     if this_item and not this_item.disable_drop_flag then
-    --       item.drop(target, slot)
-    --     end
-    --   end
-    -- end
+    if target.inventory then
+      for _, slot in ipairs(item.DROPPING_SLOTS) do
+        local this_item = target.inventory[slot]
+        if this_item then
+          item.drop(target, slot)
+        end
+      end
+    end
 
     State:remove(target)
     if not target.boring_flag then
