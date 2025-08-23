@@ -29,7 +29,24 @@ actions.move = function(direction)
   }, action.base)
 end
 
-local base_attack = function(entity, target, slot)
+local base_attack
+
+--- @type action
+actions.hand_attack = Table.extend({
+  cost = {
+    actions = 1,
+  },
+  _is_available = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    return target and target.hp
+  end,
+  _act = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    base_attack(entity, target, "hand")
+  end,
+}, action.base)
+
+base_attack = function(entity, target, slot)
   local direction = target.position - entity.position
   assert(direction:abs() == 1)
   entity:rotate(direction)
@@ -57,21 +74,6 @@ local base_attack = function(entity, target, slot)
     -- end
   end)
 end
-
---- @type action
-actions.hand_attack = Table.extend({
-  cost = {
-    actions = 1,
-  },
-  _is_available = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    return target and target.hp
-  end,
-  _act = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    base_attack(entity, target, "hand")
-  end,
-}, action.base)
 
 Ldump.mark(actions, {}, ...)
 return actions

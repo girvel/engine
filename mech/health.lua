@@ -21,20 +21,7 @@ local health = {}
 --   end
 -- end
 
-floating_damage = function(number, grid_position)
-  local a = math.floor(State.level.cell_size * .25)
-  local b = math.floor(State.level.cell_size * .75)
-  return {
-    boring_flag = true,
-    codename = "floating_damage",
-    position = grid_position * State.level.cell_size
-      + V(math.random(a, b), math.random(a, b)),
-    view = "grids_fx",
-    drift = V(0, -4),
-    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
-    life_time = 3,
-  }
-end
+local floating_damage
 
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target table
@@ -59,6 +46,11 @@ health.damage = function(target, amount, is_critical)
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
+    if target.player_flag then
+      State.mode:player_has_died()
+      return
+    end
+
     if target.on_death then
       target:on_death()
     end
@@ -134,6 +126,21 @@ end
 --   health.damage(target, damage_roll:roll())
 --   return true
 -- end
+
+floating_damage = function(number, grid_position)
+  local a = math.floor(State.level.cell_size * .25)
+  local b = math.floor(State.level.cell_size * .75)
+  return {
+    boring_flag = true,
+    codename = "floating_damage",
+    position = grid_position * State.level.cell_size
+      + V(math.random(a, b), math.random(a, b)),
+    view = "grids_fx",
+    drift = V(0, -4),
+    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
+    life_time = 3,
+  }
+end
 
 Ldump.mark(health, {}, ...)
 return health

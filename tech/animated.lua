@@ -3,14 +3,19 @@ local sprite = require("engine.tech.sprite")
 
 local animated = {}
 
---- @class animated_mixin
---- @field animation {pack: table<string, sprite_image[]>, paused: boolean, current: string, frame: number, _end_promise: promise}
---- @field sprite sprite_image
+--- @class animation
+--- @field pack table<string, sprite_image[]>
+--- @field paused boolean
+--- @field current string
+--- @field frame number
+--- @field _end_promise promise
+
 local methods = {}
 
 local load_pack
 
---- @return animated_mixin
+--- @param path string
+--- @return table
 animated.mixin = function(path)
   return Table.extend({
     animation = {
@@ -20,6 +25,13 @@ animated.mixin = function(path)
     },
     sprite = {},
   }, methods)
+end
+
+--- @param entity entity
+--- @param path string
+animated.change_pack = function(entity, path)
+  entity.animation.pack = load_pack(path)
+  entity:animate()
 end
 
 --- @param animation_name? string

@@ -12,6 +12,8 @@ local entityx = {}
 --- @field ai? ai
 --- @field shader? shader individial shader to render with
 --- @field sprite? sprite
+--- @field animation? animation
+--- @field animate? fun(entity, string?): promise
 ---
 --- @field resources? table<string, integer> resources to spend on actions
 --- @field inventory? table<string, table>

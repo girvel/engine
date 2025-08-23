@@ -13,7 +13,7 @@ local state = {}
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_info
---- @field player player
+--- @field player entity
 --- @field debug boolean
 --- @field _world table
 --- @field _entities table
@@ -46,10 +46,11 @@ local state_methods = {
   --- @generic T: table
   --- @param self state
   --- @param entity T
+  --- @param silently? boolean
   --- @return T
-  remove = function(self, entity)
+  remove = function(self, entity, silently)
     --- @cast entity table
-    if not entity.boring_flag then
+    if not silently and not entity.boring_flag then
       Log.debug("State:remove(%s)" % Entity.codename(entity))
     end
 
@@ -62,7 +63,7 @@ local state_methods = {
 
     if entity.inventory then
       for _, item in pairs(entity.inventory) do
-        self:remove(item)
+        self:remove(item, silently)
       end
     end
 
@@ -79,6 +80,14 @@ local state_methods = {
 
   exists = function(self, entity)
     return self._entities[entity]
+  end,
+
+  reset = function(self)
+    Log.info("State:reset()")
+    local to_remove = Table.shallow_copy(self._entities)
+    for e, _ in pairs(to_remove) do
+      State:remove(e, true)
+    end
   end,
 
   --- @async

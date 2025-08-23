@@ -1,3 +1,6 @@
+local animated = require("engine.tech.animated")
+local level    = require("engine.tech.level")
+
 local mode = {}
 
 local STATES = {
@@ -8,6 +11,7 @@ local STATES = {
   journal = require("engine.state.mode.journal"),
   save_menu = require("engine.state.mode.save_menu"),
   load_menu = require("engine.state.mode.load_menu"),
+  death = require("engine.state.mode.death"),
 }
 
 --- @class state_mode
@@ -66,6 +70,19 @@ local methods = {
     assert(menus[self._mode.type])
     Log.info("Closing", self._mode.type)
     self._mode = self._mode._prev
+  end,
+
+  player_has_died = function(self)
+    self._mode = STATES.death.new()
+    level.remove(State.player)
+    State.player:rotate(Vector.left)
+    animated.change_pack(State.player, "engine/assets/sprites/animations/skeleton")
+  end,
+
+  to_start_screen = function(self)
+    assert(self._mode.type == "death")
+    self._mode = STATES.start_menu.new()
+    State:reset()
   end,
 }
 
