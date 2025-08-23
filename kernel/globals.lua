@@ -32,6 +32,8 @@ Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")
 
+Period = require("engine.lib.period")
+
 Promise = require("engine.lib.promise")
 Ldump.mark_module("engine.lib.promise", "const")
 

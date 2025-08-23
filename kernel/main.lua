@@ -3,7 +3,6 @@ local saves = require "engine.kernel.saves"
 -- pre-initialization --
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
-love.keyboard.setKeyRepeat(true)
 require("engine.kernel.globals")
 require("engine.kernel.wrappers")
 
@@ -25,11 +24,6 @@ for callback_name, _ in pairs(
     State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
     State._world:refresh()
   end
-end
-
-local inner_draw = love.draw
-love.draw = function()
-  inner_draw(love.timer.getDelta())
 end
 
 love.load = function(args)
@@ -60,6 +54,9 @@ love.run = function()
 
 	love.timer.step()
 	local dt = 0
+  local delays = {}
+  local KEY_REPETITION_DELAY = .3
+  local KEY_REPETITION_DEFAULT_RATE = 5
 
 	return function()
     if Kernel._load then
@@ -73,18 +70,32 @@ love.run = function()
         if not love.quit or not love.quit() then
           return a or 0
         end
+      elseif name == "keypressed" then
+        delays[b] = KEY_REPETITION_DELAY
+      elseif name == "keyreleased" then
+        delays[b] = nil
       end
       love.handlers[name](a,b,c,d,e,f)
     end
 
 		dt = love.timer.step()
 
+    for k, v in pairs(delays) do
+      delays[k] = math.max(0, v - dt)
+      if delays[k] == 0 then
+        local rate = Kernel._specific_key_rates[k] or KEY_REPETITION_DEFAULT_RATE
+        while Period(1 / rate, delays, k) do
+          love.keypressed(k)
+        end
+      end
+    end
+
 		love.update(dt)
 
     love.graphics.origin()
     love.graphics.clear(love.graphics.getBackgroundColor())
 
-    love.draw()
+    love.draw(love.timer.getDelta())
 
     love.graphics.present()
 

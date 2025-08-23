@@ -1,14 +1,17 @@
 local init = {}
 
---- @class kernel
+--- @class kernel middleware between fallen engine and LOVE
 --- @field _save? string
 --- @field _load? string
+--- @field _specific_key_rates table<love.KeyConstant, number>
 local methods = {}
 local mt = {__index = methods}
 
 --- @return kernel
 init.new = function()
-  return setmetatable({}, mt)
+  return setmetatable({
+    _specific_key_rates = {},
+  }, mt)
 end
 
 --- @param filepath string
@@ -43,6 +46,18 @@ methods.list_saves = function(_)
 
   table.sort(result, function(a, b) return dates[a] > dates[b] end)
   return result
+end
+
+--- @param key love.KeyConstant
+--- @param value number
+methods.set_key_rate = function(self, key, value)
+  self._specific_key_rates[key] = value
+end
+
+--- @param key love.KeyConstant
+--- @return number
+methods.get_key_rate = function(self, key)
+  return self._specific_key_rates[key]
 end
 
 return init
