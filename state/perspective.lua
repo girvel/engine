@@ -63,8 +63,8 @@ from_matrix = function(matrix)
 end
 
 local SMOOTHING_CUTOFF = 3
-local SPRING_STIFFNESS = 100
-local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
+local SPRING_STIFFNESS = 50
+local DAMPING_K = 4 * math.sqrt(SPRING_STIFFNESS)
 
 offsets.camera = setmetatable({
   velocity = Vector.zero,

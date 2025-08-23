@@ -8,7 +8,7 @@ player.base = function()
   local result = Table.extend(creature.mixin(), {
     codename = "player",
     player_flag = true,
-    fov_r = 15,
+    fov_r = 16,
     base_hp = 10,
 
     ai = {
