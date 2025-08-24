@@ -335,6 +335,7 @@ ui.hot_button = function(image, key)
   ui.finish_frame()
 
   if is_mouse_over or is_active then
+    model.cursor = "hand"
     ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
       ui.tile(is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()
