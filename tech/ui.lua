@@ -23,6 +23,7 @@ local model = {
     max_i = 0,
     is_pressed = false,
   },
+  cursor = nil,
   active_frames_t = CompositeMap.new(),
 
   -- context --
@@ -52,9 +53,8 @@ local SCALE = 4  -- TODO extract scale here & in view
 local get_font, get_batch, get_mouse_over
 
 ui.start = function()
-  love.mouse.setCursor(CURSORS.normal)
-
   model.selection.max_i = 0
+  model.cursor = "normal"
   model.frame = {{
     x = 0,
     y = 0,
@@ -72,6 +72,7 @@ ui.finish = function()
   model.selection.is_pressed = false
   model.mouse.button_pressed = nil
   model.keyboard.pressed = {}
+  love.mouse.setCursor(CURSORS[model.cursor])
 end
 
 --- @param x? integer?
@@ -442,7 +443,7 @@ ui.choice = function(options)
         return model.selection.i
       end
       is_selected = true
-      love.mouse.setCursor(CURSORS.hand)
+      model.cursor = "hand"
       love.graphics.setColor(.7, .7, .7)
     end
 
