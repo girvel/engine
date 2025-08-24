@@ -27,7 +27,7 @@ end
 --- @enum (key) cue_slot
 factories = {
   blood = function()
-    return Log.trace(Table.extend(
+    return Table.extend(
       animated.mixin("engine/assets/sprites/animations/blood"),
       {
         name = "Кровь",
@@ -35,7 +35,7 @@ factories = {
         slot = "blood",
         boring_flag = true,
       }
-    ))
+    )
   end,
 
   highlight = function()
