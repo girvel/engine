@@ -89,7 +89,7 @@ local draw_gui = function(self, dt)
     ui.br()
     local max = player:get_resources("full")
     local RESOURCE_DISPLAY_ORDER = {
-      "actions", "bonus_actions", "reactions", "movement", "hit_dice",
+      "actions", "bonus_actions", "reactions", "movement", "hit_dice", "action_surge",
     }
 
     ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)

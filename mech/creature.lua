@@ -8,6 +8,7 @@ creature.mixin = function()
   local result = Table.extend({
     resources = {},
     inventory = {},
+    perks = {},
   }, methods)
 
   return result
@@ -20,43 +21,53 @@ creature.init = function(entity)
   entity:rotate(entity.direction or Vector.right)
 end
 
+--- @param self entity
+--- @param name string
+--- @param value any
+--- @param ... any
+methods.modify = function(self, name, value, ...)
+  local additional_args = {...}
+  name = "modify_" .. name
+  return Fun.iter(self.perks)
+    :filter(function(p) return p[name] end)
+    :reduce(
+      function(acc, p) return p[name](p, self, acc, unpack(additional_args)) end,
+      value
+    )
+end
+
 --- @alias rest_type "free"|"move"|"short"|"long"|"full"
 
 --- @param rest_type rest_type
 methods.get_resources = function(self, rest_type)
+  local result = {}
   if rest_type == "free" then
-    return {
+    result = {
       movement = 6,
       bonus_actions = 1,
     }
-  end
-
-  if rest_type == "move" then
-    return {
+  elseif rest_type == "move" then
+    result = {
       actions = 1,
       bonus_actions = 1,
       reactions = 1,
       movement = 6,
     }
-  end
-
-  if rest_type == "short" then
-    return {}  -- NEXT modify with effects
-  end
-
-  if rest_type == "long" then
-    return {}  -- NEXT modify with effects
-  end
-
-  if rest_type == "full" then
+  elseif rest_type == "short" then
+    result = {}
+  elseif rest_type == "long" then
+    result =  {}
+  elseif rest_type == "full" then
     return Table.extend(
       self:get_resources("move"),
       self:get_resources("short"),
       self:get_resources("long")
     )
+  else
+    error("Unknown rest type %q" % {rest_type})
   end
 
-  error("Unknown rest type %q" % {rest_type})
+  return self:modify("get_resources", result, rest_type)
 end
 
 methods.get_max_hp = function(self)

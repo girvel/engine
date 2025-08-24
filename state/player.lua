@@ -3,6 +3,11 @@ local player = {}
 
 --- @class base_player: entity
 --- @field fov_r integer
+--- @field ai player_ai
+
+--- @class player_ai: ai
+--- @field next_action action?
+--- @field finish_turn true?
 
 player.base = function()
   local result = Table.extend(creature.mixin(), {
