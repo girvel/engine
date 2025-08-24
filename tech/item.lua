@@ -3,6 +3,8 @@ local item = {}
 item.DROPPING_SLOTS = {"hand", "offhand", "gloves", "right_pocket", "inside"}
 
 --- @class item: entity
+--- @field damage_roll? d
+--- @field bonus? integer
 --- @field tags table<string, true>
 --- @field slot string
 
@@ -41,23 +43,23 @@ item.give = function(entity, this_item)
   if this_item.slot == "hands" then
     if this_item.tags.two_handed or not this_item.tags.light then
       is_free = (
-        (not entity.inventory.main_hand or item.drop(entity, "main_hand"))
-        and (not entity.inventory.other_hand or item.drop(entity, "other_hand"))
+        (not entity.inventory.hand or item.drop(entity, "hand"))
+        and (not entity.inventory.offhand or item.drop(entity, "offhand"))
       )
-      slot = "main_hand"
+      slot = "hand"
     else
-      if not entity.inventory.main_hand
-        or (not entity.inventory.main_hand.tags.light and item.drop(entity, "main_hand"))
+      if not entity.inventory.hand
+        or (not entity.inventory.hand.tags.light and item.drop(entity, "hand"))
       then
-        slot = "main_hand"
+        slot = "hand"
         is_free = true
-      elseif entity.inventory.main_hand.tags.light and not entity.inventory.other_hand then
-        slot = "other_hand"
+      elseif entity.inventory.hand.tags.light and not entity.inventory.offhand then
+        slot = "offhand"
         is_free = true
-      elseif entity.inventory.main_hand.tags.light and item.drop(entity, "other_hand") then
-        entity.inventory.other_hand = entity.inventory.main_hand
-        entity.inventory.main_hand = nil
-        slot = "main_hand"
+      elseif entity.inventory.hand.tags.light and item.drop(entity, "offhand") then
+        entity.inventory.offhand = entity.inventory.hand
+        entity.inventory.hand = nil
+        slot = "hand"
         is_free = true
       else
         is_free = false

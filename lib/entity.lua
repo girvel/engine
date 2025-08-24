@@ -1,7 +1,7 @@
 --- Module for in-game entities
 local entityx = {}
 
---- @class entity
+--- @class entity: _creature_methods
 --- @field name string in-game name
 --- @field codename string in-code name
 --- @field view string entity's coordinate system's (offset + scale) name
@@ -22,12 +22,6 @@ local entityx = {}
 --- @field base_hp integer base maximal HP value before modifiers
 --- @field armor integer static armor class; less priority than :get_armor()
 --- @field perks table[] all class, feat, race perks that modify default creature behavior
---- @field modify fun(entity, string, any, ...)
---- @field rest fun(entity, rest_type)
---- @field rotate fun(entity, vector)
---- @field get_max_hp fun(entity): integer
---- @field get_armor fun(entity): integer compute armor class; takes priority over .armor
---- @field get_resources fun(entity, string): table<string, integer>
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision

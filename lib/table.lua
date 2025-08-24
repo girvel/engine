@@ -199,4 +199,18 @@ tablex.set = function(list)
   return result
 end
 
+--- @param t table
+--- @param fields string[]
+tablex.assert_fields = function(t, fields)
+  local missing_fields = {}
+  for _, field in ipairs(fields) do
+    if t[field] == nil then
+      table.insert(missing_fields, field)
+    end
+  end
+  if #missing_fields > 0 then
+    error("fields %s are required for %s" % {table.concat(missing_fields, ", "), t})
+  end
+end
+
 return tablex

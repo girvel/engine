@@ -1,6 +1,8 @@
 local health = require "engine.mech.health"
+local abilities = require "engine.mech.abilities"
 local creature = {}
 
+--- @class _creature_methods
 local methods = {}
 
 --- @return entity
@@ -16,7 +18,7 @@ end
 
 --- @param entity entity
 creature.init = function(entity)
-  assert(entity.base_hp, "creature requires .base_hp for %s" % {Entity.codename(entity)})
+  Table.assert_fields(entity, {"base_hp", "base_abilities"})
   entity:rest("full")
   entity:rotate(entity.direction or Vector.right)
 end
@@ -67,7 +69,7 @@ methods.get_resources = function(self, rest_type)
     error("Unknown rest type %q" % {rest_type})
   end
 
-  return self:modify("get_resources", result, rest_type)
+  return self:modify("resources", result, rest_type)
 end
 
 methods.get_max_hp = function(self)
@@ -94,52 +96,82 @@ methods.rotate = function(self, direction)
   end
 end
 
+--- Compute armor class; takes priority over .armor
+--- @param self entity
 methods.get_armor = function(self)
-  return
-  -- NEXT (when class) use abilities
+  return 10 + self:get_modifier("dex")
+end
+
+--- @param self entity
+--- @param ability ability|skill
+methods.get_modifier = function(self, ability)
+  if abilities.set[ability] then
+    return abilities.get_modifier(self:modify(
+      "ability_score",
+      self.base_abilities[ability],
+      ability
+    ))
+  end
+
+    assert(abilities.skill_bases[abilities], "%s is not a skill nor an ability" % {ability})
+
+    return self:modify(
+      "skill_score",
+      self:get_modifier(abilities.skill_bases[ability]),
+      ability
+    )
+end
+
+--- @param self entity
+--- @param slot string
+--- @return integer
+methods.get_melee_modifier = function(self, slot)
+  local weapon = self.inventory[slot]
+  if weapon and weapon.tags and weapon.tags.finesse then
+    return math.max(
+      self:get_modifier("str"),
+      self:get_modifier("dex")
+    )
+  end
+  return self:get_modifier("str")
 end
 
 --- @param self entity
 --- @param slot string
 methods.get_melee_attack_roll = function(self, slot)
-  return D(20)
-  -- NEXT (when class)
-  -- local roll = D(20)
-  --   + experience.get_proficiency_modifier(self.level)
-  --   + abilities.get_melee_modifier(self, slot)
+  local roll = D(20)
+    + self:get_melee_modifier(slot)
 
-  -- local weapon = self.inventory[slot]
-  -- if weapon then
-  --   roll = roll + weapon.bonus
-  -- end
+  local weapon = self.inventory[slot]
+  if weapon then
+    roll = roll + weapon.bonus
+  end
 
-  -- return self:get_effect("modify_attack_roll", roll)
+  return self:modify("attack_roll", roll, slot)
 end
 
 --- @param self entity
 --- @param slot string
 methods.get_melee_damage_roll = function(self, slot)
-  return D(4)
-  -- NEXT (class)
-  -- local weapon = self.inventory[slot]
-  -- if not weapon then
-  --   return D.roll({}, self:get_modifier("str") + 1)
-  -- end
+  local weapon = self.inventory[slot]
+  if not weapon then
+    return D.new({}, self:get_modifier("str") + 1)
+  end
 
-  -- local roll
-  -- if weapon.tags.versatile and not self.inventory.other_hand then
-  --   roll = D(weapon.damage_roll.dice[1].sides_n + 2)
-  -- else
-  --   roll = weapon.damage_roll
-  -- end
+  local roll
+  if weapon.tags.versatile and not self.inventory.other_hand then
+    roll = D(weapon.damage_roll.dice[1].sides_n + 2)
+  else
+    roll = weapon.damage_roll
+  end
 
-  -- roll = roll + weapon.bonus
+  roll = roll + weapon.bonus
 
-  -- if slot == "main_hand" then
-  --   roll = roll + abilities.get_melee_modifier(self, slot)
-  -- end
+  if slot == "hand" then
+    roll = roll + self:get_melee_modifier(slot)
+  end
 
-  -- return self:get_effect("modify_damage_roll", roll, slot)
+  return self:modify("damage_roll", roll, slot)
 end
 
 Ldump.mark(creature, {}, ...)
