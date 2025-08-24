@@ -1,5 +1,6 @@
 local sprite = require "engine.tech.sprite"
 local item   = require "engine.tech.item"
+local cue    = require "engine.tech.cue"
 local health = {}
 
 -- NEXT
@@ -24,7 +25,7 @@ local health = {}
 local floating_damage
 
 --- Inflict fixed damage; handles hp, death and FX
---- @param target table
+--- @param target entity
 --- @param amount number
 --- @param is_critical? boolean whether to display damage as critical
 --- @return nil
@@ -51,10 +52,6 @@ health.damage = function(target, amount, is_critical)
       return
     end
 
-    if target.on_death then
-      target:on_death()
-    end
-
     if target.inventory then
       for _, slot in ipairs(item.DROPPING_SLOTS) do
         local this_item = target.inventory[slot]
@@ -78,11 +75,9 @@ end
 health.set_hp = function(target, value)
   target.hp = value
 
-  -- NEXT (when cues)
-
-  -- if target.get_max_hp then
-  --   cue.set(target, "blood", target.hp <= target:get_max_hp() / 2)
-  -- end
+  if target.get_max_hp then
+    cue.set(target, "blood", target.hp <= target:get_max_hp() / 2)
+  end
 end
 
 --- Attacks with given attack/damage rolls

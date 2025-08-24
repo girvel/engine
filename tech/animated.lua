@@ -17,13 +17,14 @@ local load_pack
 --- @param path string
 --- @return table
 animated.mixin = function(path)
+  local pack = load_pack(path)
   return Table.extend({
     animation = {
-      pack = load_pack(path),
+      pack = pack,
       paused = false,
       _end_promise = nil,
     },
-    sprite = {},
+    sprite = select(2, next(pack))[1],
   }, methods)
 end
 

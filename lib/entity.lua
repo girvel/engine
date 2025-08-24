@@ -2,28 +2,29 @@
 local entityx = {}
 
 --- @class entity
---- @field name? string in-game name
---- @field codename? string in-code name
---- @field view? string entity's coordinate system's (offset + scale) name
---- @field position? vector position relative to the view
---- @field direction? vector
---- @field size? vector
---- @field layer? string name of the grid layer
---- @field ai? ai
---- @field shader? shader individial shader to render with
---- @field sprite? sprite
---- @field animation? animation
---- @field animate? fun(entity, string?): promise
+--- @field name string in-game name
+--- @field codename string in-code name
+--- @field view string entity's coordinate system's (offset + scale) name
+--- @field position vector position relative to the view
+--- @field direction vector
+--- @field size vector
+--- @field layer string name of the grid layer
+--- @field ai ai
+--- @field shader shader individial shader to render with
+--- @field sprite sprite
+--- @field animation animation
+--- @field animate fun(entity, string?): promise
+--- @field animation_set_paused fun(entity, boolean)
 ---
---- @field resources? table<string, integer> resources to spend on actions
---- @field inventory? table<string, table>
---- @field hp? integer current health points
---- @field base_hp? integer base maximal HP value before modifiers
---- @field armor? integer static armor class; less priority than :get_armor()
---- @field rest? fun(entity, rest_type)
---- @field rotate? fun(entity, vector)
---- @field get_max_hp? fun(entity): integer
---- @field get_armor? fun(entity): integer compute armor class; takes priority over .armor
+--- @field resources table<string, integer> resources to spend on actions
+--- @field inventory table<string, item>
+--- @field hp integer current health points
+--- @field base_hp integer base maximal HP value before modifiers
+--- @field armor integer static armor class; less priority than :get_armor()
+--- @field rest fun(entity, rest_type)
+--- @field rotate fun(entity, vector)
+--- @field get_max_hp fun(entity): integer
+--- @field get_armor fun(entity): integer compute armor class; takes priority over .armor
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision
