@@ -21,8 +21,10 @@ action.base = {
 
   act = function(self, entity)
     if not self:is_available(entity) then return false end
-    local result = self:_act(entity)
-    if not result then return false end
+    if self._act then
+      local result = self:_act(entity)
+      if not result then return false end
+    end
     for k, v in pairs(self.cost or {}) do
       entity.resources[k] = entity.resources[k] - v
     end

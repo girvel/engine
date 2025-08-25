@@ -46,6 +46,15 @@ actions.move = function(direction)
   }, action.base)
 end
 
+actions.dash = Table.extend({
+  codename = "dash",
+
+  cost = {
+    actions = 1,
+    movement = -6,
+  },
+}, action.base)
+
 local base_attack
 
 --- @type action
