@@ -16,6 +16,7 @@ local from_matrix
 
 perspective.new = function()
   local views, views_order, offset_fs = from_matrix {
+    {"grids_fx_under", 4, offsets.camera},
     {"grids", 4, offsets.camera},
     {"grids_fx", 4, offsets.camera},
   }

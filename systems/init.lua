@@ -16,6 +16,7 @@ return {
   require("engine.systems.timed_death"),  -- small
 
   -- love.draw
+  require("engine.systems.drawing_under"),
   require("engine.systems.drawing"),
   require("engine.systems.draw_fps"),
 }

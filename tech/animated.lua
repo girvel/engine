@@ -28,6 +28,28 @@ animated.mixin = function(path)
   }, methods)
 end
 
+--- Create an entity from animation that exists as long as the animation is playing
+--- @param path string
+--- @param position vector
+--- @return entity
+animated.fx = function(path, view, position)
+  local result = Table.extend(
+    animated.mixin(path),
+    {
+      boring_flag = true,
+      codename = "fx",
+      position = position * State.level.cell_size,
+      view = "grids_fx_under",
+    }
+  )
+
+  result:animate():next(function()
+    State:remove(result)
+  end)
+
+  return result
+end
+
 --- @param entity entity
 --- @param path string
 animated.change_pack = function(entity, path)
