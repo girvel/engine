@@ -312,7 +312,7 @@ local ACTIVE_FRAME_PERIOD = .1
 
 --- @param image string|love.Image
 --- @param key love.KeyConstant
---- @return boolean is_pressed
+--- @return {is_pressed: boolean, is_mouse_over: boolean}
 ui.hot_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * SCALE
@@ -367,7 +367,10 @@ ui.hot_button = function(image, key, is_disabled)
   frame.x = frame_image.x
   frame.y = frame_image.y
 
-  return is_pressed
+  return {
+    is_pressed = is_pressed,
+    is_mouse_over = is_mouse_over,
+  }
 end
 
 --- @param path string path to atlas file

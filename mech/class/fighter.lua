@@ -18,6 +18,7 @@ fighter.action_surge = Table.extend({
   end,
 
   cost = {
+    actions = -1,
     action_surge = 1,
   },
 
@@ -28,7 +29,6 @@ fighter.action_surge = Table.extend({
     -- NEXT!
     -- sound("assets/sounds/action_surge.mp3", .3):place(entity.position):play()
     -- NEXT (sounds)
-    entity.resources.actions = entity.resources.actions + 1
     return true
   end,
 }, action.base)

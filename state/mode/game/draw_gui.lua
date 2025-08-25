@@ -1,5 +1,5 @@
 local player_mod = require("engine.state.player")
-local tk = require("engine.state.mode.tk")
+local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
@@ -9,6 +9,21 @@ local fighter = require("engine.mech.class.fighter")
 
 local PADDING = 40
 local HP_BAR_H = 10 * 4
+
+local cost
+
+local action_button = function(action, hotkey)
+  local player = State.player
+  local is_available = action:is_available(player)
+  local codename = is_available and action.codename or (action.codename .. "_inactive")
+  local button = ui.hot_button(gui_elements[codename], hotkey, not is_available)
+  if button.is_pressed then
+    player.ai.next_action = action
+  end
+  if button.is_mouse_over then
+    cost = action.cost
+  end
+end
 
 --- @param self state_mode_game
 --- @param dt number
@@ -41,53 +56,55 @@ local draw_gui = function(self, dt)
     ui.br()
     ui.br()
 
+    cost = nil
+
     ui.start_line()
-      if ui.hot_button(gui.escape_menu, "escape") then
+      if ui.hot_button(gui.escape_menu, "escape").is_pressed then
         State.mode:open_escape_menu()
       end
       ui.offset(4)
 
       local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
-      if ui.hot_button(journal_image, "j") then
+      if ui.hot_button(journal_image, "j").is_pressed then
         State.mode:open_journal()
       end
       ui.offset(4)
 
-      tk.action_button(fighter.hit_dice, "h")
+      action_button(fighter.hit_dice, "h")
       ui.offset(4)
     ui.finish_line()
     ui.offset(0, 4)
 
     ui.start_line()
       if State.combat then
-        tk.action_button(player_mod.skip_turn, "space")
+        action_button(player_mod.skip_turn, "space")
         ui.offset(4)
-        tk.action_button(actions.disengage, "g")
+        action_button(actions.disengage, "g")
       else
         ui.offset(132)
       end
       ui.offset(4)
 
-      tk.action_button(actions.dash, "lshift")
+      action_button(actions.dash, "lshift")
       ui.offset(4)
     ui.finish_line()
     ui.offset(0, 4)
 
     ui.start_line()
-      tk.action_button(actions.hand_attack, "1")
+      action_button(actions.hand_attack, "1")
       ui.offset(4)
 
       if player.inventory.offhand then
-        tk.action_button(actions.offhand_attack, "2")
+        action_button(actions.offhand_attack, "2")
       else
-        tk.action_button(actions.shove, "2")
+        action_button(actions.shove, "2")
       end
       ui.offset(4)
 
-      tk.action_button(fighter.second_wind, "3")
+      action_button(fighter.second_wind, "3")
       ui.offset(4)
 
-      tk.action_button(fighter.action_surge, "4")
+      action_button(fighter.action_surge, "4")
       ui.offset(4)
     ui.finish_line()
 
@@ -123,10 +140,11 @@ local draw_gui = function(self, dt)
       actions = Vector.hex("79ad9c"),
       bonus_actions = Vector.hex("c3e06c"),
       reactions = Vector.hex("fcea9b"),
-      movement = Vector.hex("394e57"),
+      movement = Vector.hex("429858"),
     }
 
     local WHITE = Vector.hex("ffffff")
+    local HIGHLIGHTED = Vector.hex("e7573e")
 
     ui.separator()
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
@@ -136,9 +154,21 @@ local draw_gui = function(self, dt)
       end
 
       ui.start_frame(200)
-      love.graphics.setColor(COLORS[r] or WHITE)
-        ui.text((ICONS[r] or DEFAULT_ICON) * amount)
-      love.graphics.setColor(WHITE)
+      ui.start_line()
+        local icon = ICONS[r] or DEFAULT_ICON
+        local highlighted_n = cost and cost[r]
+        if highlighted_n then
+          love.graphics.setColor(HIGHLIGHTED)
+            ui.text(icon * highlighted_n)
+          love.graphics.setColor(COLORS[r] or WHITE)
+            ui.text(icon * math.max(0, amount - highlighted_n))
+          love.graphics.setColor(WHITE)
+        else
+          love.graphics.setColor(COLORS[r] or WHITE)
+            ui.text(icon * amount)
+          love.graphics.setColor(WHITE)
+        end
+      ui.finish_line()
       ui.finish_frame()
 
       ui.text(translation.resources[r]:utf_capitalize())

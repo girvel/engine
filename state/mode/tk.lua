@@ -90,14 +90,5 @@ tk.draw_entity = function(entity, x, y, scale)
   end
 end
 
-tk.action_button = function(action, hotkey)
-  local player = State.player
-  local is_available = action:is_available(player)
-  local codename = is_available and action.codename or (action.codename .. "_inactive")
-  if ui.hot_button(gui_elements[codename], hotkey, not is_available) then
-    player.ai.next_action = action
-  end
-end
-
 Ldump.mark(tk, {}, ...)
 return tk
