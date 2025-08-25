@@ -1,3 +1,4 @@
+local tk = require("engine.state.mode.tk")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
@@ -45,7 +46,7 @@ local draw_gui = function(self, dt)
       end
       ui.offset(4)
 
-      local journal_image = State.quests.has_new_content and gui.journal_active or gui.journal
+      local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
       if ui.hot_button(journal_image, "j") then
         State.mode:open_journal()
       end
@@ -71,9 +72,7 @@ local draw_gui = function(self, dt)
       end
       ui.offset(4)
 
-      if ui.hot_button(gui.action_surge, "4") then
-        fighter.action_surge:act(player)
-      end
+      tk.action_button(fighter.action_surge, "4")
       ui.offset(4)
     ui.finish_line()
 

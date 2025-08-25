@@ -304,13 +304,15 @@ local ACTIVE_FRAME_PERIOD = .1
 --- @param image string|love.Image
 --- @param key love.KeyConstant
 --- @return boolean is_pressed
-ui.hot_button = function(image, key)
+ui.hot_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * SCALE
   local h = image:getHeight() * SCALE
-  local is_mouse_over = get_mouse_over(w, h)
-  local is_pressed = (is_mouse_over and model.mouse.button_pressed)
+  local is_mouse_over = not is_disabled and get_mouse_over(w, h)
+  local is_pressed = not is_disabled and (
+    (is_mouse_over and model.mouse.button_pressed)
     or Table.contains(model.keyboard.pressed, key)
+  )
 
   if is_pressed then
     model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
