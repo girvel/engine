@@ -33,14 +33,25 @@ local FALLEN_TOTAL = 12482
 
 local cli = {
   stat = function(args)
-    local excessive_total = read_run("cat **/*.lua | wc -l")
-    local vendor = read_run(
-      ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
-    )
-    local total = excessive_total - vendor
-    print("Total:", total)
-    print("Fallen total:", FALLEN_TOTAL)
-    print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+    do
+      local excessive_total = read_run("cat **/*.lua | wc -l")
+      local vendor = read_run(
+        ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
+      )
+      local total = excessive_total - vendor
+
+      print("# Engine")
+      print("Total:", total)
+      print("Fallen total:", FALLEN_TOTAL)
+      print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+    end
+
+    do
+      local words = tonumber(read_run("cat **/*.ms | wc -w"))
+      print()
+      print("# Screenplay")
+      print("Words:", words)
+    end
   end,
 }
 
