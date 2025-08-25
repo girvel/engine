@@ -51,6 +51,26 @@ actions.hand_attack = Table.extend({
   end,
 }, action.base)
 
+--- @type action
+actions.offhand_attack = Table.extend({
+  codename = "offhand_attack",
+
+  cost = {
+    bonus_actions = 1,
+  },
+
+  _is_available = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    return target and target.hp and entity.inventory.offhand
+  end,
+
+  _act = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    base_attack(entity, target, "offhand")
+    return true
+  end,
+}, action.base)
+
 base_attack = function(entity, target, slot)
   local direction = target.position - entity.position
   assert(direction:abs() == 1)

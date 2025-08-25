@@ -64,9 +64,7 @@ local draw_gui = function(self, dt)
       tk.action_button(actions.hand_attack, "1")
       ui.offset(4)
 
-      if ui.hot_button(gui.offhand_attack, "2") then
-        Log.debug("Offhand attack")
-      end
+      tk.action_button(actions.offhand_attack, "2")
       ui.offset(4)
 
       tk.action_button(fighter.action_surge, "4")
