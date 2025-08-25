@@ -1,5 +1,5 @@
 return Tiny.system {
-  codename = "drawing",
+  codename = "debug_draw_fps",
   base_callback = "draw",
   update = function()
     if State.debug then

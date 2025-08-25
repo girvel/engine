@@ -46,7 +46,10 @@ love.load = function(args)
 end
 
 love.quit = function()
+  if not State.debug and State.mode:attempt_exit() then return true end
+
   Log.info("Exited smoothly")
+  return false
 end
 
 love.run = function()

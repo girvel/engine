@@ -86,7 +86,6 @@ local methods = {
 
   --- @return boolean ok false if already in confirmation menu
   attempt_exit = function(self)
-    Log.info("Exit attempt")
     if self._mode.type == "exit_confirmation" then
       return false
     end

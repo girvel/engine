@@ -7,7 +7,7 @@ cli.parse = function(args)
 
   parser:flag(
     "-d --debug",
-    "Show FPS"
+    "Show FPS; no confirmation on exit, exit through Ctrl+D enabled;"
   )
 
   parser:flag(

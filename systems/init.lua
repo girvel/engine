@@ -1,6 +1,7 @@
 return {
   -- love.keypressed
   require("engine.systems.ui_keypressed"),
+  require("engine.systems.debug_exit"),
 
   -- love.mousemoved
   require("engine.systems.ui_mousemoved"),
@@ -17,5 +18,5 @@ return {
 
   -- love.draw
   require("engine.systems.drawing"),
-  require("engine.systems.draw_fps"),
+  require("engine.systems.debug_draw_fps"),
 }

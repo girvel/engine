@@ -60,7 +60,7 @@ methods.draw_gui = function(self)
       })
     ui.finish_alignment()
 
-    if n == 1 then
+    if n == 1 or ui.keyboard("escape") then
       State.mode:close_menu()
     elseif n == 2 then
       Log.info("Exiting the game from escape menu")
