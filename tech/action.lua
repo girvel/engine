@@ -23,6 +23,12 @@ action.base = {
     if not self:is_available(entity) then return false end
     if self._act then
       local result = self:_act(entity)
+      assert(
+        result == true or result == false,
+        "action %s returned %s; actions must explicitly return true or false" % {
+          Entity.codename(self), Inspect(result)
+        }
+      )
       if not result then return false end
     end
     for k, v in pairs(self.cost or {}) do

@@ -47,6 +47,7 @@ player.skip_turn = Table.extend({
   end,
   _act = function(self, entity)
     entity.ai.finish_turn = true
+    return true
   end,
 }, action.base)
 

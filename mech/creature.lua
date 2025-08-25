@@ -12,6 +12,7 @@ creature.mixin = function()
     resources = {},
     inventory = {},
     perks = {},
+    conditions = {},
   }, methods)
 
   return result
@@ -32,6 +33,7 @@ methods.modify = function(self, name, value, ...)
   local additional_args = {...}
   name = "modify_" .. name
   return Fun.iter(self.perks)
+    :chain(self.conditions)
     :filter(function(p) return p[name] end)
     :reduce(
       function(acc, p) return p[name](p, self, acc, unpack(additional_args)) end,

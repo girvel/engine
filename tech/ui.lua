@@ -314,6 +314,10 @@ ui.hot_button = function(image, key, is_disabled)
     or Table.contains(model.keyboard.pressed, key)
   )
 
+  if is_mouse_over then
+    model.cursor = "hand"
+  end
+
   if is_pressed then
     model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
   end
@@ -337,7 +341,6 @@ ui.hot_button = function(image, key, is_disabled)
   ui.finish_frame()
 
   if is_mouse_over or is_active then
-    model.cursor = "hand"
     ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
       ui.tile(is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()

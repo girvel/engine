@@ -22,7 +22,12 @@ return Tiny.processingSystem {
     local current = State.combat:get_current()
     local ai = entity.ai
 
-    if entity ~= current or not ai.control then return end
+    if entity ~= current then return end
+
+    if not ai.control then
+      self:_update_conditions(entity, 6)
+      State.combat:_pass_turn()
+    end
 
     if not ai._control_coroutine then
       ai._control_coroutine = async.nil_serialized(coroutine.create(ai.control))
@@ -38,6 +43,8 @@ return Tiny.processingSystem {
       Log.info("%s's turn" % {Entity.codename(State.combat:get_current())})
       -- NEXT! reset timeout (when implementing AIs/putting safety in)
       -- NEXT FX and SFX for player's turn
+
+      self:_update_conditions(entity, 6)
     end
   end,
 
@@ -56,6 +63,24 @@ return Tiny.processingSystem {
       if entity.rest then
         entity:rest("free")
       end
+    end
+
+    self:_update_conditions(entity, dt)
+  end,
+
+  _update_conditions = function(self, entity, dt)
+    if not entity.conditions then return end
+
+    local indexes_to_remove = {}
+    for i, condition in ipairs(entity.conditions) do
+      condition.life_time = condition.life_time - dt
+      if condition.life_time <= 0 then
+        table.insert(indexes_to_remove, i)
+      end
+    end
+
+    for i = #indexes_to_remove, 1, -1 do
+      Table.remove_breaking_at(entity.conditions, i)
     end
   end,
 }

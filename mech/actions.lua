@@ -23,18 +23,20 @@ actions.move = function(direction)
         return false
       end
 
-      Fun.iter(Vector.directions)
-        :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
-        :filter(function(e)
-          return e
-            -- and hostility.are_hostile(entity, e)
-            -- NEXT (on combat AI)
-            and e.resources
+      if entity:modify("opportunity_attack_trigger", true) then
+        Fun.iter(Vector.directions)
+          :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
+          :filter(function(e)
+            return e
+              -- and hostility.are_hostile(entity, e)
+              -- NEXT (on combat AI)
+              and e.resources
+            end)
+          :each(function(e, d)
+            e:rotate(-d)
+            actions.opportunity_attack:act(e)
           end)
-        :each(function(e, d)
-          e:rotate(-d)
-          actions.reaction_attack:act(e)
-        end)
+      end
 
       local result = level.unsafe_move(entity, entity.position + direction)
       if result and entity.animate then
@@ -53,6 +55,33 @@ actions.dash = Table.extend({
     actions = 1,
     movement = -6,
   },
+}, action.base)
+
+local disengaged = function()
+  return {
+    codename = "disengaged",
+
+    life_time = 6,
+
+    modify_opportunity_attack_trigger = function(self, entity, triggered)
+      return false
+    end,
+  }
+end
+
+actions.disengage = Table.extend({
+  codename = "disengage",
+
+  cost = {
+    actions = 1,
+  },
+
+  _is_available = function() return State.combat end,
+
+  _act = function(self, entity)
+    table.insert(entity.conditions, disengaged())
+    return true
+  end,
 }, action.base)
 
 local base_attack
@@ -77,7 +106,7 @@ actions.hand_attack = Table.extend({
 }, action.base)
 
 --- @type action
-actions.reaction_attack = Table.extend({
+actions.opportunity_attack = Table.extend({
   codename = "reaction_attack",
 
   cost = {

@@ -24,6 +24,7 @@ local entityx = {}
 --- @field base_hp integer base maximal HP value before modifiers
 --- @field armor integer static armor class; less priority than :get_armor()
 --- @field perks table[] all class, feat, race perks that modify default creature behavior
+--- @field conditions table[] like .perks, but temporary
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision

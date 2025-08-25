@@ -5,7 +5,6 @@ local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
 local gui = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
-local class   = require("engine.mech.class")
 
 
 local PADDING = 40
@@ -62,8 +61,10 @@ local draw_gui = function(self, dt)
     ui.start_line()
       if State.combat then
         tk.action_button(player_mod.skip_turn, "space")
+        ui.offset(4)
+        tk.action_button(actions.disengage, "g")
       else
-        ui.offset(64)
+        ui.offset(132)
       end
       ui.offset(4)
 
