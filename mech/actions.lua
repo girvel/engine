@@ -45,8 +45,7 @@ actions.hand_attack = Table.extend({
   end,
 
   _act = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    base_attack(entity, target, "hand")
+    base_attack(entity, "hand")
     return true
   end,
 }, action.base)
@@ -65,16 +64,39 @@ actions.offhand_attack = Table.extend({
   end,
 
   _act = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
-    base_attack(entity, target, "offhand")
+    base_attack(entity, "offhand")
     return true
   end,
 }, action.base)
 
-base_attack = function(entity, target, slot)
-  local direction = target.position - entity.position
-  assert(direction:abs() == 1)
-  entity:rotate(direction)
+--- @type action
+actions.shove = Table.extend({
+  codename = "shove",
+
+  cost = {
+    bonus_actions = 1,
+  },
+
+  _is_available = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    return target and target.hp and not entity.inventory.offhand
+  end,
+
+  _act = function(_, entity)
+    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    local direction = entity.direction
+    entity:animate("offhand_attack"):next(function()
+      -- NEXT sound
+      if not level.safe_move(target, target.position + direction) then
+        health.damage(target, D(4):roll(), false)
+      end
+    end)
+    return true
+  end,
+}, action.base)
+
+base_attack = function(entity, slot)
+  local target = State.grids.solids:safe_get(entity.position + entity.direction)
 
   -- sound.play("assets/sounds/whoosh", 0.1, entity.position)
   -- NEXT (sounds)

@@ -83,6 +83,7 @@ end
 --- Attacks with given attack/damage rolls
 --- @param target entity attacked entity
 --- @param attack_roll table
+--- @return boolean did_hit true if attack landed
 health.attack = function(target, attack_roll, damage_roll)
   local attack = attack_roll:roll()
   local is_nat = attack == attack_roll:max()

@@ -66,7 +66,11 @@ local draw_gui = function(self, dt)
       tk.action_button(actions.hand_attack, "1")
       ui.offset(4)
 
-      tk.action_button(actions.offhand_attack, "2")
+      if player.inventory.offhand then
+        tk.action_button(actions.offhand_attack, "2")
+      else
+        tk.action_button(actions.shove, "2")
+      end
       ui.offset(4)
 
       tk.action_button(fighter.second_wind, "3")
