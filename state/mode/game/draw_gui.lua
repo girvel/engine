@@ -87,16 +87,13 @@ local draw_gui = function(self, dt)
       end
     end
 
-    ui.text("Lorem ipsum dolor sit amet inscowd werdf efds asdew asdfawe qwerasd fqwera asdf")
-
-    ui.br()
     local max = player:get_resources("full")
     local RESOURCE_DISPLAY_ORDER = {
       "actions", "bonus_actions", "reactions", "movement",
       "hit_dice", "action_surge", "second_wind", "fighting_spirit",
     }
 
-    ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
+    ui.table({"  Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
       :filter(function(key)
         return player.resources[key] and (State.combat or key ~= "movement")
       end)
@@ -110,11 +107,13 @@ local draw_gui = function(self, dt)
 
     if State.combat then
       ui.br()
-      ui.text("Combat:")
-      for i, entity in ipairs(State.combat.list) do
-        local prefix = State.combat.current_i == i and "x " or "- "
-        ui.text(prefix .. Entity.name(entity))
-      end
+      ui.table({"", "Очередь ходов"}, Fun.iter(State.combat.list)
+        :enumerate()
+        :map(function(i, e) return {
+          State.combat.current_i == i and "x" or "-",
+          Entity.name(e),
+        } end)
+        :totable())
     end
   ui.finish_frame()
 end
