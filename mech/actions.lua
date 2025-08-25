@@ -88,12 +88,21 @@ actions.shove = Table.extend({
     entity:animate("offhand_attack"):next(function()
       -- NEXT sound
       local dc = (D(20) + target:get_modifier("acrobatics")):roll()
-      if not entity:ability_check("athletics", dc) then
+      local distance = math.ceil(entity:get_modifier("athletics") / 4)
+
+      if distance <= 0 or not entity:ability_check("athletics", dc) then
         State:add(health.floater("-", target.position, health.COLOR_DAMAGE))
         return
       end
-      if not level.slow_move(target, target.position + direction) then
-        health.damage(target, D(4):roll(), false)
+
+      for remains = distance, 1, -1 do
+        local next_p = target.position + direction
+        if not level.slow_move(target, next_p) and
+          (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
+        then
+          health.damage(target, D(2 + remains * 2):roll(), false)
+          break
+        end
       end
     end)
     return true
