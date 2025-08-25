@@ -20,6 +20,14 @@ async.resume = function(coroutine_, ...)
   return result
 end
 
+--- @generic T: thread
+--- @param coroutine_ T
+--- @return T
+async.nil_serialized = function(coroutine_)
+  Ldump.serializer.handlers[coroutine_] = "nil"
+  return coroutine_
+end
+
 --- @async
 --- @param seconds integer
 async.sleep = function(seconds)

@@ -12,6 +12,7 @@ local STATES = {
   save_menu = require("engine.state.mode.save_menu"),
   load_menu = require("engine.state.mode.load_menu"),
   death = require("engine.state.mode.death"),
+  exit_confirmation = require("engine.state.mode.exit_confirmation"),
 }
 
 --- @class state_mode
@@ -66,10 +67,8 @@ local methods = {
   end,
 
   close_menu = function(self)
-    local menus = Table.set {"journal", "escape_menu", "save_menu", "load_menu"}
-    assert(menus[self._mode.type])
     Log.info("Closing", self._mode.type)
-    self._mode = self._mode._prev
+    self._mode = assert(self._mode._prev)
   end,
 
   player_has_died = function(self)
@@ -83,6 +82,16 @@ local methods = {
     assert(self._mode.type == "death")
     self._mode = STATES.start_menu.new()
     State:reset()
+  end,
+
+  --- @return boolean ok false if already in confirmation menu
+  attempt_exit = function(self)
+    Log.info("Exit attempt")
+    if self._mode.type == "exit_confirmation" then
+      return false
+    end
+    self._mode = STATES.exit_confirmation.new(self._mode)
+    return true
   end,
 }
 

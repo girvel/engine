@@ -7,6 +7,7 @@ Ldump.serializer = setmetatable({
     if a then
       return a, b
     end
+
     if type(x) == "userdata"
       and x.typeOf
       and x:typeOf("ImageData")

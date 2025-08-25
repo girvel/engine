@@ -14,7 +14,7 @@ local state = {}
 --- @field grid_size vector
 --- @field level level_info
 --- @field player player
---- @field debug boolean
+--- @field debug boolean is debug mode enabled; see engine.kernel.cli
 --- @field _world table
 --- @field _entities table
 local state_methods = {

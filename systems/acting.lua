@@ -25,7 +25,7 @@ return Tiny.processingSystem {
     if entity ~= current or not ai.control then return end
 
     if not ai._control_coroutine then
-      ai._control_coroutine = coroutine.create(ai.control)
+      ai._control_coroutine = async.nil_serialized(coroutine.create(ai.control))
     end
 
     async.resume(ai._control_coroutine, entity, dt)
@@ -46,7 +46,7 @@ return Tiny.processingSystem {
     if not ai.control then return end
 
     if not ai._control_coroutine then
-      ai._control_coroutine = coroutine.create(ai.control)
+      ai._control_coroutine = async.nil_serialized(coroutine.create(ai.control))
     end
 
     async.resume(ai._control_coroutine, entity, dt)
