@@ -1,28 +1,28 @@
 local sprite = require "engine.tech.sprite"
 local item   = require "engine.tech.item"
 local cue    = require "engine.tech.cue"
+
+
 local health = {}
 
--- NEXT
--- ---- @alias healthy {hp: integer, get_max_hp: fun(self): integer, immortal: true?}
--- --- @alias healthy any
--- 
--- --- Restores `amount` of `target`'s health with FX
--- --- @param target healthy
--- --- @param amount integer
--- --- @return nil
--- health.heal = function(target, amount)
---   local value = target.hp + amount
---   if target.get_max_hp then
---     value = math.min(target:get_max_hp(), value)
---   end
---   health.set_hp(target, value)
---   if target.position then
---     State:add(gui.floating_damage("+" .. amount, target.position, Colors.light_green))
---   end
--- end
+local floater
+local COLOR_DAMAGE = Vector.hex("e7573e")
+local COLOR_HEALING = Vector.hex("c3e06c")
 
-local floating_damage
+--- Restores `amount` of `target`'s health with FX
+--- @param target entity
+--- @param amount integer
+--- @return nil
+health.heal = function(target, amount)
+  local value = target.hp + amount
+  if target.get_max_hp then
+    value = math.min(target:get_max_hp(), value)
+  end
+  health.set_hp(target, value)
+  if target.position then
+    State:add(floater("+" .. amount, target.position, COLOR_HEALING))
+  end
+end
 
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target entity
@@ -43,7 +43,7 @@ health.damage = function(target, amount, is_critical)
     repr = repr .. "!"
   end
 
-  State:add(floating_damage(repr, target.position))
+  State:add(floater(repr, target.position, COLOR_DAMAGE))
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
@@ -92,12 +92,12 @@ health.attack = function(target, attack_roll, damage_roll)
   Log.info("%s is attacked; attack roll: %s, armor: %s" % {Entity.name(target), attack, ac})
 
   if is_nat_miss then
-    State:add(floating_damage("!", target.position))
+    State:add(floater("!", target.position, COLOR_DAMAGE))
     return false
   end
 
   if attack < ac and not is_nat then
-    State:add(floating_damage("-", target.position))
+    State:add(floater("-", target.position, COLOR_DAMAGE))
     return false
   end
 
@@ -122,7 +122,7 @@ end
 --   return true
 -- end
 
-floating_damage = function(number, grid_position)
+floater = function(number, grid_position, color)
   local a = math.floor(State.level.cell_size * .25)
   local b = math.floor(State.level.cell_size * .75)
   return {
@@ -132,7 +132,7 @@ floating_damage = function(number, grid_position)
       + V(math.random(a, b), math.random(a, b)),
     view = "grids_fx",
     drift = V(0, -4),
-    sprite = sprite.text(tostring(number), 16, Vector.hex("e7573e")),
+    sprite = sprite.text(tostring(number), 16, color),
     life_time = 3,
   }
 end

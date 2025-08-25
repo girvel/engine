@@ -35,7 +35,7 @@ return Tiny.processingSystem {
         current:rest("move")
       end
       State.combat:_pass_turn()
-      Log.info("%s's turn" % {State.combat:get_current()})
+      Log.info("%s's turn" % {Entity.codename(State.combat:get_current())})
       -- NEXT! reset timeout (when implementing AIs/putting safety in)
       -- NEXT FX and SFX for player's turn
     end

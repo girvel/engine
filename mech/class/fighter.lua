@@ -1,3 +1,4 @@
+local health = require("engine.mech.health")
 local action = require("engine.tech.action")
 
 
@@ -20,11 +21,38 @@ fighter.action_surge = Table.extend({
   _is_available = function() return State.combat end,
 
   _act = function(self, entity)
-    -- State:add(fx("assets/sprites/fx/action_surge_proto", "fx_under", entity.position))
+    -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
     -- NEXT!
     -- sound("assets/sounds/action_surge.mp3", .3):place(entity.position):play()
     -- NEXT (sounds)
     entity.resources.actions = entity.resources.actions + 1
+    return true
+  end,
+}, action.base)
+
+fighter.second_wind = Table.extend({
+  codename = "second_wind",
+
+  modify_resources = function(self, entity, resources, rest_type)
+    if rest_type == "short" or rest_type == "long" then
+      resources.second_wind = (resources.second_wind or 0) + 1
+    end
+    return resources
+  end,
+
+  cost = {
+    second_wind = 1,
+    bonus_actions = 1,
+  },
+
+  _is_available = function(self, entity) return entity.hp <= entity:get_max_hp() end,
+
+  _act = function(self, entity)
+    -- State:add(fx("assets/sprites/fx/second_wind", "fx_under", entity.position))
+    -- NEXT!
+    -- sound("assets/sounds/second_wind.mp3", .3):place(entity.position):play()
+    -- NEXT (sounds)
+    health.heal(entity, (D(10) + entity.level):roll())
     return true
   end,
 }, action.base)

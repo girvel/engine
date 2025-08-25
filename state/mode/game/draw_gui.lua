@@ -67,6 +67,9 @@ local draw_gui = function(self, dt)
       tk.action_button(actions.offhand_attack, "2")
       ui.offset(4)
 
+      tk.action_button(fighter.second_wind, "3")
+      ui.offset(4)
+
       tk.action_button(fighter.action_surge, "4")
       ui.offset(4)
     ui.finish_line()
@@ -89,7 +92,8 @@ local draw_gui = function(self, dt)
     ui.br()
     local max = player:get_resources("full")
     local RESOURCE_DISPLAY_ORDER = {
-      "actions", "bonus_actions", "reactions", "movement", "hit_dice", "action_surge",
+      "actions", "bonus_actions", "reactions", "movement",
+      "hit_dice", "action_surge", "second_wind", "fighting_spirit",
     }
 
     ui.table({"Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
