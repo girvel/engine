@@ -14,6 +14,8 @@ local gui_elements = {
   hand_attack = nth(6),
   offhand_attack = nth(7),
 
+  skip_turn_inactive = nth(9),
+
   hand_attack_inactive = nth(14),
   offhand_attack_inactive = nth(15),
 

@@ -2,6 +2,9 @@ local async = {}
 
 local LAG_THRESHOLD_SEC = .1
 
+--- @param coroutine_ thread
+--- @param ... any
+--- @return any
 async.resume = function(coroutine_, ...)
   local t = love.timer.getTime()
   local success, result = coroutine.resume(coroutine_, ...)
@@ -15,6 +18,15 @@ async.resume = function(coroutine_, ...)
   end
 
   return result
+end
+
+--- @async
+--- @param seconds integer
+async.sleep = function(seconds)
+  local t = love.timer.getTime()
+  while love.timer.getTime() - t < seconds do
+    coroutine.yield()
+  end
 end
 
 Ldump.mark(async, {}, ...)

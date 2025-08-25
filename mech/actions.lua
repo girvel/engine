@@ -33,13 +33,17 @@ local base_attack
 
 --- @type action
 actions.hand_attack = Table.extend({
+  codename = "hand_attack",
+
   cost = {
     actions = 1,
   },
+
   _is_available = function(_, entity)
     local target = State.grids.solids:safe_get(entity.position + entity.direction)
     return target and target.hp
   end,
+
   _act = function(_, entity)
     local target = State.grids.solids:safe_get(entity.position + entity.direction)
     base_attack(entity, target, "hand")

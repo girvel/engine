@@ -1,4 +1,7 @@
+local action = require("engine.tech.action")
 local creature = require "engine.mech.creature"
+
+
 local player = {}
 
 --- @class base_player: entity
@@ -35,6 +38,18 @@ player.base = function()
 
   return result
 end
+
+--- @type action
+player.skip_turn = Table.extend({
+  codename = "skip_turn",
+
+  _is_available = function(self, entity)
+    return State.combat and State.combat:get_current() == entity
+  end,
+  _act = function(self, entity)
+    entity.ai.finish_turn = true
+  end,
+}, action.base)
 
 Ldump.mark(player, {}, ...)
 return player

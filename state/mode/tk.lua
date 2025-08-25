@@ -91,10 +91,11 @@ tk.draw_entity = function(entity, x, y, scale)
 end
 
 tk.action_button = function(action, hotkey)
-  local is_available = action:is_available(State.player)
+  local player = State.player
+  local is_available = action:is_available(player)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   if ui.hot_button(gui_elements[codename], hotkey, not is_available) then
-    action:act(State.player)
+    player.ai.next_action = action
   end
 end
 

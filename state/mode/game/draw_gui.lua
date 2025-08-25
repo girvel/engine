@@ -1,3 +1,4 @@
+local player_mod = require("engine.state.player")
 local tk = require("engine.state.mode.tk")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
@@ -53,18 +54,14 @@ local draw_gui = function(self, dt)
       ui.offset(4)
 
       if State.combat then
-        if ui.hot_button(gui.skip_turn, "space") then
-          player.ai.finish_turn = true
-        end
+        tk.action_button(player_mod.skip_turn, "space")
         ui.offset(4)
       end
     ui.finish_line()
     ui.offset(0, 4)
 
     ui.start_line()
-      if ui.hot_button(gui.hand_attack, "1") then
-        player.ai.next_action = actions.hand_attack
-      end
+      tk.action_button(actions.hand_attack, "1")
       ui.offset(4)
 
       if ui.hot_button(gui.offhand_attack, "2") then
