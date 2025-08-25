@@ -164,6 +164,9 @@ local wrap = function(text)
   local chars_per_line = math.floor(effective_w / font_w)
 
   local lines = math.ceil(text:utf_len() / chars_per_line)
+  if lines == 0 then
+    return {""}
+  end
   for i = 0, lines - 1 do
     table.insert(result, text:utf_sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
   end
@@ -214,6 +217,12 @@ end
 
 ui.br = function()
   ui.text(" ")
+end
+
+ui.separator = function()
+  local frame = Table.last(model.frame)
+  local font = Table.last(model.font)
+  ui.text("-" * math.floor(frame.w / font:getWidth("w")))
 end
 
 --- @param text string

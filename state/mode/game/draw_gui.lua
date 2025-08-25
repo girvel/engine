@@ -110,17 +110,42 @@ local draw_gui = function(self, dt)
       "hit_dice", "action_surge", "second_wind", "fighting_spirit",
     }
 
-    ui.table({"  Ресурсы", ""}, Fun.iter(RESOURCE_DISPLAY_ORDER)
-      :filter(function(key)
-        return player.resources[key] and (State.combat or key ~= "movement")
-      end)
-      :map(function(key)
-        return {
-          translation.resources[key]:utf_capitalize(),
-          player.resources[key] .. "/" .. max[key]
-        }
-      end)
-      :totable())
+    local ICONS = {
+      actions = "#",
+      bonus_actions = "+",
+      reactions = "*",
+      movement = ">",
+    }
+
+    local DEFAULT_ICON = "'"
+
+    local COLORS = {
+      actions = Vector.hex("79ad9c"),
+      bonus_actions = Vector.hex("c3e06c"),
+      reactions = Vector.hex("fcea9b"),
+      movement = Vector.hex("394e57"),
+    }
+
+    local WHITE = Vector.hex("ffffff")
+
+    ui.separator()
+    for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
+      local amount = player.resources[r]
+      if not amount or (not State.combat and r == "movement") then
+        goto continue
+      end
+
+      ui.start_frame(200)
+      love.graphics.setColor(COLORS[r] or WHITE)
+        ui.text((ICONS[r] or DEFAULT_ICON) * amount)
+      love.graphics.setColor(WHITE)
+      ui.finish_frame()
+
+      ui.text(translation.resources[r]:utf_capitalize())
+
+      ::continue::
+    end
+    ui.br()
 
     if State.combat then
       ui.br()
