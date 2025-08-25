@@ -5,9 +5,8 @@ local cue    = require "engine.tech.cue"
 
 local health = {}
 
-local floater
-local COLOR_DAMAGE = Vector.hex("e7573e")
-local COLOR_HEALING = Vector.hex("c3e06c")
+health.COLOR_DAMAGE = Vector.hex("e7573e")
+health.COLOR_HEALING = Vector.hex("c3e06c")
 
 --- Restores `amount` of `target`'s health with FX
 --- @param target entity
@@ -20,7 +19,7 @@ health.heal = function(target, amount)
   end
   health.set_hp(target, value)
   if target.position then
-    State:add(floater("+" .. amount, target.position, COLOR_HEALING))
+    State:add(health.floater("+" .. amount, target.position, health.COLOR_HEALING))
   end
 end
 
@@ -43,7 +42,7 @@ health.damage = function(target, amount, is_critical)
     repr = repr .. "!"
   end
 
-  State:add(floater(repr, target.position, COLOR_DAMAGE))
+  State:add(health.floater(repr, target.position, health.COLOR_DAMAGE))
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
@@ -93,12 +92,12 @@ health.attack = function(target, attack_roll, damage_roll)
   Log.info("%s is attacked; attack roll: %s, armor: %s" % {Entity.name(target), attack, ac})
 
   if is_nat_miss then
-    State:add(floater("!", target.position, COLOR_DAMAGE))
+    State:add(health.floater("!", target.position, health.COLOR_DAMAGE))
     return false
   end
 
   if attack < ac and not is_nat then
-    State:add(floater("-", target.position, COLOR_DAMAGE))
+    State:add(health.floater("-", target.position, health.COLOR_DAMAGE))
     return false
   end
 
@@ -123,7 +122,11 @@ end
 --   return true
 -- end
 
-floater = function(number, grid_position, color)
+--- Floating text for damage & such
+--- @param text string|number
+--- @param grid_position vector
+--- @param color vector
+health.floater = function(text, grid_position, color)
   local a = math.floor(State.level.cell_size * .25)
   local b = math.floor(State.level.cell_size * .75)
   return {
@@ -133,7 +136,7 @@ floater = function(number, grid_position, color)
       + V(math.random(a, b), math.random(a, b)),
     view = "grids_fx",
     drift = V(0, -4),
-    sprite = sprite.text(tostring(number), 16, color),
+    sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,
   }
 end

@@ -115,13 +115,37 @@ methods.get_modifier = function(self, ability)
     ))
   end
 
-    assert(abilities.skill_bases[abilities], "%s is not a skill nor an ability" % {ability})
+  assert(abilities.skill_bases[ability], "%s is not a skill nor an ability" % {ability})
 
-    return self:modify(
-      "skill_score",
-      self:get_modifier(abilities.skill_bases[ability]),
-      ability
-    )
+  return self:modify(
+    "skill_score",
+    self:get_modifier(abilities.skill_bases[ability]),
+    ability
+  )
+end
+
+--- @param self entity
+--- @param to_check ability|skill
+--- @param dc integer difficulty class
+--- @return boolean
+methods.ability_check = function(self, to_check, dc)
+  local roll = D(20) + self:get_modifier(to_check)
+  local result = roll:roll()
+
+  Log.debug("%s rolls check %s: %s against %s" % {
+    Entity.name(self), to_check, result, dc
+  })
+
+  local success = result >= dc
+
+  -- NEXT (sound)
+  -- sound.play(
+  --   ability_check_sound[success and "success" or "failure"],
+  --   self.position,
+  --   "small"
+  -- )
+
+  return success
 end
 
 --- @param self entity

@@ -79,7 +79,7 @@ actions.shove = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp and not entity.inventory.offhand
+    return target and target.hp and target.get_modifier and not entity.inventory.offhand
   end,
 
   _act = function(_, entity)
@@ -87,6 +87,11 @@ actions.shove = Table.extend({
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
       -- NEXT sound
+      local dc = (D(20) + target:get_modifier("acrobatics")):roll()
+      if not entity:ability_check("athletics", dc) then
+        State:add(health.floater("-", target.position, health.COLOR_DAMAGE))
+        return
+      end
       if not level.slow_move(target, target.position + direction) then
         health.damage(target, D(4):roll(), false)
       end
