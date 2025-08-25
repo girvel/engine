@@ -33,7 +33,7 @@ local draw_grid = function(self, dt)
       for y = start.y, finish.y do
         if not snapshot:is_visible_unsafe(x, y) then goto continue end
 
-        local e = grid:fast_get(x, y)
+        local e = grid:unsafe_get(x, y)
         if not e then goto continue end
 
         local is_hidden_by_perspective = (

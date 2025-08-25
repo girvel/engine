@@ -51,7 +51,7 @@ local grid_methods = {
   --- @param v vector
   --- @param default? any
   --- @return any
-  safe_get = function(self, v, default)
+  slow_get = function(self, v, default)
     assert(getmetatable(v) == vector.mt)
     if not self:can_fit(v) then return default end
     return self[v]
@@ -61,7 +61,7 @@ local grid_methods = {
   --- @param x integer
   --- @param y integer
   --- @return any
-  fast_get = function(self, x, y)
+  unsafe_get = function(self, x, y)
     return self._inner_array[self:_get_inner_index(x, y)]
   end,
 
@@ -110,8 +110,8 @@ local grid_methods = {
         end
 
         if
-          not self:safe_get(neighbour, true)
-          and not visited_vertices:safe_get(neighbour)
+          not self:slow_get(neighbour, true)
+          and not visited_vertices:slow_get(neighbour)
           and self:can_fit(neighbour)
           and (distance_to[neighbour] or math.huge) > current_distance
         then
@@ -156,7 +156,7 @@ local grid_methods = {
   --- @param max_radius? integer
   --- @return vector?
   find_free_position = function(self, start, max_radius)
-    -- TODO OPT can be optimized replacing safe_get with fast_get + min/max
+    -- TODO OPT can be optimized replacing slow_get with fast_get + min/max
     if self[start] == nil then return end
 
     max_radius = math.min(
@@ -172,22 +172,22 @@ local grid_methods = {
     for r = 1, max_radius do
       for x = 0, r - 1 do
         local v = vector.new(x, x - r) + start
-        if not self:safe_get(v, true) then return v end
+        if not self:slow_get(v, true) then return v end
       end
 
       for x = r, 1, -1 do
         local v = vector.new(x, r - x) + start
-        if not self:safe_get(v, true) then return v end
+        if not self:slow_get(v, true) then return v end
       end
 
       for x = 0, 1 - r, -1 do
         local v = vector.new(x, x + r) + start
-        if not self:safe_get(v, true) then return v end
+        if not self:slow_get(v, true) then return v end
       end
 
       for x = -r, 1 do
         local v = vector.new(x, -r - x) + start
-        if not self:safe_get(v, true) then return v end
+        if not self:slow_get(v, true) then return v end
       end
     end
 

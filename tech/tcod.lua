@@ -59,11 +59,12 @@ if tcod_c then
   --- @param grid T
   --- @return T
   tcod.observer = function(grid)
+    --- @cast grid grid
     local w, h = unpack(grid.size)
     local map = tcod_c.TCOD_map_new(w, h)
     for x = 1, w do
       for y = 1, h do
-        local e = grid:fast_get(x, y)
+        local e = grid:unsafe_get(x, y)
         tcod_c.TCOD_map_set_properties(
           map, x - 1, y - 1, not e or not not e.transparent_flag, not e
         )
@@ -166,7 +167,7 @@ else
   end
 
   snapshot_methods.is_transparent_unsafe = function(self, x, y)
-    local e = self._grid:fast_get(x, y)
+    local e = self._grid:unsafe_get(x, y)
     return not e or (not not e.transparent_flag)
   end
 

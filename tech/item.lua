@@ -15,7 +15,7 @@ item.drop = function(parent, slot)
   local drop_position = Fun.chain({Vector.zero}, Vector.directions)
     :map(function(d) return parent.position + d end)
     :filter(function(v)
-      return (v == parent.position or not State.grids.solids:safe_get(v, true))
+      return (v == parent.position or not State.grids.solids:slow_get(v, true))
         and not State.grids.items[v]
     end)
     :nth(1)

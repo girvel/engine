@@ -19,7 +19,7 @@ actions.move = function(direction)
         entity.direction = direction
       end
 
-      local result = level.safe_move(entity, entity.position + direction)
+      local result = level.slow_move(entity, entity.position + direction)
       if result and entity.animate then
         entity:animate("move")
       end
@@ -40,7 +40,7 @@ actions.hand_attack = Table.extend({
   },
 
   _is_available = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
     return target and target.hp
   end,
 
@@ -59,7 +59,7 @@ actions.offhand_attack = Table.extend({
   },
 
   _is_available = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
     return target and target.hp and entity.inventory.offhand
   end,
 
@@ -78,16 +78,16 @@ actions.shove = Table.extend({
   },
 
   _is_available = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
     return target and target.hp and not entity.inventory.offhand
   end,
 
   _act = function(_, entity)
-    local target = State.grids.solids:safe_get(entity.position + entity.direction)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
       -- NEXT sound
-      if not level.safe_move(target, target.position + direction) then
+      if not level.slow_move(target, target.position + direction) then
         health.damage(target, D(4):roll(), false)
       end
     end)
@@ -96,7 +96,7 @@ actions.shove = Table.extend({
 }, action.base)
 
 base_attack = function(entity, slot)
-  local target = State.grids.solids:safe_get(entity.position + entity.direction)
+  local target = State.grids.solids:slow_get(entity.position + entity.direction)
 
   -- sound.play("assets/sounds/whoosh", 0.1, entity.position)
   -- NEXT (sounds)

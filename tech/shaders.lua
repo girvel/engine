@@ -75,7 +75,7 @@ shaders.water = function(palette_path, palette_real_colors_n)
     end,
 
     _get_reflection_image = function(_, entity)
-      local reflected = State.grids.solids:safe_get(entity.position + Vector.up)
+      local reflected = State.grids.solids:slow_get(entity.position + Vector.up)
       if not reflected or reflected.low_flag then return nil end
       return reflected.sprite.image
     end

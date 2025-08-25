@@ -7,12 +7,12 @@ local level = {}
 --- @param entity grid_positioned
 --- @param position vector
 --- @return nil
-level.move = function(entity, position)
+level.unsafe_move = function(entity, position)
   assert(entity.position, "Can not move an entity without the current position")
 
   local grid = State.grids[entity.layer]
   if grid[position] then
-    Log.warn("level.move: replacing %s with %s" % {Entity.name(grid[position]), Entity.name(entity)})
+    Log.warn("level.unsafe_move: replacing %s with %s" % {Entity.name(grid[position]), Entity.name(entity)})
   end
   grid[entity.position] = nil
   grid[position] = entity
@@ -24,10 +24,10 @@ end
 --- @param entity grid_positioned
 --- @param position vector
 --- @return boolean # false if position is out of grid's bounds or the new position is occupied
-level.safe_move = function(entity, position)
+level.slow_move = function(entity, position)
   local grid = State.grids[entity.layer]
   if not grid:can_fit(position) or grid[position] then return false end
-  level.move(entity, position)
+  level.unsafe_move(entity, position)
   return true
 end
 
