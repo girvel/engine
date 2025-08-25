@@ -11,11 +11,12 @@ end
 
 local gui_elements = {
   skip_turn = nth(1),
+  hit_dice = nth(5),
   hand_attack = nth(6),
   offhand_attack = nth(7),
 
   skip_turn_inactive = nth(9),
-
+  hit_dice_inactive = nth(13),
   hand_attack_inactive = nth(14),
   offhand_attack_inactive = nth(15),
 

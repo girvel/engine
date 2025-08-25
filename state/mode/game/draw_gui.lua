@@ -53,6 +53,8 @@ local draw_gui = function(self, dt)
       end
       ui.offset(4)
 
+      tk.action_button(fighter.hit_dice, "h")
+
       if State.combat then
         tk.action_button(player_mod.skip_turn, "space")
         ui.offset(4)
