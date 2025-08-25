@@ -17,7 +17,6 @@ player.base = function()
     codename = "player",
     player_flag = true,
     fov_r = 16,
-    base_hp = 10,
 
     ai = {
       next_action = nil,

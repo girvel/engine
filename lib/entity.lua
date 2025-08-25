@@ -16,6 +16,8 @@ local entityx = {}
 --- @field animate fun(entity, string?): promise
 --- @field animation_set_paused fun(entity, boolean)
 ---
+--- @field base_abilities abilities ability scores before perks/level-ups
+--- @field level integer
 --- @field resources table<string, integer> resources to spend on actions
 --- @field inventory table<string, item>
 --- @field hp integer current health points

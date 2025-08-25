@@ -1,3 +1,4 @@
+local xp = require("engine.mech.xp")
 local health = require "engine.mech.health"
 local abilities = require "engine.mech.abilities"
 local creature = {}
@@ -18,7 +19,7 @@ end
 
 --- @param entity entity
 creature.init = function(entity)
-  Table.assert_fields(entity, {"base_hp", "base_abilities"})
+  Table.assert_fields(entity, {"base_hp", "base_abilities", "level"})
   entity:rest("full")
   entity:rotate(entity.direction or Vector.right)
 end
@@ -40,6 +41,7 @@ end
 
 --- @alias rest_type "free"|"move"|"short"|"long"|"full"
 
+--- @param self entity
 --- @param rest_type rest_type
 methods.get_resources = function(self, rest_type)
   local result = {}
@@ -140,6 +142,7 @@ end
 --- @param slot string
 methods.get_melee_attack_roll = function(self, slot)
   local roll = D(20)
+    + xp.get_proficiency_bonus(self.level)
     + self:get_melee_modifier(slot)
 
   local weapon = self.inventory[slot]
