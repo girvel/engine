@@ -19,12 +19,29 @@ actions.move = function(direction)
         entity.direction = direction
       end
 
-      local result = level.slow_move(entity, entity.position + direction)
+      if State.grids.solids:slow_get(entity.position + direction, true) then
+        return false
+      end
+
+      Fun.iter(Vector.directions)
+        :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
+        :filter(function(e)
+          return e
+            -- and hostility.are_hostile(entity, e)
+            -- NEXT (on combat AI)
+            and e.resources
+          end)
+        :each(function(e, d)
+          e:rotate(-d)
+          actions.reaction_attack:act(e)
+        end)
+
+      local result = level.unsafe_move(entity, entity.position + direction)
       if result and entity.animate then
         entity:animate("move")
       end
       return result
-      -- NEXT reaction, sound
+      -- NEXT sound
     end,
   }, action.base)
 end
@@ -37,6 +54,25 @@ actions.hand_attack = Table.extend({
 
   cost = {
     actions = 1,
+  },
+
+  _is_available = function(_, entity)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
+    return target and target.hp
+  end,
+
+  _act = function(_, entity)
+    base_attack(entity, "hand")
+    return true
+  end,
+}, action.base)
+
+--- @type action
+actions.reaction_attack = Table.extend({
+  codename = "reaction_attack",
+
+  cost = {
+    reactions = 1,
   },
 
   _is_available = function(_, entity)
