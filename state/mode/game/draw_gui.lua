@@ -2,6 +2,7 @@ local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
 local gui = require("engine.state.mode.gui_elements")
+local fighter = require("engine.mech.class.fighter")
 
 
 local PADDING = 40
@@ -67,6 +68,11 @@ local draw_gui = function(self, dt)
 
       if ui.hot_button(gui.offhand_attack, "2") then
         Log.debug("Offhand attack")
+      end
+      ui.offset(4)
+
+      if ui.hot_button(gui.action_surge, "4") then
+        fighter.action_surge:act(player)
       end
       ui.offset(4)
     ui.finish_line()

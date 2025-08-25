@@ -320,7 +320,7 @@ ui.hot_button = function(image, key)
 
   local font_size, text, dy
   if key:utf_len() == 1 then
-    font_size = 36
+    font_size = 32
     text = key:utf_upper()
     dy = SCALE
   else

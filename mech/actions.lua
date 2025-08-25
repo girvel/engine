@@ -43,6 +43,7 @@ actions.hand_attack = Table.extend({
   _act = function(_, entity)
     local target = State.grids.solids:safe_get(entity.position + entity.direction)
     base_attack(entity, target, "hand")
+    return true
   end,
 }, action.base)
 
