@@ -21,7 +21,7 @@ methods.control = function(entity)
   local target = State.player
 
   api.travel(entity, target.position)
-  -- NEXT! attack it
+  api.attack(entity, target)
 end
 
 local OBSERVE_PERIOD = .5

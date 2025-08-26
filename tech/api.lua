@@ -52,14 +52,16 @@ api.follow_path = function(entity, path)
   end
 end
 
+--- @param entity entity
+--- @param target entity
 api.attack = function(entity, target)
   local direction = target.position - entity.position
   if direction:abs() ~= 1 then return end
 
   Log.debug("Attempt at attacking %s" % Entity.name(target))
   entity:rotate(direction)
-  while entity:act(actions.hand_attack) or entity:act(actions.other_hand_attack) do
-    while not entity.animation.current.codename:starts_with("idle") do
+  while actions.hand_attack:act(entity) or actions.offhand_attack:act(entity) do
+    while not entity.animation.current:starts_with("idle") do
       coroutine.yield()
     end
   end
