@@ -19,6 +19,15 @@ local VISION_RANGE = 10
 local find_target
 
 --- @param entity entity
+methods.init = function(entity)
+  State.hostility:subscribe(function(attacker, target)
+    if entity.faction and target == entity then
+      State.hostility:set(entity.faction, attacker.faction, true)
+    end
+  end)
+end
+
+--- @param entity entity
 methods.control = function(entity)
   if not State.combat then return end
 

@@ -2,6 +2,7 @@ local hostility = {}
 
 --- @class state_hostility
 --- @field _are_hostile table<string, boolean>
+--- @field _agression_subscriptions fun(entity, entity)[]
 local methods = {}
 local mt = {__index = methods}
 
@@ -9,6 +10,7 @@ local mt = {__index = methods}
 hostility.new = function()
   return setmetatable({
     _are_hostile = {},
+    _agression_subscriptions = {},  -- TODO use weak tables?
   }, mt)
 end
 
@@ -26,7 +28,34 @@ end
 --- @param faction_b string
 --- @param value boolean
 methods.set = function(self, faction_a, faction_b, value)
-  self._are_hostile[faction_a .. "_to_" .. faction_b] = value or nil
+  local key = faction_a .. "_to_" .. faction_b
+  value = value and true or nil
+  if self._are_hostile[key] == value then return end
+
+  Log.info("%s %s hostile towards %s" % {
+    faction_a,
+    value and "becomes" or "stops being",
+    faction_b,
+  })
+  self._are_hostile[key] = value
+end
+
+--- @param f fun(entity, entity)
+methods.subscribe = function(self, f)
+  table.insert(self._agression_subscriptions, f)
+end
+
+--- @param f fun(entity, entity)
+methods.unsubscribe = function(self, f)
+  Table.remove(self._agression_subscriptions, f)
+end
+
+--- @param entity entity the one attacking
+--- @param target entity
+methods.register = function(self, entity, target)
+  for _, f in ipairs(self._agression_subscriptions) do
+    f(entity, target)
+  end
 end
 
 Ldump.mark(hostility, {}, ...)

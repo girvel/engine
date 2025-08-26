@@ -2,13 +2,27 @@ local async = require "engine.tech.async"
 
 
 --- @class ai
---- @field control fun(base_entity)
---- @field observe fun(base_entity, number)
+--- @field init? fun(base_entity)
+--- @field deinit? fun(base_entity)
+--- @field control? fun(base_entity)
+--- @field observe? fun(base_entity, number)
 
 return Tiny.processingSystem {
   codename = "acting",
   base_callback = "update",
   filter = Tiny.requireAll("ai"),
+
+  onAdd = function(self, entity)
+    if entity.ai.init then
+      entity.ai.init(entity)
+    end
+  end,
+
+  onRemove = function(self, entity)
+    if entity.ai.deinit then
+      entity.ai.deinit(entity)
+    end
+  end,
 
   preProcess = function(self, entity, dt)
     if State.combat and Fun.iter(State.combat.list)

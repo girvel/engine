@@ -189,8 +189,7 @@ base_attack = function(entity, slot)
   -- NEXT (sounds)
 
   entity:animate(slot .. "_attack"):next(function()
-    -- State:register_aggression(entity, target)
-    -- NEXT (combat AI)
+    State.hostility:register(entity, target)
 
     if not health.attack(
       target,
