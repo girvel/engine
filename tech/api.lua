@@ -10,11 +10,20 @@ local api = {}
 --- @param entity entity
 --- @param destination vector
 api.travel = function(entity, destination)
-  if entity.position == destination then return end
+  if entity.position == destination or (
+    State.grids.solids:slow_get(destination, true)
+    and (entity.position - destination):abs() == 1)
+  then return end
 
   local possible_destinations = {unpack(Vector.extended_directions)}
   table.sort(possible_destinations, function(a, b)
-    return (entity.position - destination - a):abs() < (entity.position - destination - b):abs()
+    local abs_a = a:abs()
+    local abs_b = b:abs()
+    if abs_a == abs_b then
+      return (entity.position - destination - a):abs() < (entity.position - destination - b):abs()
+    end
+
+    return abs_a < abs_b
   end)
   table.insert(possible_destinations, 1, Vector.zero)
 
@@ -40,6 +49,19 @@ api.follow_path = function(entity, path)
     if Random.chance(.1) then coroutine.yield() end
     if not actions.move(position - entity.position):act(entity) then break end
     async.sleep(.25)
+  end
+end
+
+api.attack = function(entity, target)
+  local direction = target.position - entity.position
+  if direction:abs() ~= 1 then return end
+
+  Log.debug("Attempt at attacking %s" % Entity.name(target))
+  entity:rotate(direction)
+  while entity:act(actions.hand_attack) or entity:act(actions.other_hand_attack) do
+    while not entity.animation.current.codename:starts_with("idle") do
+      coroutine.yield()
+    end
   end
 end
 
