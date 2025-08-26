@@ -79,8 +79,6 @@ return Tiny.processingSystem {
       end
     end
 
-    for i = #indexes_to_remove, 1, -1 do
-      Table.remove_breaking_at(entity.conditions, i)
-    end
+    Table.remove_breaking_in_bulk(entity.conditions, indexes_to_remove)
   end,
 }

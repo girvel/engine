@@ -47,6 +47,7 @@ tablex.join = function(base, extension, ...)
     if type(k) == "number" and math.floor(k) == k then
       base[length + k] = v
     else
+      assert(not base[k], ("collision during Table.join on key %s"):format(k))
       base[k] = v
     end
   end
@@ -150,12 +151,19 @@ tablex.remove = function(t, item)
   return t
 end
 
---- @param t table
+--- @param t any[]
 --- @param i integer
---- @return table
-tablex.remove_breaking_at = function(t, i)
+tablex.remove_breaking = function(t, i)
   t[i] = t[#t]
   t[#t] = nil
+end
+
+--- @param t any[]
+--- @param indexes integer[]
+tablex.remove_breaking_in_bulk = function(t, indexes)
+  for i = #indexes, 1, -1 do
+    tablex.remove_breaking(t, indexes[i])
+  end
 end
 
 --- @param t table

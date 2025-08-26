@@ -1,13 +1,14 @@
 --- LDtk level parsing
 local ldtk = {}
 
-local parser_new
+local parser_new, load_scenes
 
 --- Level's init.lua return
 --- @class level_definition
 --- @field ldtk {path: string, level: string}
 --- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
+--- @field rails_factory? fun(...): rails
 
 --- General information about the level
 --- @class level_info
@@ -19,13 +20,12 @@ local parser_new
 --- Read LDtk level file
 --- @async
 --- @param path string
---- @return {level_info: level_info, entities: entity[]}
+--- @return {level_info: level_info, entities: entity[], rails: rails}
 ldtk.load = function(path)
   --- @type level_definition
   local level_module = require(path)
 
   local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
-
   return parser_new():parse(raw, level_module.palette, level_module.cell_size)
 end
 
@@ -167,12 +167,31 @@ parser_new = function()
         end
       end
 
+      -- local rails = level_module.rails_factory()
+      -- rails:init(load_scenes(path .. ".scenes"), nil, nil)
+      -- NEXT (rails) handle positions & entities
+
+      local rails = require("levels.main.rails").new()
+      rails:init(load_scenes("levels.main.scenes"))
+      -- NEXT (rails) remove hardcoded stuff
+
       return {
         entities = self._entities,
         level_info = self._level_info,
+        rails = rails,
       }
     end,
   }
+end
+
+--- @param path string
+load_scenes = function(path)
+  local result = {}
+  for _, modname in ipairs(love.filesystem.getDirectoryItems(path:gsub("%.", "/"))) do
+    assert(modname:ends_with(".lua"))
+    Table.join(result, require(path .. "." .. modname:sub(1, -5)))
+  end
+  return result
 end
 
 Ldump.mark(ldtk, {}, ...)

@@ -11,6 +11,7 @@ local state = {}
 --- @field combat state_combat?
 --- @field quests state_quests
 --- @field hostility state_hostility
+--- @field rails rails
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_info
@@ -103,6 +104,8 @@ local state_methods = {
 
     self.level = load_data.level_info
     Log.info("State.level is", self.level)
+
+    self.rails = load_data.rails
 
     self.grids = Fun.iter(self.level.layers)
       :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
