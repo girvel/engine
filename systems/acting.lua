@@ -10,6 +10,27 @@ return Tiny.processingSystem {
   base_callback = "update",
   filter = Tiny.requireAll("ai"),
 
+  preProcess = function(self, entity, dt)
+    if State.combat and Fun.iter(State.combat.list)
+      :all(function(a) return Fun.iter(State.combat.list)
+        :all(function(b) return a == b or not State.hostility:get(a, b) end)
+      end)
+    then
+      Log.info(
+        "Combat ends as only %s are left standing"
+         % table.concat(Fun.iter(State.combat.list)
+          :map(Entity.codename)
+          :totable(), ", ")
+      )
+
+      for _, e in ipairs(State.combat.list) do
+        e:rest("short")
+      end
+
+      State.combat = nil
+    end
+  end,
+
   process = function(self, entity, dt)
     if State.combat then
       self:_process_inside_combat(entity, dt)

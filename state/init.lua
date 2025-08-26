@@ -167,10 +167,13 @@ methods.start_combat = function(self, list)
   end
 
   table.sort(list, function(a, b) return initiatives[a] > initiatives[b] end)
+  local repr = table.concat(Fun.iter(list):map(Entity.codename):totable(), ", ")
 
   if self.combat then
+    Log.info("Joining the combat: %s" % {repr})
     Table.concat(self.combat.list, list)
   else
+    Log.info("Combat starts: %s" % {repr})
     self.combat = combat.new(list)
   end
 end
