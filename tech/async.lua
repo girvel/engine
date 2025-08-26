@@ -29,7 +29,7 @@ async.nil_serialized = function(coroutine_)
 end
 
 --- @async
---- @param seconds integer
+--- @param seconds number
 async.sleep = function(seconds)
   local t = love.timer.getTime()
   while love.timer.getTime() - t < seconds do

@@ -1,3 +1,4 @@
+local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
 
 
@@ -14,13 +15,23 @@ end
 
 --- @param entity entity
 methods.control = function(entity)
+  if not State.combat then return end
+
+  -- NEXT! pick closest target
+  local target = State.player
+
+  api.travel(entity, target.position)
+  -- NEXT! attack it
 end
 
 local OBSERVE_PERIOD = .5
 
+--- @param entity entity
+--- @param dt number
 methods.observe = function(entity, dt)
   if not Random.chance(dt / OBSERVE_PERIOD) then return end
 
+  -- starting/joining combat
   if (not State.combat or not Table.contains(State.combat.list, entity))
     and State.hostility:get(entity, State.player)
     and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))

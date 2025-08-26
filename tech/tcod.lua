@@ -95,6 +95,7 @@ if tcod_c then
     })
   end
 
+  --- @param grid grid
   --- @return snapshot
   tcod.snapshot = function(grid)
     do return rawget(grid, "_tcod__snapshot") end
@@ -139,7 +140,7 @@ if tcod_c then
       local xp = ffi.new("int[1]")
       local yp = ffi.new("int[1]")
       tcod_c.TCOD_path_get(raw_path, i, xp, yp)
-      table.insert(result, Vector {xp[0], yp[0]} + Vector.one)
+      table.insert(result, V(xp[0], yp[0]) + Vector.one)
     end
     tcod_c.TCOD_path_delete(raw_path)
 
