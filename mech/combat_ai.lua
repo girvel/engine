@@ -43,7 +43,7 @@ methods.observe = function(entity, dt)
   if (not State.combat or not Table.contains(State.combat.list, entity)) then
     local target = find_target(entity)
 
-    local condition = true
+    local condition = target
     if target == State.player then
       condition = (
         not State.player.ai.in_cutscene_flag
@@ -53,7 +53,7 @@ methods.observe = function(entity, dt)
     end
 
     if condition then
-      State:start_combat({State.player, entity})
+      State:start_combat({target, entity})
     end
   end
 end

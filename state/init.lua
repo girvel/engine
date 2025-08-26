@@ -152,8 +152,6 @@ end
 
 --- @param list entity[]
 methods.start_combat = function(self, list)
-  Log.info("State:start_combat()")
-
   list = {unpack(list)}
   if self.combat then
     list = Fun.iter(list)
