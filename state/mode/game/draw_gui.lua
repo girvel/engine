@@ -123,7 +123,6 @@ local draw_gui = function(self, dt)
       end
     end
 
-    local max = player:get_resources("full")
     local RESOURCE_DISPLAY_ORDER = {
       "actions", "bonus_actions", "reactions", "movement",
       "hit_dice", "action_surge", "second_wind", "fighting_spirit",
@@ -148,9 +147,16 @@ local draw_gui = function(self, dt)
     local WHITE = Vector.hex("ffffff")
     local HIGHLIGHTED = Vector.hex("e7573e")
 
+    local PRIMITIVE_RESOURCES = {
+      "movement",
+      "actions",
+      "bonus_actions",
+      "reactions",
+    }
+
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
       local amount = player.resources[r]
-      if not amount or (not State.combat and r == "movement") then
+      if not amount or (not State.combat and Table.contains(PRIMITIVE_RESOURCES, r)) then
         goto continue
       end
 
