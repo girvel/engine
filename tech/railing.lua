@@ -55,7 +55,7 @@ methods.update = function(self, dt)
           end
 
           -- for _, character in pairs(characters) do
-          --   Query(character).ai.in_cutscene = true
+          --   Query(character).ai.in_cutscene_flag = true
           -- end
 
           -- run the body
@@ -76,7 +76,7 @@ methods.update = function(self, dt)
           scene:run(characters)
 
           -- for _, character in pairs(characters) do
-          --   Query(character).ai.in_cutscene = nil
+          --   Query(character).ai.in_cutscene_flag = nil
           -- end
 
           if not scene.boring_flag then
