@@ -26,7 +26,7 @@ fighter.action_surge = Table.extend({
 
   _act = function(self, entity)
     -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
-    -- NEXT!
+    -- NEXT (FX)
     -- sound("assets/sounds/action_surge.mp3", .3):place(entity.position):play()
     -- NEXT (sounds)
     return true
