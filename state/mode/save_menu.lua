@@ -32,6 +32,21 @@ methods.draw_entity = function(self, ...)
 end
 
 methods.draw_gui = function(self, dt)
+  if State.combat then
+    tk.start_window("center", "center", 400, 120)
+    ui.start_font(28)
+    ui.start_alignment("center")
+      ui.text("Невозможно сохранить игру во время битвы")
+      ui.br()
+      if ui.choice({"OK"}) or ui.keyboard("escape") then
+        State.mode:close_menu()
+      end
+    ui.finish_alignment()
+    ui.finish_font()
+    tk.finish_window()
+    return
+  end
+
   tk.start_window("center", "center", "read_max", "max")
   ui.start_font(24)
     ui.h1("Сохранить игру")

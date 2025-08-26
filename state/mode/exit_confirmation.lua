@@ -43,22 +43,21 @@ methods.draw_gui = function(self)
 
   tk.start_window("center", "center", W, H)
   ui.start_font(28)
-    ui.start_alignment("center")
-      ui.text("Вы действительно хотите выйти из игры?")
+  ui.start_alignment("center")
+    ui.text("Вы действительно хотите выйти из игры?")
+    ui.br()
+
+    if self._prev.has_saved == false then
+      love.graphics.setColor(RED)
+      ui.text("Игра не сохранена")
       ui.br()
+      love.graphics.setColor(WHITE)
+    end
 
-      if self._prev.has_saved == false then
-        love.graphics.setColor(RED)
-        ui.text("Игра не сохранена")
-        ui.br()
-        love.graphics.setColor(WHITE)
-      end
-
-      local n = ui.choice({
-        "Вернуться  ",
-        "Выйти из игры  ",
-      })
-    ui.finish_alignment()
+    local n = ui.choice({
+      "Вернуться  ",
+      "Выйти из игры  ",
+    })
 
     if n == 1 or ui.keyboard("escape") then
       State.mode:close_menu()
@@ -66,6 +65,7 @@ methods.draw_gui = function(self)
       Log.info("Exiting the game from escape menu")
       love.event.quit()
     end
+  ui.finish_alignment()
   ui.finish_font()
   tk.finish_window()
 end
