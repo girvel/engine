@@ -25,7 +25,7 @@ creature.init = function(entity)
   entity:rotate(entity.direction or Vector.right)
 end
 
---- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"
+--- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"
 
 --- @param self entity
 --- @param modification creature_modification
@@ -49,7 +49,7 @@ end
 --- @param rest_type rest_type
 methods.get_resources = function(self, rest_type)
   local result = {}
-  if rest_type == "free" then
+  if rest_type == "free" then  -- TODO is free needed?
     result = {
       movement = 6,
       bonus_actions = 1,
@@ -205,6 +205,11 @@ methods.get_melee_damage_roll = function(self, slot)
   end
 
   return self:modify("damage_roll", roll, slot)
+end
+
+--- @param self entity
+methods.get_initiative_roll = function(self)
+  return self:modify("initiative_roll", D(20) + self:get_modifier("dex"))
 end
 
 Ldump.mark(creature, {}, ...)

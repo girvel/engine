@@ -13,16 +13,21 @@ combat_ai.new = function()
 end
 
 --- @param entity entity
---- @param dt integer
-methods.control = function(entity, dt)
-  if not State.combat then
-    if State.hostility:get(entity, State.player)
-      and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-      and not State.player.ai.in_cutscene_flag
-      and (State.player.position - entity.position):abs() <= State.player.fov_r * 0.6
-    then
-      State:start_combat({State.player, entity})
-    end
+methods.control = function(entity)
+end
+
+local OBSERVE_PERIOD = .5
+
+methods.observe = function(entity, dt)
+  if not Random.chance(dt / OBSERVE_PERIOD) then return end
+
+  if (not State.combat or not Table.contains(State.combat.list, entity))
+    and State.hostility:get(entity, State.player)
+    and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
+    and not State.player.ai.in_cutscene_flag
+    and (State.player.position - entity.position):abs() <= State.player.fov_r * 0.6
+  then
+    State:start_combat({State.player, entity})
   end
 end
 

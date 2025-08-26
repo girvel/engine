@@ -2,7 +2,8 @@ local async = require "engine.tech.async"
 
 
 --- @class ai
---- @field control fun(base_entity, number): boolean?
+--- @field control fun(base_entity)
+--- @field observe fun(base_entity, number)
 
 return Tiny.processingSystem {
   codename = "acting",
@@ -19,9 +20,13 @@ return Tiny.processingSystem {
 
   _process_inside_combat = function(self, entity, dt)
     -- NEXT! timeout (when implementing AIs/putting safety in)
-    local current = State.combat:get_current()
     local ai = entity.ai
 
+    if ai.observe then
+      ai.observe(entity, dt)
+    end
+
+    local current = State.combat:get_current()
     if entity ~= current then return end
 
     if not ai.control then
@@ -50,6 +55,11 @@ return Tiny.processingSystem {
 
   _process_outside_combat = function(self, entity, dt)
     local ai = entity.ai
+
+    if ai.observe then
+      ai.observe(entity, dt)
+    end
+
     if not ai.control then return end
 
     if not ai._control_coroutine then
@@ -61,7 +71,7 @@ return Tiny.processingSystem {
     if coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil
       if entity.rest then
-        entity:rest("free")
+        entity:rest("move")
       end
     end
 

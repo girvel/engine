@@ -152,8 +152,27 @@ end
 
 --- @param list entity[]
 methods.start_combat = function(self, list)
-  -- NEXT! append to combat
-  self.combat = combat.new(list)
+  Log.info("State:start_combat()")
+
+  list = {unpack(list)}
+  if self.combat then
+    list = Fun.iter(list)
+      :filter(function(e) return not Table.contains(self.combat.list, e) end)
+      :totable()
+  end
+
+  local initiatives = {}
+  for _, e in ipairs(list) do
+    initiatives[e] = e:get_initiative_roll():roll()
+  end
+
+  table.sort(list, function(a, b) return initiatives[a] > initiatives[b] end)
+
+  if self.combat then
+    Table.concat(self.combat.list, list)
+  else
+    self.combat = combat.new(list)
+  end
 end
 
 Ldump.mark(state, {}, ...)
