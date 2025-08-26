@@ -132,7 +132,7 @@ parser_new = function()
 
           local args_expression = get_field(instance, "args")
           local entity if args_expression then
-            entity = factory(assert(loadstring("return " .. args_expression.__value)))
+            entity = factory(assert(loadstring("return " .. args_expression.__value))())
           else
             entity = factory()
           end

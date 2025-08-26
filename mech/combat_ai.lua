@@ -16,22 +16,17 @@ end
 
 local VISION_RANGE = 10
 
+local find_target
+
 --- @param entity entity
 methods.control = function(entity)
   if not State.combat then return end
 
-  local target
-  for d in iteration.expanding_rhombus(VISION_RANGE) do
-    local e = State.grids.solids:slow_get(entity.position + d)
-    if e and State.hostility:get(entity, e) then
-      target = e
-      goto found
-    end
+  local target = find_target(entity)
+  if not target then
+    State.combat:remove(entity)
+    return
   end
-
-  State.combat:remove(entity)
-  do return end
-  ::found::
 
   api.travel(entity, target.position)
   api.attack(entity, target)
@@ -45,13 +40,31 @@ methods.observe = function(entity, dt)
   if not Random.chance(dt / OBSERVE_PERIOD) then return end
 
   -- starting/joining combat
-  if (not State.combat or not Table.contains(State.combat.list, entity))
-    and State.hostility:get(entity, State.player)
-    and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-    and not State.player.ai.in_cutscene_flag
-    and (State.player.position - entity.position):abs() <= VISION_RANGE
-  then
-    State:start_combat({State.player, entity})
+  if (not State.combat or not Table.contains(State.combat.list, entity)) then
+    local target = find_target(entity)
+
+    local condition = true
+    if target == State.player then
+      condition = (
+        not State.player.ai.in_cutscene_flag
+        and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
+        and (State.player.position - entity.position):abs() <= VISION_RANGE
+      )
+    end
+
+    if condition then
+      State:start_combat({State.player, entity})
+    end
+  end
+end
+
+--- @return entity?
+find_target = function(entity)
+  for d in iteration.expanding_rhombus(VISION_RANGE) do
+    local e = State.grids.solids:slow_get(entity.position + d)
+    if e and State.hostility:get(entity, e) then
+      return e
+    end
   end
 end
 
