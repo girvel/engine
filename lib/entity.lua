@@ -1,7 +1,7 @@
 --- Module for in-game entities
 local entityx = {}
 
---- @class entity: _creature_methods
+--- @class entity: _creature_methods, _animated_methods
 --- @field name string in-game name
 --- @field codename string in-code name
 --- @field view string entity's coordinate system's (offset + scale) name
@@ -13,8 +13,7 @@ local entityx = {}
 --- @field shader shader individial shader to render with
 --- @field sprite sprite
 --- @field animation animation
---- @field animate fun(entity, string?): promise
---- @field animation_set_paused fun(entity, boolean)
+--- @field faction string determines hostility through State.hostility
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer

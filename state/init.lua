@@ -10,6 +10,7 @@ local state = {}
 --- @field perspective state_perspective
 --- @field combat state_combat?
 --- @field quests state_quests
+--- @field hostility state_hostility
 --- @field grids table<string, grid>
 --- @field grid_size vector
 --- @field level level_info
@@ -138,6 +139,7 @@ state.new = function(systems)
     mode = require("engine.state.mode").new(),
     perspective = require("engine.state.perspective").new(),
     quests = require("engine.state.quests").new(),
+    hostility = require("engine.state.hostility").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},

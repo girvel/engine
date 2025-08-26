@@ -28,8 +28,7 @@ actions.move = function(direction)
           :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
           :filter(function(e)
             return e
-              -- and hostility.are_hostile(entity, e)
-              -- NEXT (on combat AI)
+              and State.hostility:get(e, entity)
               and e.resources
             end)
           :each(function(e, d)

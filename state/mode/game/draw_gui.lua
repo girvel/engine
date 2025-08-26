@@ -148,7 +148,6 @@ local draw_gui = function(self, dt)
     local WHITE = Vector.hex("ffffff")
     local HIGHLIGHTED = Vector.hex("e7573e")
 
-    ui.separator()
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
       local amount = player.resources[r]
       if not amount or (not State.combat and r == "movement") then
@@ -178,9 +177,10 @@ local draw_gui = function(self, dt)
       ::continue::
     end
     ui.br()
+    ui.br()
 
     if State.combat then
-      ui.br()
+      ui.separator()
       ui.table({"", "Очередь ходов"}, Fun.iter(State.combat.list)
         :enumerate()
         :map(function(i, e) return {

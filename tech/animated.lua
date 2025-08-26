@@ -10,6 +10,7 @@ local animated = {}
 --- @field frame number
 --- @field _end_promise promise
 
+--- @class _animated_methods
 local methods = {}
 
 local load_pack
