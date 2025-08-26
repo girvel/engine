@@ -21,7 +21,7 @@ player.base = function()
     ai = {
       next_action = nil,
       finish_turn = nil,
-      control = function(entity, _)
+      control = function(entity)
         while true do
           if entity.ai.next_action then
             entity.ai.next_action:act(entity)
@@ -31,6 +31,12 @@ player.base = function()
           coroutine.yield()
         end
         entity.ai.finish_turn = false
+      end,
+
+      observe = function(entity, dt)
+        if State.combat and not Table.contains(State.combat.list, entity) then
+          State:start_combat({entity})
+        end
       end,
     },
   })
