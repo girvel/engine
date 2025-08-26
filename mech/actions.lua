@@ -26,14 +26,10 @@ actions.move = function(direction)
       if entity:modify("opportunity_attack_trigger", true) then
         Fun.iter(Vector.directions)
           :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
-          :filter(function(e)
-            return e
-              and State.hostility:get(e, entity)
-              and e.resources
-            end)
+          :filter(function(e) return e and e.resources end)
           :each(function(e, d)
             e:rotate(-d)
-            actions.opportunity_attack:act(e)
+            actions.opportunity_attack:act(e)  -- State.hostility considered inside
           end)
       end
 
@@ -95,7 +91,7 @@ actions.hand_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp
+    return target and target.hp and State.hostility:get(entity, target)
   end,
 
   _act = function(_, entity)
@@ -114,7 +110,7 @@ actions.opportunity_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp
+    return target and target.hp and State.hostility:get(entity, target)
   end,
 
   _act = function(_, entity)
@@ -133,7 +129,7 @@ actions.offhand_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp and entity.inventory.offhand
+    return target and target.hp and entity.inventory.offhand and State.hostility:get(entity, target)
   end,
 
   _act = function(_, entity)
