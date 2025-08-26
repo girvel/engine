@@ -37,7 +37,7 @@ end
 -- Modifies first argument, concatenating integer fields and copying all the key-value data, both 
 -- in order from left to right
 --- @param base table table to be changed
---- @param extension table table to copy fields from
+--- @param extension table? table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
 tablex.join = function(base, extension, ...)

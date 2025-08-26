@@ -1,3 +1,4 @@
+local railing = require "engine.tech.railing"
 --- LDtk level parsing
 local ldtk = {}
 
@@ -8,7 +9,7 @@ local parser_new, load_scenes
 --- @field ldtk {path: string, level: string}
 --- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
---- @field rails_factory? fun(...): rails
+--- @field rails? {factory: fun(...): rails, scenes: scene[]}
 
 --- General information about the level
 --- @class level_info
@@ -26,7 +27,9 @@ ldtk.load = function(path)
   local level_module = require(path)
 
   local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
-  return parser_new():parse(raw, level_module.palette, level_module.cell_size)
+  return parser_new():parse(
+    raw, level_module.palette, level_module.cell_size, level_module.rails
+  )
 end
 
 local get_identifier = function(node)
@@ -147,7 +150,7 @@ parser_new = function()
       end,
     },
 
-    parse = function(self, raw, palette, cell_size)
+    parse = function(self, raw, palette, cell_size, rails_config)
       self._level_info.cell_size = cell_size
       self._level_info.grid_size = Vector.zero
 
@@ -167,13 +170,8 @@ parser_new = function()
         end
       end
 
-      -- local rails = level_module.rails_factory()
-      -- rails:init(load_scenes(path .. ".scenes"), nil, nil)
+      local rails = rails_config.factory(railing.runner(rails_config.scenes))
       -- NEXT (rails) handle positions & entities
-
-      local rails = require("levels.main.rails").new()
-      rails:init(load_scenes("levels.main.scenes"))
-      -- NEXT (rails) remove hardcoded stuff
 
       return {
         entities = self._entities,

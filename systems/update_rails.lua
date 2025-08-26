@@ -3,7 +3,7 @@ return Tiny.system {
   base_callback = "update",
   update = function(self, dt)
     if State.rails then  -- may occur in loading
-      State.rails:update(dt)
+      State.rails.runner:update(dt)
     end
   end,
 }

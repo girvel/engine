@@ -15,19 +15,25 @@ local railing = {}
 --- @field name string
 --- @field base_scene scene
 
---- @class rails_base
+--- @class rails_runner
 --- @field scenes table<string|integer, scene>
 --- @field _scene_runs scene_run[]
-railing.methods = {}
+local methods = {}
+local mt = {__index = methods}
 
-railing.methods.init = function(self, scenes, positions, entities)
-  self.scenes = scenes
-  self._scene_runs = {}
+
+--- @param scenes scene[]
+--- @return rails_runner
+railing.runner = function(scenes, positions, entities)
+  return setmetatable({
+    scenes = scenes,
+    _scene_runs = {},
+  }, mt)
   -- NEXT (rails) handle positions, entities
 end
 
 --- @param dt number
-railing.methods.update = function(self, dt)
+methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
     -- NEXT (rails) characters
 
