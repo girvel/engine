@@ -1,5 +1,6 @@
 local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
+local iteration = require("engine.tech.iteration")
 
 
 local combat_ai = {}
@@ -13,12 +14,24 @@ combat_ai.new = function()
   return setmetatable({}, mt)
 end
 
+local VISION_RANGE = 10
+
 --- @param entity entity
 methods.control = function(entity)
   if not State.combat then return end
 
-  -- NEXT! pick closest target
-  local target = State.player
+  local target
+  for d in iteration.expanding_rhombus(VISION_RANGE) do
+    local e = State.grids.solids:slow_get(entity.position + d)
+    if e and State.hostility:get(entity, e) then
+      target = e
+      goto found
+    end
+  end
+
+  State.combat:remove(entity)
+  do return end
+  ::found::
 
   api.travel(entity, target.position)
   api.attack(entity, target)
@@ -36,7 +49,7 @@ methods.observe = function(entity, dt)
     and State.hostility:get(entity, State.player)
     and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
     and not State.player.ai.in_cutscene_flag
-    and (State.player.position - entity.position):abs() <= State.player.fov_r * 0.6
+    and (State.player.position - entity.position):abs() <= VISION_RANGE
   then
     State:start_combat({State.player, entity})
   end
