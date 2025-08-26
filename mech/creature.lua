@@ -20,23 +20,25 @@ end
 
 --- @param entity entity
 creature.init = function(entity)
-  Table.assert_fields(entity, {"base_hp", "base_abilities", "level"})
+  Table.assert_fields(entity, {"base_abilities", "level"})
   entity:rest("full")
   entity:rotate(entity.direction or Vector.right)
 end
 
+--- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"
+
 --- @param self entity
---- @param name string
+--- @param modification creature_modification
 --- @param value any
 --- @param ... any
-methods.modify = function(self, name, value, ...)
+methods.modify = function(self, modification, value, ...)
   local additional_args = {...}
-  name = "modify_" .. name
+  modification = "modify_" .. modification
   return Fun.iter(self.perks)
     :chain(self.conditions)
-    :filter(function(p) return p[name] end)
+    :filter(function(p) return p[modification] end)
     :reduce(
-      function(acc, p) return p[name](p, self, acc, unpack(additional_args)) end,
+      function(acc, p) return p[modification](p, self, acc, unpack(additional_args)) end,
       value
     )
 end
@@ -76,11 +78,12 @@ methods.get_resources = function(self, rest_type)
   return self:modify("resources", result, rest_type)
 end
 
+--- @param self entity
 methods.get_max_hp = function(self)
-  -- TODO effects
-  return self.base_hp
+  return math.max(1, self:modify("max_hp", self.level * self:get_modifier("con")))
 end
 
+--- @param self entity
 --- @param rest_type rest_type
 methods.rest = function(self, rest_type)
   if rest_type == "long" or rest_type == "full" then
@@ -90,6 +93,7 @@ methods.rest = function(self, rest_type)
   Table.extend(self.resources, self:get_resources(rest_type))
 end
 
+--- @param self entity
 methods.rotate = function(self, direction)
   self.direction = direction
   for _, item in pairs(self.inventory) do

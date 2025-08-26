@@ -11,6 +11,10 @@ class.hit_dice = function(die)
   return Table.extend({
     codename = "hit_dice",
 
+    modify_max_hp = function(self, entity, value)
+      return value + die + (math.floor(die / 2) + 1) * (entity.level - 1)
+    end,
+
     modify_resources = function(self, entity, resources, rest_type)
       if rest_type == "long" then
         resources.hit_dice = (resources.hit_dice or 0) + entity.level
