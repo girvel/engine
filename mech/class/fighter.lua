@@ -52,13 +52,63 @@ fighter.second_wind = Table.extend({
 
   _act = function(self, entity)
     -- State:add(fx("assets/sprites/fx/second_wind", "fx_under", entity.position))
-    -- NEXT!
+    -- NEXT (FX)
     -- sound("assets/sounds/second_wind.mp3", .3):place(entity.position):play()
     -- NEXT (sounds)
     health.heal(entity, (D(10) + entity.level):roll())
     return true
   end,
 }, action.base)
+
+local fighting_spirit_condition = function()
+  return {
+    codename = "fighting_spirit_condition",
+
+    life_time = 6,
+
+    modify_attack_roll = function(self, entity, roll, slot)
+      return roll:extended({advantage = true})  -- OPT prevent reallocation
+    end,
+  }
+end
+
+fighter.fighting_spirit = Table.extend({
+  codename = "fighting_spirit",
+
+  modify_resources = function(self, entity, resources, rest_type)
+    if rest_type == "long" then
+      resources.fighting_spirit = (resources.fighting_spirit or 0) + 3
+    end
+    return resources
+  end,
+
+  cost = {
+    fighting_spirit = 1,
+    bonus_actions = 1,
+  },
+
+  _is_available = function(self, entity) return State.combat end,
+
+  _act = function(self, entity)
+    -- NEXT FX, sounds
+    table.insert(entity.conditions, fighting_spirit_condition())
+    health.set_hp(entity, entity.hp + 5)
+    return true
+  end,
+}, action.base)
+
+fighter.fighting_styles = {}
+
+fighter.fighting_styles.two_weapon_fighting = {
+  codename = "two_weapon_fighting",
+
+  modify_damage_roll = function(self, entity, roll, slot)
+    if slot ~= "offhand" or not entity.inventory.offhand then
+      return roll
+    end
+    return roll + entity:get_melee_modifier(slot)
+  end,
+}
 
 Ldump.mark(fighter, {}, ...)
 return fighter

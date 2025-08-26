@@ -21,7 +21,8 @@ local entityx = {}
 --- @field resources table<string, integer> resources to spend on actions
 --- @field inventory table<string, item>
 --- @field hp integer current health points
---- @field armor integer static armor class; less priority than :get_armor()
+--- @field max_hp integer max health points, overrides base :get_max_hp value
+--- @field armor integer static armor class; less priority than :get_armor
 --- @field perks table[] all class, feat, race perks that modify default creature behavior
 --- @field conditions table[] like .perks, but temporary
 ---

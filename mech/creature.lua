@@ -80,7 +80,7 @@ end
 
 --- @param self entity
 methods.get_max_hp = function(self)
-  return math.max(1, self:modify("max_hp", self.level * self:get_modifier("con")))
+  return math.max(1, self:modify("max_hp", self.max_hp or self.level * self:get_modifier("con")))
 end
 
 --- @param self entity

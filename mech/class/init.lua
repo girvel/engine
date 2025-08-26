@@ -54,5 +54,19 @@ class.skill_proficiency = function(skill)
   }
 end
 
+--- @param ability ability
+--- @return table
+class.save_proficiency = function(ability)
+  return {
+    codename = ability .. "_save_proficiency",
+
+    modify_saving_throw = function(self, entity, roll, this_ability)
+      if ability == this_ability then
+        return roll + xp.get_max_hp(entity.level)
+      end
+    end,
+  }
+end
+
 Ldump.mark(class, {}, ...)
 return class

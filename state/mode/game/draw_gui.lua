@@ -106,6 +106,8 @@ local draw_gui = function(self, dt)
 
       action_button(fighter.action_surge, "4")
       ui.offset(4)
+
+      action_button(fighter.fighting_spirit, "5")
     ui.finish_line()
 
     ui.br()

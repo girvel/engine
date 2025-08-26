@@ -37,7 +37,7 @@ abilities.skill_bases = {
   survival = "wis",
   deception = "cha",
   intimidation = "cha",
-  performace = "cha",
+  performance = "cha",
   persuasion = "cha",
 }
 
