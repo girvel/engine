@@ -484,6 +484,10 @@ ui.keyboard = function(key)
   return Table.contains(model.keyboard.pressed, key)
 end
 
+ui.get_frame = function()
+  return Table.shallow_copy(Table.last(model.frame))
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Event handlers
 ----------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ combat_ai.new = function()
   return setmetatable({}, mt)
 end
 
-local VISION_RANGE = 10
+local HOSTILITY_RANGE = 10
 
 local find_target
 
@@ -57,7 +57,7 @@ methods.observe = function(entity, dt)
       condition = (
         not State.player.ai.in_cutscene_flag
         and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-        and (State.player.position - entity.position):abs() <= VISION_RANGE
+        and (State.player.position - entity.position):abs() <= HOSTILITY_RANGE
       )
     end
 
@@ -69,7 +69,7 @@ end
 
 --- @return entity?
 find_target = function(entity)
-  for d in iteration.expanding_rhombus(VISION_RANGE) do
+  for d in iteration.expanding_rhombus(HOSTILITY_RANGE) do
     local e = State.grids.solids:slow_get(entity.position + d)
     if e and State.hostility:get(entity, e) then
       return e

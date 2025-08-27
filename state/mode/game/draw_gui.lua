@@ -196,35 +196,47 @@ local PRIMITIVE_RESOURCES = {
   "reactions",
 }
 
+local SIDEBAR_BLOCK_PADDING = 10
+
 draw_resources = function()
-  for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
-    local amount = State.player.resources[r]
-    if not amount or (not State.combat and Table.contains(PRIMITIVE_RESOURCES, r)) then
-      goto continue
-    end
-
-    ui.start_frame(200)
-    ui.start_line()
-      local icon = ICONS[r] or DEFAULT_ICON
-      local highlighted_n = cost and cost[r]
-      if highlighted_n then
-        love.graphics.setColor(HIGHLIGHTED)
-          ui.text(icon * highlighted_n)
-        love.graphics.setColor(COLORS[r] or WHITE)
-          ui.text(icon * math.max(0, amount - highlighted_n))
-        love.graphics.setColor(WHITE)
-      else
-        love.graphics.setColor(COLORS[r] or WHITE)
-          ui.text(icon * amount)
-        love.graphics.setColor(WHITE)
+  ui.start_frame(SIDEBAR_BLOCK_PADDING, SIDEBAR_BLOCK_PADDING, -2 * SIDEBAR_BLOCK_PADDING)
+    local start = ui.get_frame()
+    for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
+      local amount = State.player.resources[r]
+      if not amount or (not State.combat and Table.contains(PRIMITIVE_RESOURCES, r)) then
+        goto continue
       end
-    ui.finish_line()
-    ui.finish_frame()
 
-    ui.text(translation.resources[r]:utf_capitalize())
+      ui.start_frame(200)
+      ui.start_line()
+        local icon = ICONS[r] or DEFAULT_ICON
+        local highlighted_n = cost and cost[r]
+        if highlighted_n then
+          love.graphics.setColor(HIGHLIGHTED)
+            ui.text(icon * highlighted_n)
+          love.graphics.setColor(COLORS[r] or WHITE)
+            ui.text(icon * math.max(0, amount - highlighted_n))
+          love.graphics.setColor(WHITE)
+        else
+          love.graphics.setColor(COLORS[r] or WHITE)
+            ui.text(icon * amount)
+          love.graphics.setColor(WHITE)
+        end
+      ui.finish_line()
+      ui.finish_frame()
 
-    ::continue::
-  end
+      ui.text(translation.resources[r]:utf_capitalize())
+
+      ::continue::
+    end
+    local finish = ui.get_frame()
+  ui.finish_frame()
+
+  local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING
+  ui.start_frame(-20, -20, sidebar_w + 40, h + 40)
+    ui.tile(gui.sidebar_block_bg)
+  ui.finish_frame()
+  ui.offset(0, h)
 end
 
 draw_move_order = function()
