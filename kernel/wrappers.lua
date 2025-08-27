@@ -72,3 +72,13 @@ love.graphics.newCanvas = function(...)
   end
   return result
 end
+
+local old_newSource = love.audio.newSource
+love.audio.newSource = function(...)
+  local result = old_newSource(...)
+  local args = {...}
+  Ldump.serializer.handlers[result] = function()
+    return love.audio.newSource(unpack(args))
+  end
+  return result
+end
