@@ -23,12 +23,14 @@ fighter.action_surge = Table.extend({
     action_surge = 1,
   },
 
+  sounds = sound.multiple("engine/assets/sounds/action_surge", .3),
+
   _is_available = function() return State.combat end,
 
   _act = function(self, entity)
     -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
     -- NEXT (FX)
-    sound.new("engine/assets/sounds/action_surge.mp3", .3):place(entity.position):play()
+    self.sounds:play_at(entity.position)
     return true
   end,
 }, action.base)
@@ -48,13 +50,14 @@ fighter.second_wind = Table.extend({
     bonus_actions = 1,
   },
 
+  sounds = sound.multiple("engine/assets/sounds/second_wind", .3),
+
   _is_available = function(self, entity) return entity.hp <= entity:get_max_hp() end,
 
   _act = function(self, entity)
     -- State:add(fx("assets/sprites/fx/second_wind", "fx_under", entity.position))
     -- NEXT (FX)
-    -- sound("assets/sounds/second_wind.mp3", .3):place(entity.position):play()
-    -- NEXT (sounds)
+    self.sounds:play_at(entity.position)
     health.heal(entity, (D(10) + entity.level):roll())
     return true
   end,
@@ -87,10 +90,13 @@ fighter.fighting_spirit = Table.extend({
     bonus_actions = 1,
   },
 
+  sounds = sound.multiple("engine/assets/sounds/fighting_spirit", .3),
+
   _is_available = function(self, entity) return State.combat end,
 
   _act = function(self, entity)
-    -- NEXT FX, sounds
+    -- NEXT FX
+    self.sounds:play_at(entity.position)
     table.insert(entity.conditions, fighting_spirit_condition())
     health.set_hp(entity, entity.hp + 5)
     return true

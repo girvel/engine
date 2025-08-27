@@ -1,6 +1,7 @@
 local xp = require("engine.mech.xp")
 local action = require("engine.tech.action")
 local health = require("engine.mech.health")
+local sound  = require("engine.tech.sound")
 
 
 local class = {}
@@ -26,13 +27,14 @@ class.hit_dice = function(die)
       hit_dice = 1,
     },
 
+    sounds = sound.multiple("engine/assets/sounds/hit_dice", .3),
+
     _is_available = function(self, entity)
       return not State.combat and entity.hp <= entity:get_max_hp()
     end,
 
     _act = function(self, entity)
-      -- sound("assets/sounds/hit_dice.mp3", .3):place(entity.position):play()
-      -- NEXT (sounds)
+      self.sounds:play_at(entity.position)
       health.heal(entity, (D(die) + entity:get_modifier("con")):roll())
       return true
     end,
