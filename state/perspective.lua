@@ -24,7 +24,7 @@ perspective.new = function()
     views = views,
     views_order = views_order,
     offset_fs = offset_fs,
-    SIDEBAR_W = 416,
+    SIDEBAR_W = 452,
   }, mt)
 end
 

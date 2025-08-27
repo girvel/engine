@@ -7,7 +7,9 @@ local gui = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 
 
-local PADDING = 40
+local PADDING_LX = 48
+local PADDING_RX = 60
+local PADDING_Y = 40
 local HP_BAR_H = 10 * 4
 
 local cost, sidebar_w
@@ -17,15 +19,15 @@ local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_or
 --- @param dt number
 local draw_gui = function(self, dt)
   State.perspective:update(dt)
-  sidebar_w = State.perspective.SIDEBAR_W - 2 * PADDING
+  sidebar_w = State.perspective.SIDEBAR_W - PADDING_LX - PADDING_RX
 
-  ui.start_frame(love.graphics.getWidth() - sidebar_w - 2 * PADDING)
+  ui.start_frame(love.graphics.getWidth() - sidebar_w - PADDING_LX - PADDING_RX)
     ui.tile(gui.window_bg)
   ui.finish_frame()
 
   ui.start_frame(
-    love.graphics.getWidth() - sidebar_w - PADDING, PADDING,
-    sidebar_w, love.graphics.getHeight() - 2 * PADDING
+    love.graphics.getWidth() - sidebar_w - PADDING_RX, PADDING_Y,
+    sidebar_w, love.graphics.getHeight() - PADDING_Y
   )
     draw_hp_bar()
 
@@ -80,57 +82,64 @@ end
 draw_action_grid = function()
   cost = nil
 
-  ui.start_line()
-    if ui.hot_button(gui.escape_menu, "escape").is_pressed then
-      State.mode:open_escape_menu()
-    end
-    ui.offset(4)
+  ui.start_frame(-16, -4)
+    ui.image("engine/assets/sprites/gui/action_grid_bg.png")
+  ui.finish_frame()
 
-    local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
-    if ui.hot_button(journal_image, "j").is_pressed then
-      State.mode:open_journal()
-    end
-    ui.offset(4)
-
-    action_button(fighter.hit_dice, "h")
-    ui.offset(4)
-  ui.finish_line()
-  ui.offset(0, 4)
-
-  ui.start_line()
-    if State.combat then
-      action_button(player_mod.skip_turn, "space")
+  ui.start_frame(4)
+    ui.start_line()
+      if ui.hot_button(gui.escape_menu, "escape").is_pressed then
+        State.mode:open_escape_menu()
+      end
       ui.offset(4)
-      action_button(actions.disengage, "g")
-    else
-      ui.offset(132)
-    end
-    ui.offset(4)
 
-    action_button(actions.dash, "lshift")
-    ui.offset(4)
-  ui.finish_line()
-  ui.offset(0, 4)
+      local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
+      if ui.hot_button(journal_image, "j").is_pressed then
+        State.mode:open_journal()
+      end
+      ui.offset(4)
 
-  ui.start_line()
-    action_button(actions.hand_attack, "1")
-    ui.offset(4)
+      action_button(fighter.hit_dice, "h")
+      ui.offset(4)
+    ui.finish_line()
+    ui.offset(0, 4)
 
-    if State.player.inventory.offhand then
-      action_button(actions.offhand_attack, "2")
-    else
-      action_button(actions.shove, "2")
-    end
-    ui.offset(4)
+    ui.start_line()
+      if State.combat then
+        action_button(player_mod.skip_turn, "space")
+        ui.offset(4)
+        action_button(actions.disengage, "g")
+      else
+        ui.offset(132)
+      end
+      ui.offset(4)
 
-    action_button(fighter.second_wind, "3")
-    ui.offset(4)
+      action_button(actions.dash, "lshift")
+      ui.offset(4)
+    ui.finish_line()
+    ui.offset(0, 4)
 
-    action_button(fighter.action_surge, "4")
-    ui.offset(4)
+    ui.start_line()
+      action_button(actions.hand_attack, "1")
+      ui.offset(4)
 
-    action_button(fighter.fighting_spirit, "5")
-  ui.finish_line()
+      if State.player.inventory.offhand then
+        action_button(actions.offhand_attack, "2")
+      else
+        action_button(actions.shove, "2")
+      end
+      ui.offset(4)
+
+      action_button(fighter.second_wind, "3")
+      ui.offset(4)
+
+      action_button(fighter.action_surge, "4")
+      ui.offset(4)
+
+      action_button(fighter.fighting_spirit, "5")
+    ui.finish_line()
+  ui.finish_frame()
+  ui.offset(0, 208)
 
   for key, direction in pairs {
     w = Vector.up,
