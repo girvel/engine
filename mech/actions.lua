@@ -41,8 +41,13 @@ actions.move = function(direction)
       if result and entity.animate then
         entity:animate("move")
       end
+
+      local tile = State.grids.tiles[entity.position]
+      if tile.sounds and tile.sounds.walk then
+        Random.choice(tile.sounds.walk):clone():place(entity.position):play()
+      end
+
       return result
-      -- NEXT sound
     end,
   }, action.base)
 end

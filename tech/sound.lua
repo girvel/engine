@@ -1,5 +1,7 @@
 local sound = {}
 
+--- @alias sound_event "hit"|"walk"
+
 --- @class sound
 --- @field source love.Source
 --- @field _path string
@@ -20,14 +22,30 @@ sound.new = function(path, volume)
   }, mt)
 end
 
+--- Load all sounds from a directory
+--- @param dir_path string
+--- @param volume? number
+--- @return sound[]
+sound.multiple = function(dir_path, volume)
+  return Fun.iter(love.filesystem.getDirectoryItems(dir_path))
+    :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
+    :totable()
+end
+
+--- @enum (key) sound_size
+sound.sizes = {
+  small = {1, 10},
+  medium = {7, 20},
+  large = {15, 30},
+}
+
 --- Creates a fully independent copy of the sound
 --- @param self sound
 --- @return sound
 methods.clone = function(self)
   return setmetatable({
     source = self.source:clone(),
-    _path = self._path,
-  }, sound._mt)
+  }, mt)
 end
 
 --- @generic T: sound
@@ -76,23 +94,6 @@ methods.set_looping = function(self, value)
   self.source:setLooping(value)
   return self
 end
-
---- Load all sounds from a directory
---- @param dir_path string
---- @param volume? number
---- @return sound[]
-sound.multiple = function(dir_path, volume)
-  return Fun.iter(love.filesystem.getDirectoryItems(dir_path))
-    :map(function(path) return sound(dir_path .. "/" .. path, volume) end)
-    :totable()
-end
-
---- @enum (key) sound_size
-sound.sizes = {
-  small = {1, 10},
-  medium = {7, 20},
-  large = {15, 30},
-}
 
 Ldump.mark(sound, {}, ...)
 return sound

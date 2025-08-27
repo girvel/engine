@@ -13,7 +13,7 @@ local state = {}
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field rails rails
---- @field grids table<string, grid>
+--- @field grids table<string, grid<entity>>
 --- @field grid_size vector
 --- @field level level_info
 --- @field player player

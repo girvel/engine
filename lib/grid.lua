@@ -33,179 +33,185 @@ grid.from_matrix = function(matrix, size)
   return result
 end
 
---- @class grid
+--- @class grid<T>: { [vector]: T }
 --- @field size vector
 --- @field _inner_array any[]
-local grid_methods = {
-  --- @param self grid
-  --- @param v vector
-  --- @return boolean
-  can_fit = function(self, v)
-    for _, value in ipairs(v) do
-      if value <= 0 then return false end
+local methods = {}
+
+--- @param self grid
+--- @param v vector
+--- @return boolean
+methods.can_fit = function(self, v)
+  for _, value in ipairs(v) do
+    if value <= 0 then return false end
+  end
+  return vector.zero < v and self.size >= v
+end
+
+--- @generic T, D
+--- @param self grid<T>
+--- @param v vector
+--- @param default? D
+--- @return T|D
+methods.slow_get = function(self, v, default)
+  assert(getmetatable(v) == vector.mt)
+  if not self:can_fit(v) then return default end
+  return self[v]
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param x integer
+--- @param y integer
+--- @return T
+methods.unsafe_get = function(self, x, y)
+  return self._inner_array[self:_get_inner_index(x, y)]
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @return any
+methods.iter = function(self)
+  return Fun.iter(pairs(self._inner_array))
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param start vector
+--- @param finish vector
+--- @param max_distance? integer
+--- @return vector[]
+methods.find_path = function(self, start, finish, max_distance)
+  if start == finish then return {} end
+
+  local distance_to = grid.new(self.size)
+  local way_back = grid.new(self.size)
+  local visited_vertices = grid.new(self.size)
+  local visited_vertices_list = {}
+  local vertices_to_visit = {start}  -- TODO OPT use sorted list
+  distance_to[start] = 0
+
+  local reconstruct_from = function(last)
+    local result = {}
+    local current = last
+    for i = distance_to[last], 1, -1 do
+      result[i] = current
+      current = way_back[current]
     end
-    return vector.zero < v and self.size >= v
-  end,
+    return result
+  end
 
-  --- @param self grid
-  --- @param v vector
-  --- @param default? any
-  --- @return any
-  slow_get = function(self, v, default)
-    assert(getmetatable(v) == vector.mt)
-    if not self:can_fit(v) then return default end
-    return self[v]
-  end,
+  local current_vertex_i = 1
+  local current_vertex = start
+  local current_distance = 0
+  while true do
+    for _, direction in ipairs(vector.directions) do
+      local neighbour = current_vertex + direction
 
-  --- @param self grid
-  --- @param x integer
-  --- @param y integer
-  --- @return any
-  unsafe_get = function(self, x, y)
-    return self._inner_array[self:_get_inner_index(x, y)]
-  end,
-
-  --- @param self grid
-  --- @return any
-  iter = function(self)
-    return Fun.iter(pairs(self._inner_array))
-  end,
-
-  --- @param self grid
-  --- @param start vector
-  --- @param finish vector
-  --- @param max_distance? integer
-  --- @return vector[]
-  find_path = function(self, start, finish, max_distance)
-    if start == finish then return {} end
-
-    local distance_to = grid.new(self.size)
-    local way_back = grid.new(self.size)
-    local visited_vertices = grid.new(self.size)
-    local visited_vertices_list = {}
-    local vertices_to_visit = {start}  -- TODO OPT use sorted list
-    distance_to[start] = 0
-
-    local reconstruct_from = function(last)
-      local result = {}
-      local current = last
-      for i = distance_to[last], 1, -1 do
-        result[i] = current
-        current = way_back[current]
-      end
-      return result
-    end
-
-    local current_vertex_i = 1
-    local current_vertex = start
-    local current_distance = 0
-    while true do
-      for _, direction in ipairs(vector.directions) do
-        local neighbour = current_vertex + direction
-
-        if neighbour == finish then
-          distance_to[finish] = current_distance + 1
-          way_back[finish] = current_vertex
-          return reconstruct_from(finish)
-        end
-
-        if
-          not self:slow_get(neighbour, true)
-          and not visited_vertices:slow_get(neighbour)
-          and self:can_fit(neighbour)
-          and (distance_to[neighbour] or math.huge) > current_distance
-        then
-          distance_to[neighbour] = current_distance + 1
-          way_back[neighbour] = current_vertex
-          table.insert(vertices_to_visit, neighbour)
-        end
+      if neighbour == finish then
+        distance_to[finish] = current_distance + 1
+        way_back[finish] = current_vertex
+        return reconstruct_from(finish)
       end
 
-      vertices_to_visit[current_vertex_i] = vertices_to_visit[#vertices_to_visit]
-      vertices_to_visit[#vertices_to_visit] = nil
-      visited_vertices[current_vertex] = true
-      table.insert(visited_vertices_list, current_vertex)
-
-      current_distance = math.huge
-      for i, vertex in ipairs(vertices_to_visit) do
-        local new_distance = distance_to[vertex]
-        if new_distance < current_distance then
-          current_vertex = vertex
-          current_vertex_i = i
-          current_distance = new_distance
-        end
-      end
-
-      if #vertices_to_visit == 0 or current_distance > (max_distance or math.huge) then
-        local next_best_finish
-        local key = math.huge
-        for _, vertex in ipairs(visited_vertices_list) do
-          local this_key = (vertex - finish):abs()
-          if this_key < key then
-            key = this_key
-            next_best_finish = vertex
-          end
-        end
-        return reconstruct_from(next_best_finish)
-      end
-    end
-  end,
-
-  --- @param self grid
-  --- @param start vector
-  --- @param max_radius? integer
-  --- @return vector?
-  find_free_position = function(self, start, max_radius)
-    -- TODO OPT can be optimized replacing slow_get with fast_get + min/max
-    if self[start] == nil then return end
-
-    max_radius = math.min(
-      max_radius or math.huge,
-      math.max(
-        start[1] - 1,
-        start[2] - 1,
-        self.size[1] - start[1],
-        self.size[2] - start[2]
-      ) * 2
-    )
-
-    for r = 1, max_radius do
-      for x = 0, r - 1 do
-        local v = vector.new(x, x - r) + start
-        if not self:slow_get(v, true) then return v end
-      end
-
-      for x = r, 1, -1 do
-        local v = vector.new(x, r - x) + start
-        if not self:slow_get(v, true) then return v end
-      end
-
-      for x = 0, 1 - r, -1 do
-        local v = vector.new(x, x + r) + start
-        if not self:slow_get(v, true) then return v end
-      end
-
-      for x = -r, 1 do
-        local v = vector.new(x, -r - x) + start
-        if not self:slow_get(v, true) then return v end
+      if
+        not self:slow_get(neighbour, true)
+        and not visited_vertices:slow_get(neighbour)
+        and self:can_fit(neighbour)
+        and (distance_to[neighbour] or math.huge) > current_distance
+      then
+        distance_to[neighbour] = current_distance + 1
+        way_back[neighbour] = current_vertex
+        table.insert(vertices_to_visit, neighbour)
       end
     end
 
-    return nil
-  end,
+    vertices_to_visit[current_vertex_i] = vertices_to_visit[#vertices_to_visit]
+    vertices_to_visit[#vertices_to_visit] = nil
+    visited_vertices[current_vertex] = true
+    table.insert(visited_vertices_list, current_vertex)
 
-  --- @param self grid
-  --- @param x integer
-  --- @param y integer
-  --- @return integer
-  _get_inner_index = function(self, x, y)
-    return x + (y - 1) * self.size[1]
-  end,
-}
+    current_distance = math.huge
+    for i, vertex in ipairs(vertices_to_visit) do
+      local new_distance = distance_to[vertex]
+      if new_distance < current_distance then
+        current_vertex = vertex
+        current_vertex_i = i
+        current_distance = new_distance
+      end
+    end
+
+    if #vertices_to_visit == 0 or current_distance > (max_distance or math.huge) then
+      local next_best_finish
+      local key = math.huge
+      for _, vertex in ipairs(visited_vertices_list) do
+        local this_key = (vertex - finish):abs()
+        if this_key < key then
+          key = this_key
+          next_best_finish = vertex
+        end
+      end
+      return reconstruct_from(next_best_finish)
+    end
+  end
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param start vector
+--- @param max_radius? integer
+--- @return vector?
+methods.find_free_position = function(self, start, max_radius)
+  -- TODO OPT can be optimized replacing slow_get with fast_get + min/max
+  if self[start] == nil then return end
+
+  max_radius = math.min(
+    max_radius or math.huge,
+    math.max(
+      start[1] - 1,
+      start[2] - 1,
+      self.size[1] - start[1],
+      self.size[2] - start[2]
+    ) * 2
+  )
+
+  for r = 1, max_radius do
+    for x = 0, r - 1 do
+      local v = vector.new(x, x - r) + start
+      if not self:slow_get(v, true) then return v end
+    end
+
+    for x = r, 1, -1 do
+      local v = vector.new(x, r - x) + start
+      if not self:slow_get(v, true) then return v end
+    end
+
+    for x = 0, 1 - r, -1 do
+      local v = vector.new(x, x + r) + start
+      if not self:slow_get(v, true) then return v end
+    end
+
+    for x = -r, 1 do
+      local v = vector.new(x, -r - x) + start
+      if not self:slow_get(v, true) then return v end
+    end
+  end
+
+  return nil
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param x integer
+--- @param y integer
+--- @return integer
+methods._get_inner_index = function(self, x, y)
+  return x + (y - 1) * self.size[1]
+end
 
 grid.mt = {
   __index = function(self, v)
-    local method = grid_methods[v]
+    local method = methods[v]
     if method then return method end
 
     assert(

@@ -14,6 +14,7 @@ local entityx = {}
 --- @field sprite sprite
 --- @field animation animation
 --- @field faction string determines hostility through State.hostility
+--- @field sounds table<sound_event, sound[]>
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer
