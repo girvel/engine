@@ -1,6 +1,7 @@
 local xp = require("engine.mech.xp")
 local health = require "engine.mech.health"
 local abilities = require "engine.mech.abilities"
+local sound     = require "engine.tech.sound"
 local creature = {}
 
 --- @class _creature_methods
@@ -13,6 +14,9 @@ creature.mixin = function()
     inventory = {},
     perks = {},
     conditions = {},
+    sounds = {
+      hit = sound.multiple("engine/assets/sounds/hit/body", .3),
+    },
   }, methods)
 
   return result

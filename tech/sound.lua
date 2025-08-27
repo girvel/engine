@@ -11,7 +11,7 @@ local mt = {__index = methods}
 --- @param path string
 --- @param volume? number
 --- @return sound
-sound.new = function(path, volume)
+sound.new = Memoize(function(path, volume)
   local source = love.audio.newSource(path, "static")
   if volume then source:setVolume(volume) end
   if source:getChannelCount() == 1 then
@@ -20,17 +20,17 @@ sound.new = function(path, volume)
   return setmetatable({
     source = source,
   }, mt)
-end
+end)
 
 --- Load all sounds from a directory
 --- @param dir_path string
 --- @param volume? number
 --- @return sound[]
-sound.multiple = function(dir_path, volume)
+sound.multiple = Memoize(function(dir_path, volume)
   return Fun.iter(love.filesystem.getDirectoryItems(dir_path))
     :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
     :totable()
-end
+end)
 
 --- @enum (key) sound_size
 sound.sizes = {

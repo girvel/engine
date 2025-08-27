@@ -1,6 +1,7 @@
 local level = require "engine.tech.level"
 local action = require "engine.tech.action"
 local health = require "engine.mech.health"
+local sound  = require "engine.tech.sound"
 
 
 local actions = {}
@@ -187,11 +188,12 @@ actions.shove = Table.extend({
   end,
 }, action.base)
 
+local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
+
 base_attack = function(entity, slot)
   local target = State.grids.solids:slow_get(entity.position + entity.direction)
 
-  -- sound.play("assets/sounds/whoosh", 0.1, entity.position)
-  -- NEXT (sounds)
+  Random.choice(WHOOSH):clone():place(entity.position):play()
 
   entity:animate(slot .. "_attack"):next(function()
     State.hostility:register(entity, target)
@@ -202,14 +204,10 @@ base_attack = function(entity, slot)
       entity:get_melee_damage_roll(slot)
     ) then return end
 
-    -- if target and target.sounds and target.sounds.hit then
-    --   sound.play(target.sounds.hit, target.position)
-    -- end
-    -- NEXT (sounds)
-
-    -- if target.hardness and not -Query(entity).inventory[slot] then
-    --   attacking.attack_save(entity, "con", target.hardness, D.roll({}, 1))
-    -- end
+    if target and target.sounds and target.sounds.hit then
+      -- target.sounds.hit:play_at(target.position)
+      Random.choice(target.sounds.hit):clone():place(target.position):play()
+    end
   end)
 end
 
