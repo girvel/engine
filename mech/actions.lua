@@ -60,6 +60,15 @@ actions.dash = Table.extend({
     actions = 1,
     movement = -6,
   },
+
+  sounds = sound.multiple("engine/assets/sounds/dash", .5),
+
+  _act = function(self, entity)
+    if State.combat then
+      self.sounds:play_at(entity.position)
+    end
+    return true
+  end,
 }, action.base)
 
 local disengaged = function()

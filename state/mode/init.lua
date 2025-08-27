@@ -1,5 +1,6 @@
 local animated = require("engine.tech.animated")
 local level    = require("engine.tech.level")
+local sound    = require("engine.tech.sound")
 
 local mode = {}
 
@@ -14,6 +15,9 @@ local STATES = {
   death = require("engine.state.mode.death"),
   exit_confirmation = require("engine.state.mode.exit_confirmation"),
 }
+
+local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
+local CLOSE_JOURNAL = sound.multiple("engine/assets/sounds/close_journal", 1)
 
 --- @class state_mode
 --- @field _mode table
@@ -54,6 +58,7 @@ local methods = {
   open_journal = function(self)
     Log.info("Opening journal")
     self._mode = STATES.journal.new(self._mode --[[@as state_mode_game]])
+    OPEN_JOURNAL:play()
   end,
 
   open_save_menu = function(self)
@@ -68,6 +73,9 @@ local methods = {
 
   close_menu = function(self)
     Log.info("Closing", self._mode.type)
+    if self._mode.type == "journal" then
+      CLOSE_JOURNAL:play()
+    end
     self._mode = assert(self._mode._prev)
   end,
 

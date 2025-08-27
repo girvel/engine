@@ -110,7 +110,7 @@ methods.reset = function(self)
     State:remove(e, true)
   end
 
-  self.audio:set_paused(true)
+  self.audio:reset()
 end
 
 --- @async

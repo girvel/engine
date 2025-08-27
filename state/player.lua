@@ -1,5 +1,6 @@
 local action = require("engine.tech.action")
 local creature = require "engine.mech.creature"
+local sound    = require "engine.tech.sound"
 
 
 local player = {}
@@ -12,6 +13,8 @@ local player = {}
 --- @field next_action action?
 --- @field finish_turn true?
 
+local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
+
 player.base = function()
   local result = Table.extend(creature.mixin(), {
     codename = "player",
@@ -22,6 +25,10 @@ player.base = function()
       next_action = nil,
       finish_turn = nil,
       control = function(entity)
+        if State.combat then
+          YOUR_TURN:play()
+        end
+
         while true do
           if entity.ai.next_action then
             entity.ai.next_action:act(entity)

@@ -135,5 +135,9 @@ multiple_methods.play_at = function(self, position)
   return Random.choice(self):clone():place(position):play()
 end
 
+multiple_methods.play = function(self)
+  return Random.choice(self):clone():play()
+end
+
 Ldump.mark(sound, {}, ...)
 return sound
