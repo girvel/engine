@@ -1,3 +1,7 @@
+--- Module for storing and producing sounds
+---
+--- Wraps LOVE functions in a convenient API; also, implements serializion of dynamically changed
+--- sources.
 local sound = {}
 
 --- @alias sound_event "hit"|"walk"
@@ -19,6 +23,7 @@ sound.new = Memoize(function(path, volume)
   end
   return setmetatable({
     source = source,
+    _path = path,
   }, mt)
 end)
 
@@ -88,6 +93,32 @@ methods.stop = function(self)
   self.source:stop()
   return self
 end
+
+mt.__serialize = function(self)
+  local path = self._path
+  local volume = self.source:getVolume()
+  local looping = self.source:isLooping()
+  local relative, x, y, rolloff, ref, max
+  if self.source:getChannelCount() == 1 then
+    relative = self.source:isRelative()
+    x, y = self.source:getPosition()
+    rolloff = self.source:getRolloff()
+    ref, max = self.source:getAttenuationDistances()
+  end
+
+  return function()
+    local result = sound.new(path, volume)
+    result.source:setLooping(looping or false)
+    if result.source:getChannelCount() == 1 then
+      result.source:setRelative(relative)
+      result.source:setPosition(x, y, 0)
+      result.source:setRolloff(rolloff)
+      result.source:setAttenuationDistances(ref, max)
+    end
+    return result
+  end
+end
+
 
 --- @generic T: sound
 --- @param self T
