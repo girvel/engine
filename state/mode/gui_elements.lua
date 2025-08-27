@@ -45,6 +45,7 @@ local gui_elements = {
   window_bg = "engine/assets/sprites/gui/window_bg.png",
   hp_bg = "engine/assets/sprites/gui/hp_bg.png",
   hp_bar = "engine/assets/sprites/gui/hp_bar.png",
+  hp_bar_extra = "engine/assets/sprites/gui/hp_bar_extra.png",
 }
 
 

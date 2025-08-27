@@ -68,9 +68,21 @@ draw_hp_bar = function()
 
   ui.start_frame(nil, nil, sidebar_w, HP_BAR_H + 16)
     ui.tile(gui.hp_bg)
-    ui.start_frame(8, 8, (sidebar_w - 16) * player.hp / player:get_max_hp(), HP_BAR_H)
+
+    local saturation = player.hp / player:get_max_hp()
+    local base_saturation = math.min(saturation, 1)
+    local extra_saturation = saturation > 1 and (1 - 1 / saturation)
+
+    ui.start_frame(8, 8, math.floor((sidebar_w - 16) * base_saturation / 4) * 4, HP_BAR_H)
       ui.tile(gui.hp_bar)
     ui.finish_frame()
+
+    if extra_saturation then
+      ui.start_frame(8, 8, math.floor((sidebar_w - 16) * extra_saturation / 4) * 4, HP_BAR_H)
+        ui.tile(gui.hp_bar_extra)
+      ui.finish_frame()
+    end
+
     ui.start_alignment("center", "center")
     ui.start_font(32)
       ui.text("%s/%s" % {player.hp, player:get_max_hp()})
