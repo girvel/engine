@@ -45,7 +45,7 @@ actions.move = function(direction)
 
       local tile = State.grids.tiles[entity.position]
       if tile.sounds and tile.sounds.walk then
-        Random.choice(tile.sounds.walk):clone():place(entity.position):play()
+        tile.sounds.walk:play_at(entity.position)
       end
 
       return result
@@ -193,7 +193,7 @@ local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
 base_attack = function(entity, slot)
   local target = State.grids.solids:slow_get(entity.position + entity.direction)
 
-  Random.choice(WHOOSH):clone():place(entity.position):play()
+  WHOOSH:play_at(entity.position)
 
   entity:animate(slot .. "_attack"):next(function()
     State.hostility:register(entity, target)
@@ -205,8 +205,7 @@ base_attack = function(entity, slot)
     ) then return end
 
     if target and target.sounds and target.sounds.hit then
-      -- target.sounds.hit:play_at(target.position)
-      Random.choice(target.sounds.hit):clone():place(target.position):play()
+      target.sounds.hit:play_at(target.position)
     end
   end)
 end

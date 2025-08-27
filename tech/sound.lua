@@ -22,14 +22,18 @@ sound.new = Memoize(function(path, volume)
   }, mt)
 end)
 
+--- @class sound_multiple: { [integer]: sound }
+local multiple_methods = {}
+local multiple_mt = {__index = multiple_methods}
+
 --- Load all sounds from a directory
 --- @param dir_path string
 --- @param volume? number
---- @return sound[]
+--- @return sound_multiple
 sound.multiple = Memoize(function(dir_path, volume)
-  return Fun.iter(love.filesystem.getDirectoryItems(dir_path))
+  return setmetatable(Fun.iter(love.filesystem.getDirectoryItems(dir_path))
     :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
-    :totable()
+    :totable(), multiple_mt)
 end)
 
 --- @enum (key) sound_size
@@ -93,6 +97,11 @@ methods.set_looping = function(self, value)
   --- @cast self sound
   self.source:setLooping(value)
   return self
+end
+
+--- @param position vector
+multiple_methods.play_at = function(self, position)
+  return Random.choice(self):clone():place(position):play()
 end
 
 Ldump.mark(sound, {}, ...)
