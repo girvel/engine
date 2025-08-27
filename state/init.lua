@@ -12,6 +12,7 @@ local state = {}
 --- @field combat state_combat?
 --- @field quests state_quests
 --- @field hostility state_hostility
+--- @field audio state_audio
 --- @field rails rails
 --- @field grids table<string, grid<entity>>
 --- @field grid_size vector
@@ -31,6 +32,7 @@ state.new = function(systems)
     perspective = require("engine.state.perspective").new(),
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
+    audio = require("engine.state.audio").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},
