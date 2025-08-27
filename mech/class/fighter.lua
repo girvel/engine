@@ -1,6 +1,7 @@
 local health = require("engine.mech.health")
 local action = require("engine.tech.action")
 local class  = require("engine.mech.class")
+local sound  = require("engine.tech.sound")
 
 
 local fighter = {}
@@ -27,8 +28,7 @@ fighter.action_surge = Table.extend({
   _act = function(self, entity)
     -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
     -- NEXT (FX)
-    -- sound("assets/sounds/action_surge.mp3", .3):place(entity.position):play()
-    -- NEXT (sounds)
+    sound.new("engine/assets/sounds/action_surge.mp3", .3):play()
     return true
   end,
 }, action.base)

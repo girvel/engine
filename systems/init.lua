@@ -10,6 +10,7 @@ return {
   require("engine.systems.ui_mousepressed"),
 
   -- love.update
+  require("engine.systems.update_sound"),
   require("engine.systems.update_rails"),
   require("engine.systems.acting"),
   require("engine.systems.animation"),
