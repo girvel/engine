@@ -109,6 +109,8 @@ methods.reset = function(self)
   for e, _ in pairs(to_remove) do
     State:remove(e, true)
   end
+
+  self.audio:set_paused(true)
 end
 
 --- @async

@@ -23,62 +23,25 @@ Ldump.serializer = setmetatable({
   end,
 })
 
-local old_newImage = love.graphics.newImage
-love.graphics.newImage = Memoize(function(...)
-  local result = old_newImage(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newImage(unpack(args))
+local wrap = function(modname, fname, memoize)
+  local old = love[modname][fname]
+  love[modname][fname] = function(...)
+    local result = old(...)
+    local args = {...}
+    Ldump.serializer.handlers[result] = function()
+      return love[modname][fname](unpack(args))
+    end
+    return result
   end
-  return result
-end)
 
-local old_newQuad = love.graphics.newQuad
-love.graphics.newQuad = function(...)
-  local result = old_newQuad(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newQuad(unpack(args))
+  if memoize then
+    love[modname][fname] = Memoize(love[modname][fname])
   end
-  return result
 end
 
-local old_newFont = love.graphics.newFont
-love.graphics.newFont = Memoize(function(...)
-  local result = old_newFont(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newFont(unpack(args))
-  end
-  return result
-end)
-
-local old_newSpriteBatch = love.graphics.newSpriteBatch
-love.graphics.newSpriteBatch = function(...)
-  local result = old_newSpriteBatch(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newSpriteBatch(unpack(args))
-  end
-  return result
-end
-
-local old_newCanvas = love.graphics.newCanvas
-love.graphics.newCanvas = function(...)
-  local result = old_newCanvas(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.graphics.newCanvas(unpack(args))
-  end
-  return result
-end
-
-local old_newSource = love.audio.newSource
-love.audio.newSource = function(...)
-  local result = old_newSource(...)
-  local args = {...}
-  Ldump.serializer.handlers[result] = function()
-    return love.audio.newSource(unpack(args))
-  end
-  return result
-end
+wrap("graphics", "newImage", true)
+wrap("graphics", "newQuad")
+wrap("graphics", "newFont", true)
+wrap("graphics", "newSpriteBatch")
+wrap("graphics", "newCanvas")
+wrap("audio", "newSource")

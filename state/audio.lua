@@ -60,5 +60,9 @@ methods.set_paused = function(self, value)
   end
 end
 
+methods.reset = function(self)
+  self._current.source:pause()
+end
+
 Ldump.mark(audio, {}, ...)
 return audio
