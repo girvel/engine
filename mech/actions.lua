@@ -174,6 +174,7 @@ actions.shove = Table.extend({
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
+      State.hostility:register(entity, target)
       local dc = (D(20) + target:get_modifier("acrobatics")):roll()
       local distance = math.ceil(entity:get_modifier("athletics") / 4)
 

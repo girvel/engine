@@ -134,6 +134,9 @@ methods.get_modifier = function(self, ability)
   )
 end
 
+local SUCCESS = sound.multiple("engine/assets/sounds/check_succeeded")
+local FAILURE = sound.multiple("engine/assets/sounds/check_failed")
+
 --- @param self entity
 --- @param to_check ability|skill
 --- @param dc integer difficulty class
@@ -148,12 +151,8 @@ methods.ability_check = function(self, to_check, dc)
 
   local success = result >= dc
 
-  -- NEXT (sound)
-  -- sound.play(
-  --   ability_check_sound[success and "success" or "failure"],
-  --   self.position,
-  --   "small"
-  -- )
+  local sounds = success and SUCCESS or FAILURE
+  sounds:play_at(self.position)
 
   return success
 end
