@@ -44,7 +44,7 @@ actions.move = function(direction)
       end
 
       local tile = State.grids.tiles[entity.position]
-      if tile.sounds and tile.sounds.walk then
+      if tile and tile.sounds and tile.sounds.walk then
         tile.sounds.walk:play_at(entity.position)
       end
 
@@ -165,7 +165,6 @@ actions.shove = Table.extend({
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
-      -- NEXT sound
       local dc = (D(20) + target:get_modifier("acrobatics")):roll()
       local distance = math.ceil(entity:get_modifier("athletics") / 4)
 

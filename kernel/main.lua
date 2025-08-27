@@ -64,6 +64,9 @@ love.run = function()
 	return function()
     if Kernel._load then
       State = saves.read(Kernel._load)  --[[@as state]]
+      if State.mode._mode.type == "escape_menu" then
+        State.mode:close_menu()
+      end
       Kernel._load = nil
     end
 
