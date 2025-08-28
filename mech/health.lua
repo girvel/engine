@@ -129,7 +129,6 @@ health.floater = function(text, grid_position, color)
     codename = "floating_damage",
     position = grid_position * State.level.cell_size
       + V(math.random(a, b), math.random(a, b)),
-    view = "grids_fx",
     drift = V(0, -4),
     sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,

@@ -5,11 +5,9 @@ local tcod  = require("engine.tech.tcod")
 --- @param dt number
 local draw_grid = function(self, dt)
   local start, finish do
-    local view = State.perspective.views.grids
-    start = -(view.offset / view.scale / State.level.cell_size):map(math.ceil)
-    finish = start + (
-      V(love.graphics.getDimensions()) / view.scale / State.level.cell_size
-    ):map(math.ceil)
+    local total_scale = State.perspective.SCALE * State.level.cell_size
+    start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
+    finish = start + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)
 
     start = Vector.use(Math.median, Vector.one, start, State.level.grid_size)
     finish = Vector.use(Math.median, Vector.one, finish, State.level.grid_size)

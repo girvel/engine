@@ -4,8 +4,7 @@ local entityx = {}
 --- @class entity: _creature_methods, _animated_methods
 --- @field name string in-game name
 --- @field codename string in-code name
---- @field view string entity's coordinate system's (offset + scale) name
---- @field position vector position relative to the view
+--- @field position vector position in grid cells; can be float if .grid_layer is nil
 --- @field direction vector
 --- @field size vector
 --- @field grid_layer string name of the grid layer

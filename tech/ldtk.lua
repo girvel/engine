@@ -77,7 +77,6 @@ local handle_tiles_or_intgrid = function(is_tiles)
         :add_mut(Vector.one)
         :add_mut(offset)
       e.grid_layer = layer_id
-      e.view = "grids"
 
       -- NEXT entity captures (after rails)
       -- local rails_name = -Query(to_capture)[layer_id][result.position]
@@ -141,7 +140,6 @@ parser_new = function()
             :add_mut(Vector.one)
             :add_mut(offset)
           entity.grid_layer = layer_id
-          entity.view = "grids"
 
           -- NEXT capturing
 

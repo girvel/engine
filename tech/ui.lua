@@ -43,7 +43,7 @@ local CURSORS = {
 local FRAME = "engine/assets/sprites/gui/button_frame.png"
 local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
-local SCALE = 4  -- TODO extract scale here & in view
+local SCALE = 4  -- TODO extract scale here
 
 
 ----------------------------------------------------------------------------------------------------
