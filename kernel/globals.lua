@@ -32,6 +32,8 @@ Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")
 
+Moonspeak = require("engine.lib.moonspeak")
+
 Period = require("engine.lib.period")
 
 Promise = require("engine.lib.promise")
