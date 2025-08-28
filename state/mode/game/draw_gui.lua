@@ -199,7 +199,7 @@ local PRIMITIVE_RESOURCES = {
 local SIDEBAR_BLOCK_PADDING = 10
 
 draw_resources = function()
-  ui.start_frame(SIDEBAR_BLOCK_PADDING, SIDEBAR_BLOCK_PADDING, -2 * SIDEBAR_BLOCK_PADDING)
+  ui.start_frame(4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING, -2 * SIDEBAR_BLOCK_PADDING - 8)
     local start = ui.get_frame()
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
       local amount = State.player.resources[r]
@@ -232,8 +232,8 @@ draw_resources = function()
     local finish = ui.get_frame()
   ui.finish_frame()
 
-  local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING
-  ui.start_frame(-20, -20, sidebar_w + 40, h + 40)
+  local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING + 8
+  ui.start_frame(-16, -16, sidebar_w + 32, h + 32)
     ui.tile(gui.sidebar_block_bg)
   ui.finish_frame()
   ui.offset(0, h)
