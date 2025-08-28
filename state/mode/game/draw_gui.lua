@@ -9,12 +9,7 @@ local fighter = require("engine.mech.class.fighter")
 local tk = require("engine.state.mode.tk")
 
 
-local PADDING_LX = 48
-local PADDING_RX = 60
-local PADDING_Y = 40
-local HP_BAR_H = 10 * 4
-
-local cost, hint, sidebar_w
+local cost, hint
 local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order, draw_dialogue
 
 --- @param self state_mode_game
@@ -24,18 +19,28 @@ local draw_gui = function(self, dt)
   draw_dialogue()
 end
 
+local PADDING_LX = 48
+local PADDING_RX = 60
+local PADDING_Y = 40
+local HP_BAR_H = 10 * 4
+
+local SIDEBAR_W = 344  -- (usable)
+
 draw_sidebar = function()
-  if State.rails.runner.locked_entities[State.player] then return end
+  if State.rails.runner.locked_entities[State.player] then
+    State.perspective.sidebar_w = 0
+    return
+  end
 
-  sidebar_w = State.perspective.SIDEBAR_W - PADDING_LX - PADDING_RX
+  State.perspective.sidebar_w = SIDEBAR_W - PADDING_LX - PADDING_RX
 
-  ui.start_frame(love.graphics.getWidth() - sidebar_w - PADDING_LX - PADDING_RX)
+  ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING_LX - PADDING_RX)
     ui.tile(gui.window_bg)
   ui.finish_frame()
 
   ui.start_frame(
-    love.graphics.getWidth() - sidebar_w - PADDING_RX, PADDING_Y,
-    sidebar_w, love.graphics.getHeight() - 2 * PADDING_Y
+    love.graphics.getWidth() - SIDEBAR_W - PADDING_RX, PADDING_Y,
+    SIDEBAR_W, love.graphics.getHeight() - 2 * PADDING_Y
   )
     draw_hp_bar()
 
@@ -82,19 +87,19 @@ end
 draw_hp_bar = function()
   local player = State.player
 
-  ui.start_frame(nil, nil, sidebar_w, HP_BAR_H + 16)
+  ui.start_frame(nil, nil, SIDEBAR_W, HP_BAR_H + 16)
     ui.tile(gui.hp_bg)
 
     local saturation = player.hp / player:get_max_hp()
     local base_saturation = math.min(saturation, 1)
     local extra_saturation = saturation > 1 and (1 - 1 / saturation)
 
-    ui.start_frame(8, 8, math.floor((sidebar_w - 16) * base_saturation / 4) * 4, HP_BAR_H)
+    ui.start_frame(8, 8, math.floor((SIDEBAR_W - 16) * base_saturation / 4) * 4, HP_BAR_H)
       ui.tile(gui.hp_bar)
     ui.finish_frame()
 
     if extra_saturation then
-      ui.start_frame(8, 8, math.floor((sidebar_w - 16) * extra_saturation / 4) * 4, HP_BAR_H)
+      ui.start_frame(8, 8, math.floor((SIDEBAR_W - 16) * extra_saturation / 4) * 4, HP_BAR_H)
         ui.tile(gui.hp_bar_extra)
       ui.finish_frame()
     end

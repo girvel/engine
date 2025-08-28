@@ -9,7 +9,7 @@ local smooth_camera_offset
 --- @field camera_offset vector
 --- @field vision_start vector
 --- @field vision_end vector
---- @field SIDEBAR_W integer
+--- @field sidebar_w integer
 --- @field SCALE integer
 local methods = {}
 local mt = {__index = methods}
@@ -19,14 +19,17 @@ perspective.new = function()
     camera_offset = Vector.zero,
     vision_start = Vector.zero,
     vision_end = Vector.zero,
-    SIDEBAR_W = 452,
+    sidebar_w = 0,
     SCALE = 4,
   }, mt)
 end
 
+--- @param prev vector
+--- @param position vector
+--- @return vector
 methods.center_camera = function(self, prev, position)
   local scene_k = State.level.cell_size * self.SCALE
-  local window_size = V(love.graphics.getDimensions()) - V(self.SIDEBAR_W, 0)
+  local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
   local border_size = (window_size / 2 - Vector.one * scene_k):map(math.floor)
   local scaled_position = position * scene_k
 
