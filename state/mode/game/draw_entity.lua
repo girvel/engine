@@ -5,6 +5,10 @@ local tk = require("engine.state.mode.tk")
 --- @param entity table
 --- @param dt number
 local draw_entity = function(self, entity, dt)
+  if entity.sprite.type == "grid" then
+    return self:draw_grid(entity.layer, entity.sprite.grid, dt)
+  end
+
   local offset_position = entity.position
   if entity.grid_layer then
     offset_position = offset_position * State.level.cell_size
@@ -33,7 +37,7 @@ local draw_entity = function(self, entity, dt)
     love.graphics.setFont(sprite.font)
     love.graphics.print({sprite.color, sprite.text}, x, y)
   else
-    error()
+    assert(false)
   end
 
   if entity.shader then

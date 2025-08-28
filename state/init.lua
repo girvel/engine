@@ -2,6 +2,7 @@ local level = require("engine.tech.level")
 local combat = require("engine.state.combat")
 local ldtk = require("engine.tech.ldtk")
 local tcod = require("engine.tech.tcod")
+local sprite = require("engine.tech.sprite")
 
 
 local state = {}
@@ -136,6 +137,15 @@ methods.load_level = function(self, path)
     self.grids.solids,
     "Missing \"solids\" grid_layer; required for FOV and pathing to work"
   ))
+
+  for layer, grid in pairs(self.grids) do
+    State:add({
+      codename = layer .. "_grid_container",
+      sprite = sprite.grid(grid),
+      layer = layer,
+      position = Vector.zero,
+    })
+  end
 
   local BATCH_SIZE = 1024
   for i, e in ipairs(load_data.entities) do

@@ -130,6 +130,7 @@ health.floater = function(text, grid_position, color)
     drift = V(0, -.25),
     sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,
+    layer = "fx_over",
   }
 end
 

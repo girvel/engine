@@ -7,7 +7,8 @@ local entityx = {}
 --- @field position vector position in grid cells; can be float if .grid_layer is nil
 --- @field direction vector
 --- @field size vector
---- @field grid_layer string name of the grid layer
+--- @field layer string name of the global display layer; nil if entity is in a grid
+--- @field grid_layer string name of the grid layer; grid layers are a subset of all layers
 --- @field ai ai
 --- @field shader shader individial shader to render with
 --- @field sprite sprite

@@ -19,12 +19,6 @@ save_menu.new = function(prev)
   }, mt)
 end
 
-methods.draw_grid = function(self, ...)
-  if self._prev.draw_grid then
-    self._prev:draw_grid(...)
-  end
-end
-
 methods.draw_entity = function(self, ...)
   if self._prev.draw_entity then
     self._prev:draw_entity(...)

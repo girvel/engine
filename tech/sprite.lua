@@ -5,7 +5,7 @@ local sprite = {utility = {}}
 
 local pull_anchors
 
---- @alias sprite sprite_image | sprite_atlas | sprite_text
+--- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid
 
 --- @class sprite_image
 --- @field type "image"
@@ -48,12 +48,29 @@ end)
 --- @field font love.Font
 --- @field color vector
 
+--- @param text string
+--- @param size integer
+--- @param color vector
+--- @return sprite_text
 sprite.text = function(text, size, color)
   return {
     type = "text",
     text = text,
     font = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size),
     color = color,
+  }
+end
+
+--- @class sprite_grid
+--- @field type "grid"
+--- @field grid grid<entity>
+
+--- @param grid grid<entity>
+--- @return sprite_grid
+sprite.grid = function(grid)
+  return {
+    type = "grid",
+    grid = grid,
   }
 end
 
