@@ -17,6 +17,8 @@ local railing = {}
 
 --- @class rails_runner
 --- @field scenes table<string|integer, scene>
+--- @field positions table<string, vector>
+--- @field entities table<string, entity>
 --- @field _scene_runs scene_run[]
 local methods = {}
 local mt = {__index = methods}

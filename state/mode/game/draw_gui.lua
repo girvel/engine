@@ -306,7 +306,13 @@ draw_dialogue = function()
   ui.start_font(32)
     local text = line.text
     if line.source then
-      text = Entity.name(line.source) .. ": " .. line.text
+      local name = Entity.name(line.source)
+      ui.start_frame()
+      love.graphics.setColor(line.source.sprite.color)
+        ui.text(name)
+      love.graphics.setColor(Vector.white)
+      ui.finish_frame()
+      text = (" " * name:utf_len()) .. ": " .. line.text
     end
     ui.text(text)
   ui.finish_font()

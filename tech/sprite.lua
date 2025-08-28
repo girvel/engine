@@ -11,6 +11,7 @@ local pull_anchors
 --- @field type "image"
 --- @field image love.Image
 --- @field anchors table<anchor, vector?>
+--- @field color vector
 
 --- @param base string|love.ImageData
 --- @return sprite_image
@@ -19,11 +20,12 @@ sprite.image = function(base)
     base = love.image.newImageData(base)
   end
 
-  local anchors = pull_anchors(base)
+  local main_color, anchors = pull_anchors(base)
   return {
     type = "image",
     anchors = anchors,
     image = love.graphics.newImage(base),
+    color = main_color,
   }
 end
 
@@ -165,7 +167,7 @@ pull_anchors = function(base)
     end
   end
 
-  return result
+  return V(main_color.r, main_color.g, main_color.b):div_mut(255), result
 end
 
 Ldump.mark(sprite, {}, ...)
