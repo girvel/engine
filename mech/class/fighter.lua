@@ -9,6 +9,7 @@ local fighter = {}
 fighter.hit_dice = class.hit_dice(10)
 
 fighter.action_surge = Table.extend({
+  name = "всплеск действий",
   codename = "action_surge",
 
   modify_resources = function(self, entity, resources, rest_type)
@@ -36,6 +37,7 @@ fighter.action_surge = Table.extend({
 }, action.base)
 
 fighter.second_wind = Table.extend({
+  name = "второе дыхание",
   codename = "second_wind",
 
   modify_resources = function(self, entity, resources, rest_type)
@@ -76,6 +78,7 @@ local fighting_spirit_condition = function()
 end
 
 fighter.fighting_spirit = Table.extend({
+  name = "боевой дух",
   codename = "fighting_spirit",
 
   modify_resources = function(self, entity, resources, rest_type)

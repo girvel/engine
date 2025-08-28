@@ -13,7 +13,7 @@ local PADDING_RX = 60
 local PADDING_Y = 40
 local HP_BAR_H = 10 * 4
 
-local cost, sidebar_w
+local cost, hint, sidebar_w
 local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order
 
 --- @param self state_mode_game
@@ -28,7 +28,7 @@ local draw_gui = function(self, dt)
 
   ui.start_frame(
     love.graphics.getWidth() - sidebar_w - PADDING_RX, PADDING_Y,
-    sidebar_w, love.graphics.getHeight() - PADDING_Y
+    sidebar_w, love.graphics.getHeight() - 2 * PADDING_Y
   )
     draw_hp_bar()
 
@@ -48,6 +48,12 @@ local draw_gui = function(self, dt)
     if State.combat then
       draw_move_order()
     end
+
+    if hint then
+      ui.start_alignment("center", "bottom")
+        ui.text(hint:utf_capitalize())
+      ui.finish_alignment()
+    end
   ui.finish_frame()
 end
 
@@ -61,6 +67,7 @@ action_button = function(action, hotkey)
   end
   if button.is_mouse_over then
     cost = action.cost
+    hint = action.name
   end
 end
 
@@ -94,6 +101,7 @@ end
 
 draw_action_grid = function()
   cost = nil
+  hint = nil
 
   ui.start_frame(-16, -4)
     ui.image("engine/assets/sprites/gui/action_grid_bg.png")
@@ -101,14 +109,26 @@ draw_action_grid = function()
 
   ui.start_frame(4)
     ui.start_line()
-      if ui.hot_button(gui.escape_menu, "escape").is_pressed then
-        State.mode:open_escape_menu()
+      do
+        local button = ui.hot_button(gui.escape_menu, "escape")
+        if button.is_pressed then
+          State.mode:open_escape_menu()
+        end
+        if button.is_mouse_over then
+          hint = "меню"
+        end
       end
       ui.offset(4)
 
-      local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
-      if ui.hot_button(journal_image, "j").is_pressed then
-        State.mode:open_journal()
+      do
+        local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
+        local button = ui.hot_button(journal_image, "j")
+        if button.is_pressed then
+          State.mode:open_journal()
+        end
+        if button.is_mouse_over then
+          hint = "журнал"
+        end
       end
       ui.offset(4)
 

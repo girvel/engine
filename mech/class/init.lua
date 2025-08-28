@@ -10,6 +10,7 @@ local class = {}
 --- @return action
 class.hit_dice = function(die)
   return Table.extend({
+    name = "перевязать раны",
     codename = "hit_dice",
 
     modify_max_hp = function(self, entity, value)

@@ -53,6 +53,7 @@ end
 
 --- @type action
 player.skip_turn = Table.extend({
+  name = "Завершить ход",
   codename = "skip_turn",
 
   _is_available = function(self, entity)

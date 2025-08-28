@@ -109,7 +109,10 @@ end
 ui.finish_frame = function(push_y)
   local pop = table.remove(model.frame)
   if push_y then
-    Table.last(model.frame).y = pop.y + pop.h
+    local this = Table.last(model.frame)
+    local next_y = pop.y + pop.h
+    this.h = this.h - (next_y - this.y)
+    this.y = next_y
   end
 end
 
@@ -197,9 +200,10 @@ ui.text = function(text)
     if alignment.y == "center" then
       dy = (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
     elseif alignment.y == "bottom" then
-      dy = frame.h - font:getHeight() * #wrapped - font:getHeight() * (i - 1)
+      dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
     end
     love.graphics.print(line, frame.x + dx, frame.y + dy)
+    if text == "рывок" then Log.trace(frame.y + dy, frame.h, frame.y) end
 
     if alignment.y == "top" then
       if is_linear then
@@ -210,6 +214,7 @@ ui.text = function(text)
         )
       else
         frame.y = frame.y + font:getHeight() * 1.25
+        frame.h = frame.h - font:getHeight() * 1.25
       end
     end
   end
@@ -305,6 +310,7 @@ ui.image = function(image)
     )
   else
     frame.y = frame.y + image:getHeight() * SCALE
+    frame.h = frame.h - image:getHeight() * SCALE
   end
 end
 
@@ -317,13 +323,13 @@ ui.hot_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * SCALE
   local h = image:getHeight() * SCALE
-  local is_mouse_over = not is_disabled and get_mouse_over(w, h)
+  local is_mouse_over = get_mouse_over(w, h)
   local is_pressed = not is_disabled and (
     (is_mouse_over and model.mouse.button_pressed)
     or Table.contains(model.keyboard.pressed, key)
   )
 
-  if is_mouse_over then
+  if is_mouse_over and not is_disabled then
     model.cursor = "hand"
   end
 
@@ -349,7 +355,7 @@ ui.hot_button = function(image, key, is_disabled)
     local frame_image = Table.last(model.frame)
   ui.finish_frame()
 
-  if is_mouse_over or is_active then
+  if (is_mouse_over and not is_disabled) or is_active then
     ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
       ui.tile(is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()
@@ -436,6 +442,8 @@ ui.offset = function(x, y)
   local frame = Table.last(model.frame)
   frame.x = frame.x + (x or 0)
   frame.y = frame.y + (y or 0)
+  frame.w = frame.w - (x or 0)
+  frame.h = frame.h - (y or 0)
 end
 
 --- @param options string[]

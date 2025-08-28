@@ -54,6 +54,7 @@ actions.move = function(direction)
 end
 
 actions.dash = Table.extend({
+  name = "рывок",
   codename = "dash",
 
   cost = {
@@ -84,6 +85,7 @@ local disengaged = function()
 end
 
 actions.disengage = Table.extend({
+  name = "отступление",
   codename = "disengage",
 
   cost = {
@@ -102,6 +104,7 @@ local base_attack
 
 --- @type action
 actions.hand_attack = Table.extend({
+  name = "атака",
   codename = "hand_attack",
 
   cost = {
@@ -140,6 +143,7 @@ actions.opportunity_attack = Table.extend({
 
 --- @type action
 actions.offhand_attack = Table.extend({
+  name = "атака вторым оружием",
   codename = "offhand_attack",
 
   cost = {
@@ -159,6 +163,7 @@ actions.offhand_attack = Table.extend({
 
 --- @type action
 actions.shove = Table.extend({
+  name = "толкнуть",
   codename = "shove",
 
   cost = {
