@@ -11,7 +11,7 @@ local mt = {__index = methods}
 --- @return screenplayer
 screenplayer.new = function(path, characters)
   return setmetatable({
-    stack = {Log.trace(Moonspeak.read(love.filesystem.read(path)))},
+    stack = {Moonspeak.read(love.filesystem.read(path))},
     characters = characters,
   }, mt)
 end
@@ -57,6 +57,11 @@ methods.finish_option = function(self)
   assert(not Table.last(self.stack).type)
   table.remove(self.stack)
   assert(Table.last(self.stack).type == "options")
+end
+
+methods.finish = function(self)
+  assert(#self.stack == 1, "Screenplayer contains %s unclosed scopes" % {#self.stack - 1})
+  assert(#self.stack[1] == 0, "Expected script to end, got %s more entries" % {#self.stack[1]})
 end
 
 get_block = function(player, type)

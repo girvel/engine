@@ -327,6 +327,11 @@ draw_dialogue = function()
         text = (" " * name:utf_len()) .. ": " .. line.text
       end
       ui.text(text)
+
+      if ui.keyboard("space") then
+        State.player.hears = nil
+        SKIP_SOUNDS:play()
+      end
     elseif line.type == "options" then
       local sorted = {}
       for i, o in pairs(line.options) do  -- can't use luafun: ipairs/pairs detection conflict
@@ -347,11 +352,6 @@ draw_dialogue = function()
     end
   ui.finish_font()
   tk.finish_window()
-
-  if ui.keyboard("space") then
-    State.player.hears = nil
-    SKIP_SOUNDS:play()
-  end
 end
 
 return draw_gui
