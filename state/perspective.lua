@@ -1,9 +1,14 @@
+local tcod = require("engine.tech.tcod")
+
+
 local perspective = {}
 
 local smooth_camera_offset
 
 --- @class state_perspective
 --- @field camera_offset vector
+--- @field vision_start vector
+--- @field vision_end vector
 --- @field SIDEBAR_W integer
 --- @field SCALE integer
 local methods = {}
@@ -12,6 +17,8 @@ local mt = {__index = methods}
 perspective.new = function()
   return setmetatable({
     camera_offset = Vector.zero,
+    vision_start = Vector.zero,
+    vision_end = Vector.zero,
     SIDEBAR_W = 452,
     SCALE = 4,
   }, mt)
@@ -31,7 +38,23 @@ methods.center_camera = function(self, prev, position)
 end
 
 methods.update = function(self, dt)
+  if not State.player then return end
+
   self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
+
+  do
+    local total_scale = self.SCALE * State.level.cell_size
+    self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
+    self.vision_end = self.vision_start
+      + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)
+
+    self.vision_start = Vector.use(
+      Math.median, Vector.one, self.vision_start, State.level.grid_size
+    )
+    self.vision_end = Vector.use(Math.median, Vector.one, self.vision_end, State.level.grid_size)
+  end
+
+  tcod.snapshot(State.grids.solids):refresh_fov(State.player.position, State.player.fov_r)
 end
 
 local SMOOTHING_CUTOFF = 3

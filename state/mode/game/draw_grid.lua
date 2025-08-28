@@ -4,21 +4,12 @@ local tcod  = require("engine.tech.tcod")
 --- @param self state_mode_game
 --- @param dt number
 local draw_grid = function(self, dt)
-  local start, finish do
-    local total_scale = State.perspective.SCALE * State.level.cell_size
-    start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
-    finish = start + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)
-
-    start = Vector.use(Math.median, Vector.one, start, State.level.grid_size)
-    finish = Vector.use(Math.median, Vector.one, finish, State.level.grid_size)
-  end
-
-  local snapshot = tcod.snapshot(State.grids.solids)
   if State.player.fov_r == 0 then
     self:draw_entity(State.player, dt)
     return
   end
-  snapshot:refresh_fov(State.player.position, State.player.fov_r)
+
+  local snapshot = tcod.snapshot(State.grids.solids)
 
   for _, grid_layer in ipairs(State.level.grid_layers) do
     local grid = State.grids[grid_layer]
@@ -27,8 +18,8 @@ local draw_grid = function(self, dt)
       sprite_batch:clear()
     end
 
-    for x = start.x, finish.x do
-      for y = start.y, finish.y do
+    for x = State.perspective.vision_start.x, State.perspective.vision_end.x do
+      for y = State.perspective.vision_start.y, State.perspective.vision_end.y do
         if not snapshot:is_visible_unsafe(x, y) then goto continue end
 
         local e = grid:unsafe_get(x, y)

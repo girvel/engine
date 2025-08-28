@@ -19,7 +19,6 @@ local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_or
 --- @param self state_mode_game
 --- @param dt number
 local draw_gui = function(self, dt)
-  State.perspective:update(dt)
   sidebar_w = State.perspective.SIDEBAR_W - PADDING_LX - PADDING_RX
 
   ui.start_frame(love.graphics.getWidth() - sidebar_w - PADDING_LX - PADDING_RX)

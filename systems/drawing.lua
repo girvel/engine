@@ -8,6 +8,7 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(_, dt)
+    State.perspective:update(dt)
     State.mode:draw_grid(dt)
   end,
 
