@@ -15,11 +15,18 @@ local PADDING_Y = 40
 local HP_BAR_H = 10 * 4
 
 local cost, hint, sidebar_w
-local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order, draw_dialogue
+local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order, draw_dialogue
 
 --- @param self state_mode_game
 --- @param dt number
 local draw_gui = function(self, dt)
+  draw_sidebar()
+  draw_dialogue()
+end
+
+draw_sidebar = function()
+  if State.rails.runner.locked_entities[State.player] then return end
+
   sidebar_w = State.perspective.SIDEBAR_W - PADDING_LX - PADDING_RX
 
   ui.start_frame(love.graphics.getWidth() - sidebar_w - PADDING_LX - PADDING_RX)
@@ -56,7 +63,6 @@ local draw_gui = function(self, dt)
     end
   ui.finish_frame()
 
-  draw_dialogue()
 end
 
 action_button = function(action, hotkey)

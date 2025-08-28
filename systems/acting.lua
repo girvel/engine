@@ -47,6 +47,8 @@ return Tiny.processingSystem {
   end,
 
   process = function(self, entity, dt)
+    if State.rails.runner.locked_entities[entity] then return end
+
     if State.combat then
       self:_process_inside_combat(entity, dt)
     else

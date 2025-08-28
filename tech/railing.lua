@@ -19,6 +19,7 @@ local railing = {}
 --- @field scenes table<string|integer, scene>
 --- @field positions table<string, vector>
 --- @field entities table<string, entity>
+--- @field locked_entities table<entity, true>
 --- @field _scene_runs scene_run[]
 local methods = {}
 local mt = {__index = methods}
@@ -32,6 +33,7 @@ railing.runner = function(scenes, positions, entities)
     positions = positions,
     entities = entities,
     _scene_runs = {},
+    locked_entities = {},
   }, mt)
   -- NEXT (rails) handle positions, entities
 end
