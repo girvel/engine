@@ -71,6 +71,11 @@ end
 --- @param source entity? no source == narration
 --- @param text string
 api.line = function(source, text)
+  assert(
+    State.rails.runner.locked_entities[State.player],
+    "api.line shouldn't be called when the player is not locked into a cutscene"
+  )
+
   local t = {
     type = "plain_line",
     source = source,
