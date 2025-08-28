@@ -3,9 +3,12 @@ local async = require("engine.tech.async")
 
 local railing = {}
 
+--- @alias characters table<string, entity>
+
 --- @class scene
---- @field start_predicate fun(scene, integer)
---- @field run fun(scene)
+--- @field characters? table<string, table>
+--- @field start_predicate fun(scene, integer, characters)
+--- @field run fun(scene, characters)
 --- @field disabled? true
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field multiple_times_flag? true don't disable the scene in the beginning of the first run
@@ -35,19 +38,20 @@ railing.runner = function(scenes, positions, entities)
     _scene_runs = {},
     locked_entities = {},
   }, mt)
-  -- NEXT (rails) handle positions, entities
 end
 
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
-    -- NEXT (rails) characters
+    local characters = Fun.pairs(scene.characters or {})
+      :map(function(name, opts) return name, self.entities[name] end)
+      :tomap()
 
     if not scene.disabled
       -- NEXT (rails)
-      -- and (scene.multiple_instances_flag or not self:is_running(scene))
+      -- and (scene.simultaneous_flag or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
-      -- and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
+      and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
       and scene:start_predicate(dt, characters)
     then
       table.insert(self._scene_runs, {
@@ -60,30 +64,17 @@ methods.update = function(self, dt)
             Log.info("Scene %q starts" % {scene_name})
           end
 
-          -- for _, character in pairs(characters) do
-          --   Query(character).ai.in_cutscene_flag = true
-          -- end
-
-          -- run the body
-          -- if failed
-          --   if debug mode
-          --     update stack
-          --     launch debug shell
-          --   else
-          --     log the stack trace
-          --     reset blackout
-          -- else
-          --   proceed
-          -- reset in_cutscene
-          -- log ending
+          for _, character in pairs(characters) do
+            self.locked_entities[character] = true
+          end
 
           -- NEXT (safety) safe call
           -- Debug.call(scene.run, scene, self, characters)
           scene:run(characters)
 
-          -- for _, character in pairs(characters) do
-          --   Query(character).ai.in_cutscene_flag = nil
-          -- end
+          for _, character in pairs(characters) do
+            self.locked_entities[character] = nil
+          end
 
           if not scene.boring_flag then
             Log.info("Scene %q ends" % {scene_name})

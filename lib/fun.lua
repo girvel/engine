@@ -133,6 +133,18 @@ local iter = function(obj, param, state)
 end
 exports.iter = iter
 
+local rawpairs = function(obj, param, state)
+    if obj == nil then
+      error("Can not iterate over nil", 2)
+    end
+    return map_gen, obj, nil
+end
+
+local pairs_ = function(obj, param, state)
+    return wrap(rawpairs(obj, param, state))
+end
+exports.pairs = pairs_
+
 local method0 = function(fun)
     return function(self)
         return fun(self.gen, self.param, self.state)
