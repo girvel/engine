@@ -2,6 +2,7 @@ local health = require("engine.mech.health")
 local action = require("engine.tech.action")
 local class  = require("engine.mech.class")
 local sound  = require("engine.tech.sound")
+local animated = require("engine.tech.animated")
 
 
 local fighter = {}
@@ -29,8 +30,7 @@ fighter.action_surge = Table.extend({
   _is_available = function() return State.combat end,
 
   _act = function(self, entity)
-    -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
-    -- NEXT (FX)
+    State:add(animated.fx("engine/assets/sprites/animations/action_surge", entity.position))
     self.sounds:play_at(entity.position)
     return true
   end,
