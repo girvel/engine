@@ -55,9 +55,7 @@ local draw_gui = function(self, dt)
     end
   ui.finish_frame()
 
-  if State.player.hears then
-    draw_dialogue(State.player.hears)
-  end
+  draw_dialogue()
 end
 
 action_button = function(action, hotkey)
@@ -297,19 +295,24 @@ end
 
 local H = 200
 local BOTTOM_GAP = 50 + 40  -- (padding)
-local PADDING = 20
 
---- @param hearing dialogue_line
-draw_dialogue = function(hearing)
+draw_dialogue = function()
+  local line = State.player.hears
+  if not line then return end
+
   tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
   ui.start_font(32)
-    local line = hearing.text
-    if hearing.source then
-      line = Entity.name(hearing.source) .. ": " .. hearing.text
+    local text = line.text
+    if line.source then
+      text = Entity.name(line.source) .. ": " .. line.text
     end
-    ui.text(line)
+    ui.text(text)
   ui.finish_font()
   tk.finish_window()
+
+  if ui.keyboard("space") then
+    State.player.hears = nil
+  end
 end
 
 return draw_gui
