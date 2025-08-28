@@ -1,3 +1,4 @@
+local sound = require("engine.tech.sound")
 local player_mod = require("engine.state.player")
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
@@ -295,6 +296,7 @@ end
 
 local H = 200
 local BOTTOM_GAP = 50 + 40  -- (padding)
+local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
 
 draw_dialogue = function()
   local line = State.player.hears
@@ -312,6 +314,7 @@ draw_dialogue = function()
 
   if ui.keyboard("space") then
     State.player.hears = nil
+    SKIP_SOUNDS:play()
   end
 end
 
