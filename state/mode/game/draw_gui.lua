@@ -222,7 +222,11 @@ draw_resources = function()
           love.graphics.setColor(WHITE)
         else
           love.graphics.setColor(COLORS[r] or WHITE)
-            ui.text(icon * amount)
+            if amount <= 12 then
+              ui.text(icon * amount)
+            else
+              ui.text("x" .. amount)
+            end
           love.graphics.setColor(WHITE)
         end
       ui.finish_line()

@@ -23,6 +23,7 @@ methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
     if entity.faction and target == entity then
       State.hostility:set(entity.faction, attacker.faction, true)
+      State:start_combat({entity, attacker})
     end
   end)
 end
