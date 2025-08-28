@@ -61,6 +61,9 @@ vector.down = vector.new(0, 1)
 vector.left = vector.new(-1, 0)
 vector.right = vector.new(1, 0)
 
+vector.white = vector.new(1, 1, 1)
+vector.black = vector.new(0, 0, 0)
+
 --- @alias direction_name "up" | "left" | "down" | "right"
 
 vector.direction_names = {"up", "left", "down", "right"}

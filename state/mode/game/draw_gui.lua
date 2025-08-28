@@ -199,6 +199,11 @@ local PRIMITIVE_RESOURCES = {
 
 draw_resources = function()
   local start = tk.start_block()
+    ui.start_alignment("center")
+      ui.text("Ресурсы")
+    ui.finish_alignment()
+    ui.br()
+
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
       local amount = State.player.resources[r]
       if not amount or (not State.combat and Table.contains(PRIMITIVE_RESOURCES, r)) then
@@ -230,15 +235,45 @@ draw_resources = function()
   tk.finish_block(start)
 end
 
+BORDERS = Vector.hex("191919")
+ENEMY = Vector.hex("99152c")
+ALLY = Vector.hex("5d863f")
+
 draw_move_order = function()
-  ui.separator()
-  ui.table({"", "Очередь ходов"}, Fun.iter(State.combat.list)
-    :enumerate()
-    :map(function(i, e) return {
-      State.combat.current_i == i and "x" or "-",
-      Entity.name(e),
-    } end)
-    :totable())
+  local start = tk.start_block()
+    ui.start_alignment("center")
+      ui.text("Очередь ходов")
+    ui.finish_alignment()
+    ui.br()
+
+    for i, e in ipairs(State.combat.list) do
+      ui.start_line()
+        if State.combat.current_i == i then
+          ui.text("x ")
+        else
+          love.graphics.setColor(BORDERS)
+          ui.text("- ")
+        end
+
+        local color =
+          e == State.player and Vector.white
+          or State.hostility:get(e, State.player) and ENEMY
+          or ALLY
+
+        love.graphics.setColor(color)
+          ui.text(Entity.name(e))
+        love.graphics.setColor(Vector.white)
+      ui.finish_line()
+    end
+  tk.finish_block(start)
+  -- ui.separator()
+  -- ui.table({"", "Очередь ходов"}, Fun.iter(State.combat.list)
+  --   :enumerate()
+  --   :map(function(i, e) return {
+  --     State.combat.current_i == i and "x" or "-",
+  --     Entity.name(e),
+  --   } end)
+  --   :totable())
 end
 
 return draw_gui
