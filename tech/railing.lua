@@ -27,6 +27,8 @@ local mt = {__index = methods}
 railing.runner = function(scenes, positions, entities)
   return setmetatable({
     scenes = scenes,
+    positions = positions,
+    entities = entities,
     _scene_runs = {},
   }, mt)
   -- NEXT (rails) handle positions, entities

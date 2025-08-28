@@ -2,7 +2,7 @@ local railing = require "engine.tech.railing"
 --- LDtk level parsing
 local ldtk = {}
 
-local parser_new, load_scenes
+local parser_new
 
 --- Level's init.lua return
 --- @class level_definition
@@ -10,7 +10,7 @@ local parser_new, load_scenes
 --- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
 --- @field layers string[] global layers in order
---- @field rails? {factory: fun(...): rails, scenes: scene[]}
+--- @field rails? {factory: (fun(...): rails), scenes: scene[]}
 
 --- General information about the level
 --- @class level_info
@@ -74,11 +74,12 @@ local handle_tiles_or_intgrid = function(is_tiles)
         :add_mut(offset)
       e.grid_layer = layer_id
 
-      -- NEXT entity captures (after rails)
-      -- local rails_name = -Query(to_capture)[layer_id][result.position]
-      -- if rails_name then
-      --   captured_entities[rails_name] = result
-      -- end
+      local rails_name = this_parser._to_capture[layer_id][e.position]
+      if rails_name then
+        this_parser._were_captured[rails_name] = true
+        this_parser._captures.entities[rails_name] = e
+      end
+
       table.insert(this_parser._entities, e)
     end
   end
@@ -93,6 +94,13 @@ parser_new = function()
       grid_size = nil,
       cell_size = nil,
     },
+    _captures = {
+      positions = {},
+      entities = {},
+    },
+    _to_capture = nil,
+    _were_captured = nil,
+    _should_be_captured = nil,
 
     _handlers = {
       tiles = handle_tiles_or_intgrid(true),
@@ -137,12 +145,40 @@ parser_new = function()
             :add_mut(offset)
           entity.grid_layer = layer_id
 
-          -- NEXT capturing
+          local rails_name = this_parser._to_capture[layer_id][entity.position]
+          if rails_name then
+            this_parser._were_captured[rails_name] = true
+            this_parser._captures.entities[rails_name] = entity
+            assert(not get_field(instance, "rails_name"))
+          else
+            local f = get_field(instance, "rails_name")
+            if f then
+              this_parser._captures.entities[f.__value] = entity
+            end
+          end
 
           table.insert(this_parser._entities, entity)
         end
       end,
     },
+
+    _read_positions = function(self, layer, offset)
+      self._should_be_captured = {}
+      self._were_captured = {}
+
+      for _, instance in ipairs(layer.entityInstances) do
+        if get_identifier(instance) == "entity_capture" then
+          local name = get_field(instance, "rails_name").__value:lower()
+          self._to_capture
+            [get_field(instance, "layer").__value:lower()]
+            [Vector.own(instance.__grid) + Vector.one + offset] = name
+          table.insert(self._should_be_captured, name)
+        else
+          self._captures.positions[instance.fieldInstances[1].__value:lower()]
+            = Vector.own(instance.__grid):add_mut(Vector.one):add_mut(offset)
+        end
+      end
+    end,
 
     parse = function(self, path)
       --- @type level_definition
@@ -151,26 +187,57 @@ parser_new = function()
       local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
 
       self._level_info.cell_size = level_module.cell_size
-      self._level_info.grid_size = Vector.zero
       self._level_info.layers = level_module.layers
+      self._level_info.grid_size = Vector.zero
 
-      local total_layers = Fun.iter(raw):map(function(l) return #l.layerInstances end):sum()
-      local average_layers = total_layers / #raw
-
-      for j, level in ipairs(raw) do
+      for _, level in ipairs(raw) do
         local offset = V(level.worldX, level.worldY) / level_module.cell_size
         local end_point = offset + V(level.pxWid, level.pxHei) / level_module.cell_size
         self._level_info.grid_size = Vector.use(math.max, self._level_info.grid_size, end_point)
+      end
+
+      self._to_capture = Fun.iter(level_module.layers)
+        :map(function(l) return l, Grid.new(self._level_info.grid_size) end)
+        :tomap()
+
+      local total_layers_n = Fun.iter(raw):map(function(l) return #l.layerInstances end):sum()
+      local average_layers_n = total_layers_n / #raw
+
+      for j, level in ipairs(raw) do
+        local offset = V(level.worldX, level.worldY) / level_module.cell_size
+        local positions_layer = Fun.iter(level.layerInstances)
+          :filter(function(layer) return get_identifier(layer) == "positions" end)
+          :nth(1)
+
+        if positions_layer then
+          self:_read_positions(positions_layer, offset)
+          coroutine.yield(.5 * j * average_layers_n / total_layers_n)
+        end
 
         for i = #level.layerInstances, 1, -1 do
           local layer = level.layerInstances[i]
-          self._handlers[layer.__type:utf_lower()](self, layer, level_module.palette, offset)
-          -- TODO time-based yield?
-          coroutine.yield(.5 * (j * average_layers - i) / total_layers)
+          if get_identifier(layer) ~= "positions" then
+            self._handlers[layer.__type:utf_lower()](self, layer, level_module.palette, offset)
+            -- TODO time-based yield moment?
+            coroutine.yield(.5 * (j * average_layers_n - i) / total_layers_n)
+          end
+        end
+
+        do
+          local were_not_captured = Fun.iter(self._should_be_captured)
+            :filter(function(name) return not self._were_captured[name] end)
+            :totable()
+
+          assert(
+            #were_not_captured == 0,
+            "Entity captures %s did not catch anything" % {table.concat(were_not_captured, ", ")}
+          )
         end
       end
 
-      local rails = level_module.rails.factory(railing.runner(level_module.rails.scenes))
+      local rails = level_module.rails.factory(railing.runner(
+        level_module.rails.scenes, self._captures.positions, self._captures.entities
+      ))
       -- NEXT (rails) handle positions & entities
 
       return {
