@@ -1,4 +1,5 @@
 local async = require "engine.tech.async"
+local animated = require "engine.tech.animated"
 
 
 --- @class ai
@@ -80,9 +81,11 @@ return Tiny.processingSystem {
         current:rest("move")
       end
       State.combat:_pass_turn()
-      Log.info("%s's turn" % {Entity.codename(State.combat:get_current())})
+
+      local current = State.combat:get_current()
+      Log.info("%s's turn" % {Entity.codename(current)})
       -- NEXT reset timeout (safety)
-      -- NEXT FX and SFX for player's turn
+      State:add(animated.fx("engine/assets/sprites/animations/turn_starts", current.position))
 
       self:_update_conditions(entity, 6)
     end

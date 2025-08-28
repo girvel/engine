@@ -31,7 +31,7 @@ class.hit_dice = function(die)
     sounds = sound.multiple("engine/assets/sounds/hit_dice", .3),
 
     _is_available = function(self, entity)
-      return not State.combat and entity.hp <= entity:get_max_hp()
+      return not State.combat and entity.hp < entity:get_max_hp()
     end,
 
     _act = function(self, entity)

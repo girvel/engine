@@ -2,6 +2,7 @@ local level = require "engine.tech.level"
 local action = require "engine.tech.action"
 local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
+local animated = require "engine.tech.animated"
 
 
 local actions = {}
@@ -66,6 +67,7 @@ actions.dash = Table.extend({
 
   _act = function(self, entity)
     if State.combat then
+      State:add(animated.fx("engine/assets/sprites/animations/dash", entity.position))
       self.sounds:play_at(entity.position)
     end
     return true
