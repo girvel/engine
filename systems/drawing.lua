@@ -4,7 +4,7 @@ return Tiny.processingSystem {
   codename = "drawing",
   base_callback = "draw",
   filter = function(_, entity)
-    return entity.sprite and entity.position and not entity.layer
+    return entity.sprite and entity.position and not entity.grid_layer
   end,
 
   preProcess = function(_, dt)

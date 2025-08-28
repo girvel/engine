@@ -22,9 +22,9 @@ local draw_grid = function(self, dt)
   end
   snapshot:refresh_fov(State.player.position, State.player.fov_r)
 
-  for _, layer in ipairs(State.level.layers) do
-    local grid = State.grids[layer]
-    local sprite_batch = self._sprite_batches[layer]
+  for _, grid_layer in ipairs(State.level.grid_layers) do
+    local grid = State.grids[grid_layer]
+    local sprite_batch = self._sprite_batches[grid_layer]
     if sprite_batch then
       sprite_batch:clear()
     end

@@ -8,7 +8,7 @@ local entityx = {}
 --- @field position vector position relative to the view
 --- @field direction vector
 --- @field size vector
---- @field layer string name of the grid layer
+--- @field grid_layer string name of the grid layer
 --- @field ai ai
 --- @field shader shader individial shader to render with
 --- @field sprite sprite

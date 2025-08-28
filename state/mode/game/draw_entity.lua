@@ -7,7 +7,7 @@ local tk = require("engine.state.mode.tk")
 local draw_entity = function(self, entity, dt)
   local current_view = State.perspective.views[entity.view]
   local offset_position = entity.position
-  if entity.layer then
+  if entity.grid_layer then
     offset_position = offset_position * State.level.cell_size
   end
   offset_position = current_view:apply(offset_position)
@@ -28,7 +28,7 @@ local draw_entity = function(self, entity, dt)
   if sprite.type == "image" or (sprite.type == "atlas" and entity.shader) then
     tk.draw_entity(entity, x, y, current_view.scale)
   elseif sprite.type == "atlas" then
-    self._sprite_batches[entity.layer]:add(sprite.quad, x, y, 0, current_view.scale)
+    self._sprite_batches[entity.grid_layer]:add(sprite.quad, x, y, 0, current_view.scale)
   elseif sprite.type == "text" then
     love.graphics.setFont(sprite.font)
     love.graphics.print({sprite.color, sprite.text}, x, y)

@@ -13,8 +13,8 @@ local parser_new, load_scenes
 
 --- General information about the level
 --- @class level_info
---- @field layers string[] grid layers in order
---- @field atlases table<string, love.Image> atlas images for each layer that uses them
+--- @field grid_layers string[] grid layers in order
+--- @field atlases table<string, love.Image> atlas images for each grid_layer that uses them
 --- @field cell_size integer size of a single grid cell in pixels before scaling
 --- @field grid_size vector
 
@@ -50,8 +50,8 @@ local handle_tiles_or_intgrid = function(is_tiles)
       "Missing palette element %q" % {layer_id}
     )
 
-    if not Table.contains(this_parser._level_info.layers, layer_id) then
-      table.insert(this_parser._level_info.layers, layer_id)
+    if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+      table.insert(this_parser._level_info.grid_layers, layer_id)
     end
 
     this_parser._level_info.atlases[layer_id] = assert(
@@ -76,7 +76,7 @@ local handle_tiles_or_intgrid = function(is_tiles)
         :div_mut(this_parser._level_info.cell_size)
         :add_mut(Vector.one)
         :add_mut(offset)
-      e.layer = layer_id
+      e.grid_layer = layer_id
       e.view = "grids"
 
       -- NEXT entity captures (after rails)
@@ -93,7 +93,7 @@ parser_new = function()
   return {
     _entities = {},
     _level_info = {
-      layers = {},
+      grid_layers = {},
       atlases = {},
       grid_size = nil,
       cell_size = nil,
@@ -119,8 +119,8 @@ parser_new = function()
           )
         end
 
-        if not Table.contains(this_parser._level_info.layers, layer_id) then
-          table.insert(this_parser._level_info.layers, layer_id)
+        if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+          table.insert(this_parser._level_info.grid_layers, layer_id)
         end
 
         for _, instance in ipairs(layer.entityInstances) do
@@ -140,7 +140,7 @@ parser_new = function()
           entity.position = Vector.own(instance.__grid)
             :add_mut(Vector.one)
             :add_mut(offset)
-          entity.layer = layer_id
+          entity.grid_layer = layer_id
           entity.view = "grids"
 
           -- NEXT capturing
@@ -180,16 +180,6 @@ parser_new = function()
       }
     end,
   }
-end
-
---- @param path string
-load_scenes = function(path)
-  local result = {}
-  for _, modname in ipairs(love.filesystem.getDirectoryItems(path:gsub("%.", "/"))) do
-    assert(modname:ends_with(".lua"))
-    Table.join(result, require(path .. "." .. modname:sub(1, -5)))
-  end
-  return result
 end
 
 Ldump.mark(ldtk, {}, ...)

@@ -51,7 +51,7 @@ methods.add = function(self, entity, ...)
   Table.extend(entity, ...)
   self._world:add(entity)
   self._entities[entity] = true
-  if entity.position and entity.layer then
+  if entity.position and entity.grid_layer then
     level.put(entity)
   end
   if entity.inventory then
@@ -78,7 +78,7 @@ methods.remove = function(self, entity, silently)
   self._world:remove(entity)
   self._entities[entity] = nil
 
-  if entity.position and entity.layer then
+  if entity.position and entity.grid_layer then
     level.remove(entity)
   end
 
@@ -128,13 +128,13 @@ methods.load_level = function(self, path)
 
   self.rails = load_data.rails
 
-  self.grids = Fun.iter(self.level.layers)
+  self.grids = Fun.iter(self.level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
     :tomap()
 
   self.grids.solids = tcod.observer(assert(
     self.grids.solids,
-    "Missing \"solids\" layer; required for FOV and pathing to work"
+    "Missing \"solids\" grid_layer; required for FOV and pathing to work"
   ))
 
   local BATCH_SIZE = 1024
