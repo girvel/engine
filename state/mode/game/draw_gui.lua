@@ -210,7 +210,7 @@ draw_resources = function()
         goto continue
       end
 
-      ui.start_frame(200)
+      ui.start_frame(180)
       ui.start_line()
         local icon = ICONS[r] or DEFAULT_ICON
         local highlighted_n = cost and cost[r]

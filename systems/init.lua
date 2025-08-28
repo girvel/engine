@@ -17,6 +17,7 @@ return {
   require("engine.systems.ui_update"),
   require("engine.systems.drifting"),     -- small
   require("engine.systems.timed_death"),  -- small
+  require("engine.systems.running"),      -- small
 
   -- love.draw
   require("engine.systems.drawing"),
