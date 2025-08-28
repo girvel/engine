@@ -8,6 +8,14 @@ local player = {}
 --- @class base_player: entity
 --- @field fov_r integer
 --- @field ai player_ai
+--- @field hears dialogue_line
+
+--- @alias dialogue_line plain_dialogue_line
+
+--- @class plain_dialogue_line
+--- @field type "plain_line"
+--- @field source entity?
+--- @field text string
 
 --- @class player_ai: ai
 --- @field next_action action?

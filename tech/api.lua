@@ -67,5 +67,20 @@ api.attack = function(entity, target)
   end
 end
 
+--- @param source entity? no source == narration
+--- @param text string
+api.line = function(source, text)
+  local t = {
+    type = "plain_line",
+    source = source,
+    text = text,
+  }
+  State.player.hears = t
+
+  while State.player.hears == t do
+    coroutine.yield()
+  end
+end
+
 Ldump.mark(api, {}, ...)
 return api

@@ -14,7 +14,7 @@ local PADDING_Y = 40
 local HP_BAR_H = 10 * 4
 
 local cost, hint, sidebar_w
-local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order
+local action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order, draw_dialogue
 
 --- @param self state_mode_game
 --- @param dt number
@@ -54,6 +54,10 @@ local draw_gui = function(self, dt)
       ui.finish_alignment()
     end
   ui.finish_frame()
+
+  if State.player.hears then
+    draw_dialogue(State.player.hears)
+  end
 end
 
 action_button = function(action, hotkey)
@@ -289,14 +293,23 @@ draw_move_order = function()
       ui.finish_line()
     end
   tk.finish_block(start)
-  -- ui.separator()
-  -- ui.table({"", "Очередь ходов"}, Fun.iter(State.combat.list)
-  --   :enumerate()
-  --   :map(function(i, e) return {
-  --     State.combat.current_i == i and "x" or "-",
-  --     Entity.name(e),
-  --   } end)
-  --   :totable())
+end
+
+local H = 200
+local BOTTOM_GAP = 50 + 40  -- (padding)
+local PADDING = 20
+
+--- @param hearing dialogue_line
+draw_dialogue = function(hearing)
+  tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
+  ui.start_font(32)
+    local line = hearing.text
+    if hearing.source then
+      line = Entity.name(hearing.source) .. ": " .. hearing.text
+    end
+    ui.text(line)
+  ui.finish_font()
+  tk.finish_window()
 end
 
 return draw_gui

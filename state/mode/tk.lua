@@ -12,35 +12,34 @@ local MAX_READABLE_W = 800
 --- @param w integer|"max"|"read_max"
 --- @param h integer|"max"
 tk.start_window = function(x, y, w, h)
-  assert(x == "center")
-  assert(y == "center")
-
-  --- @cast w integer
   if w == "max" then
     w = love.graphics.getWidth() - 4 * PADDING
   elseif w == "read_max" then
     w = math.min(love.graphics.getWidth() - 4 * PADDING, MAX_READABLE_W)
-  end
+  end --- @cast w integer
 
-  --- @cast h integer
   if h == "max" then
     h = love.graphics.getHeight() - 4 * PADDING
-  end
+  end --- @cast h integer
+
+  if x == "center" then
+    x = (love.graphics.getWidth() - w) / 2
+  end --- @cast x integer
+
+  if y == "center" then
+    y = (love.graphics.getHeight() - h) / 2
+  end --- @cast y integer
 
   ui.start_frame(
-    (love.graphics.getWidth() - w) / 2 - PADDING,
-    (love.graphics.getHeight() - h) / 2 - PADDING,
+    x - PADDING,
+    y - PADDING,
     w + 2 * PADDING,
     h + 2 * PADDING
   )
     ui.tile(gui_elements.window_bg)
   ui.finish_frame()
 
-  ui.start_frame(
-    (love.graphics.getWidth() - w) / 2,
-    (love.graphics.getHeight() - h) / 2,
-    w, h
-  )
+  ui.start_frame(x, y, w, h)
 end
 
 tk.finish_window = function()
