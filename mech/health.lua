@@ -122,14 +122,12 @@ end
 --- @param grid_position vector
 --- @param color vector
 health.floater = function(text, grid_position, color)
-  local a = math.floor(State.level.cell_size * .25)
-  local b = math.floor(State.level.cell_size * .75)
   return {
     boring_flag = true,
     codename = "floating_damage",
-    position = grid_position * State.level.cell_size
-      + V(math.random(a, b), math.random(a, b)),
-    drift = V(0, -4),
+    position = grid_position
+      + V(math.random() * .5 + .25, math.random() * .5 + .25),
+    drift = V(0, -.25),
     sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,
   }
