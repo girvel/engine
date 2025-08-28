@@ -90,5 +90,27 @@ tk.draw_entity = function(entity, x, y, scale)
   end
 end
 
+local SIDEBAR_BLOCK_PADDING = 10
+
+tk.start_block = function()
+  local frame = ui.get_frame()
+  ui.start_frame(
+    4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
+    -2 * SIDEBAR_BLOCK_PADDING - 8
+  )
+  return frame
+end
+
+tk.finish_block = function(start)
+  local finish = ui.get_frame()
+  ui.finish_frame()
+
+  local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING + 4
+  ui.start_frame(-16, -16, start.w + 32, h + 32)
+    ui.tile(gui_elements.sidebar_block_bg)
+  ui.finish_frame()
+  ui.offset(0, h)
+end
+
 Ldump.mark(tk, {}, ...)
 return tk
