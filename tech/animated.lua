@@ -36,6 +36,24 @@ animated.change_pack = function(entity, path)
   entity:animate()
 end
 
+--- @param path string
+--- @param position vector
+--- @param is_over? boolean
+animated.fx = function(path, position, is_over)
+  local result = animated.mixin(path)
+
+  local _, _, head = path:find("/?([^/]+)$")
+  result.codename = head and (head .. "_fx") or "unnamed_fx"
+  result.boring_flag = true
+  result.position = position
+  result.layer = is_over and "fx_over" or "fx_under"
+
+  result:animate():next(function() State:remove(result) end)
+
+  return result
+end
+
+--- @param self entity
 --- @param animation_name? string
 --- @return promise
 methods.animate = function(self, animation_name)

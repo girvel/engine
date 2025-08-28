@@ -1,14 +1,18 @@
 local ui = require("engine.tech.ui")
 
-return Tiny.processingSystem {
+return Tiny.sortedProcessingSystem {
   codename = "drawing",
   base_callback = "draw",
   filter = function(_, entity)
-    return entity.sprite and entity.position and not entity.layer
+    return entity.sprite and entity.position and entity.layer
+  end,
+
+  compare = function(_, a, b)
+    return Table.index_of(State.level.layers, a.layer) < Table.index_of(State.level.layers, b.layer)
   end,
 
   preProcess = function(_, dt)
-    State.mode:draw_grid(dt)
+    State.perspective:update(dt)
   end,
 
   process = function(_, entity, dt)

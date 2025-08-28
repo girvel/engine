@@ -43,7 +43,7 @@ local CURSORS = {
 local FRAME = "engine/assets/sprites/gui/button_frame.png"
 local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
-local SCALE = 4  -- TODO extract scale here & in view
+local SCALE = 4  -- TODO extract scale here
 
 
 ----------------------------------------------------------------------------------------------------
@@ -203,7 +203,6 @@ ui.text = function(text)
       dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
     end
     love.graphics.print(line, frame.x + dx, frame.y + dy)
-    if text == "рывок" then Log.trace(frame.y + dy, frame.h, frame.y) end
 
     if alignment.y == "top" then
       if is_linear then

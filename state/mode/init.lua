@@ -30,10 +30,6 @@ local methods = {
     return -Query(self._mode):draw_entity(entity, dt)
   end,
 
-  draw_grid = function(self, entity, dt)
-    return -Query(self._mode):draw_grid(entity, dt)
-  end,
-
   start_game = function(self)
     -- TODO switch modes between frames, not in the middle
     assert(self._mode.type == "start_menu")

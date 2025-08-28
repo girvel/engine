@@ -2,6 +2,7 @@ local health = require("engine.mech.health")
 local action = require("engine.tech.action")
 local class  = require("engine.mech.class")
 local sound  = require("engine.tech.sound")
+local animated = require("engine.tech.animated")
 
 
 local fighter = {}
@@ -29,8 +30,7 @@ fighter.action_surge = Table.extend({
   _is_available = function() return State.combat end,
 
   _act = function(self, entity)
-    -- State:add(fx("assets/sprites/fx/action_surge", "fx_under", entity.position))
-    -- NEXT (FX)
+    State:add(animated.fx("engine/assets/sprites/animations/action_surge", entity.position))
     self.sounds:play_at(entity.position)
     return true
   end,
@@ -54,11 +54,10 @@ fighter.second_wind = Table.extend({
 
   sounds = sound.multiple("engine/assets/sounds/second_wind", .3),
 
-  _is_available = function(self, entity) return entity.hp <= entity:get_max_hp() end,
+  _is_available = function(self, entity) return entity.hp < entity:get_max_hp() end,
 
   _act = function(self, entity)
-    -- State:add(fx("assets/sprites/fx/second_wind", "fx_under", entity.position))
-    -- NEXT (FX)
+    State:add(animated.fx("engine/assets/sprites/animations/second_wind", entity.position))
     self.sounds:play_at(entity.position)
     health.heal(entity, (D(10) + entity.level):roll())
     return true
@@ -98,7 +97,7 @@ fighter.fighting_spirit = Table.extend({
   _is_available = function(self, entity) return State.combat end,
 
   _act = function(self, entity)
-    -- NEXT FX
+    State:add(animated.fx("engine/assets/sprites/animations/fighting_spirit", entity.position))
     self.sounds:play_at(entity.position)
     table.insert(entity.conditions, fighting_spirit_condition())
     health.set_hp(entity, entity.hp + 5)

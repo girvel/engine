@@ -6,7 +6,9 @@ return Tiny.processingSystem {
   filter = Tiny.requireAll("animation"),
 
   onAdd = function(_, entity)
-    entity:animate()
+    if not entity.animation.current then
+      entity:animate()
+    end
   end,
 
   --- @param entity entity

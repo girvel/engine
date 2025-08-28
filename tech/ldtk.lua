@@ -9,12 +9,14 @@ local parser_new, load_scenes
 --- @field ldtk {path: string, level: string}
 --- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
+--- @field layers string[] global layers in order
 --- @field rails? {factory: fun(...): rails, scenes: scene[]}
 
 --- General information about the level
 --- @class level_info
---- @field layers string[] grid layers in order
---- @field atlases table<string, love.Image> atlas images for each layer that uses them
+--- @field grid_layers string[] grid layers in order
+--- @field layers string[] global layers in order
+--- @field atlases table<string, love.Image> atlas images for each grid_layer that uses them
 --- @field cell_size integer size of a single grid cell in pixels before scaling
 --- @field grid_size vector
 
@@ -23,13 +25,7 @@ local parser_new, load_scenes
 --- @param path string
 --- @return {level_info: level_info, entities: entity[], rails: rails}
 ldtk.load = function(path)
-  --- @type level_definition
-  local level_module = require(path)
-
-  local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
-  return parser_new():parse(
-    raw, level_module.palette, level_module.cell_size, level_module.rails
-  )
+  return parser_new():parse(path)
 end
 
 local get_identifier = function(node)
@@ -50,8 +46,8 @@ local handle_tiles_or_intgrid = function(is_tiles)
       "Missing palette element %q" % {layer_id}
     )
 
-    if not Table.contains(this_parser._level_info.layers, layer_id) then
-      table.insert(this_parser._level_info.layers, layer_id)
+    if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+      table.insert(this_parser._level_info.grid_layers, layer_id)
     end
 
     this_parser._level_info.atlases[layer_id] = assert(
@@ -76,8 +72,7 @@ local handle_tiles_or_intgrid = function(is_tiles)
         :div_mut(this_parser._level_info.cell_size)
         :add_mut(Vector.one)
         :add_mut(offset)
-      e.layer = layer_id
-      e.view = "grids"
+      e.grid_layer = layer_id
 
       -- NEXT entity captures (after rails)
       -- local rails_name = -Query(to_capture)[layer_id][result.position]
@@ -93,7 +88,7 @@ parser_new = function()
   return {
     _entities = {},
     _level_info = {
-      layers = {},
+      grid_layers = {},
       atlases = {},
       grid_size = nil,
       cell_size = nil,
@@ -119,8 +114,8 @@ parser_new = function()
           )
         end
 
-        if not Table.contains(this_parser._level_info.layers, layer_id) then
-          table.insert(this_parser._level_info.layers, layer_id)
+        if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+          table.insert(this_parser._level_info.grid_layers, layer_id)
         end
 
         for _, instance in ipairs(layer.entityInstances) do
@@ -140,8 +135,7 @@ parser_new = function()
           entity.position = Vector.own(instance.__grid)
             :add_mut(Vector.one)
             :add_mut(offset)
-          entity.layer = layer_id
-          entity.view = "grids"
+          entity.grid_layer = layer_id
 
           -- NEXT capturing
 
@@ -150,27 +144,33 @@ parser_new = function()
       end,
     },
 
-    parse = function(self, raw, palette, cell_size, rails_config)
-      self._level_info.cell_size = cell_size
+    parse = function(self, path)
+      --- @type level_definition
+      local level_module = require(path)
+
+      local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
+
+      self._level_info.cell_size = level_module.cell_size
       self._level_info.grid_size = Vector.zero
+      self._level_info.layers = level_module.layers
 
       local total_layers = Fun.iter(raw):map(function(l) return #l.layerInstances end):sum()
       local average_layers = total_layers / #raw
 
       for j, level in ipairs(raw) do
-        local offset = V(level.worldX, level.worldY) / cell_size
-        local end_point = offset + V(level.pxWid, level.pxHei) / cell_size
+        local offset = V(level.worldX, level.worldY) / level_module.cell_size
+        local end_point = offset + V(level.pxWid, level.pxHei) / level_module.cell_size
         self._level_info.grid_size = Vector.use(math.max, self._level_info.grid_size, end_point)
 
         for i = #level.layerInstances, 1, -1 do
           local layer = level.layerInstances[i]
-          self._handlers[layer.__type:utf_lower()](self, layer, palette, offset)
+          self._handlers[layer.__type:utf_lower()](self, layer, level_module.palette, offset)
           -- TODO time-based yield?
           coroutine.yield(.5 * (j * average_layers - i) / total_layers)
         end
       end
 
-      local rails = rails_config.factory(railing.runner(rails_config.scenes))
+      local rails = level_module.rails.factory(railing.runner(level_module.rails.scenes))
       -- NEXT (rails) handle positions & entities
 
       return {
@@ -180,16 +180,6 @@ parser_new = function()
       }
     end,
   }
-end
-
---- @param path string
-load_scenes = function(path)
-  local result = {}
-  for _, modname in ipairs(love.filesystem.getDirectoryItems(path:gsub("%.", "/"))) do
-    assert(modname:ends_with(".lua"))
-    Table.join(result, require(path .. "." .. modname:sub(1, -5)))
-  end
-  return result
 end
 
 Ldump.mark(ldtk, {}, ...)

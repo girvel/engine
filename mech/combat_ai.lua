@@ -1,6 +1,7 @@
 local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
 local iteration = require("engine.tech.iteration")
+local animated  = require("engine.tech.animated")
 
 
 local combat_ai = {}
@@ -22,8 +23,9 @@ local find_target
 --- @param entity entity
 methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
-    if entity.faction and target == entity then
+    if entity.faction and target == entity and not State.hostility:get(entity, attacker) then
       State.hostility:set(entity.faction, attacker.faction, true)
+      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
       State:start_combat({entity, attacker})
     end
   end)
@@ -64,6 +66,7 @@ methods.observe = function(entity, dt)
     end
 
     if condition then
+      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
       State:start_combat({target, entity})
     end
   end

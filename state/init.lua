@@ -2,6 +2,7 @@ local level = require("engine.tech.level")
 local combat = require("engine.state.combat")
 local ldtk = require("engine.tech.ldtk")
 local tcod = require("engine.tech.tcod")
+local sprite = require("engine.tech.sprite")
 
 
 local state = {}
@@ -51,7 +52,7 @@ methods.add = function(self, entity, ...)
   Table.extend(entity, ...)
   self._world:add(entity)
   self._entities[entity] = true
-  if entity.position and entity.layer then
+  if entity.position and entity.grid_layer then
     level.put(entity)
   end
   if entity.inventory then
@@ -78,7 +79,7 @@ methods.remove = function(self, entity, silently)
   self._world:remove(entity)
   self._entities[entity] = nil
 
-  if entity.position and entity.layer then
+  if entity.position and entity.grid_layer then
     level.remove(entity)
   end
 
@@ -128,14 +129,23 @@ methods.load_level = function(self, path)
 
   self.rails = load_data.rails
 
-  self.grids = Fun.iter(self.level.layers)
+  self.grids = Fun.iter(self.level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
     :tomap()
 
   self.grids.solids = tcod.observer(assert(
     self.grids.solids,
-    "Missing \"solids\" layer; required for FOV and pathing to work"
+    "Missing \"solids\" grid_layer; required for FOV and pathing to work"
   ))
+
+  for layer, grid in pairs(self.grids) do
+    State:add({
+      codename = layer .. "_grid_container",
+      sprite = sprite.grid(grid),
+      layer = layer,
+      position = Vector.zero,
+    })
+  end
 
   local BATCH_SIZE = 1024
   for i, e in ipairs(load_data.entities) do
@@ -147,6 +157,8 @@ methods.load_level = function(self, path)
       coroutine.yield(.5 + .5 * (i / #load_data.entities))
     end
   end
+
+  self.perspective.camera_offset = self.perspective:center_camera(Vector.zero, self.player.position)
 
   local end_time = love.timer.getTime()
   Log.info("Added entities in %.2f s, total time %.2f s" % {

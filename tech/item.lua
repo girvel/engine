@@ -26,8 +26,7 @@ item.drop = function(parent, slot)
 
   parent.inventory[slot] = nil
   this_item.position = drop_position
-  this_item.layer = "items"
-  this_item.view = "grids"
+  this_item.grid_layer = "items"
   State:add(this_item)
   return true
 end
