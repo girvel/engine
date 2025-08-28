@@ -67,6 +67,7 @@ api.attack = function(entity, target)
   end
 end
 
+--- @async
 --- @param source entity? no source == narration
 --- @param text string
 api.line = function(source, text)
@@ -80,6 +81,28 @@ api.line = function(source, text)
   while State.player.hears == t do
     coroutine.yield()
   end
+end
+
+--- @param options table<integer, string>
+--- @param remove_picked? boolean
+--- @return integer
+api.options = function(options, remove_picked)
+  State.player.hears = {
+    type = "options",
+    options = options,
+  }
+
+  while not State.player.speaks do
+    coroutine.yield()
+  end
+
+  local result = State.player.speaks  --[[@as integer]]
+  State.player.speaks = nil
+  if remove_picked then
+    options[result] = nil
+  end
+
+  return result
 end
 
 Ldump.mark(api, {}, ...)

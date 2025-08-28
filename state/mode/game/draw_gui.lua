@@ -315,17 +315,36 @@ draw_dialogue = function()
 
   tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
   ui.start_font(32)
-    local text = line.text
-    if line.source then
-      local name = Entity.name(line.source)
-      ui.start_frame()
-      love.graphics.setColor(line.source.sprite.color)
-        ui.text(name)
-      love.graphics.setColor(Vector.white)
-      ui.finish_frame()
-      text = (" " * name:utf_len()) .. ": " .. line.text
+    if line.type == "plain_line" then
+      local text = line.text
+      if line.source then
+        local name = Entity.name(line.source)
+        ui.start_frame()
+        love.graphics.setColor(line.source.sprite.color)
+          ui.text(name)
+        love.graphics.setColor(Vector.white)
+        ui.finish_frame()
+        text = (" " * name:utf_len()) .. ": " .. line.text
+      end
+      ui.text(text)
+    elseif line.type == "options" then
+      local sorted = {}
+      for i, o in pairs(line.options) do  -- can't use luafun: ipairs/pairs detection conflict
+        table.insert(sorted, {i, o})
+      end
+      table.sort(sorted, function(a, b) return a[1] < b[1] end)
+
+      local displayed = Fun.iter(sorted)
+        :map(function(pair) return pair[2] end)
+        :totable()
+
+      local n = ui.choice(displayed)
+      if n then
+        State.player.speaks = sorted[n][1]
+      end
+    else
+      assert(false)
     end
-    ui.text(text)
   ui.finish_font()
   tk.finish_window()
 
