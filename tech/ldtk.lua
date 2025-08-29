@@ -211,7 +211,7 @@ parser_new = function()
 
         if positions_layer then
           self:_read_positions(positions_layer, offset)
-          coroutine.yield(.5 * j * average_layers_n / total_layers_n)
+          coroutine.yield(.5 * (j - 1) * average_layers_n / total_layers_n)
         end
 
         for i = #level.layerInstances, 1, -1 do
