@@ -84,6 +84,7 @@ tk.draw_entity = function(entity, x, y, scale)
     display_slot("head")
     display_slot("blood")
     display_slot("gloves")
+    display_slot("bag")
     if not is_hand_bg then display_slot("hand") end
     if not is_offhand_bg then display_slot("offhand") end
     display_slot("highlight")
