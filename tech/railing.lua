@@ -55,9 +55,16 @@ methods.update = function(self, dt)
     if not scene.disabled
       and (scene.mode == "parallel" or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
-      and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
+      and Fun.pairs(characters):all(function(_, c)
+        return State:exists(c) and not self.locked_entities[c]
+      end)
       and env(scene.start_predicate, scene, dt, characters)
     then
+      for _, character in pairs(characters) do
+        self.locked_entities[character] = true
+      end
+      -- outside coroutine to avoid two scenes with the same character starting in the same frame
+
       table.insert(self._scene_runs, setmetatable({
         coroutine = coroutine.create(function()
           if not scene.mode then
@@ -66,10 +73,6 @@ methods.update = function(self, dt)
 
           if not scene.boring_flag then
             Log.info("Scene %q starts" % {scene_name})
-          end
-
-          for _, character in pairs(characters) do
-            self.locked_entities[character] = true
           end
 
           -- NEXT (safety) safe call
