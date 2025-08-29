@@ -15,6 +15,7 @@ actions.move = function(direction)
       movement = 1,
     },
     _act = function(_, entity)
+      error()
       if entity.rotate then
         entity:rotate(direction)
       elseif entity.direction then
