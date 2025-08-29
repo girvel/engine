@@ -303,9 +303,9 @@ end
 vector_methods.normalized2 = function(self)
   assert(#self == 2)
   if math.abs(self[1]) > math.abs(self[2]) then
-    return vector({sign(self[1]), 0})
+    return vector.new(sign(self[1]), 0)
   elseif self[2] ~= 0 then
-    return vector({0, sign(self[2])})
+    return vector.new(0, sign(self[2]))
   else
     error("Can not normalize vector.zero")
   end

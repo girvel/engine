@@ -172,5 +172,11 @@ api.autosave = function()
   end)
 end
 
+--- @param entity entity
+--- @param target entity
+api.rotate = function(entity, target)
+  entity:rotate((target.position - entity.position):normalized2())
+end
+
 Ldump.mark(api, {}, ...)
 return api
