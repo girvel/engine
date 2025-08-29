@@ -43,6 +43,8 @@ end
 
 local scene_run_mt = {}
 
+local env
+
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
@@ -54,7 +56,7 @@ methods.update = function(self, dt)
       and (scene.mode == "parallel" or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
       and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
-      and scene:start_predicate(dt, characters)
+      and env(scene.start_predicate, scene, dt, characters)
     then
       table.insert(self._scene_runs, setmetatable({
         coroutine = coroutine.create(function()
@@ -90,7 +92,8 @@ methods.update = function(self, dt)
 
   local indexes_to_remove = {}
   for i, run in ipairs(self._scene_runs) do
-    async.resume(run.coroutine)
+    env(async.resume, run.coroutine)
+
     if coroutine.status(run.coroutine) == "dead" then
       table.insert(indexes_to_remove, i)
     end
@@ -158,6 +161,13 @@ scene_run_mt.__serialize = function(self)
     Log.warn("Scene %s is active when saving" % {self.name})
   end
   return "nil"
+end
+
+env = function(f, ...)
+  Runner = State.rails.runner
+  local result = f(...)
+  Runner = (nil --[[@as rails_runner]])
+  return result
 end
 
 Ldump.mark(railing, {}, ...)
