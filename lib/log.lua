@@ -33,6 +33,12 @@ local levels = {
   fatal = {color = "\27[35m", index = 6},
 }
 
+local count = {
+  warn = 0,
+  error = 0,
+  fatal = 0,
+}
+
 
 local round = function(x, increment)
   increment = increment or 1
@@ -60,6 +66,10 @@ end
 
 
 module_mt.__call = function(_, level, trace_shift, ...)
+  if count[level] then
+    count[level] = count[level] + 1
+  end
+
   -- Return early if we're below the log level
   if levels[level].index < levels[log.level].index then
     return ...
@@ -93,6 +103,10 @@ for level, _ in pairs(levels) do
   log[level] = function(...)
     return log(level, 0, ...)
   end
+end
+
+log.report = function()
+  log.info(("%s warnings, %s errors, %s fatal"):format(count.warn, count.error, count.fatal))
 end
 
 

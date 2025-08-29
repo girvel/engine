@@ -49,6 +49,7 @@ love.quit = function()
   if not State.debug and State.mode:attempt_exit() then return true end
 
   Log.info("Exited smoothly")
+  Log.report()
   return false
 end
 
@@ -123,6 +124,7 @@ end
 local builtin = love.errorhandler
 love.errorhandler = function(msg)
   Log.fatal(debug.traceback(msg))
+  Log.report()
   return builtin(msg)
   -- saves.write({State}, "last_crash.ldump.gz")
   -- love.window.requestAttention()
