@@ -1,3 +1,6 @@
+local safety = require "engine.tech.safety"
+
+
 return {
   -- love.keypressed
   require("engine.systems.ui_keypressed"),
@@ -10,14 +13,14 @@ return {
   require("engine.systems.ui_mousepressed"),
 
   -- love.update
-  require("engine.systems.update_sound"),
-  require("engine.systems.update_rails"),
-  require("engine.systems.acting"),
-  require("engine.systems.animation"),
+  safety.live_system(require("engine.systems.update_sound")),
+  safety.live_system(require("engine.systems.update_rails")),
+  safety.live_system(require("engine.systems.acting")),
+  safety.live_system(require("engine.systems.animation")),
   require("engine.systems.ui_update"),
-  require("engine.systems.drifting"),     -- small
-  require("engine.systems.timed_death"),  -- small
-  require("engine.systems.running"),      -- small
+  safety.live_system(require("engine.systems.drifting")),     -- small
+  safety.live_system(require("engine.systems.timed_death")),  -- small
+  safety.live_system(require("engine.systems.running")),      -- small
 
   -- love.draw
   require("engine.systems.drawing"),

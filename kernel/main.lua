@@ -1,5 +1,3 @@
-local cli = require "engine.kernel.cli"
-local saves = require "engine.kernel.saves"
 -- pre-initialization --
 love.graphics.setDefaultFilter("nearest", "nearest")
 love.audio.setDistanceModel("exponent")
@@ -10,6 +8,9 @@ require("engine.kernel.wrappers")
 -- imports --
 local state = require("engine.state")
 local systems = require("engine.systems")
+local safety = require "engine.tech.safety"
+local cli = require "engine.kernel.cli"
+local saves = require "engine.kernel.saves"
 
 
 -- callbacks --
