@@ -1,7 +1,7 @@
 local safety = require "engine.tech.safety"
 
 
-return {
+local result = {
   -- love.keypressed
   require("engine.systems.ui_keypressed"),
   require("engine.systems.debug_exit"),
@@ -25,3 +25,7 @@ return {
   -- love.draw
   require("engine.systems.drawing"),
 }
+
+Fun.iter(result):each(safety.for_system)
+
+return result
