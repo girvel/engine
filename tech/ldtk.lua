@@ -238,7 +238,6 @@ parser_new = function()
       local rails = level_module.rails.factory(railing.runner(
         level_module.rails.scenes, self._captures.positions, self._captures.entities
       ))
-      -- NEXT (rails) handle positions & entities
 
       return {
         entities = self._entities,
