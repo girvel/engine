@@ -61,7 +61,6 @@ methods.update = function(self, dt)
   tcod.snapshot(State.grids.solids):refresh_fov(State.player.position, State.player.fov_r)
 end
 
-local SMOOTHING_CUTOFF = 3
 local SPRING_STIFFNESS = 100
 local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 
@@ -89,7 +88,6 @@ smooth_camera_offset = {
     }
 
     local d = target - prev
-    if d:abs() <= SMOOTHING_CUTOFF then return target end
 
     local acceleration = SPRING_STIFFNESS * d - DAMPING_K * self.velocity
     self.velocity = self.velocity + acceleration * dt
