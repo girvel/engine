@@ -59,9 +59,7 @@ love.run = function()
 
 	love.timer.step()
 	local dt = 0
-  local delays = {}
   local KEY_REPETITION_DELAY = .3
-  local KEY_REPETITION_DEFAULT_RATE = 5
   local save_load_t = 0
 
 	return function()
@@ -82,9 +80,9 @@ love.run = function()
           return a or 0
         end
       elseif name == "keypressed" then
-        delays[b] = KEY_REPETITION_DELAY
+        Kernel._delays[b] = KEY_REPETITION_DELAY
       elseif name == "keyreleased" then
-        delays[b] = nil
+        Kernel._delays[b] = nil
       end
       love.handlers[name](a,b,c,d,e,f)
     end
@@ -92,13 +90,11 @@ love.run = function()
 		dt = love.timer.step() - save_load_t
     save_load_t = 0
 
-    for k, v in pairs(delays) do
-      delays[k] = math.max(0, v - dt)
-      if delays[k] == 0 then
-        local rate = Kernel._specific_key_rates[k] or KEY_REPETITION_DEFAULT_RATE
-        while Period(1 / rate, delays, k) do
-          love.keypressed(k)
-        end
+    for k, v in pairs(Kernel._delays) do
+      Kernel._delays[k] = math.max(0, v - dt)
+      if Kernel._delays[k] == 0 then
+        love.keypressed(k)
+        Kernel._delays[k] = 1 / Kernel:get_key_rate(k)
       end
     end
 

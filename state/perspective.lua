@@ -32,7 +32,7 @@ end
 methods.center_camera = function(self, prev, position)
   local scene_k = State.level.cell_size * self.SCALE
   local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
-  local border_size = (window_size / 2 - Vector.one * scene_k):map(math.floor)
+  local border_size = (window_size / 2 - Vector.one * 1.5 * scene_k):map(math.floor)
   local scaled_position = position * scene_k
 
   return Vector.use(Math.median,
@@ -71,7 +71,13 @@ local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 smooth_camera_offset = {
   velocity = Vector.zero,
   next = function(self, prev, dt)
-    local target = State.perspective:center_camera(prev, State.player.position)
+    local virtual_position = State.player.position
+      - Vector.up    * math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
+      - Vector.left  * math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
+      - Vector.down  * math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
+      - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+
+    local target = State.perspective:center_camera(prev, virtual_position)
 
     local d = target - prev
     if d:abs() <= SMOOTHING_CUTOFF then return target end

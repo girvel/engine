@@ -4,6 +4,7 @@ local init = {}
 --- @field _save? string
 --- @field _load? string
 --- @field _specific_key_rates table<love.KeyConstant, number>
+--- @field _delays table<love.KeyConstant, number>
 local methods = {}
 local mt = {__index = methods}
 
@@ -11,6 +12,7 @@ local mt = {__index = methods}
 init.new = function()
   return setmetatable({
     _specific_key_rates = {},
+    _delays = {},
   }, mt)
 end
 
@@ -54,10 +56,12 @@ methods.set_key_rate = function(self, key, value)
   self._specific_key_rates[key] = value
 end
 
+local DEFAULT_KEY_RATE = 5
+
 --- @param key love.KeyConstant
 --- @return number
 methods.get_key_rate = function(self, key)
-  return self._specific_key_rates[key]
+  return self._specific_key_rates[key] or DEFAULT_KEY_RATE
 end
 
 return init
