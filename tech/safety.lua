@@ -79,6 +79,20 @@ safety.for_system = function(system)
     end
   end
 
+  local onAdd = system.onAdd
+  if onAdd then
+    system.onAdd = function(...)
+      return safety.call(onAdd, ...)
+    end
+  end
+
+  local onRemove = system.onRemove
+  if onRemove then
+    system.onRemove = function(...)
+      return safety.call(onRemove, ...)
+    end
+  end
+
   return system
 end
 
