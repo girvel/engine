@@ -105,7 +105,7 @@ love.run = function()
     love.graphics.origin()
     love.graphics.clear(love.graphics.getBackgroundColor())
 
-    love.draw(love.timer.getDelta())
+    love.draw(dt)
 
     love.graphics.present()
 
