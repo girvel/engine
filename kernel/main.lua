@@ -60,14 +60,17 @@ love.run = function()
   local delays = {}
   local KEY_REPETITION_DELAY = .3
   local KEY_REPETITION_DEFAULT_RATE = 5
+  local save_load_t = 0
 
 	return function()
     if Kernel._load then
-      State = saves.read(Kernel._load)  --[[@as state]]
-      if State.mode._mode.type == "escape_menu" then
-        State.mode:close_menu()
-      end
-      Kernel._load = nil
+      local t = love.timer.getTime()
+        State = saves.read(Kernel._load)  --[[@as state]]
+        if State.mode._mode.type == "escape_menu" then
+          State.mode:close_menu()
+        end
+        Kernel._load = nil
+      save_load_t = save_load_t + love.timer.getTime() - t
     end
 
     love.event.pump()
@@ -84,7 +87,8 @@ love.run = function()
       love.handlers[name](a,b,c,d,e,f)
     end
 
-		dt = love.timer.step()
+		dt = love.timer.step() - save_load_t
+    save_load_t = 0
 
     for k, v in pairs(delays) do
       delays[k] = math.max(0, v - dt)
@@ -108,8 +112,10 @@ love.run = function()
 		love.timer.sleep(0.001)
 
     if Kernel._save then
-      saves.write(State, Kernel._save)
-      Kernel._save = nil
+      local t = love.timer.getTime()
+        saves.write(State, Kernel._save)
+        Kernel._save = nil
+      save_load_t = save_load_t + love.timer.getTime() - t
     end
   end
 end

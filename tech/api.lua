@@ -161,5 +161,16 @@ api.fade_move = function(position)
   State.perspective.is_camera_following = true
 end
 
+api.autosave = function()
+  State.rails.runner:run_task(function()
+    assert(
+      not State.rails.runner.locked_entities[State.player],
+      "Autosave when the player is locked in a cutscene"
+    )
+    Kernel:plan_save("autosave")
+    Log.info("Autosave")
+  end)
+end
+
 Ldump.mark(api, {}, ...)
 return api

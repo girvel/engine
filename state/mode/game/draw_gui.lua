@@ -61,6 +61,7 @@ draw_sidebar = function()
       draw_move_order()
     end
 
+    hint = Kernel._save and "сохранение..." or hint
     if hint then
       ui.start_alignment("center", "bottom")
         ui.text(hint:utf_capitalize())
