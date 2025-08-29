@@ -340,10 +340,16 @@ draw_dialogue = function()
       table.sort(sorted, function(a, b) return a[1] < b[1] end)
 
       local displayed = Fun.iter(sorted)
-        :map(function(pair) return pair[2] end)
+        :enumerate()
+        :map(function(i, pair) return i .. ". " .. pair[2] end)
         :totable()
 
       local n = ui.choice(displayed)
+      for i = 1, #displayed do
+        if ui.keyboard(tostring(i)) then
+          n = i
+        end
+      end
       if n then
         State.player.speaks = sorted[n][1]
       end
