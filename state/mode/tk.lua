@@ -58,7 +58,7 @@ tk.draw_entity = function(entity, x, y, scale)
       if not this_item then return end
 
       local item_sprite = this_item.sprite
-      local entity_anchor = entity.sprite.anchors[slot]
+      local entity_anchor = entity.sprite.anchors[this_item.anchor or slot]
       local item_anchor = item_sprite.anchors.parent
       local item_x, item_y = x, y
       if entity_anchor and item_anchor then
@@ -79,6 +79,7 @@ tk.draw_entity = function(entity, x, y, scale)
   love.graphics.draw(entity.sprite.image, x, y, 0, scale)
 
   if entity.inventory then
+    display_slot("tatoo")
     display_slot("body")
     display_slot("head")
     display_slot("blood")

@@ -7,6 +7,7 @@ item.DROPPING_SLOTS = {"hand", "offhand", "gloves", "right_pocket", "inside"}
 --- @field bonus? integer
 --- @field tags table<string, true>
 --- @field slot string
+--- @field anchor? string
 
 --- @param parent entity
 --- @param slot string | integer

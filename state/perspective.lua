@@ -68,10 +68,13 @@ smooth_camera_offset = {
   velocity = Vector.zero,
   next = function(self, prev, dt)
     local virtual_position = State.player.position
-      - Vector.up    * math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
-      - Vector.left  * math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
-      - Vector.down  * math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
-      - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+    if State.player:can_act() and State.player.resources.movement > 0 then
+      virtual_position = virtual_position
+        - Vector.up    * math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
+        - Vector.left  * math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
+        - Vector.down  * math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
+        - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+    end
 
     State.debug_overlay.points.vp = {
       position = virtual_position + V(.5, .5),

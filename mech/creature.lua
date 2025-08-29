@@ -215,6 +215,10 @@ methods.get_initiative_roll = function(self)
   return self:modify("initiative_roll", D(20) + self:get_modifier("dex"))
 end
 
+methods.can_act = function(self)
+  return not State.rails.runner.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
+end
+
 Ldump.mark(creature, {
   mixin = {methods = "const"},
 }, ...)

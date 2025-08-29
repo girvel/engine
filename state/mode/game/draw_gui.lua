@@ -76,7 +76,7 @@ action_button = function(action, hotkey)
   local is_available = action:is_available(player)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.hot_button(gui_elements[codename], hotkey, not is_available)
-  if button.is_pressed and (not State.combat or State.combat:get_current() == player) then
+  if button.is_pressed and State.player:can_act() then
     player.ai.next_action = action
   end
   if button.is_mouse_over then
