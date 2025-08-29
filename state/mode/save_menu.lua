@@ -26,11 +26,14 @@ methods.draw_entity = function(self, ...)
 end
 
 methods.draw_gui = function(self, dt)
-  if State.combat then
+  local in_combat = State.combat
+  local in_cutscene = State.rails.runner.locked_entities[State.player]
+  if in_combat or in_cutscene then
     tk.start_window("center", "center", 400, 120)
     ui.start_font(28)
     ui.start_alignment("center")
-      ui.text("Невозможно сохранить игру во время битвы")
+      local reason = in_combat and "битвы" or "диалога"
+      ui.text("Невозможно сохранить игру во время " .. reason)
       ui.br()
       if ui.choice({"OK"}) or ui.keyboard("escape") then
         State.mode:close_menu()
