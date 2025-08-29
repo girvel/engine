@@ -106,5 +106,5 @@ mode.new = function()
   }, mt)
 end
 
-Ldump.mark(mode, {}, ...)
+Ldump.mark(mode, {new = {mt = "const"}}, ...)
 return mode

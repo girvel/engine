@@ -352,6 +352,11 @@ draw_dialogue = function()
     end
   ui.finish_font()
   tk.finish_window()
+
+  if ui.keyboard("escape") then
+    State.mode:open_escape_menu()
+  end
 end
 
+Ldump.mark(draw_gui, {}, ...)
 return draw_gui

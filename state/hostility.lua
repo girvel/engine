@@ -42,6 +42,7 @@ end
 
 --- @param f fun(entity, entity)
 methods.subscribe = function(self, f)
+  Ldump.ignore_upvalue_size(f)
   table.insert(self._agression_subscriptions, f)
 end
 

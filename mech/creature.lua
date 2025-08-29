@@ -215,5 +215,7 @@ methods.get_initiative_roll = function(self)
   return self:modify("initiative_roll", D(20) + self:get_modifier("dex"))
 end
 
-Ldump.mark(creature, {}, ...)
+Ldump.mark(creature, {
+  mixin = {methods = "const"},
+}, ...)
 return creature

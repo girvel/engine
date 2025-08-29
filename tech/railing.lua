@@ -12,6 +12,7 @@ local railing = {}
 --- @field disabled? true
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field multiple_times_flag? true don't disable the scene in the beginning of the first run
+--- @field save_flag? true don't warn about making a save during this scene
 
 --- @class scene_run
 --- @field coroutine thread
@@ -40,6 +41,8 @@ railing.runner = function(scenes, positions, entities)
   }, mt)
 end
 
+local scene_run_mt = {}
+
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
@@ -54,7 +57,7 @@ methods.update = function(self, dt)
       and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
       and scene:start_predicate(dt, characters)
     then
-      table.insert(self._scene_runs, {
+      table.insert(self._scene_runs, setmetatable({
         coroutine = coroutine.create(function()
           if not scene.multiple_times_flag then
             scene.disabled = true
@@ -82,7 +85,7 @@ methods.update = function(self, dt)
         end),
         base_scene = scene,
         name = scene_name,
-      })
+      }, scene_run_mt))
     end
   end
 
@@ -95,6 +98,13 @@ methods.update = function(self, dt)
   end
 
   Table.remove_breaking_in_bulk(self._scene_runs, indexes_to_remove)
+end
+
+scene_run_mt.__serialize = function(self)
+  if not self.base_scene.save_flag then
+    Log.warn("Scene %s is active when saving" % {self.name})
+  end
+  return "nil"
 end
 
 Ldump.mark(railing, {}, ...)
