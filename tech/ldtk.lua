@@ -41,6 +41,13 @@ end
 local handle_tiles_or_intgrid = function(is_tiles)
   return function(this_parser, layer, palette, offset)
     local layer_id = get_identifier(layer)
+    if not is_tiles then
+      local postfix = "_auto"
+      Log.trace(layer_id)
+      assert(layer_id:ends_with(postfix))
+      layer_id = layer_id:sub(1, -#postfix - 1)
+    end
+
     local layer_palette = assert(
       palette[layer_id],
       "Missing palette element %q" % {layer_id}
