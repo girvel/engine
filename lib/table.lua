@@ -86,6 +86,19 @@ tablex.index_of = function(t, item)
   return nil
 end
 
+--- Return one of the keys of the item in the table
+--- @param t table
+--- @param item any
+--- @return any
+tablex.key_of = function(t, item)
+  for k, v in pairs(t) do
+    if v == item then
+      return k
+    end
+  end
+  return nil
+end
+
 --- Checks if the two tables are isomorphic on the first level on recursion
 --- @param t1 table
 --- @param t2 table

@@ -11,7 +11,7 @@ local railing = {}
 --- @field run fun(scene, characters)
 --- @field disabled? true
 --- @field boring_flag? true don't log scene beginning and ending
---- @field multiple_times_flag? true don't disable the scene in the beginning of the first run
+--- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
 
 --- @class scene_run
@@ -51,15 +51,14 @@ methods.update = function(self, dt)
       :tomap()
 
     if not scene.disabled
-      -- NEXT (rails)
-      -- and (scene.simultaneous_flag or not self:is_running(scene))
+      and (scene.mode == "parallel" or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
       and Fun.pairs(characters):all(function(_, c) return State:exists(c) end)
       and scene:start_predicate(dt, characters)
     then
       table.insert(self._scene_runs, setmetatable({
         coroutine = coroutine.create(function()
-          if not scene.multiple_times_flag then
+          if not scene.mode then
             scene.disabled = true
           end
 
@@ -98,6 +97,40 @@ methods.update = function(self, dt)
   end
 
   Table.remove_breaking_in_bulk(self._scene_runs, indexes_to_remove)
+end
+
+--- @param scene string|scene
+methods.is_running = function(self, scene)
+  if type(scene) == "string" then
+    scene = self.scenes[scene]
+  end
+
+  return Fun.iter(self._scene_runs)
+    :any(function(r) return r.base_scene == scene end)
+end
+
+methods.stop = function(self, scene)
+  if type(scene) == "string" then
+    scene = self.scenes[scene]
+  end
+
+  local old_length = #self._scene_runs
+
+  self._scene_runs = Fun.iter(self._scene_runs)
+    :filter(function(r) return r.base_scene ~= scene end)
+    :totable()
+
+  Log.info("Stopping scene %s; interrupted %s runs" % {
+    Table.key_of(self.scenes, scene),
+    old_length - #self._scene_runs,
+  })
+end
+
+methods.remove = function(self, scene)
+  self:stop(scene)
+  local key = type(scene) == "string" and scene or Table.key_of(self.scenes, scene)
+  self.scenes[key] = nil
+  Log.info("Removed scene %s")
 end
 
 scene_run_mt.__serialize = function(self)
