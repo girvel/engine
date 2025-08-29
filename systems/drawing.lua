@@ -1,4 +1,5 @@
 local ui = require("engine.tech.ui")
+local debug_overlay = require("engine.tech.debug_overlay")
 
 return Tiny.sortedProcessingSystem {
   codename = "drawing",
@@ -22,6 +23,9 @@ return Tiny.sortedProcessingSystem {
   postProcess = function(_, dt)
     ui.start()
     State.mode:draw_gui(dt)
+    if State.debug then
+      debug_overlay.draw(dt)
+    end
     ui.finish()
   end,
 }

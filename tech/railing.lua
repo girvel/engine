@@ -145,14 +145,20 @@ end
 
 --- @param f fun(scene, characters)
 methods.run_task = function(self, f)
+  local key
+  for i = 1, math.huge do
+    key = "task_" .. i
+    if not self.scenes[key] then break end
+  end
+
   local result = {
     start_predicate = function() return true end,
     run = function(self_scene)
+      self.scenes[key] = nil
       f(self_scene)
-      Table.remove(self.scenes, self_scene)
     end,
   }
-  table.insert(self.scenes, result)
+  self.scenes[key] = result
   return result
 end
 
