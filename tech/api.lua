@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
@@ -123,6 +124,41 @@ api.options = function(options, remove_picked)
   end
 
   return result
+end
+
+local prev_fov
+local FADE_DURATION = .5
+
+--- @async
+api.fade_out = function()
+  prev_fov = State.player.fov_r
+  for i = prev_fov, 0, -1 do
+    State.player.fov_r = i
+    while not Period(FADE_DURATION / prev_fov, api.fade_out) do
+      coroutine.yield()
+    end
+  end
+end
+
+--- @async
+api.fade_in = function()
+  for i = 0, prev_fov do
+    State.player.fov_r = i
+    while not Period(FADE_DURATION / prev_fov, api.fade_in) do
+      coroutine.yield()
+    end
+  end
+end
+
+api.fade_move = function(position)
+  local offset = State.perspective.camera_offset + State.player.position * State.level.cell_size * 4
+  State.perspective.is_camera_following = false
+  api.fade_out()
+    level.slow_move(State.player, position)
+    State.perspective.camera_offset = offset - State.player.position * State.level.cell_size * 4
+    async.sleep(2)
+  api.fade_in()
+  State.perspective.is_camera_following = true
 end
 
 Ldump.mark(api, {}, ...)

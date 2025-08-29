@@ -20,6 +20,7 @@ local state = {}
 --- @field level level_info
 --- @field player player
 --- @field debug boolean is debug mode enabled; see engine.kernel.cli
+--- @field is_loaded boolean is level fully loaded
 --- @field _world table
 --- @field _entities table
 local methods = {}
@@ -34,6 +35,8 @@ state.new = function(systems)
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
+
+    is_loaded = false,
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},
@@ -117,6 +120,7 @@ end
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
+  self.is_loaded = false
   Log.info("Loading level %s" % {path})
   local start_time = love.timer.getTime()
 
@@ -164,6 +168,8 @@ methods.load_level = function(self, path)
   Log.info("Added entities in %.2f s, total time %.2f s" % {
     end_time - read_time, end_time - start_time,
   })
+
+  self.is_loaded = true
 end
 
 --- @param list entity[]

@@ -6,6 +6,7 @@ local perspective = {}
 local smooth_camera_offset
 
 --- @class state_perspective
+--- @field is_camera_following boolean
 --- @field camera_offset vector
 --- @field vision_start vector
 --- @field vision_end vector
@@ -16,6 +17,7 @@ local mt = {__index = methods}
 
 perspective.new = function()
   return setmetatable({
+    is_camera_following = true,
     camera_offset = Vector.zero,
     vision_start = Vector.zero,
     vision_end = Vector.zero,
@@ -43,7 +45,9 @@ end
 methods.update = function(self, dt)
   if not State.player then return end
 
-  self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
+  if self.is_camera_following then
+    self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
+  end
 
   do
     local total_scale = self.SCALE * State.level.cell_size
