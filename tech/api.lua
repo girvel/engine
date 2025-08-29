@@ -9,6 +9,21 @@ local api = {}
 --- @async
 --- @param entity entity
 --- @param destination vector
+--- @param attempts_n vector
+api.travel_persistent = function(entity, destination, attempts_n)
+  for _ = 1, attempts_n do
+    api.travel(entity, destination)
+    if entity.position == destination or (
+      State.grids.solids:slow_get(destination, true)
+      and (entity.position - destination):abs() == 1)
+    then return end
+    coroutine.yield()
+  end
+end
+
+--- @async
+--- @param entity entity
+--- @param destination vector
 api.travel = function(entity, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
