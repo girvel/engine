@@ -3,7 +3,7 @@ local async = require("engine.tech.async")
 
 local railing = {}
 
---- @alias characters table<string, entity>
+--- @alias _railing_characters table<string, entity>
 
 --- @class scene
 --- @field characters? table<string, table>
@@ -109,6 +109,7 @@ methods.is_running = function(self, scene)
     :any(function(r) return r.base_scene == scene end)
 end
 
+--- @param scene string|scene
 methods.stop = function(self, scene)
   if type(scene) == "string" then
     scene = self.scenes[scene]
@@ -120,17 +121,36 @@ methods.stop = function(self, scene)
     :filter(function(r) return r.base_scene ~= scene end)
     :totable()
 
+  coroutine.yield()
+  for character, _ in pairs(scene.characters or {}) do
+    self.locked_entities[self.entities[character]] = nil
+  end
+
   Log.info("Stopping scene %s; interrupted %s runs" % {
     Table.key_of(self.scenes, scene),
     old_length - #self._scene_runs,
   })
 end
 
+--- @param scene string|scene
 methods.remove = function(self, scene)
   self:stop(scene)
   local key = type(scene) == "string" and scene or Table.key_of(self.scenes, scene)
   self.scenes[key] = nil
   Log.info("Removed scene %s")
+end
+
+--- @param f fun(scene, characters)
+methods.run_task = function(self, f)
+  local result = {
+    start_predicate = function() return true end,
+    run = function(self_scene)
+      f(self_scene)
+      Table.remove(self.scenes, self_scene)
+    end,
+  }
+  table.insert(self.scenes, result)
+  return result
 end
 
 scene_run_mt.__serialize = function(self)
