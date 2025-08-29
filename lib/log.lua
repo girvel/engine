@@ -65,6 +65,8 @@ local tostring = function(...)
 end
 
 
+local last_message = {}
+
 module_mt.__call = function(_, level, trace_shift, ...)
   if count[level] then
     count[level] = count[level] + 1
@@ -76,6 +78,12 @@ module_mt.__call = function(_, level, trace_shift, ...)
   end
 
   local msg = tostring(...)
+  if msg == last_message[level] then
+    msg = "~"
+  else
+    last_message[level] = msg
+  end
+
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
   local nameupper = level:upper()
