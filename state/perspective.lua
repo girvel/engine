@@ -65,8 +65,8 @@ methods.update = function(self, dt)
 end
 
 local SMOOTHING_CUTOFF = 3
-local SPRING_STIFFNESS = 50
-local DAMPING_K = 4 * math.sqrt(SPRING_STIFFNESS)
+local SPRING_STIFFNESS = 100
+local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 
 smooth_camera_offset = {
   velocity = Vector.zero,
