@@ -30,16 +30,8 @@ end
 --- @param position vector
 --- @return vector
 methods.center_camera = function(self, prev, position)
-  local scene_k = State.level.cell_size * self.SCALE
   local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
-  local border_size = (window_size / 2 - Vector.one * 1.5 * scene_k):map(math.floor)
-  local scaled_position = position * scene_k
-
-  return Vector.use(Math.median,
-    window_size - scaled_position - border_size,
-    prev,
-    border_size - scaled_position
-  )
+  return -(position) * State.level.cell_size * self.SCALE + window_size / 2
 end
 
 methods.update = function(self, dt)
@@ -47,6 +39,11 @@ methods.update = function(self, dt)
 
   if self.is_camera_following then
     self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
+    State.debug_overlay.points.camera = {
+      position = -self.camera_offset + V(734, 540) + V(32, 32),
+      color = V(0, 0, 1),
+      view = "absolute",
+    }
   end
 
   do
@@ -77,14 +74,28 @@ smooth_camera_offset = {
       - Vector.down  * math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
       - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
 
+    State.debug_overlay.points.vp = {
+      position = virtual_position + V(.5, .5),
+      color = V(1, 0, 0),
+      view = "grid",
+    }
+
     local target = State.perspective:center_camera(prev, virtual_position)
+
+    State.debug_overlay.points.target = {
+      position = -target + V(734, 540) + V(32, 32),
+      color = V(0, 1, 0),
+      view = "absolute",
+    }
 
     local d = target - prev
     if d:abs() <= SMOOTHING_CUTOFF then return target end
 
     local acceleration = SPRING_STIFFNESS * d - DAMPING_K * self.velocity
     self.velocity = self.velocity + acceleration * dt
-    return (prev + self.velocity * dt):map(math.floor)
+
+    local result = (prev + self.velocity * dt):map(math.floor)
+    return result
   end,
 }
 

@@ -14,6 +14,7 @@ local state = {}
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
+--- @field debug_overlay state_debug_overlay
 --- @field rails rails
 --- @field grids table<string, grid<entity>>
 --- @field grid_size vector
@@ -35,6 +36,7 @@ state.new = function(systems)
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
+    debug_overlay = require("engine.state.debug_overlay").new(),
 
     is_loaded = false,
 
