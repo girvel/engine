@@ -1,3 +1,4 @@
+local safety = require "engine.tech.safety"
 local action = {}
 
 --- @class action
@@ -20,9 +21,9 @@ action.base = {
   end,
 
   act = function(self, entity)
-    if not self:is_available(entity) then return false end
+    if not safety.call(self.is_available, self, entity) then return false end
     if self._act then
-      local result = self:_act(entity)
+      local result = safety.call(self._act, self, entity)
       assert(
         result == true or result == false,
         "action %s returned %s; actions must explicitly return true or false" % {

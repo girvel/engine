@@ -31,5 +31,19 @@ safety.assert = function(condition, message)
   return condition
 end
 
+--- @param f function
+--- @param ... any
+--- @return any
+safety.call = function(f, ...)
+  if State.debug then
+    return f(...)
+  end
+
+  local ok, result = pcall(f, ...)
+  if ok then return result end
+
+  Log("warn", 1, "safety.call error:", result)
+end
+
 Ldump.mark(safety, {}, ...)
 return safety

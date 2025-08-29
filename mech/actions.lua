@@ -9,13 +9,14 @@ local actions = {}
 
 --- @param direction vector
 --- @return action
-actions.move = function(direction)
+actions.move = Memoize(function(direction)
   return Table.extend({
+    codename = "move_" .. Vector.name_from_direction(direction),
+
     cost = {
       movement = 1,
     },
     _act = function(_, entity)
-      error()
       if entity.rotate then
         entity:rotate(direction)
       elseif entity.direction then
@@ -53,7 +54,7 @@ actions.move = function(direction)
       return result
     end,
   }, action.base)
-end
+end)
 
 actions.dash = Table.extend({
   name = "рывок",
