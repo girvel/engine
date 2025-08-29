@@ -27,7 +27,7 @@ safety.assert = function(condition, message)
     error(message)
   end
 
-  Log.warn(message)
+  Log.error(message)
   return condition
 end
 
@@ -44,7 +44,7 @@ safety.call = function(f, ...)
   end, ...)
   if ok then return result end
 
-  Log.warn("safety.call error:", result)
+  Log.error("safety.call error:", result)
 end
 
 --- Prevents the system from running if the level is not fully loaded

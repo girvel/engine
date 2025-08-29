@@ -14,7 +14,12 @@ async.resume = function(coroutine_, ...)
   end
 
   if not success then
-    error("Coroutine error: %s\ncoroutine %s" % {result, debug.traceback(coroutine_)})
+    local message = "Coroutine error: %s\ncoroutine %s" % {result, debug.traceback(coroutine_)}
+    if State.debug then
+      error(message)
+    else
+      Log.error(message)
+    end
   end
 
   return result
