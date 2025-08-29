@@ -184,7 +184,24 @@ parser_new = function()
       --- @type level_definition
       local level_module = require(path)
 
-      local raw = Json.decode(love.filesystem.read(level_module.ldtk.path)).levels
+      local content = love.filesystem.read(level_module.ldtk.path)
+      coroutine.yield(0)
+
+      local json_thread = love.thread.newThread [[
+        local content = ...
+
+        love.thread.getChannel('json'):push(
+          require("engine.lib.json").decode(content)
+        )
+      ]]
+      json_thread:start(content)
+
+      local raw
+      while not raw do
+        coroutine.yield(0)
+        raw = love.thread.getChannel('json'):pop()
+      end
+      raw = raw.levels
 
       self._level_info.cell_size = level_module.cell_size
       self._level_info.layers = level_module.layers
@@ -211,7 +228,7 @@ parser_new = function()
 
         if positions_layer then
           self:_read_positions(positions_layer, offset)
-          coroutine.yield(.5 * (j - 1) * average_layers_n / total_layers_n)
+          coroutine.yield(.1 + .4 * (j - 1) * average_layers_n / total_layers_n)
         end
 
         for i = #level.layerInstances, 1, -1 do
@@ -219,7 +236,7 @@ parser_new = function()
           if get_identifier(layer) ~= "positions" then
             self._handlers[layer.__type:utf_lower()](self, layer, level_module.palette, offset)
             -- TODO time-based yield moment?
-            coroutine.yield(.5 * (j * average_layers_n - i) / total_layers_n)
+            coroutine.yield(.1 + .4 * (j * average_layers_n - i) / total_layers_n)
           end
         end
 
