@@ -11,13 +11,11 @@ local draw_entity = function(self, entity, dt)
     return self:draw_grid(entity.layer, entity.sprite.grid, dt)
   end
 
-  local offset_position = entity.position
-  if entity.grid_layer then
-    offset_position = offset_position * State.level.cell_size
-  end
-  offset_position = State.perspective.camera_offset
-    + entity.position * State.perspective.SCALE * State.level.cell_size
-  local x, y = unpack(offset_position)
+  local x, y = unpack(entity.position)
+  local dx, dy = unpack(State.perspective.camera_offset)
+  local k = State.perspective.SCALE * State.level.cell_size
+  x = dx + x * k
+  y = dy + y * k
 
   if entity.shader then
     love.graphics.setShader(entity.shader.love_shader)
