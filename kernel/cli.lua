@@ -35,6 +35,10 @@ cli.parse = function(args)
     "Disables background music"
   )
 
+  parser:option(
+    "-r --resolution"
+  )
+
   args[-2] = nil
   args[-1] = nil
 
@@ -49,7 +53,20 @@ cli.parse = function(args)
     table.remove(args)
   end
 
-  return parser:parse(args)
+  local result = parser:parse(args)
+
+  if result.resolution then
+    local builtin_resolutions = {
+      ["1080p"] = V(1920, 1080),
+      ["720p"] = V(1280, 720),
+      ["360p"] = V(640, 360),
+    }
+
+    result.resolution = builtin_resolutions[result.resolution]
+      or Vector.own(Fun.iter(result.resolution / "x"):map(tonumber):totable())
+  end
+
+  return result
 end
 
 return cli

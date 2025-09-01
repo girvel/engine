@@ -32,6 +32,12 @@ return function(args)
     }
   end
 
+  if args.resolution then
+    love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false})
+  else
+    love.window.updateMode(0, 0, {fullscreen = true})
+  end
+
   State = state.new(systems, args)
   assert = safety.assert
 
