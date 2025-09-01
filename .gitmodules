@@ -4,3 +4,6 @@
 [submodule "lib/moonspeak"]
 	path = lib/moonspeak
 	url = https://github.com/girvel/moonspeak
+[submodule "lib/vector"]
+	path = lib/vector
+	url = https://github.com/girvel/vector
