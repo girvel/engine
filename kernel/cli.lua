@@ -30,6 +30,11 @@ cli.parse = function(args)
     "Run the game with profiler"
   )
 
+  parser:flag(
+    "-A --disable-ambient",
+    "Disables background music"
+  )
+
   args[-2] = nil
   args[-1] = nil
 

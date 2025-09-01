@@ -33,6 +33,8 @@ methods._update = function(self, dt)
     love.audio.setPosition(-1000, -1000, 0)
   end
 
+  if State.args.disable_ambient then return end
+
   local last_track = self._current
 
   if last_track and last_track.source:isPlaying() then
