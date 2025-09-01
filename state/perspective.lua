@@ -26,12 +26,14 @@ perspective.new = function()
   }, mt)
 end
 
---- @param prev vector
---- @param position vector
---- @return vector
-methods.center_camera = function(self, prev, position)
-  local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
-  return -(position) * State.level.cell_size * self.SCALE + window_size / 2
+methods.center_camera = function(self, target_x, target_y)
+  local k = State.level.cell_size * self.SCALE
+  return
+    math.floor(love.graphics.getWidth() / 2 - self.sidebar_w - target_x * k),
+    math.floor(love.graphics.getHeight() / 2 - target_y * k)
+
+  -- local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
+  -- return -(position) * State.level.cell_size * self.SCALE + window_size / 2
 end
 
 methods.update = function(self, dt)
@@ -65,43 +67,58 @@ local SPRING_STIFFNESS = 100
 local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 
 smooth_camera_offset = {
-  velocity = Vector.zero,
+  vx = 0,
+  vy = 0,
   next = function(self, prev, dt)
     prev = prev:map(function(v) return v ~= v and 0 or v end)
+    local prev_x, prev_y = unpack(prev)
 
     if dt >= .05 then  -- spring-based camera overshoots on low FPS
-      return State.perspective:center_camera(prev, State.player.position)
+      return V(State.perspective:center_camera(unpack(State.player.position)))
     end
 
-    local virtual_position = State.player.position
+    local vx, vy = unpack(State.player.position)
     if State.player:can_act() and State.player.resources.movement > 0 then
-      virtual_position = virtual_position
-        - Vector.up    * math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
-        - Vector.left  * math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
-        - Vector.down  * math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
-        - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+      vx = vx
+        + math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+        - math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
+
+      vy = vy
+        + math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
+        - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
     end
 
-    State.debug_overlay.points.vp = {
-      position = virtual_position + V(.5, .5),
-      color = V(1, 0, 0),
-      view = "grid",
-    }
+    if State.debug then
+      State.debug_overlay.points.vp = {
+        position = V(vx + .5, vy + .5),
+        color = V(1, 0, 0),
+        view = "grid",
+      }
+    end
 
-    local target = State.perspective:center_camera(prev, virtual_position)
+    local target_x, target_y = State.perspective:center_camera(vx, vy)
 
-    State.debug_overlay.points.target = {
-      position = -target + V(734, 540) + V(32, 32),
-      color = V(0, 1, 0),
-      view = "absolute",
-    }
+    if State.debug then
+      State.debug_overlay.points.target = {
+        position = V(734 + 32 - target_x, 540 + 32 - target_y),
+        color = V(0, 1, 0),
+        view = "absolute",
+      }
+    end
 
-    local d = target - prev
+    local dx = target_x - prev_x
+    local dy = target_y - prev_y
 
-    local acceleration = SPRING_STIFFNESS * d - DAMPING_K * self.velocity
-    self.velocity = self.velocity + acceleration * dt
+    local ax = SPRING_STIFFNESS * dx - DAMPING_K * self.vx
+    local ay = SPRING_STIFFNESS * dy - DAMPING_K * self.vy
 
-    local result = (prev + self.velocity * dt):map(math.floor)
+    self.vx = self.vx + ax * dt
+    self.vy = self.vy + ay * dt
+
+    local result = V(
+      math.floor(prev_x + self.vx * dt),
+      math.floor(prev_y + self.vy * dt)
+    )
     return result
   end,
 }

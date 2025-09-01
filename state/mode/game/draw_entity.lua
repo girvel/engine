@@ -5,8 +5,6 @@ local tk = require("engine.state.mode.tk")
 --- @param entity table
 --- @param dt number
 local draw_entity = function(self, entity, dt)
-  Lp.start()
-
   if entity.sprite.type == "grid" then
     return self:draw_grid(entity.layer, entity.sprite.grid, dt)
   end
@@ -45,8 +43,6 @@ local draw_entity = function(self, entity, dt)
     love.graphics.setShader()
     love.graphics.draw(self._temp_canvas)
   end
-
-  Lp.stop()
 end
 
 return draw_entity
