@@ -56,8 +56,6 @@ return function()
 
     love.graphics.present()
 
-		love.timer.sleep(0.001)
-
     if Kernel._save then
       local t = love.timer.getTime()
         saves.write(State, Kernel._save)
