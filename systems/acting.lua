@@ -87,7 +87,7 @@ return Tiny.processingSystem {
       local current = State.combat:get_current()
       Log.info("%s's turn" % {Entity.codename(current)})
       -- NEXT reset timeout (safety)
-      State:add(animated.fx("engine/assets/sprites/animations/turn_starts", current.position))
+      State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 
       self:_update_conditions(entity, 6)
     end
