@@ -25,6 +25,11 @@ cli.parse = function(args)
     "Sets `disabled = true` for given scene identifiers"
   ):args("+"):default({})
 
+  parser:flag(
+    "-p --profiler",
+    "Run the game with profiler"
+  )
+
   args[-2] = nil
   args[-1] = nil
 

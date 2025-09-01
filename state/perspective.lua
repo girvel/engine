@@ -92,10 +92,10 @@ smooth_camera_offset = {
       view = "absolute",
     }
 
-    if dt >= .1 then  -- spring-based camera overshoots on low FPS
+    if dt >= .05 then  -- spring-based camera overshoots on low FPS
       return target
     end
-    
+
     local d = target - prev
 
     local acceleration = SPRING_STIFFNESS * d - DAMPING_K * self.velocity

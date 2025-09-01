@@ -33,6 +33,10 @@ love.load = function(args)
   args = cli.parse(args)
   Log.info("CLI args:", args)
 
+  if args.profiler then
+    Profile.start()
+  end
+
   if args.recover then
     love.window.minimize()
     State = unpack(saves.read("last_crash.ldump.gz")) --[[@as state]]
@@ -50,8 +54,45 @@ love.quit = function()
   if not State.debug and State.mode:attempt_exit() then return true end
 
   Log.info("Exited smoothly")
+  if State.args.profiler then
+    Log.info(Profile.report(100))
+  end
   Log.report()
   return false
+end
+
+love.errorhandler = function(msg)
+  Log.fatal(debug.traceback(msg))
+  if State.args.profiler then
+    Log.info(Profile.report(100))
+  end
+  Log.report()
+  -- saves.write({State}, "last_crash.ldump.gz")
+  -- love.window.requestAttention()
+
+  if State.debug then return end
+
+  local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 48)
+
+  return function()
+    love.event.pump()
+
+    for e,a,b,c in love.event.poll() do
+      if e == "quit" then
+        return 1
+      elseif e == "keypressed" and a == "return" then
+        love.event.quit()
+      end
+    end
+
+    love.graphics.clear()
+      love.graphics.setColor(Vector.white)
+      love.graphics.setFont(FONT)
+
+      love.graphics.print("Игра потерпела крушение", 200, 200)
+      love.graphics.print("нажмите [Enter] чтобы выйти", 200, 260)
+    love.graphics.present()
+  end
 end
 
 love.run = function()
@@ -115,37 +156,6 @@ love.run = function()
         Kernel._save = nil
       save_load_t = save_load_t + love.timer.getTime() - t
     end
-  end
-end
-
-love.errorhandler = function(msg)
-  Log.fatal(debug.traceback(msg))
-  Log.report()
-  -- saves.write({State}, "last_crash.ldump.gz")
-  -- love.window.requestAttention()
-
-  if State.debug then return end
-
-  local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 48)
-
-  return function()
-    love.event.pump()
-
-    for e,a,b,c in love.event.poll() do
-      if e == "quit" then
-        return 1
-      elseif e == "keypressed" and a == "return" then
-        love.event.quit()
-      end
-    end
-
-    love.graphics.clear()
-      love.graphics.setColor(Vector.white)
-      love.graphics.setFont(FONT)
-
-      love.graphics.print("Игра потерпела крушение", 200, 200)
-      love.graphics.print("нажмите [Enter] чтобы выйти", 200, 260)
-    love.graphics.present()
   end
 end
 

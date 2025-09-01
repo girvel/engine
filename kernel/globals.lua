@@ -36,6 +36,8 @@ Moonspeak = require("engine.lib.moonspeak")
 
 Period = require("engine.lib.period")
 
+Profile = require("engine.lib.profile")
+
 Promise = require("engine.lib.promise")
 Ldump.mark_module("engine.lib.promise", "const")
 
