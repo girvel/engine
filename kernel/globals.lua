@@ -28,6 +28,8 @@ Inspect = function(x) return require("engine.lib.inspect")(x, {keys_limit = 20})
 
 Json = require("engine.lib.json")
 
+Lp = require("engine.lib.line_profiler")
+
 Math = require("engine.lib.math")
 
 Memoize = require("engine.lib.memoize")
