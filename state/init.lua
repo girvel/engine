@@ -14,13 +14,12 @@ local state = {}
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
---- @field debug_overlay state_debug_overlay
+--- @field debug state_debug? nil if debug mode is disabled
 --- @field rails rails
 --- @field grids table<string, grid<entity>>
 --- @field grid_size vector
 --- @field level level_info
 --- @field player player
---- @field debug boolean is debug mode enabled; see engine.kernel.cli
 --- @field is_loaded boolean is level fully loaded
 --- @field _world table
 --- @field _entities table
@@ -29,14 +28,16 @@ state.mt = {__index = methods}
 
 --- @param systems table[]
 --- @return state
-state.new = function(systems)
+state.new = function(systems, args)
   return setmetatable({
     mode = require("engine.state.mode").new(),
     perspective = require("engine.state.perspective").new(),
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
-    debug_overlay = require("engine.state.debug_overlay").new(),
+    debug = args.debug and require("engine.state.debug").new(),
+
+    args = args,
 
     is_loaded = false,
 

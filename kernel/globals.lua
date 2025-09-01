@@ -67,6 +67,4 @@ Ldump.mark_module("engine.lib.vector", "const")
 Query = require("engine.lib.query")
 Ldump.mark_module("engine.lib.query", "const")
 
-assert = require("engine.tech.safety").assert
-
 Log.info("Initialized globals")

@@ -40,8 +40,8 @@ love.load = function(args)
     os.exit()
   end
 
-  State = state.new(systems)
-  State.debug = args.debug
+  State = state.new(systems, args)
+  assert = safety.assert
 
   Log.info("Finished love.load")
 end

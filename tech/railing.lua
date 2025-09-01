@@ -32,6 +32,14 @@ local mt = {__index = methods}
 --- @param scenes scene[]
 --- @return rails_runner
 railing.runner = function(scenes, positions, entities)
+  for _, scene in ipairs(State.args.enable_scenes) do
+    scenes[scene].disabled = nil
+  end
+
+  for _, scene in ipairs(State.args.disable_scenes) do
+    scenes[scene].disabled = true
+  end
+
   return setmetatable({
     scenes = scenes,
     positions = positions,

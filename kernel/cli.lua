@@ -15,8 +15,29 @@ cli.parse = function(args)
     "Launch lua shell instead of the game"
   )
 
+  parser:option(
+    "-s --enable-scenes",
+    "Sets `disabled = false` for given scene identifiers"
+  ):args("+"):default({})
+
+  parser:option(
+    "-S --disable-scenes",
+    "Sets `disabled = true` for given scene identifiers"
+  ):args("+"):default({})
+
   args[-2] = nil
   args[-1] = nil
+
+  if Table.last(args) == "-debug" then
+    local ok, mobdebug = pcall(require, "mobdebug")
+    assert(
+      ok,
+      "-debug option provided, but mobdebug is not found. Are you running this from ZeroBrane?"
+    )
+
+    mobdebug.start()
+    table.remove(args)
+  end
 
   return parser:parse(args)
 end
