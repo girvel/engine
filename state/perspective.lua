@@ -68,7 +68,11 @@ smooth_camera_offset = {
   velocity = Vector.zero,
   next = function(self, prev, dt)
     prev = prev:map(function(v) return v ~= v and 0 or v end)
-    
+
+    if dt >= .05 then  -- spring-based camera overshoots on low FPS
+      return State.perspective:center_camera(prev, State.player.position)
+    end
+
     local virtual_position = State.player.position
     if State.player:can_act() and State.player.resources.movement > 0 then
       virtual_position = virtual_position
@@ -91,10 +95,6 @@ smooth_camera_offset = {
       color = V(0, 1, 0),
       view = "absolute",
     }
-
-    if dt >= .05 then  -- spring-based camera overshoots on low FPS
-      return target
-    end
 
     local d = target - prev
 

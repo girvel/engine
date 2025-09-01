@@ -11,6 +11,7 @@ local systems = require("engine.systems")
 local safety = require "engine.tech.safety"
 local cli = require "engine.kernel.cli"
 local saves = require "engine.kernel.saves"
+local async = require "engine.tech.async"
 
 
 -- callbacks --
@@ -35,6 +36,7 @@ love.load = function(args)
 
   if args.profiler then
     Profile.start()
+    async.lag_threshold = 1
   end
 
   if args.recover then

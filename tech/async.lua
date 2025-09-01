@@ -1,6 +1,6 @@
 local async = {}
 
-local LAG_THRESHOLD_SEC = .1
+async.lag_threshold = .1
 
 --- @param coroutine_ thread
 --- @param ... any
@@ -9,7 +9,7 @@ async.resume = function(coroutine_, ...)
   local t = love.timer.getTime()
   local success, result = coroutine.resume(coroutine_, ...)
   t = love.timer.getTime() - t
-  if t > LAG_THRESHOLD_SEC then
+  if t > async.lag_threshold then
     Log.warn("Coroutine lags (%.2f s)\n%s" % {t, debug.traceback()})
   end
 
