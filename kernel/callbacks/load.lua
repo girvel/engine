@@ -24,6 +24,14 @@ return function(args)
     os.exit()
   end
 
+  if not args.debug then
+    Lp = {
+      start = function() end,
+      stop = function() end,
+      report = function() return "" end,
+    }
+  end
+
   State = state.new(systems, args)
   assert = safety.assert
 

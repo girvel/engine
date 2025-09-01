@@ -39,7 +39,7 @@ methods.update = function(self, dt)
 
   if self.is_camera_following and State.is_loaded then
     self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
-    State.debug.points.camera = {
+    State.debug_overlay.points.camera = {
       position = -self.camera_offset + V(734, 540) + V(32, 32),
       color = V(0, 0, 1),
       view = "absolute",
@@ -82,7 +82,7 @@ smooth_camera_offset = {
         - Vector.right * math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
     end
 
-    State.debug.points.vp = {
+    State.debug_overlay.points.vp = {
       position = virtual_position + V(.5, .5),
       color = V(1, 0, 0),
       view = "grid",
@@ -90,7 +90,7 @@ smooth_camera_offset = {
 
     local target = State.perspective:center_camera(prev, virtual_position)
 
-    State.debug.points.target = {
+    State.debug_overlay.points.target = {
       position = -target + V(734, 540) + V(32, 32),
       color = V(0, 1, 0),
       view = "absolute",

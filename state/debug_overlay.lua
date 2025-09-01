@@ -1,7 +1,7 @@
 local ui = require("engine.tech.ui")
 
 
-local debug = {}
+local debug_overlay = {}
 
 --- @class state_debug
 --- @field points table<string, overlay_point>
@@ -10,7 +10,7 @@ local methods = {}
 local mt = {__index = methods}
 
 --- @return state_debug
-debug.new = function()
+debug_overlay.new = function()
   return setmetatable({
     points = {},
     _show_points = false,
@@ -70,5 +70,5 @@ end
 --- @field color vector
 --- @field view "grid"|"gui"|"absolute"
 
-Ldump.mark(debug, {}, ...)
-return debug
+Ldump.mark(debug_overlay, {}, ...)
+return debug_overlay

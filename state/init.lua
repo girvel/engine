@@ -14,7 +14,8 @@ local state = {}
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
---- @field debug state_debug? nil if debug mode is disabled
+--- @field debug_overlay state_debug
+--- @field debug boolean
 --- @field args table CLI args
 --- @field rails rails
 --- @field grids table<string, grid<entity>>
@@ -36,7 +37,8 @@ state.new = function(systems, args)
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
-    debug = args.debug and require("engine.state.debug").new(),
+    debug_overlay = require("engine.state.debug_overlay").new(),
+    debug = args.debug,
 
     args = args,
 
