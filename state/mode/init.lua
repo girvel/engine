@@ -23,11 +23,15 @@ local CLOSE_JOURNAL = sound.multiple("engine/assets/sounds/close_journal", 1)
 --- @field _mode table
 local methods = {
   draw_gui = function(self, dt)
-    return -Query(self._mode):draw_gui(dt)
+    if self._mode.draw_gui then
+      return self._mode:draw_gui(dt)
+    end
   end,
 
   draw_entity = function(self, entity, dt)
-    return -Query(self._mode):draw_entity(entity, dt)
+    if self._mode.draw_entity then
+      return self._mode:draw_entity(entity, dt)
+    end
   end,
 
   start_game = function(self)

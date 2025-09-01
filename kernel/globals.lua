@@ -66,7 +66,4 @@ Vector = require("engine.lib.vector")
 V = Vector.new
 Ldump.mark_module("engine.lib.vector", "const")
 
-Query = require("engine.lib.query")
-Ldump.mark_module("engine.lib.query", "const")
-
 Log.info("Initialized globals")
