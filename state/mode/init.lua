@@ -19,56 +19,64 @@ local STATES = {
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
 local CLOSE_JOURNAL = sound.multiple("engine/assets/sounds/close_journal", 1)
 
+local empty_f = function() end
+
 --- @class state_mode
 --- @field _mode table
 local methods = {
+  _set_mode = function(self, mode)
+    self._mode = mode
+    self.draw_gui = mode.draw_gui and function(self, ...)
+      return mode:draw_gui(...)
+    end or empty_f
+    self.draw_entity = mode.draw_entity and function(self, ...)
+      return mode:draw_entity(...)
+    end or empty_f
+  end,
+
   draw_gui = function(self, dt)
-    if self._mode.draw_gui then
-      return self._mode:draw_gui(dt)
-    end
+    error("No State.mode._mode is set")
   end,
 
   draw_entity = function(self, entity, dt)
-    if self._mode.draw_entity then
-      return self._mode:draw_entity(entity, dt)
-    end
+    error("No State.mode._mode is set")
   end,
 
   start_game = function(self)
     -- TODO switch modes between frames, not in the middle
     assert(self._mode.type == "start_menu")
     Log.info("Starting new game...")
-    self._mode = STATES.loading_screen.new(
+    self:_set_mode(STATES.loading_screen.new(
       coroutine.create(Fn.curry(State.load_level, State, "levels.main")),
       Fn.curry(self.start_game_finish, self)
-    )
+    ))
   end,
 
   start_game_finish = function(self)
     assert(self._mode.type == "loading_screen")
     Log.info("Game started")
-    self._mode = STATES.game.new()
+    self:_set_mode(STATES.game.new())
   end,
 
   open_escape_menu = function(self)
     Log.info("Opening escape menu")
-    self._mode = STATES.escape_menu.new(self._mode --[[@as state_mode_game]])
+    self:_set_mode(STATES.escape_menu.new(self._mode --[[@as state_mode_game]]))
   end,
 
   open_journal = function(self)
     Log.info("Opening journal")
-    self._mode = STATES.journal.new(self._mode --[[@as state_mode_game]])
+    self:_set_mode(STATES.journal.new(self._mode --[[@as state_mode_game]]))
     OPEN_JOURNAL:play()
   end,
 
   open_save_menu = function(self)
     Log.info("Opening save menu")
-    self._mode = STATES.save_menu.new(self._mode)
+    self:_set_mode(STATES.save_menu.new(self._mode))
   end,
 
   open_load_menu = function(self)
     Log.info("Opening load menu")
-    self._mode = STATES.load_menu.new(self._mode)
+    self:_set_mode(STATES.load_menu.new(self._mode))
   end,
 
   close_menu = function(self)
@@ -76,11 +84,11 @@ local methods = {
     if self._mode.type == "journal" then
       CLOSE_JOURNAL:play()
     end
-    self._mode = assert(self._mode._prev)
+    self:_set_mode(assert(self._mode._prev))
   end,
 
   player_has_died = function(self)
-    self._mode = STATES.death.new()
+    self:_set_mode(STATES.death.new())
     level.remove(State.player)
     State.player:rotate(Vector.left)
     animated.change_pack(State.player, "engine/assets/sprites/animations/skeleton")
@@ -88,7 +96,7 @@ local methods = {
 
   to_start_screen = function(self)
     assert(self._mode.type == "death")
-    self._mode = STATES.start_menu.new()
+    self:_set_mode(STATES.start_menu.new())
     State:reset()
   end,
 
@@ -97,7 +105,7 @@ local methods = {
     if self._mode.type == "exit_confirmation" then
       return false
     end
-    self._mode = STATES.exit_confirmation.new(self._mode)
+    self:_set_mode(STATES.exit_confirmation.new(self._mode))
     return true
   end,
 }
@@ -105,9 +113,9 @@ local methods = {
 local mt = {__index = methods}
 
 mode.new = function()
-  return setmetatable({
-    _mode = STATES.start_menu.new(),
-  }, mt)
+  local result = setmetatable({}, mt)
+  result:_set_mode(STATES.start_menu.new())
+  return result
 end
 
 Ldump.mark(mode, {new = {mt = "const"}}, ...)
