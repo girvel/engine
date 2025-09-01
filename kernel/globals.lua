@@ -29,6 +29,7 @@ Inspect = function(x) return require("engine.lib.inspect")(x, {keys_limit = 20})
 Json = require("engine.lib.json")
 
 Lp = require("engine.lib.line_profiler")
+Lp.time_function = love.timer.getTime
 
 Math = require("engine.lib.math")
 
