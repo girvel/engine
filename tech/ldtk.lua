@@ -43,7 +43,6 @@ local handle_tiles_or_intgrid = function(is_tiles)
     local layer_id = get_identifier(layer)
     if not is_tiles then
       local postfix = "_auto"
-      Log.trace(layer_id)
       assert(layer_id:ends_with(postfix))
       layer_id = layer_id:sub(1, -#postfix - 1)
     end
