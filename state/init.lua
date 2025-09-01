@@ -37,7 +37,7 @@ state.new = function(systems, args)
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
-    debug_overlay = require("engine.state.debug_overlay").new(),
+    debug_overlay = require("engine.state.debug_overlay").new(args.debug),
     debug = args.debug,
 
     args = args,

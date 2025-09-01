@@ -6,21 +6,28 @@ local debug_overlay = {}
 --- @class state_debug
 --- @field points table<string, overlay_point>
 --- @field _show_points boolean
+--- @field _show_fps boolean
+--- @field _show_scenes boolean
 local methods = {}
 local mt = {__index = methods}
 
+--- @param is_debug boolean
 --- @return state_debug
-debug_overlay.new = function()
+debug_overlay.new = function(is_debug)
   return setmetatable({
     points = {},
     _show_points = false,
+    _show_fps = is_debug,
+    _show_scenes = is_debug,
   }, mt)
 end
 
 methods.draw = function(self, dt)
-  ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
+  if self._show_fps then
+    ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
+  end
 
-  if State.rails then
+  if State.rails and self._show_scenes then
     local enabled = Fun.pairs(State.rails.runner.scenes)
       :map(function(k, v) return k end)
       :totable()
@@ -36,10 +43,6 @@ methods.draw = function(self, dt)
     for _, v in ipairs(State.rails.runner._scene_runs) do
       ui.text("- " .. v.name)
     end
-  end
-
-  if ui.keyboard("f1") then
-    self._show_points = not self._show_points
   end
 
   if self._show_points then
@@ -62,6 +65,18 @@ methods.draw = function(self, dt)
       love.graphics.setColor(Vector.white)
     end
     ui.finish_font()
+  end
+
+  if ui.keyboard("f1") then
+    self._show_points = not self._show_points
+  end
+
+  if ui.keyboard("f2") then
+    self._show_fps = not self._show_fps
+  end
+
+  if ui.keyboard("f3") then
+    self._show_scenes = not self._show_scenes
   end
 end
 
