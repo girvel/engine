@@ -60,7 +60,7 @@ methods.observe = function(entity, dt)
     if target == State.player then
       condition = (
         not State.player.ai.in_cutscene_flag
-        and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
+        and tcod.snapshot(State.grids.solids):is_visible_unsafe(entity.position:unpack())
         and (State.player.position - entity.position):abs() <= HOSTILITY_RANGE
       )
     end

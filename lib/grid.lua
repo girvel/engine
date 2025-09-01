@@ -1,4 +1,4 @@
-local vector = require("engine.lib.vector")
+local vector = require("engine.lib.vector.vector")
 
 --- indexing starts from 1
 local grid = {}
@@ -10,7 +10,7 @@ grid.new = function(size, factory)
   assert(size)
   local inner_array = {}
   if factory then
-    for i = 1, size[1] * size[2] do
+    for i = 1, size.items[0] * size.items[1] do
         inner_array[i] = factory()
     end
   end
@@ -25,8 +25,8 @@ end
 --- @return grid
 grid.from_matrix = function(matrix, size)
   local result = grid.new(size)
-  for x = 1, size[1] do
-    for y = 1, size[2] do
+  for x = 1, size.items[0] do
+    for y = 1, size.items[1] do
       result._inner_array[result:_get_inner_index(x, y)] = matrix[y][x]
     end
   end
@@ -42,9 +42,6 @@ local methods = {}
 --- @param v vector
 --- @return boolean
 methods.can_fit = function(self, v)
-  for _, value in ipairs(v) do
-    if value <= 0 then return false end
-  end
   return vector.zero < v and self.size >= v
 end
 
@@ -168,10 +165,10 @@ methods.find_free_position = function(self, start, max_radius)
   max_radius = math.min(
     max_radius or math.huge,
     math.max(
-      start[1] - 1,
-      start[2] - 1,
-      self.size[1] - start[1],
-      self.size[2] - start[2]
+      start.items[0] - 1,
+      start.items[1] - 1,
+      self.size.items[0] - start.items[0],
+      self.size.items[1] - start.items[1]
     ) * 2
   )
 
@@ -206,7 +203,7 @@ end
 --- @param y integer
 --- @return integer
 methods._get_inner_index = function(self, x, y)
-  return x + (y - 1) * self.size[1]
+  return x + (y - 1) * self.size.items[0]
 end
 
 grid.mt = {
@@ -214,17 +211,17 @@ grid.mt = {
     local method = methods[v]
     if method then return method end
 
-    assert(
-      getmetatable(v) == vector.mt,
-      ("Attempt to index grid with %s which is neither vector nor a method name"):format(v)
-    )
+    -- assert(
+    --   getmetatable(v) == vector.mt,
+    --   ("Attempt to index grid with %s which is neither vector nor a method name"):format(v)
+    -- )
     assert(self:can_fit(v), ("%s is too big"):format(v))
-    return self._inner_array[self:_get_inner_index(unpack(v))]
+    return self._inner_array[self:_get_inner_index(v:unpack())]
   end,
 
   __newindex = function(self, v, value)
     assert(self:can_fit(v), tostring(v) .. " does not fit into grid size " .. tostring(self.size))
-    self._inner_array[self:_get_inner_index(unpack(v))] = value
+    self._inner_array[self:_get_inner_index(v:unpack())] = value
   end,
 }
 

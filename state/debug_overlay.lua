@@ -56,7 +56,7 @@ methods.draw = function(self, dt)
       else
         assert(false)
       end
-      local x, y = unpack(v)
+      local x, y = v:unpack()
       love.graphics.circle("fill", x, y, 3)
       love.graphics.print(k, x, y)
       love.graphics.setColor(Vector.white)

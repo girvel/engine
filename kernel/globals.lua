@@ -65,7 +65,7 @@ Tiny.worldMetaTable.__serialize = function(self)
   end
 end
 
-Vector = require("engine.lib.vector")
+Vector = require("engine.lib.vector.vector")
 V = Vector.new
 Ldump.mark_module("engine.lib.vector", "const")
 

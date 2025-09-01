@@ -168,7 +168,7 @@ methods.load_level = function(self, path)
     end
   end
 
-  self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
+  self.perspective.camera_offset = V(self.perspective:center_camera(self.player.position:unpack()))
 
   local end_time = love.timer.getTime()
   Log.info("Added entities in %.2f s, total time %.2f s" % {

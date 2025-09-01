@@ -28,7 +28,7 @@ local FADE_DURATION = .5
 
 methods._update = function(self, dt)
   if State.player then
-    love.audio.setPosition(unpack(State.player.position))
+    love.audio.setPosition(State.player.position:unpack())
   else
     love.audio.setPosition(-1000, -1000, 0)
   end

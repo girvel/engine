@@ -75,11 +75,31 @@ local handle_tiles_or_intgrid = function(is_tiles)
       )
 
       local e = factory()
-      e.position = Vector.own(instance.px)
+      e.position = V(unpack(instance.px))
         :div_mut(this_parser._level_info.cell_size)
         :add_mut(Vector.one)
         :add_mut(offset)
       e.grid_layer = layer_id
+
+      local v = e.position
+      if type(v.items[0]) ~= "number" or #v ~= 2 then
+        Log.trace(v.len, v.items[0], v.items[1])
+        Log.trace(instance.px)
+        Log.trace(v)
+        Log.trace(v:unpack())
+        Log.trace(V(unpack(instance.px)))
+        Log.trace(V(unpack(instance.px))
+          :div_mut(this_parser._level_info.cell_size))
+        Log.trace(V(unpack(instance.px))
+          :div_mut(this_parser._level_info.cell_size)
+          :add_mut(Vector.one))
+        Log.trace(V(unpack(instance.px))
+          :div_mut(this_parser._level_info.cell_size)
+          :add_mut(Vector.one)
+          :add_mut(offset))
+        Log.trace(offset)
+        error()
+      end
 
       local rails_name = this_parser._to_capture[layer_id][e.position]
       if rails_name then
@@ -147,7 +167,7 @@ parser_new = function()
             entity = factory()
           end
 
-          entity.position = Vector.own(instance.__grid)
+          entity.position = V(unpack(instance.__grid))
             :add_mut(Vector.one)
             :add_mut(offset)
           entity.grid_layer = layer_id
@@ -178,11 +198,11 @@ parser_new = function()
           local name = get_field(instance, "rails_name").__value:lower()
           self._to_capture
             [get_field(instance, "layer").__value:lower()]
-            [Vector.own(instance.__grid) + Vector.one + offset] = name
+            [V(unpack(instance.__grid)) + Vector.one + offset] = name
           table.insert(self._should_be_captured, name)
         else
           self._captures.positions[instance.fieldInstances[1].__value:lower()]
-            = Vector.own(instance.__grid):add_mut(Vector.one):add_mut(offset)
+            = V(unpack(instance.__grid)):add_mut(Vector.one):add_mut(offset)
         end
       end
     end,

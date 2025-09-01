@@ -9,8 +9,8 @@ local draw_entity = function(self, entity, dt)
     return self:draw_grid(entity.layer, entity.sprite.grid, dt)
   end
 
-  local x, y = unpack(entity.position)
-  local dx, dy = unpack(State.perspective.camera_offset)
+  local x, y = entity.position:unpack()
+  local dx, dy = State.perspective.camera_offset:unpack()
   local k = State.perspective.SCALE * State.level.cell_size
   x = dx + x * k
   y = dy + y * k

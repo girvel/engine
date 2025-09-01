@@ -70,7 +70,7 @@ methods.place = function(self, position, size)
   )
 
   self.source:setRelative(false)
-  self.source:setPosition(unpack(position))
+  self.source:setPosition(position:unpack())
   self.source:setAttenuationDistances(unpack(limits))
   self.source:setRolloff(2)
   return self

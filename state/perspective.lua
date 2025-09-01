@@ -71,13 +71,13 @@ smooth_camera_offset = {
   vy = 0,
   next = function(self, prev, dt)
     prev = prev:map(function(v) return v ~= v and 0 or v end)
-    local prev_x, prev_y = unpack(prev)
+    local prev_x, prev_y = prev:unpack()
 
     if dt >= .05 then  -- spring-based camera overshoots on low FPS
-      return V(State.perspective:center_camera(unpack(State.player.position)))
+      return V(State.perspective:center_camera(State.player.position:unpack()))
     end
 
-    local vx, vy = unpack(State.player.position)
+    local vx, vy = State.player.position:unpack()
     if State.player:can_act() and State.player.resources.movement > 0 then
       vx = vx
         + math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))

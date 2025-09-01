@@ -115,10 +115,10 @@ local anchors = {
 
 local color_eq = function(v, color)
   return (
-    math.abs(v[1] - color.r) <= 2 and
-    math.abs(v[2] - color.g) <= 2 and
-    math.abs(v[3] - color.b) <= 2 and
-    (not v[4] or math.abs(v[4] - color.a) <= 2)
+    math.abs(v.items[0] - color.r) <= 2 and
+    math.abs(v.items[1] - color.g) <= 2 and
+    math.abs(v.items[2] - color.b) <= 2 and
+    (not v.items[3] or math.abs(v.items[3] - color.a) <= 2)
   )
 end
 

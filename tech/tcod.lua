@@ -60,7 +60,7 @@ if tcod_c then
   --- @return T
   tcod.observer = function(grid)
     --- @cast grid grid
-    local w, h = unpack(grid.size)
+    local w, h = grid.size:unpack()
     local map = tcod_c.TCOD_map_new(w, h)
     for x = 1, w do
       for y = 1, h do
@@ -78,7 +78,7 @@ if tcod_c then
 
       __newindex = function(self, index, value)
         grid[index] = value
-        local x, y = unpack(index)
+        local x, y = index:unpack()
         tcod_c.TCOD_map_set_properties(
           rawget(self, "_tcod__snapshot")._map,
           x - 1, y - 1,
@@ -103,7 +103,7 @@ if tcod_c then
 
   --- @return nil
   snapshot_methods.refresh_fov = function(self, position, r)
-    local px, py = unpack(position - Vector.one)
+    local px, py = (position - Vector.one):unpack()
     tcod_c.TCOD_map_compute_fov(
       self._map, px, py, r, true, tcod_c.FOV_PERMISSIVE_8
     )
@@ -131,8 +131,8 @@ if tcod_c then
     assert(self._grid:can_fit(destination))
 
     local raw_path = tcod_c.TCOD_path_new_using_map(self._map, 0)
-    local ox, oy = unpack(origin - Vector.one)
-    local dx, dy = unpack(destination - Vector.one)
+    local ox, oy = (origin - Vector.one):unpack()
+    local dx, dy = (destination - Vector.one):unpack()
     tcod_c.TCOD_path_compute(raw_path, ox, oy, dx, dy)
 
     local result = {}
@@ -160,7 +160,7 @@ else
 
   snapshot_methods.refresh_fov = function(self, position, r)
     self.r = math.floor(r * 2 / 3)
-    self.px, self.py = unpack(position)
+    self.px, self.py = position:unpack()
   end
 
   snapshot_methods.is_visible_unsafe = function(self, x, y)
