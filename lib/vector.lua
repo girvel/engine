@@ -314,9 +314,17 @@ end
 --- @param self vector
 --- @return vector
 vector_methods.normalized = function(self)
+  return self:copy():normalized_mut()
+end
+
+--- @param self vector
+--- @return vector
+vector_methods.normalized_mut = function(self)
   local abs = self:abs()
-  if abs == 0 then return vector.fill(#self, function() return 0 end) end
-  return self / abs
+  for i, v in ipairs(self) do
+    self[i] = abs == 0 and 0 or (v / abs)
+  end
+  return self
 end
 
 local SWIZZLE_BASES = {

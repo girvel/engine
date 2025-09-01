@@ -37,7 +37,7 @@ end
 methods.update = function(self, dt)
   if not State.player then return end
 
-  if self.is_camera_following then
+  if self.is_camera_following and State.is_loaded then
     self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
     State.debug.points.camera = {
       position = -self.camera_offset + V(734, 540) + V(32, 32),
@@ -67,6 +67,8 @@ local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 smooth_camera_offset = {
   velocity = Vector.zero,
   next = function(self, prev, dt)
+    prev = prev:map(function(v) return v ~= v and 0 or v end)
+    
     local virtual_position = State.player.position
     if State.player:can_act() and State.player.resources.movement > 0 then
       virtual_position = virtual_position
@@ -90,6 +92,10 @@ smooth_camera_offset = {
       view = "absolute",
     }
 
+    if dt >= .1 then  -- spring-based camera overshoots on low FPS
+      return target
+    end
+    
     local d = target - prev
 
     local acceleration = SPRING_STIFFNESS * d - DAMPING_K * self.velocity

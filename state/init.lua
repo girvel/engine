@@ -15,6 +15,7 @@ local state = {}
 --- @field hostility state_hostility
 --- @field audio state_audio
 --- @field debug state_debug? nil if debug mode is disabled
+--- @field args table CLI args
 --- @field rails rails
 --- @field grids table<string, grid<entity>>
 --- @field grid_size vector
