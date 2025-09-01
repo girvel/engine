@@ -35,6 +35,8 @@ return function()
     end
 
 		dt = love.timer.step() - save_load_t
+    Kernel._total_time = Kernel._total_time + dt
+    Kernel._total_frames = Kernel._total_frames + 1
     save_load_t = 0
 
     for k, v in pairs(Kernel._delays) do

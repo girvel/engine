@@ -5,6 +5,8 @@ local init = {}
 --- @field _load? string
 --- @field _specific_key_rates table<love.KeyConstant, number>
 --- @field _delays table<love.KeyConstant, number>
+--- @field _total_frames integer
+--- @field _total_time number
 local methods = {}
 local mt = {__index = methods}
 
@@ -13,6 +15,8 @@ init.new = function()
   return setmetatable({
     _specific_key_rates = {},
     _delays = {},
+    _total_frames = 0,
+    _total_time = 0,
   }, mt)
 end
 
@@ -62,6 +66,20 @@ local DEFAULT_KEY_RATE = 5
 --- @return number
 methods.get_key_rate = function(self, key)
   return self._specific_key_rates[key] or DEFAULT_KEY_RATE
+end
+
+methods.report = function(self)
+  if State.args.profiler then
+    Log.info(Profile.report(100))
+  end
+
+  local line_report = Lp.report()
+  if #line_report > 0 then
+    Log.info(line_report)
+  end
+
+  Log.info("Average FPS is %.2f" % {self._total_frames / self._total_time})
+  Log.report()
 end
 
 return init

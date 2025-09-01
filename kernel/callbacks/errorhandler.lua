@@ -1,9 +1,6 @@
 return function(msg)
   Log.fatal(debug.traceback(msg))
-  if State.args.profiler then
-    Log.info(Profile.report(100))
-  end
-  Log.report()
+  Kernel:report()
   -- saves.write({State}, "last_crash.ldump.gz")
   -- love.window.requestAttention()
 
