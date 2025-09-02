@@ -43,7 +43,7 @@ local handle_tiles_or_intgrid = function(is_tiles)
     local layer_id = get_identifier(layer)
     if not is_tiles then
       local postfix = "_auto"
-      assert(layer_id:ends_with(postfix))
+      assert(layer_id:ends_with(postfix), "Auto layers should end with %q" % {postfix})
       layer_id = layer_id:sub(1, -#postfix - 1)
     end
 
@@ -155,12 +155,17 @@ parser_new = function()
           if rails_name then
             this_parser._were_captured[rails_name] = true
             this_parser._captures.entities[rails_name] = entity
-            assert(not get_field(instance, "rails_name"))
-          else
-            local f = get_field(instance, "rails_name")
-            if f then
-              this_parser._captures.entities[f.__value] = entity
-            end
+          end
+
+          local f = get_field(instance, "rails_name")
+          if f then
+            assert(
+              not rails_name,
+              "Collision: entity %s at %s%s has rails_name %s and captured as %s" % {
+                Entity.codename(entity), layer_id, entity.position, rails_name, f.__value,
+              }
+            )
+            this_parser._captures.entities[f.__value] = entity
           end
 
           table.insert(this_parser._entities, entity)
@@ -174,14 +179,37 @@ parser_new = function()
 
       for _, instance in ipairs(layer.entityInstances) do
         if get_identifier(instance) == "entity_capture" then
-          local name = get_field(instance, "rails_name").__value:lower()
+          local rails_name = get_field(instance, "rails_name").__value:lower()
+          local capture_layer = get_field(instance, "layer").__value:lower()
+          local position = Vector.new(unpack(instance.__grid)):add_mut(Vector.one):add_mut(offset)
+          local prev = self._to_capture[capture_layer][position]
+
+          assert(
+            not prev,
+            "Collision: %s%s captured as %s and %s" % {
+              capture_layer, position, rails_name, tostring(prev),
+            }
+          )
+
           self._to_capture
-            [get_field(instance, "layer").__value:lower()]
-            [Vector.own(instance.__grid) + Vector.one + offset] = name
-          table.insert(self._should_be_captured, name)
+            [capture_layer]
+            [position] = rails_name
+          table.insert(self._should_be_captured, rails_name)
         else
-          self._captures.positions[instance.fieldInstances[1].__value:lower()]
-            = Vector.own(instance.__grid):add_mut(Vector.one):add_mut(offset)
+          local rails_name = instance.fieldInstances[1].__value:lower()
+          local this_position = Vector.new(unpack(instance.__grid))
+            :add_mut(Vector.one)
+            :add_mut(offset)
+          local prev = self._captures.positions[rails_name]
+          Log.trace(rails_name)
+          assert(
+            not prev,
+            "Collision: position with name %s defined at %s and %s" % {
+              rails_name, prev, this_position,
+            }
+          )
+
+          self._captures.positions[rails_name] = this_position
         end
       end
     end,
