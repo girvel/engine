@@ -48,12 +48,12 @@ local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
 local SCALE = 4  -- TODO extract scale here
 
+local get_font, get_batch, get_mouse_over, button
+
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Context
 ----------------------------------------------------------------------------------------------------
-
-local get_font, get_batch, get_mouse_over
 
 ui.start = function()
   model.selection.max_i = 0
@@ -321,47 +321,29 @@ local ACTIVE_FRAME_PERIOD = .1
 
 --- @param image string|love.Image
 --- @param key love.KeyConstant
---- @return {is_pressed: boolean, is_mouse_over: boolean}
+--- @return ui_button_out
 ui.key_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * SCALE
   local h = image:getHeight() * SCALE
-  local is_clicked = Table.contains(model.keyboard.pressed, key)
-  local is_mouse_over = get_mouse_over(w, h)
+  local result = button(w, h)
 
-  if is_mouse_over then
-    if Table.contains(model.mouse.button_pressed, 1) then
-      model.are_pressed:set(true, image, key)
-    end
-
-    if Table.contains(model.mouse.button_released, 1)
-      and model.are_pressed:get(image, key)
-    then
-      is_clicked = true
-    end
+  if is_disabled then
+    result.is_clicked = false
+    result.is_mouse_over = false
   else
-    if Table.contains(model.mouse.button_released, 1) then
-      model.are_pressed:set(false, image, key)
-    end
+    result.is_clicked = result.is_clicked or Table.contains(model.keyboard.pressed, key)
   end
-  -- if mouse is over and mouse is down now set pressed
-  -- if mouse is not over and mouse is up unset pressed
-  -- if mouse is over and mouse is up and pressed set clicked
 
-  if is_disabled then is_clicked = false end
-
-  if is_mouse_over and not is_disabled then
+  if result.is_mouse_over and not is_disabled then
     model.cursor = "hand"
   end
 
-  if is_clicked then
+  if result.is_clicked then
     model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
   end
 
-  local is_active = (
-    model.active_frames_t:get(image, key)
-    or is_mouse_over and model.are_pressed:get(image, key)
-  )
+  result.is_active = result.is_active or model.active_frames_t:get(image, key)
 
   local font_size, text, dy
   if key:utf_len() == 1 then
@@ -379,9 +361,9 @@ ui.key_button = function(image, key, is_disabled)
     local frame_image = Table.last(model.frame)
   ui.finish_frame()
 
-  if (is_mouse_over and not is_disabled) or is_active then
+  if (result.is_mouse_over and not is_disabled) or result.is_active then
     ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
-      ui.tile(is_active and ACTIVE_FRAME or FRAME)
+      ui.tile(result.is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()
   end
 
@@ -397,10 +379,7 @@ ui.key_button = function(image, key, is_disabled)
   frame.x = frame_image.x
   frame.y = frame_image.y
 
-  return {
-    is_pressed = is_clicked,
-    is_mouse_over = is_mouse_over,
-  }
+  return result
 end
 
 --- @param path string path to atlas file
@@ -612,6 +591,45 @@ get_mouse_over = function(w, h)
     and model.mouse.x <= frame.x + w
     and model.mouse.y <= frame.y + h
   )
+end
+
+--- @class ui_button_out
+--- @field is_clicked boolean
+--- @field is_active boolean
+--- @field is_mouse_over boolean
+
+--- @param w integer
+--- @param h integer
+--- @return ui_button_out
+button = function(w, h)
+  local frame = Table.last(model.frame)
+  local x = frame.x
+  local y = frame.y
+  local result = {
+    is_clicked = false,
+    is_mouse_over = get_mouse_over(w, h),
+  }
+
+  result.is_active = result.is_mouse_over and model.are_pressed:get(x, y, w, h)
+
+  if result.is_mouse_over then
+    if Table.contains(model.mouse.button_pressed, 1) then
+      model.are_pressed:set(true, x, y, w, h)
+    end
+
+    if Table.contains(model.mouse.button_released, 1)
+      and model.are_pressed:get(x, y, w, h)
+    then
+      result.is_clicked = true
+      model.are_pressed:set(false, x, y, w, h)
+    end
+  else
+    if Table.contains(model.mouse.button_released, 1) then
+      model.are_pressed:set(false, x, y, w, h)
+    end
+  end
+
+  return result
 end
 
 ----------------------------------------------------------------------------------------------------

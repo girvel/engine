@@ -33,6 +33,7 @@ end
 
 --- @param head any
 --- @param ... any
+--- @return any
 methods.get = function(self, head, ...)
   if head == nil then
     return self._value
