@@ -1,15 +1,15 @@
 local api = require "engine.tech.api"
-local screenplayer = {}
+local screenplay = {}
 
---- @class screenplayer
---- @field stack (moonspeak_script|moonspeak_options)[]
+--- @class screenplay
+--- @field stack (moonspeak|moonspeak_options)[]
 --- @field characters table<string, entity>
 local methods = {}
 local mt = {__index = methods}
 
 --- @param path string
---- @return screenplayer
-screenplayer.new = function(path, characters)
+--- @return screenplay
+screenplay.new = function(path, characters)
   return setmetatable({
     stack = {Moonspeak.read(love.filesystem.read(path))},
     characters = characters,
@@ -84,7 +84,7 @@ methods.finish_branch = function(self)
 end
 
 methods.finish = function(self)
-  assert(#self.stack == 1, "Screenplayer contains %s unclosed scopes;\nstack = %s" % {
+  assert(#self.stack == 1, "Screenplay contains %s unclosed scopes;\nstack = %s" % {
     #self.stack - 1, Inspect(self.stack)
   })
   assert(#self.stack[1] == 0, "Expected script to end, got %s more entries;\nstack[1] = %s" % {
@@ -98,9 +98,9 @@ get_block = function(player, type)
   if block.type == "code" then
     block = table.remove(branch, 1)
   end
-  assert(block.type == type, "Screenplayer expected %s, got %s" % {type, block.type})
+  assert(block.type == type, "Screenplay expected %s, got %s" % {type, block.type})
   return block
 end
 
-Ldump.mark(screenplayer, {}, ...)
-return screenplayer
+Ldump.mark(screenplay, {}, ...)
+return screenplay
