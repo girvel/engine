@@ -9,7 +9,7 @@ local railing = {}
 --- @field characters? table<string, table>
 --- @field start_predicate fun(scene, integer, characters)
 --- @field run fun(scene, characters)
---- @field disabled? true
+--- @field enabled? true
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
@@ -33,11 +33,11 @@ local mt = {__index = methods}
 --- @return rails_runner
 railing.runner = function(scenes, positions, entities)
   for _, scene in ipairs(State.args.enable_scenes) do
-    scenes[scene].disabled = nil
+    scenes[scene].enabled = true
   end
 
   for _, scene in ipairs(State.args.disable_scenes) do
-    scenes[scene].disabled = true
+    scenes[scene].enabled = nil
   end
 
   return setmetatable({
@@ -60,7 +60,7 @@ methods.update = function(self, dt)
       :map(function(name, opts) return name, self.entities[name] end)
       :tomap()
 
-    if not scene.disabled
+    if scene.enabled
       and (scene.mode == "parallel" or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
       and Fun.pairs(characters):all(function(_, c)
@@ -76,7 +76,7 @@ methods.update = function(self, dt)
       table.insert(self._scene_runs, setmetatable({
         coroutine = coroutine.create(function()
           if not scene.mode then
-            scene.disabled = true
+            scene.enabled = nil
           end
 
           if not scene.boring_flag then

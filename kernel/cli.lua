@@ -16,13 +16,11 @@ cli.parse = function(args)
   )
 
   parser:option(
-    "-s --enable-scenes",
-    "Sets `disabled = false` for given scene identifiers"
+    "-s --enable-scenes"
   ):args("+"):default({})
 
   parser:option(
-    "-S --disable-scenes",
-    "Sets `disabled = true` for given scene identifiers"
+    "-S --disable-scenes"
   ):args("+"):default({})
 
   parser:flag(

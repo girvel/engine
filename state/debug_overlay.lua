@@ -28,13 +28,9 @@ methods.draw = function(self, dt)
   end
 
   if State.rails and self._show_scenes then
-    local enabled = Fun.pairs(State.rails.runner.scenes)
-      :map(function(k, v) return k end)
-      :totable()
-
     ui.text("enabled:")
     for k, v in pairs(State.rails.runner.scenes) do
-      if not v.disabled then
+      if v.enabled then
         ui.text("- " .. k)
       end
     end
