@@ -50,7 +50,8 @@ methods.start_option = function(self, n)
   local options = Table.last(self.stack)
   assert(options.type == "options")
 
-  table.insert(self.stack, assert(options.options[n].branch))
+  assert(options.options[n].branch)
+  table.insert(self.stack, options.options[n].branch)
 end
 
 methods.finish_option = function(self)
@@ -72,8 +73,8 @@ end
 methods.start_branch = function(self, n)
   local branches = Table.last(self.stack)  --[[@as moonspeak_branches]]
   assert(branches.type == "branches")
-
-  table.insert(self.stack, assert(branches.branches[n].branch))
+  assert(branches.branches[n].branch)
+  table.insert(self.stack, branches.branches[n].branch)
 end
 
 methods.finish_branch = function(self)

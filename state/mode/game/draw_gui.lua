@@ -310,6 +310,9 @@ local H = 200
 local BOTTOM_GAP = 50 + 40  -- (padding)
 local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
 
+local FAILURE = Vector.hex("e7573e")
+local SUCCESS = Vector.hex("c3e06c")
+
 draw_dialogue = function()
   local line = State.player.hears
   if not line then return end
@@ -319,13 +322,36 @@ draw_dialogue = function()
     if line.type == "plain_line" then
       local text = line.text
       if line.source then
-        local name = Entity.name(line.source)
         ui.start_frame()
-        love.graphics.setColor(line.source.sprite.color)
-          ui.text(name)
-        love.graphics.setColor(Vector.white)
+        ui.start_line()
+          local name = Entity.name(line.source)
+          love.graphics.setColor(line.source.sprite.color)
+            ui.text(name)
+          love.graphics.setColor(Vector.white)
+          ui.text(": ")
+
+          local color
+          local _, j, highlighted = text:find("^(%[[^%]]+ — успех%] )")
+          if highlighted then
+            color = SUCCESS
+          else
+            _, j, highlighted = text:find("^(%[[^%]]+ — провал%] )")
+            if highlighted then
+              color = FAILURE
+            end
+          end
+
+          local offset = name:utf_len() + 2
+          if highlighted then
+            love.graphics.setColor(color)
+              ui.text(highlighted)
+            love.graphics.setColor(Vector.white)
+            offset = offset + highlighted:utf_len()
+            text = text:sub(j + 1)
+          end
+          text = (" " * offset) .. text
+        ui.finish_line()
         ui.finish_frame()
-        text = (" " * name:utf_len()) .. ": " .. line.text
       end
       ui.text(text)
 

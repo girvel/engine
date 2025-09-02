@@ -3,7 +3,7 @@ local async = require("engine.tech.async")
 
 local railing = {}
 
---- @alias _railing_characters table<string, entity>
+--- @alias railing_characters table<string, entity>
 
 --- @class scene
 --- @field characters? table<string, table>
