@@ -308,10 +308,7 @@ end
 
 local H = 200
 local BOTTOM_GAP = 50 + 40  -- (padding)
-local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
-
-local FAILURE = Vector.hex("e7573e")
-local SUCCESS = Vector.hex("c3e06c")
+local draw_line, draw_options
 
 draw_dialogue = function()
   local line = State.player.hears
@@ -320,66 +317,9 @@ draw_dialogue = function()
   tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
   ui.start_font(32)
     if line.type == "plain_line" then
-      local text = line.text
-      if line.source then
-        ui.start_frame()
-        ui.start_line()
-          local name = Entity.name(line.source)
-          love.graphics.setColor(line.source.sprite.color)
-            ui.text(name)
-          love.graphics.setColor(Vector.white)
-          ui.text(": ")
-
-          local color
-          local _, j, highlighted = text:find("^(%[[^%]]+ — успех%] )")
-          if highlighted then
-            color = SUCCESS
-          else
-            _, j, highlighted = text:find("^(%[[^%]]+ — провал%] )")
-            if highlighted then
-              color = FAILURE
-            end
-          end
-
-          local offset = name:utf_len() + 2
-          if highlighted then
-            love.graphics.setColor(color)
-              ui.text(highlighted)
-            love.graphics.setColor(Vector.white)
-            offset = offset + highlighted:utf_len()
-            text = text:sub(j + 1)
-          end
-          text = (" " * offset) .. text
-        ui.finish_line()
-        ui.finish_frame()
-      end
-      ui.text(text)
-
-      if ui.keyboard("space") then
-        State.player.hears = nil
-        SKIP_SOUNDS:play()
-      end
+      draw_line(line)
     elseif line.type == "options" then
-      local sorted = {}
-      for i, o in pairs(line.options) do  -- can't use luafun: ipairs/pairs detection conflict
-        table.insert(sorted, {i, o})
-      end
-      table.sort(sorted, function(a, b) return a[1] < b[1] end)
-
-      local displayed = Fun.iter(sorted)
-        :enumerate()
-        :map(function(i, pair) return i .. ". " .. pair[2] end)
-        :totable()
-
-      local n = ui.choice(displayed)
-      for i = 1, #displayed do
-        if ui.keyboard(tostring(i)) then
-          n = i
-        end
-      end
-      if n then
-        State.player.speaks = sorted[n][1]
-      end
+      draw_options(line)
     else
       assert(false)
     end
@@ -388,6 +328,76 @@ draw_dialogue = function()
 
   if ui.keyboard("escape") then
     State.mode:open_escape_menu()
+  end
+end
+
+local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
+
+local FAILURE = Vector.hex("e7573e")
+local SUCCESS = Vector.hex("c3e06c")
+
+draw_line = function(line)
+  local text = line.text
+  if line.source then
+    ui.start_frame()
+    ui.start_line()
+      local name = Entity.name(line.source)
+      love.graphics.setColor(line.source.sprite.color)
+        ui.text(name)
+      love.graphics.setColor(Vector.white)
+      ui.text(": ")
+
+      local color
+      local _, j, highlighted = text:find("^(%[[^%]]+ — успех%] )")
+      if highlighted then
+        color = SUCCESS
+      else
+        _, j, highlighted = text:find("^(%[[^%]]+ — провал%] )")
+        if highlighted then
+          color = FAILURE
+        end
+      end
+
+      local offset = name:utf_len() + 2
+      if highlighted then
+        love.graphics.setColor(color)
+          ui.text(highlighted)
+        love.graphics.setColor(Vector.white)
+        offset = offset + highlighted:utf_len()
+        text = text:sub(j + 1)
+      end
+      text = (" " * offset) .. text
+    ui.finish_line()
+    ui.finish_frame()
+  end
+  ui.text(text)
+
+  if ui.keyboard("space") or ui.mousedown() then
+    State.player.hears = nil
+    SKIP_SOUNDS:play()
+  end
+end
+
+draw_options = function(line)
+  local sorted = {}
+  for i, o in pairs(line.options) do  -- can't use luafun: ipairs/pairs detection conflict
+    table.insert(sorted, {i, o})
+  end
+  table.sort(sorted, function(a, b) return a[1] < b[1] end)
+
+  local displayed = Fun.iter(sorted)
+    :enumerate()
+    :map(function(i, pair) return i .. ". " .. pair[2] end)
+    :totable()
+
+  local n = ui.choice(displayed)
+  for i = 1, #displayed do
+    if ui.keyboard(tostring(i)) then
+      n = i
+    end
+  end
+  if n then
+    State.player.speaks = sorted[n][1]
   end
 end
 

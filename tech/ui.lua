@@ -507,16 +507,26 @@ ui.keyboard = function(...)
   return false
 end
 
---- @param ... integer
---- @return boolean
-ui.mouse = function(...)
-  for i = 1, select("#", ...) do
-    if model.mouse.button_pressed == select(i, ...) then
-      return true
-    end
-  end
-  return false
+ui.mousedown = function()
+  return Table.contains(model.mouse.button_pressed, 1)
 end
+
+-- --- @param is_global? boolean use all screen instead of current frame
+-- --- @return boolean
+-- ui.mouse = function(is_global)
+--   if is_global then
+--     table.insert(model.frame, {
+--       x = 0, y = 0,
+--       w = love.graphics.getWidth(), h = love.graphics.getHeight()
+--     })
+--   end
+--   local frame = Table.last(model.frame)
+--   local result = button(frame.w, frame.h).is_clicked
+--   if is_global then
+--     table.remove(model.frame)
+--   end
+--   return result
+-- end
 
 ui.get_frame = function()
   return Table.shallow_copy(Table.last(model.frame))
