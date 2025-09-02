@@ -14,17 +14,19 @@ safety.live_system = function(system)
   return system
 end
 
+local built_in_assert = assert
+
 --- @generic T
 --- @param condition T
 --- @param message string
 --- @return T
 safety.assert = function(condition, message)
-  if condition then
-    return condition
+  if State.debug then
+    return built_in_assert(condition, message)
   end
 
-  if State.debug then
-    error(message)
+  if condition then
+    return condition
   end
 
   Log.error(message)
