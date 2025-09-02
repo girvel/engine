@@ -114,7 +114,14 @@ for level, _ in pairs(levels) do
 end
 
 log.report = function()
-  log.info(("%s warnings, %s errors, %s fatal"):format(count.warn, count.error, count.fatal))
+  local level = "info"
+  if count.error > 0 then
+    level = "error"
+  elseif count.warn > 0 then
+    level = "warn"
+  end
+
+  log[level](("%s warnings, %s errors, %s fatal"):format(count.warn, count.error, count.fatal))
 end
 
 
