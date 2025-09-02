@@ -59,9 +59,36 @@ methods.finish_option = function(self)
   assert(Table.last(self.stack).type == "options")
 end
 
+methods.start_branches = function(self)
+  local block = get_block(self, "branches")  --[[@as moonspeak_branches]]
+  table.insert(self.stack, block)
+end
+
+methods.finish_branches = function(self)
+  assert(Table.last(self.stack).type == "branches")
+  table.remove(self.stack)
+end
+
+methods.start_branch = function(self, n)
+  local branches = Table.last(self.stack)  --[[@as moonspeak_branches]]
+  assert(branches.type == "branches")
+
+  table.insert(self.stack, assert(branches.branches[n].branch))
+end
+
+methods.finish_branch = function(self)
+  assert(not Table.last(self.stack).type)
+  table.remove(self.stack)
+  assert(Table.last(self.stack).type == "branches")
+end
+
 methods.finish = function(self)
-  assert(#self.stack == 1, "Screenplayer contains %s unclosed scopes" % {#self.stack - 1})
-  assert(#self.stack[1] == 0, "Expected script to end, got %s more entries" % {#self.stack[1]})
+  assert(#self.stack == 1, "Screenplayer contains %s unclosed scopes;\nstack = %s" % {
+    #self.stack - 1, Inspect(self.stack)
+  })
+  assert(#self.stack[1] == 0, "Expected script to end, got %s more entries;\nstack[1] = %s" % {
+    #self.stack[1], Inspect(self.stack[1])
+  })
 end
 
 get_block = function(player, type)
