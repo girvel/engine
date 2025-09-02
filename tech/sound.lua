@@ -36,9 +36,15 @@ local multiple_mt = {__index = multiple_methods}
 --- @param volume? number
 --- @return sound_multiple
 sound.multiple = Memoize(function(dir_path, volume)
-  return setmetatable(Fun.iter(love.filesystem.getDirectoryItems(dir_path))
-    :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
-    :totable(), multiple_mt)
+  assert(love.filesystem.getInfo(dir_path), "%q doesn't exist" % {dir_path})
+  local result = setmetatable(
+    Fun.iter(love.filesystem.getDirectoryItems(dir_path))
+      :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
+      :totable(),
+    multiple_mt
+  )
+  assert(#result > 0, "%q is empty" % {dir_path})
+  return result
 end)
 
 --- @enum (key) sound_size
