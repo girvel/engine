@@ -83,6 +83,12 @@ methods.finish_branch = function(self)
   assert(Table.last(self.stack).type == "branches")
 end
 
+--- @return string
+methods.literal = function(self)
+  local block = get_block(self, "literal")  --[[@as moonspeak_literal]]
+  return block.text
+end
+
 methods.finish = function(self)
   assert(#self.stack == 1, "Screenplay contains %s unclosed scopes;\nstack = %s" % {
     #self.stack - 1, Inspect(self.stack)

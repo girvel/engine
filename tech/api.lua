@@ -210,5 +210,11 @@ api.notification = function(text)
   end)
 end
 
+--- @return objective
+api.journal_update = function()
+  api.notification("Новая задача")
+  State.quests.has_new_content = true
+end
+
 Ldump.mark(api, {}, ...)
 return api
