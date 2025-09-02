@@ -3,6 +3,7 @@ local level = require("engine.tech.level")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
+local sound= require("engine.tech.sound")
 
 
 --- API for asynchronous scripting, both AI and rails
@@ -201,8 +202,11 @@ api.rotate = function(entity, target)
   entity:rotate((target.position - entity.position):normalized2())
 end
 
+local NOTIFICATION_SOUND = sound.multiple("engine/assets/sounds/notification", .01)
+
 --- @param text string
 api.notification = function(text)
+  NOTIFICATION_SOUND:play()
   State.rails.runner:run_task(function()
     State.player.notification = text
     async.sleep(5)
@@ -210,7 +214,6 @@ api.notification = function(text)
   end)
 end
 
---- @return objective
 api.journal_update = function()
   api.notification("Новая задача")
   State.quests.has_new_content = true
