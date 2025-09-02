@@ -403,17 +403,44 @@ draw_options = function(line)
   end
 end
 
+local start_t, prev
+
 draw_notification = function()
   local text = State.player.notification
-  if not text then return end
+  if not text then
+    prev = text
+    return
+  end
+
+  if not prev then
+    start_t = love.timer.getTime()
+  end
+  local dt = love.timer.getTime() - start_t
+
+  local postfix, prefix
+  if dt <= .3 then
+    prefix  = "  ."
+    postfix = ".  "
+  elseif dt <= .6 then
+    prefix  = " . "
+    postfix = " . "
+  elseif dt <= .9 then
+    prefix  = ".  "
+    postfix = "  ."
+  else
+    prefix  = "   "
+    postfix = "   "
+  end
 
   ui.start_frame(nil, 10, -State.perspective.sidebar_w)
   ui.start_font(32)
   ui.start_alignment("center")
-    ui.text(text)
+    ui.text(prefix .. text .. postfix)
   ui.finish_alignment()
   ui.finish_font()
   ui.finish_frame()
+
+  prev = text
 end
 
 Ldump.mark(draw_gui, {}, ...)

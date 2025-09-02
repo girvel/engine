@@ -205,7 +205,7 @@ end
 api.notification = function(text)
   State.rails.runner:run_task(function()
     State.player.notification = text
-    async.sleep(10)
+    async.sleep(5)
     State.player.notification = nil
   end)
 end
