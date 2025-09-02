@@ -9,17 +9,35 @@ local tcod = require("engine.tech.tcod")
 local api = {}
 
 --- @async
+--- @param seconds number
+api.wait = function(seconds)
+  if not State.args.fast_scenes then
+    async.sleep(seconds)
+  end
+end
+
+--- @async
 --- @param entity entity
 --- @param destination vector
---- @param attempts_n vector
+api.travel_scripted = function(entity, destination)
+  api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs() / 3))
+
+  local p = assert(State.grids.solids:find_free_position(destination))
+  level.unsafe_move(entity, p)
+end
+
+--- @async
+--- @param entity entity
+--- @param destination vector
+--- @param attempts_n? vector
 api.travel_persistent = function(entity, destination, attempts_n)
-  for _ = 1, attempts_n do
+  for _ = 1, attempts_n or 3 do
     api.travel(entity, destination)
     if entity.position == destination or (
       State.grids.solids:slow_get(destination, true)
       and (entity.position - destination):abs() == 1)
     then return end
-    coroutine.yield()
+    async.sleep(.5)
   end
 end
 

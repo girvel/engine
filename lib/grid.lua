@@ -163,7 +163,7 @@ end
 --- @return vector?
 methods.find_free_position = function(self, start, max_radius)
   -- TODO OPT can be optimized replacing slow_get with fast_get + min/max
-  if self[start] == nil then return end
+  if self[start] == nil then return start end
 
   max_radius = math.min(
     max_radius or math.huge,
