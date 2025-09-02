@@ -11,7 +11,8 @@ local model = {
   mouse = {
     x = 0,
     y = 0,
-    button_pressed = nil,
+    button_pressed = {},
+    button_released = {},
   },
   keyboard = {
     pressed = {},
@@ -457,28 +458,33 @@ ui.choice = function(options)
   local frame = Table.last(model.frame)
 
   for i, option in ipairs(options) do
-    if model.selection.max_i + i == model.selection.i then
-      is_selected = true
-      option = "> " .. option
-    else
-      option = "  " .. option
-    end
+    local button_out = button(frame.w, font:getHeight() * 1.25)
 
-    local is_mouse_over = get_mouse_over(frame.w, font:getHeight() * 1.25)
-
-    if is_mouse_over then
+    if button_out.is_mouse_over then
       model.selection.i = model.selection.max_i + i
-      if Table.contains(model.mouse.button_pressed, 1) then
-        return model.selection.i
-      end
       is_selected = true
       model.cursor = "hand"
       love.graphics.setColor(.7, .7, .7)
     end
 
+    if model.selection.max_i + i == model.selection.i then
+      is_selected = true
+      if button_out.is_active then
+        option = "- " .. option
+      else
+        option = "> " .. option
+      end
+    else
+      option = "  " .. option
+    end
+
+    if button_out.is_clicked then
+      return model.selection.i
+    end
+
     ui.text(option)
 
-    if is_mouse_over then
+    if button_out.is_mouse_over then
       love.graphics.setColor(1, 1, 1)
     end
   end
