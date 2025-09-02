@@ -75,7 +75,7 @@ action_button = function(action, hotkey)
   local player = State.player
   local is_available = action:is_available(player)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
-  local button = ui.hot_button(gui_elements[codename], hotkey, not is_available)
+  local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_pressed and State.player:can_act() then
     player.ai.next_action = action
   end
@@ -124,7 +124,7 @@ draw_action_grid = function()
   ui.start_frame(4)
     ui.start_line()
       do
-        local button = ui.hot_button(gui.escape_menu, "escape")
+        local button = ui.key_button(gui.escape_menu, "escape")
         if button.is_pressed then
           State.mode:open_escape_menu()
         end
@@ -136,7 +136,7 @@ draw_action_grid = function()
 
       do
         local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
-        local button = ui.hot_button(journal_image, "j")
+        local button = ui.key_button(journal_image, "j")
         if button.is_pressed then
           State.mode:open_journal()
         end

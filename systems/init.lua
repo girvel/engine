@@ -12,6 +12,9 @@ local result = {
   -- love.mousepressed
   require("engine.systems.ui_mousepressed"),
 
+  -- love.mousereleased
+  require("engine.systems.ui_mousereleased"),
+
   -- love.update
   safety.live_system(require("engine.systems.update_sound")),
   safety.live_system(require("engine.systems.update_rails")),

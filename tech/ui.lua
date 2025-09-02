@@ -24,7 +24,10 @@ local model = {
     is_pressed = false,
   },
   cursor = nil,
+
+  -- state --
   active_frames_t = CompositeMap.new(),
+  are_pressed = CompositeMap.new(),  -- TODO weak pointer here
 
   -- context --
   frame = {},
@@ -70,7 +73,8 @@ end
 
 ui.finish = function()
   model.selection.is_pressed = false
-  model.mouse.button_pressed = nil
+  model.mouse.button_pressed = {}
+  model.mouse.button_released = {}
   model.keyboard.pressed = {}
   love.mouse.setCursor(CURSORS[model.cursor])
 end
@@ -318,25 +322,46 @@ local ACTIVE_FRAME_PERIOD = .1
 --- @param image string|love.Image
 --- @param key love.KeyConstant
 --- @return {is_pressed: boolean, is_mouse_over: boolean}
-ui.hot_button = function(image, key, is_disabled)
+ui.key_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * SCALE
   local h = image:getHeight() * SCALE
+  local is_clicked = Table.contains(model.keyboard.pressed, key)
   local is_mouse_over = get_mouse_over(w, h)
-  local is_pressed = not is_disabled and (
-    (is_mouse_over and model.mouse.button_pressed)
-    or Table.contains(model.keyboard.pressed, key)
-  )
+
+  if is_mouse_over then
+    if Table.contains(model.mouse.button_pressed, 1) then
+      model.are_pressed:set(true, image, key)
+    end
+
+    if Table.contains(model.mouse.button_released, 1)
+      and model.are_pressed:get(image, key)
+    then
+      is_clicked = true
+    end
+  else
+    if Table.contains(model.mouse.button_released, 1) then
+      model.are_pressed:set(false, image, key)
+    end
+  end
+  -- if mouse is over and mouse is down now set pressed
+  -- if mouse is not over and mouse is up unset pressed
+  -- if mouse is over and mouse is up and pressed set clicked
+
+  if is_disabled then is_clicked = false end
 
   if is_mouse_over and not is_disabled then
     model.cursor = "hand"
   end
 
-  if is_pressed then
+  if is_clicked then
     model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
   end
 
-  local is_active = model.active_frames_t:get(image, key)
+  local is_active = (
+    model.active_frames_t:get(image, key)
+    or is_mouse_over and model.are_pressed:get(image, key)
+  )
 
   local font_size, text, dy
   if key:utf_len() == 1 then
@@ -373,7 +398,7 @@ ui.hot_button = function(image, key, is_disabled)
   frame.y = frame_image.y
 
   return {
-    is_pressed = is_pressed,
+    is_pressed = is_clicked,
     is_mouse_over = is_mouse_over,
   }
 end
@@ -464,7 +489,7 @@ ui.choice = function(options)
 
     if is_mouse_over then
       model.selection.i = model.selection.max_i + i
-      if model.mouse.button_pressed then
+      if Table.contains(model.mouse.button_pressed, 1) then
         return model.selection.i
       end
       is_selected = true
@@ -486,9 +511,26 @@ ui.choice = function(options)
   end
 end
 
---- @param key love.KeyConstant
-ui.keyboard = function(key)
-  return Table.contains(model.keyboard.pressed, key)
+--- @param ... love.KeyConstant
+--- @return boolean
+ui.keyboard = function(...)
+  for i = 1, select("#", ...) do
+    if Table.contains(model.keyboard.pressed, select(i, ...)) then
+      return true
+    end
+  end
+  return false
+end
+
+--- @param ... integer
+--- @return boolean
+ui.mouse = function(...)
+  for i = 1, select("#", ...) do
+    if model.mouse.button_pressed == select(i, ...) then
+      return true
+    end
+  end
+  return false
 end
 
 ui.get_frame = function()
@@ -518,7 +560,11 @@ ui.handle_mousemove = function(x, y)
 end
 
 ui.handle_mousepress = function(button)
-  model.mouse.button_pressed = button
+  table.insert(model.mouse.button_pressed, button)
+end
+
+ui.handle_mouserelease = function(button)
+  table.insert(model.mouse.button_released, button)
 end
 
 ui.handle_update = function(dt)
