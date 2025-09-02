@@ -73,6 +73,7 @@ ui.start = function()
 end
 
 ui.finish = function()
+  assert(#model.frame == 1, "Unclosed UI frame(s) (%s)" % {#model.frame})
   model.selection.is_pressed = false
   model.mouse.button_pressed = {}
   model.mouse.button_released = {}
@@ -94,12 +95,12 @@ ui.start_frame = function(x, y, w, h)
   end
   if not w then
     w = prev.w - x
-  elseif w < 0 then
+  elseif w <= 0 then
     w = prev.w + w
   end
   if not h then
     h = prev.h - y
-  elseif h < 0 then
+  elseif h <= 0 then
     h = prev.h + h
   end
   table.insert(model.frame, {
@@ -192,6 +193,9 @@ ui.text = function(text)
 
   if is_linear then
     assert(#wrapped == 1)
+  end
+  if text == "Hi!" then
+    Log.trace(wrapped, frame)
   end
 
   for i, line in ipairs(wrapped) do

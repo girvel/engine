@@ -10,6 +10,7 @@ local player = {}
 --- @field ai player_ai
 --- @field hears? dialogue_line
 --- @field speaks? integer
+--- @field notification? string
 
 --- @alias dialogue_line plain_dialogue_line | dialogue_options
 

@@ -10,13 +10,15 @@ local tk = require("engine.state.mode.tk")
 
 
 local cost, hint
-local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order, draw_dialogue
+local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
+  draw_dialogue, draw_notification
 
 --- @param self state_mode_game
 --- @param dt number
 local draw_gui = function(self, dt)
   draw_sidebar()
   draw_dialogue()
+  draw_notification()
 end
 
 local PADDING_LX = 48
@@ -399,6 +401,19 @@ draw_options = function(line)
   if n then
     State.player.speaks = sorted[n][1]
   end
+end
+
+draw_notification = function()
+  local text = State.player.notification
+  if not text then return end
+
+  ui.start_frame(nil, 10, -State.perspective.sidebar_w)
+  ui.start_font(32)
+  ui.start_alignment("center")
+    ui.text(text)
+  ui.finish_alignment()
+  ui.finish_font()
+  ui.finish_frame()
 end
 
 Ldump.mark(draw_gui, {}, ...)

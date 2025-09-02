@@ -201,5 +201,14 @@ api.rotate = function(entity, target)
   entity:rotate((target.position - entity.position):normalized2())
 end
 
+--- @param text string
+api.notification = function(text)
+  State.rails.runner:run_task(function()
+    State.player.notification = text
+    async.sleep(10)
+    State.player.notification = nil
+  end)
+end
+
 Ldump.mark(api, {}, ...)
 return api

@@ -163,6 +163,7 @@ methods.run_task = function(self, f)
   end
 
   local result = {
+    boring_flag = true,
     start_predicate = function() return true end,
     run = function(self_scene)
       self.scenes[key] = nil

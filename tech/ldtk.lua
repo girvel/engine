@@ -201,7 +201,6 @@ parser_new = function()
             :add_mut(Vector.one)
             :add_mut(offset)
           local prev = self._captures.positions[rails_name]
-          Log.trace(rails_name)
           assert(
             not prev,
             "Collision: position with name %s defined at %s and %s" % {
