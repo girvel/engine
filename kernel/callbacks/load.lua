@@ -38,6 +38,10 @@ return function(args)
     love.window.updateMode(0, 0, {fullscreen = true})
   end
 
+  if args.fast_scenes then
+    Kernel:set_key_rate("space", 15)
+  end
+
   State = state.new(systems, args)
   assert = safety.assert
 
