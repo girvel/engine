@@ -3,6 +3,7 @@ local action = require "engine.tech.action"
 local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
 local animated = require "engine.tech.animated"
+local interactive = require "engine.tech.interactive"
 
 
 local actions = {}
@@ -227,6 +228,24 @@ base_attack = function(entity, slot)
     end
   end)
 end
+
+actions.interact = Table.extend({
+  name = "взаимодействовать",
+  codename = "interact",
+
+  cost = {
+    bonus_actions = 1,
+  },
+
+  _is_available = function(self, entity)
+    return interactive.get_for(entity)
+  end,
+
+  _act = function(self, entity)
+    assert(interactive.get_for(entity)):interact(entity)
+    return true
+  end,
+}, action.base)
 
 Ldump.mark(actions, {}, ...)
 return actions

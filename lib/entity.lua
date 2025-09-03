@@ -1,7 +1,7 @@
 --- Module for in-game entities
 local entityx = {}
 
---- @class entity: _creature_methods, _animated_methods
+--- @class entity: _creature_methods, _animated_methods, _interactive_methods
 --- @field name string in-game name
 --- @field codename string in-code name
 --- @field position vector position in grid cells; can be float if .grid_layer is nil
@@ -25,6 +25,9 @@ local entityx = {}
 --- @field armor integer static armor class; less priority than :get_armor
 --- @field perks table[] all class, feat, race perks that modify default creature behavior
 --- @field conditions table[] like .perks, but temporary
+---
+--- @field was_interacted_by entity?
+--- @field on_interact fun(entity, entity)
 ---
 --- @field player_flag? true marks player character for level loading
 --- @field transparent_flag? true marks entities that block path, but not vision

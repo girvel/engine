@@ -165,6 +165,9 @@ draw_action_grid = function()
 
       action_button(actions.dash, "lshift")
       ui.offset(4)
+
+      action_button(actions.interact, "e")
+      ui.offset(4)
     ui.finish_line()
     ui.offset(0, 4)
 

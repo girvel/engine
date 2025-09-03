@@ -20,4 +20,4 @@ love .
 
 - `levels.main` is the default level to load
 - `player` LuaLS type is user-defined
-- each level should contain `solids` and `items` grids
+- each level expects `solids` grid layer and relies on `items`, `tiles`, `on_solids`
