@@ -29,7 +29,7 @@ creature.init = function(entity)
   entity:rotate(entity.direction or Vector.right)
 end
 
---- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"
+--- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"|"dex_armor_bonus"
 
 --- @param self entity
 --- @param modification creature_modification
@@ -117,7 +117,7 @@ end
 --- Compute armor class; takes priority over .armor
 --- @param self entity
 methods.get_armor = function(self)
-  return self:modify("armor", 10 + self:get_modifier("dex"))
+  return self:modify("armor", 10 + self:modify("dex_armor_bonus", self:get_modifier("dex")))
 end
 
 --- @param self entity
