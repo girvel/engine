@@ -152,7 +152,7 @@ methods.ability_check = function(self, to_check, dc)
   local result = roll:roll()
 
   Log.debug("%s rolls check %s: %s against %s" % {
-    Entity.name(self), to_check, result, dc
+    Name.code(self), to_check, result, dc
   })
 
   local success = result >= dc

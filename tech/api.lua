@@ -94,7 +94,7 @@ api.attack = function(entity, target)
   local direction = target.position - entity.position
   if direction:abs() ~= 1 then return end
 
-  Log.debug("Attempt at attacking %s" % Entity.name(target))
+  Log.debug("Attempt at attacking %s" % Name.code(target))
   entity:rotate(direction)
   while actions.hand_attack:act(entity) or actions.offhand_attack:act(entity) do
     while not entity.animation.current:starts_with("idle") do

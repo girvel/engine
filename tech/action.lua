@@ -27,7 +27,7 @@ action.base = {
       assert(
         result == true or result == false,
         "action %s returned %s; actions must explicitly return true or false" % {
-          Entity.codename(self), Inspect(result)
+          Name.code(self), Inspect(result)
         }
       )
       if not result then return false end

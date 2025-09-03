@@ -15,7 +15,7 @@ Ldump.mark_module("engine.lib.composite_map", "const")
 D = require("engine.lib.d")
 Ldump.mark_module("engine.lib.d", "const")
 
-Entity = require("engine.lib.entity")
+Name = require("engine.lib.name")
 
 Fun = require("engine.lib.fun")
 

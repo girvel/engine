@@ -34,7 +34,7 @@ return Tiny.processingSystem {
       Log.info(
         "Combat ends as only %s are left standing"
          % table.concat(Fun.iter(State.combat.list)
-          :map(Entity.codename)
+          :map(Name.code)
           :totable(), ", ")
       )
 
@@ -85,7 +85,7 @@ return Tiny.processingSystem {
       State.combat:_pass_turn()
 
       local current = State.combat:get_current()
-      Log.info("%s's turn" % {Entity.codename(current)})
+      Log.info("%s's turn" % {Name.code(current)})
       -- NEXT reset timeout (safety)
       State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 

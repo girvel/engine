@@ -2,7 +2,7 @@ local cli = {}
 
 cli.parse = function(args)
   local parser = Argparse()
-    :name("Fallen engine")
+    :name("love <game root path>")
     :description("Launch the game")
 
   parser:flag(

@@ -79,7 +79,7 @@ end
 methods.remove = function(self, entity, silently)
   --- @cast entity table
   if not silently and not entity.boring_flag then
-    Log.debug("State:remove(%s)" % Entity.codename(entity))
+    Log.debug("State:remove(%s)" % Name.code(entity))
   end
 
   self._world:remove(entity)
@@ -190,7 +190,7 @@ methods.start_combat = function(self, list)
   end
 
   table.sort(list, function(a, b) return initiatives[a] > initiatives[b] end)
-  local repr = table.concat(Fun.iter(list):map(Entity.codename):totable(), ", ")
+  local repr = table.concat(Fun.iter(list):map(Name.code):totable(), ", ")
 
   if self.combat then
     Log.info("Joining the combat: %s" % {repr})

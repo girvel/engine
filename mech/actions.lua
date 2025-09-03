@@ -138,7 +138,7 @@ actions.hand_attack = Table.extend({
 
   get_hint = function(self, entity)
     return "%s (%s)" % {
-      Entity.name(self),
+      Name.game(self),
       entity:get_melee_damage_roll("hand"):simplified()
     }
   end,
@@ -165,7 +165,7 @@ actions.offhand_attack = Table.extend({
 
   get_hint = function(self, entity)
     return "%s (%s)" % {
-      Entity.name(self),
+      Name.game(self),
       entity:get_melee_damage_roll("offhand"):simplified()
     }
   end,

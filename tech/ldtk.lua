@@ -162,7 +162,7 @@ parser_new = function()
             assert(
               not rails_name,
               "Collision: entity %s at %s%s has rails_name %s and captured as %s" % {
-                Entity.codename(entity), layer_id, entity.position, rails_name, f.__value,
+                Name.code(entity), layer_id, entity.position, rails_name, f.__value,
               }
             )
             this_parser._captures.entities[f.__value] = entity
