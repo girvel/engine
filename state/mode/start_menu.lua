@@ -16,7 +16,7 @@ end
 
 methods.draw_gui = function()
   ui.start_font(48)
-  ui.start_frame(200, 200)
+  ui.start_frame(200, 200, 500, 500)
     local choice = ui.choice({
       "Новая игра",
       "Загрузить игру",
