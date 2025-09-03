@@ -80,7 +80,7 @@ action_button = function(action, hotkey)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_clicked and State.player:can_act() then
-    player.ai.next_action = action
+    table.insert(player.ai.next_actions, action)
   end
   if button.is_mouse_over then
     cost = action.cost
@@ -215,7 +215,7 @@ draw_action_grid = function()
     d = Vector.right,
   } do
     if ui.keyboard(key) then
-      State.player.ai.next_action = actions.move(direction)
+      table.insert(State.player.ai.next_actions, actions.move(direction))
     end
   end
 end

@@ -24,7 +24,7 @@ local base_player = {}
 --- @field options table<integer, string>
 
 --- @class player_ai: ai
---- @field next_action action?
+--- @field next_actions action[]
 --- @field finish_turn true?
 
 local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
@@ -36,7 +36,7 @@ base_player.mixin = function()
     fov_r = 16,
 
     ai = {
-      next_action = nil,
+      next_actions = {},
       finish_turn = nil,
       control = function(entity)
         if State.combat then
@@ -44,10 +44,11 @@ base_player.mixin = function()
         end
 
         while true do
-          if entity.ai.next_action then
-            entity.ai.next_action:act(entity)
-            entity.ai.next_action = nil
+          for _, a in ipairs(entity.ai.next_actions) do
+            a:act(entity)
           end
+          entity.ai.next_actions = {}
+
           if not State.combat or entity.ai.finish_turn then break end
           coroutine.yield()
         end

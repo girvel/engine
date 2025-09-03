@@ -28,8 +28,10 @@ return function()
         end
       elseif name == "keypressed" then
         Kernel._delays[b] = KEY_REPETITION_DELAY
+        Log.trace("pressed", b)
       elseif name == "keyreleased" then
         Kernel._delays[b] = nil
+        Log.trace("released", b)
       end
       love.handlers[name](a,b,c,d,e,f)
     end
@@ -42,6 +44,7 @@ return function()
     for k, v in pairs(Kernel._delays) do
       Kernel._delays[k] = math.max(0, v - dt)
       if Kernel._delays[k] == 0 then
+        Log.trace("pressed (rep)", k)
         love.keypressed(k)
         Kernel._delays[k] = 1 / Kernel:get_key_rate(k)
       end
