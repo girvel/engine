@@ -33,7 +33,7 @@ end
 
 --- @param entity entity
 methods.control = function(entity)
-  if not State.combat then return end
+  if not State.combat or State.rails.runner.locked_entities[State.player] then return end
 
   local target = find_target(entity, FOLLOW_RANGE)
   if not target then
@@ -50,6 +50,7 @@ local OBSERVE_PERIOD = .5
 --- @param entity entity
 --- @param dt number
 methods.observe = function(entity, dt)
+  if State.rails.runner.locked_entities[State.player] then return end
   if not Random.chance(dt / OBSERVE_PERIOD) then return end
 
   -- starting/joining combat
