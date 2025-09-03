@@ -1,5 +1,6 @@
 #!/usr/bin/env luajit
 
+local log = require("engine.lib.log")
 local argparse = require("engine.lib.argparse")
 
 local read_run = function(command)
@@ -7,6 +8,15 @@ local read_run = function(command)
   local result = f:read("*a")
   f:close()
   return result
+end
+
+local verbose_run = function(command)
+  print(command)
+  local exit_code = os.execute(command)
+  if exit_code ~= 0 then
+    log.fatal("Command exited with code", exit_code)
+    os.exit(1)
+  end
 end
 
 local parse_cli = function()
@@ -17,7 +27,13 @@ local parse_cli = function()
   parser:command("stat")
     :description("Display project line count")
 
-  parser:
+  local exe = parser:command("exe")
+    :description("Build a binary executable to distribute")
+
+  exe:option(
+    "-l --love-path",
+    "Full path of the love executable; defaults to $(which love.exe); should have love dlls nearby"
+  )
 
   return parser:parse()
 end
@@ -34,29 +50,65 @@ local VENDOR_LIBS = {
 
 local FALLEN_TOTAL = 12482
 
-local cli = {
-  stat = function(args)
-    do
-      local excessive_total = read_run("cat **/*.lua | wc -l")
-      local vendor = read_run(
-        ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
-      )
-      local total = excessive_total - vendor
+local cli = {}
 
-      print("# Engine")
-      print("Total:", total)
-      print("Fallen total:", FALLEN_TOTAL)
-      print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+cli.stat = function(args)
+  do
+    local excessive_total = read_run("cat **/*.lua | wc -l")
+    local vendor = read_run(
+      ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
+    )
+    local total = excessive_total - vendor
+
+    print("# Engine")
+    print("Total:", total)
+    print("Fallen total:", FALLEN_TOTAL)
+    print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+  end
+
+  do
+    local words = tonumber(read_run("cat **/*.ms | wc -w"))
+    print()
+    print("# Screenplay")
+    print("Words:", words)
+  end
+end
+
+cli.exe = function(args)
+  log.info("Starting the build")
+
+  local love_path
+  if args.love_path then
+    love_path = args.love_path
+  else
+    love_path = read_run("dirname $(which love.exe)")
+
+    do
+      local f = io.open(love_path)
+      if not f then
+        log.fatal("No --love-path provided, unable to find love.exe in PATH")
+        os.exit(1)
+      end
+      f:close()
     end
 
-    do
-      local words = tonumber(read_run("cat **/*.ms | wc -w"))
-      print()
-      print("# Screenplay")
-      print("Words:", words)
-    end
-  end,
-}
+    log.info("Found love.exe at", love_path)
+  end
+
+  verbose_run("mkdir -p .build")
+  verbose_run("rm -rf .build/*")
+  verbose_run("echo '*' > .build/.gitignore")
+
+  verbose_run("zip -9 -r .build/dot.love assets engine levels conf.lua main.lua")
+  verbose_run(("cat '%s/love.exe' .build/dot.love > .build/dot.exe"):format(love_path))
+  verbose_run("mkdir -p .build/dot_win64")
+  verbose_run("mv .build/dot.exe .build/dot_win64/dot.exe")
+  verbose_run(("cp '%s'/*.dll .build/dot_win64/"):format(love_path))
+  verbose_run("cp engine/lib/*.dll .build/dot_win64/")
+  verbose_run("cd .build; zip -9 -r dot_win64.zip dot_win64; cd ..")
+
+  log.info("Build finished.")
+end
 
 local args = parse_cli()
 cli[args.command](args)

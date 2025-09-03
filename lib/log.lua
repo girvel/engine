@@ -14,13 +14,16 @@ local inspect = require("engine.lib.inspect")
 local module_mt = {}
 local log = setmetatable({ _version = "0.1.0" }, module_mt)
 
-local log_directory = love.filesystem.getSaveDirectory() .. "/logs"
-if not love.filesystem.getInfo(log_directory) then
-  love.filesystem.createDirectory("/logs")
+local log_directory
+if love then
+  log_directory = love.filesystem.getSaveDirectory() .. "/logs"
+  if not love.filesystem.getInfo(log_directory) then
+    love.filesystem.createDirectory("/logs")
+  end
+  log.outfile = "/logs/" .. os.date("%Y-%m-%d_%H-%M-%S") .. ".txt"
 end
 
 log.usecolor = true
-log.outfile = "/logs/" .. os.date("%Y-%m-%d_%H-%M-%S") .. ".txt"
 log.level = "trace"
 
 
