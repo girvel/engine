@@ -48,5 +48,17 @@ gear.heavy_armor = Table.extend({
   end,
 }, gear.heavy)
 
+gear.weak_shield = {
+  modify_armor = function(self, entity, armor)
+    return armor + 1
+  end,
+}
+
+gear.shield = {
+  modify_armor = function(self, entity, armor)
+    return armor + 2
+  end,
+}
+
 Ldump.mark(gear, {}, ...)
 return gear

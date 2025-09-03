@@ -64,10 +64,19 @@ item.give = function(entity, this_item)
   local slot
   local is_free
   if this_item.slot == "hands" then
-    if this_item.tags.two_handed or not this_item.tags.light then
+    if this_item.tags.two_handed then
       is_free = (
         (not entity.inventory.hand or item.drop(entity, "hand"))
-        and (not entity.inventory.offhand or item.drop(entity, "offhand"))
+        and (not entity.inventory.offhand
+          or item.drop(entity, "offhand"))
+      )
+      slot = "hand"
+    elseif not this_item.tags.light then
+      is_free = (
+        (not entity.inventory.hand or item.drop(entity, "hand"))
+        and (not entity.inventory.offhand
+          or not entity.inventory.offhand.damage_roll
+          or item.drop(entity, "offhand"))
       )
       slot = "hand"
     else
@@ -79,7 +88,11 @@ item.give = function(entity, this_item)
       elseif entity.inventory.hand.tags.light and not entity.inventory.offhand then
         slot = "offhand"
         is_free = true
-      elseif entity.inventory.hand.tags.light and item.drop(entity, "offhand") then
+      elseif
+        entity.inventory.hand.tags.light
+        and this_item.tags.light
+        and item.drop(entity, "offhand")
+      then
         entity.inventory.offhand = entity.inventory.hand
         entity.inventory.hand = nil
         slot = "hand"
@@ -88,6 +101,14 @@ item.give = function(entity, this_item)
         is_free = false
       end
     end
+  elseif this_item.slot == "offhand" then
+    slot = "offhand"
+    is_free = (
+      (not entity.inventory.offhand or item.drop(entity, "offhand"))
+      and (not entity.inventory.hand
+        or not entity.inventory.hand.tags.two_handed
+        or item.drop(entity, "hand"))
+    )
   else
     is_free = not entity.inventory[this_item.slot] or item.drop(entity, this_item.slot)
     slot = this_item.slot

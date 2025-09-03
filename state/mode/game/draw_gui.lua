@@ -190,7 +190,7 @@ draw_action_grid = function()
       action_button(actions.hand_attack, "1")
       ui.offset(4)
 
-      if State.player.inventory.offhand then
+      if State.player.inventory.offhand and State.player.inventory.offhand.damage_roll then
         action_button(actions.offhand_attack, "2")
       else
         action_button(actions.shove, "2")

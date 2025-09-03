@@ -207,7 +207,7 @@ methods.get_melee_damage_roll = function(self, slot)
     roll = weapon.damage_roll
   end
 
-  roll = roll + weapon.bonus
+  roll = roll + (weapon.bonus or 0)
 
   if slot == "hand" then
     roll = roll + self:get_melee_modifier(slot)
