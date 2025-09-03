@@ -29,7 +29,7 @@ creature.init = function(entity)
   entity:rotate(entity.direction or Vector.right)
 end
 
---- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"
+--- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"
 
 --- @param self entity
 --- @param modification creature_modification
@@ -40,6 +40,12 @@ methods.modify = function(self, modification, value, ...)
   modification = "modify_" .. modification
   return Fun.iter(self.perks)
     :chain(self.conditions)
+    :chain(
+      Fun.pairs(self.inventory)
+        :map(function(_, it) return it.perks end)
+        :filter(Fun.op.truth)
+        :reduce(Table.concat, {})
+    )
     :filter(function(p) return p[modification] end)
     :reduce(
       function(acc, p) return p[modification](p, self, acc, unpack(additional_args)) end,
@@ -111,7 +117,7 @@ end
 --- Compute armor class; takes priority over .armor
 --- @param self entity
 methods.get_armor = function(self)
-  return 10 + self:get_modifier("dex")
+  return self:modify("armor", 10 + self:get_modifier("dex"))
 end
 
 --- @param self entity

@@ -1,5 +1,5 @@
 local sound = require("engine.tech.sound")
-local player_mod = require("engine.state.player")
+local base_player = require("engine.state.base_player")
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
@@ -168,7 +168,7 @@ draw_action_grid = function()
 
     ui.start_line()
       if State.combat then
-        action_button(player_mod.skip_turn, "space")
+        action_button(base_player.skip_turn, "space")
         ui.offset(4)
         action_button(actions.disengage, "g")
       else

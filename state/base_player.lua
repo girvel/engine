@@ -3,7 +3,7 @@ local creature = require "engine.mech.creature"
 local sound    = require "engine.tech.sound"
 
 
-local player = {}
+local base_player = {}
 
 --- @class base_player: entity
 --- @field fov_r integer
@@ -29,7 +29,7 @@ local player = {}
 
 local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
 
-player.base = function()
+base_player.mixin = function()
   local result = Table.extend(creature.mixin(), {
     codename = "player",
     player_flag = true,
@@ -66,7 +66,7 @@ player.base = function()
 end
 
 --- @type action
-player.skip_turn = Table.extend({
+base_player.skip_turn = Table.extend({
   name = "Завершить ход",
   codename = "skip_turn",
 
@@ -79,5 +79,5 @@ player.skip_turn = Table.extend({
   end,
 }, action.base)
 
-Ldump.mark(player, {}, ...)
-return player
+Ldump.mark(base_player, {}, ...)
+return base_player
