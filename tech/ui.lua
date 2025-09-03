@@ -480,14 +480,14 @@ ui.choice = function(options)
       option = "  " .. option
     end
 
-    if button_out.is_clicked then
-      return model.selection.i
-    end
-
     ui.text(option)
 
     if button_out.is_mouse_over then
       love.graphics.setColor(1, 1, 1)
+    end
+
+    if button_out.is_clicked then
+      return model.selection.i
     end
   end
 
