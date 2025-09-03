@@ -125,24 +125,12 @@ actions.hand_attack = Table.extend({
     base_attack(entity, "hand")
     return true
   end,
-}, action.base)
 
---- @type action
-actions.opportunity_attack = Table.extend({
-  codename = "reaction_attack",
-
-  cost = {
-    reactions = 1,
-  },
-
-  _is_available = function(_, entity)
-    local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp
-  end,
-
-  _act = function(_, entity)
-    base_attack(entity, "hand")
-    return true
+  get_hint = function(self, entity)
+    return "%s (%s)" % {
+      Entity.name(self),
+      entity:get_melee_damage_roll("hand"):simplified()
+    }
   end,
 }, action.base)
 
@@ -162,6 +150,32 @@ actions.offhand_attack = Table.extend({
 
   _act = function(_, entity)
     base_attack(entity, "offhand")
+    return true
+  end,
+
+  get_hint = function(self, entity)
+    return "%s (%s)" % {
+      Entity.name(self),
+      entity:get_melee_damage_roll("offhand"):simplified()
+    }
+  end,
+}, action.base)
+
+--- @type action
+actions.opportunity_attack = Table.extend({
+  codename = "reaction_attack",
+
+  cost = {
+    reactions = 1,
+  },
+
+  _is_available = function(_, entity)
+    local target = State.grids.solids:slow_get(entity.position + entity.direction)
+    return target and target.hp
+  end,
+
+  _act = function(_, entity)
+    base_attack(entity, "hand")
     return true
   end,
 }, action.base)

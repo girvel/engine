@@ -334,7 +334,6 @@ ui.key_button = function(image, key, is_disabled)
 
   if is_disabled then
     result.is_clicked = false
-    result.is_mouse_over = false
   else
     result.is_clicked = result.is_clicked or Table.contains(model.keyboard.pressed, key)
   end

@@ -84,7 +84,7 @@ action_button = function(action, hotkey)
   end
   if button.is_mouse_over then
     cost = action.cost
-    hint = action.name
+    hint = action.get_hint and action:get_hint(State.player) or action.name
   end
 end
 

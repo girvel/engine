@@ -117,6 +117,14 @@ d.mt.__tostring = function(self)
   return dice .. bonus
 end
 
+--- @return string
+methods.simplified = function(self)
+  local min = self:min()
+  local max = self:max()
+  if min == max then return tostring(min) end
+  return "%s–%s" % {self:min(), self:max()}
+end
+
 --- @return integer
 methods.roll = function(self)
   local rolls = Fun.iter(self.dice)
