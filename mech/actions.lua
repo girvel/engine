@@ -59,7 +59,11 @@ actions.move = Memoize(function(direction)
         or not last_walk_sound[entity]
         or not last_walk_sound[entity].source:isPlaying()
       ) then
-        last_walk_sound[entity] = sounds:play_at(entity.position)
+        if entity == State.player then
+          last_walk_sound[entity] = sounds:play()
+        else
+          last_walk_sound[entity] = sounds:play_at(entity.position)
+        end
       end
 
       return result
