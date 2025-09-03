@@ -8,6 +8,9 @@ local interactive = require "engine.tech.interactive"
 
 local actions = {}
 
+--- @type table<entity, sound>
+local last_walk_sound = setmetatable({}, {__mode = "k"})
+
 --- @param direction vector
 --- @return action
 actions.move = Memoize(function(direction)
@@ -48,8 +51,15 @@ actions.move = Memoize(function(direction)
       end
 
       local tile = State.grids.tiles[entity.position]
-      if tile and tile.sounds and tile.sounds.walk then
-        tile.sounds.walk:play_at(entity.position)
+      local prev_tile = State.grids.tiles[entity.position - entity.direction]
+      local sounds = tile and tile.sounds and tile.sounds.walk
+      if sounds and (  -- preventing ear DDOS with repetitive sounds
+        not prev_tile
+        or prev_tile.codename ~= tile.codename
+        or not last_walk_sound[entity]
+        or not last_walk_sound[entity].source:isPlaying()
+      ) then
+        last_walk_sound[entity] = sounds:play_at(entity.position)
       end
 
       return result
