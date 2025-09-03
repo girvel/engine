@@ -47,8 +47,8 @@ local methods = {
     assert(self._mode.type == "start_menu")
     Log.info("Starting new game...")
     self:_set_mode(STATES.loading_screen.new(
-      coroutine.create(Fn.curry(State.load_level, State, "levels.main")),
-      Fn.curry(self.start_game_finish, self)
+      coroutine.create(function() return State:load_level("levels.main") end),
+      function() return self:start_game_finish() end
     ))
   end,
 

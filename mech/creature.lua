@@ -186,7 +186,7 @@ methods.get_melee_attack_roll = function(self, slot)
 
   local weapon = self.inventory[slot]
   if weapon then
-    roll = roll + weapon.bonus
+    roll = roll + (weapon.bonus or 0)
   end
 
   return self:modify("attack_roll", roll, slot)

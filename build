@@ -17,6 +17,8 @@ local parse_cli = function()
   parser:command("stat")
     :description("Display project line count")
 
+  parser:
+
   return parser:parse()
 end
 

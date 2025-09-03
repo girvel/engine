@@ -17,8 +17,6 @@ Ldump.mark_module("engine.lib.d", "const")
 
 Entity = require("engine.lib.entity")
 
-Fn = require("engine.lib.fn")
-
 Fun = require("engine.lib.fun")
 
 Grid = require("engine.lib.grid")
