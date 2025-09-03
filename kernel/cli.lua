@@ -10,11 +10,6 @@ cli.parse = function(args)
     "Show FPS; no confirmation on exit, exit through Ctrl+D enabled;"
   )
 
-  parser:flag(
-    "-r --recover",
-    "Launch lua shell instead of the game"
-  )
-
   parser:option(
     "-s --enable-scenes"
   ):args("+"):default({})

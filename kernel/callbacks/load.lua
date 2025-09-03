@@ -17,13 +17,6 @@ return function(args)
     async.lag_threshold = 1
   end
 
-  if args.recover then
-    love.window.minimize()
-    State = unpack(saves.read("last_crash.ldump.gz")) --[[@as state]]
-    require("engine.kernel.shell").run()
-    os.exit()
-  end
-
   if not args.debug then
     Lp = {
       start = function() end,
