@@ -293,9 +293,11 @@ draw_resources = function()
   tk.finish_block(start)
 end
 
-BORDERS = Vector.hex("191919")
-ENEMY = Vector.hex("99152c")
-ALLY = Vector.hex("5d863f")
+local BORDERS = Vector.hex("191919")
+local HOSTILITY_COLOR = {
+  enemy = Vector.hex("99152c"),
+  ally = Vector.hex("5d863f"),
+}
 
 draw_move_order = function()
   local start = tk.start_block()
@@ -313,10 +315,8 @@ draw_move_order = function()
           ui.text("- ")
         end
 
-        local color =
-          e == State.player and Vector.white
-          or State.hostility:get(e, State.player) and ENEMY
-          or ALLY
+        local hostility = State.hostility:get(e, State.player)
+        local color = hostility and HOSTILITY_COLOR[hostility] or Vector.white
 
         love.graphics.setColor(color)
           ui.text(Name.game(e))

@@ -132,7 +132,7 @@ actions.hand_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp
+    return target and target.hp and State.hostility:get(entity, target) ~= "ally"
   end,
 
   _act = function(_, entity)
@@ -159,7 +159,11 @@ actions.offhand_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp and entity.inventory.offhand and entity.inventory.offhand.damage_roll
+    return target
+      and target.hp
+      and entity.inventory.offhand
+      and entity.inventory.offhand.damage_roll
+      and State.hostility:get(entity, target) ~= "ally"
   end,
 
   _act = function(_, entity)
@@ -205,9 +209,11 @@ actions.shove = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp and target.get_modifier and not (
-      entity.inventory.offhand and entity.inventory.offhand.damage_roll
-    )
+    return target
+      and target.hp
+      and target.get_modifier
+      and not (entity.inventory.offhand and entity.inventory.offhand.damage_roll)
+      and State.hostility:get(entity, target) ~= "ally"
   end,
 
   _act = function(_, entity)

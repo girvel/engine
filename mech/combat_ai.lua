@@ -24,7 +24,7 @@ local find_target
 methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
     if entity.faction and target == entity and not State.hostility:get(entity, attacker) then
-      State.hostility:set(entity.faction, attacker.faction, true)
+      State.hostility:set(entity.faction, attacker.faction, "enemy")
       State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
       State:start_combat({entity, attacker})
     end

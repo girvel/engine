@@ -28,7 +28,7 @@ return Tiny.processingSystem {
   preProcess = function(self, entity, dt)
     if State.combat and Fun.iter(State.combat.list)
       :all(function(a) return Fun.iter(State.combat.list)
-        :all(function(b) return a == b or not State.hostility:get(a, b) end)
+        :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
       end)
     then
       Log.info(

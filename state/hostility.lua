@@ -1,7 +1,9 @@
 local hostility = {}
 
+--- @alias hostility "ally"|"enemy"|nil
+
 --- @class state_hostility
---- @field _are_hostile table<string, boolean>
+--- @field _are_hostile table<string, hostility>
 --- @field _agression_subscriptions fun(entity, entity)[]
 local methods = {}
 local mt = {__index = methods}
@@ -16,20 +18,19 @@ end
 
 --- @param a entity
 --- @param b entity
---- @return boolean
+--- @return hostility
 methods.get = function(self, a, b)
   if not a.faction or not b.faction then
-    return false
+    return nil
   end
-  return not not self._are_hostile[a.faction .. "_to_" .. b.faction]
+  return self._are_hostile[a.faction .. "_to_" .. b.faction]
 end
 
 --- @param faction_a string
 --- @param faction_b string
---- @param value boolean
+--- @param value hostility
 methods.set = function(self, faction_a, faction_b, value)
   local key = faction_a .. "_to_" .. faction_b
-  value = value and true or nil
   if self._are_hostile[key] == value then return end
 
   Log.info("%s %s hostile towards %s" % {
