@@ -1,6 +1,3 @@
-local cue = require("tech.cue")
-
-
 local interactive = {}
 
 --- @class _interactive_methods
@@ -31,9 +28,10 @@ end
 --- @param self entity
 --- @param other entity
 methods.interact = function(self, other)
+  local item = require("engine.tech.item")
   Log.debug("%s interacts with %s" % {Entity.codename(other), Entity.codename(self)})
   self.was_interacted_by = other
-  cue.set(self, "highlight", false)
+  item.set_cue(self, "highlight", false)
   if self.on_interact then
     self:on_interact(other)
   end

@@ -1,6 +1,5 @@
 local sprite = require "engine.tech.sprite"
 local item   = require "engine.tech.item"
-local cue    = require "engine.tech.cue"
 
 
 local health = {}
@@ -70,7 +69,7 @@ health.set_hp = function(target, value)
   target.hp = value
 
   if target.get_max_hp then
-    cue.set(target, "blood", target.hp <= target:get_max_hp() / 2)
+    item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
   end
 end
 

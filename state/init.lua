@@ -68,9 +68,6 @@ methods.add = function(self, entity, ...)
     Fun.iter(entity.inventory)
       :each(function(slot, it) self:add(it) end)
   end
-  -- if entity.on_add then
-  --   entity:on_add()
-  -- end
   return entity
 end
 
