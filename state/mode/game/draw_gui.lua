@@ -24,7 +24,6 @@ end
 local PADDING_LX = 48
 local PADDING_RX = 60
 local PADDING_Y = 40
-local HP_BAR_H = 10 * 4
 
 local SIDEBAR_W = 344  -- (usable)
 
@@ -87,22 +86,36 @@ action_button = function(action, hotkey)
   end
 end
 
+local HP_BAR_W = SIDEBAR_W - 64
+local HP_BAR_H = 10 * 4
+
 draw_hp_bar = function()
   local player = State.player
 
-  ui.start_frame(nil, nil, SIDEBAR_W, HP_BAR_H + 16)
+  ui.start_frame(HP_BAR_W + 8, -4, 64, 64)
+    ui.image("engine/assets/sprites/gui/shield.png")
+  ui.finish_frame()
+  ui.start_frame(HP_BAR_W + 8, -4, 64, 64)
+  ui.start_alignment("center", "center")
+  ui.start_font(32)
+    ui.text(player:get_armor())
+  ui.finish_font()
+  ui.finish_alignment()
+  ui.finish_frame()
+
+  ui.start_frame(nil, nil, HP_BAR_W, HP_BAR_H + 16)
     ui.tile(gui.hp_bg)
 
     local saturation = player.hp / player:get_max_hp()
     local base_saturation = math.min(saturation, 1)
     local extra_saturation = saturation > 1 and (1 - 1 / saturation)
 
-    ui.start_frame(8, 8, math.floor((SIDEBAR_W - 16) * base_saturation / 4) * 4, HP_BAR_H)
+    ui.start_frame(8, 8, math.floor((HP_BAR_W - 16) * base_saturation / 4) * 4, HP_BAR_H)
       ui.tile(gui.hp_bar)
     ui.finish_frame()
 
     if extra_saturation then
-      ui.start_frame(8, 8, math.floor((SIDEBAR_W - 16) * extra_saturation / 4) * 4, HP_BAR_H)
+      ui.start_frame(8, 8, math.floor((HP_BAR_W - 16) * extra_saturation / 4) * 4, HP_BAR_H)
         ui.tile(gui.hp_bar_extra)
       ui.finish_frame()
     end

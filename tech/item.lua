@@ -5,7 +5,7 @@ local interactive = require "engine.tech.interactive"
 
 local item = {}
 
-item.DROPPING_SLOTS = {"hand", "offhand", "gloves", "right_pocket", "inside"}
+item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 
 --- @class item: entity
 --- @field damage_roll? d

@@ -182,8 +182,10 @@ local wrap = function(text)
   return result
 end
 
---- @param text string
+--- @param text any
 ui.text = function(text)
+  text = tostring(text)
+
   local frame = Table.last(model.frame)
   local font = Table.last(model.font)
   local alignment = Table.last(model.alignment)
@@ -193,9 +195,6 @@ ui.text = function(text)
 
   if is_linear then
     assert(#wrapped == 1)
-  end
-  if text == "Hi!" then
-    Log.trace(wrapped, frame)
   end
 
   for i, line in ipairs(wrapped) do
