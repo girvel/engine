@@ -7,11 +7,12 @@ local translation  = require("engine.tech.translation")
 local gui = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 local tk = require("engine.state.mode.tk")
+local interactive = require("engine.tech.interactive")
 
 
 local cost, hint
 local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
-  draw_dialogue, draw_notification
+  draw_dialogue, draw_notification, draw_suggestion
 
 --- @param self state_mode_game
 --- @param dt number
@@ -19,6 +20,7 @@ local draw_gui = function(self, dt)
   draw_sidebar()
   draw_dialogue()
   draw_notification()
+  draw_suggestion()
 end
 
 local PADDING_LX = 48
@@ -457,6 +459,19 @@ draw_notification = function()
   ui.finish_frame()
 
   prev = text
+end
+
+draw_suggestion = function()
+  local target = interactive.get_for(State.player)
+  if not target then return end
+
+  ui.start_frame(nil, love.graphics.getHeight() - 100)
+  ui.start_alignment("center")
+  ui.start_font(32)
+    ui.text("[E] для взаимодействия с " .. Entity.name(target))
+  ui.finish_font()
+  ui.finish_alignment()
+  ui.finish_frame()
 end
 
 Ldump.mark(draw_gui, {}, ...)
