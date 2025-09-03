@@ -12,12 +12,14 @@ ffi_fix.load = function(name)
   end
 
   for _, path in ipairs({
+    love.filesystem.getSource() .. "/engine/lib/" .. name .. extension,
+    love.filesystem.getSourceBaseDirectory() .. "/" .. name .. extension,
+    -- the top two alone should do the trick
+    -- but +1 ms load time is better than a crash in production
     "engine/lib/" .. name,
     love.filesystem.getSource() .. "/engine/lib/" .. name,
     love.filesystem.getSourceBaseDirectory() .. "/" .. name,
     "engine/lib/" .. name .. extension,
-    love.filesystem.getSource() .. "/engine/lib/" .. name .. extension,
-    love.filesystem.getSourceBaseDirectory() .. "/" .. name .. extension,
   }) do
     local ok, result = pcall(ffi.load, path)
     Log.info("Loading %s @ %s: %s, %s" % {name, path, ok, result})
