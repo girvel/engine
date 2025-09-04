@@ -116,18 +116,26 @@ cli.exe = function(args)
     love = nil
   end
 
+  local version_suffix = read_run("git tag --points-at")
+  if #version_suffix > 0 then
+    log.info("Detected git tag", version_suffix)
+    version_suffix = "_" .. version_suffix:sub(1, -2)
+    -- strips \n
+  end
+  local versioned_name = name .. version_suffix
+
   run("mkdir -p .build")
   run("rm -rf .build/*")
   run("echo '*' > .build/.gitignore")
 
   run("zip -9 -r%s .build/%s.love assets engine levels conf.lua main.lua",
-    args.verbose and "" or " -q", name)
-  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", love_path, name, name)
-  run("mkdir -p .build/%s_win64", name)
-  run("mv .build/%s.exe .build/%s_win64/%s.exe", name, name, name)
-  run("cp '%s'/*.dll .build/%s_win64/", love_path, name)
-  run("cp engine/lib/*.dll .build/%s_win64/", name)
-  run("cd .build; zip -9 -r %s_win64.zip %s_win64; cd ..", name, name)
+    args.verbose and "" or " -q", versioned_name)
+  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", love_path, versioned_name, name)
+  run("mkdir -p .build/%s_win64", versioned_name)
+  run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
+  run("cp '%s'/*.dll .build/%s_win64/", love_path, versioned_name)
+  run("cp engine/lib/*.dll .build/%s_win64/", versioned_name)
+  run("cd .build; zip -9 -r %s_win64.zip %s_win64; cd ..", versioned_name, versioned_name)
 
   log.info("Build finished.")
 end
