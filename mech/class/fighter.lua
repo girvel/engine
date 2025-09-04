@@ -118,5 +118,5 @@ fighter.fighting_styles.two_weapon_fighting = {
   end,
 }
 
-Ldump.mark(fighter, {}, ...)
+Ldump.mark(fighter, "const", ...)
 return fighter

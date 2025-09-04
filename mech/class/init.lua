@@ -71,5 +71,5 @@ class.save_proficiency = function(ability)
   }
 end
 
-Ldump.mark(class, {}, ...)
+Ldump.mark(class, "const", ...)
 return class

@@ -43,4 +43,5 @@ local draw_grid = function(self, layer, grid, dt)
   end
 end
 
+Ldump.mark(draw_grid, {}, ...)
 return draw_grid

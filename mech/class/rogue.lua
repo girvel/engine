@@ -5,5 +5,5 @@ local rogue = {}
 
 rogue.hit_dice = class.hit_dice(8)
 
-Ldump.mark(rogue, {}, ...)
+Ldump.mark(rogue, "const", ...)
 return rogue

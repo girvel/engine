@@ -11,5 +11,5 @@ feats.savage_attacker = {
   end,
 }
 
-Ldump.mark(feats, {}, ...)
+Ldump.mark(feats, "const", ...)
 return feats

@@ -45,4 +45,5 @@ local draw_entity = function(self, entity, dt)
   end
 end
 
+Ldump.mark(draw_entity, {}, ...)
 return draw_entity

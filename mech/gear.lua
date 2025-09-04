@@ -60,5 +60,5 @@ gear.shield = {
   end,
 }
 
-Ldump.mark(gear, {}, ...)
+Ldump.mark(gear, "const", ...)
 return gear
