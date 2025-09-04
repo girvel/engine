@@ -1,3 +1,8 @@
+# Fallen engine
+
+> [!WARNING]
+> Alpha version
+
 ## Concept
 
 - 2D grid-based graphics
@@ -11,7 +16,7 @@
 
 ```bash
 git init
-git submodule add https://github.com/girvel/fallen_engine engine
+git submodule add https://github.com/girvel/engine
 echo 'require("engine/kernel/main.lua")' | tee main.lua
 love .
 ```
