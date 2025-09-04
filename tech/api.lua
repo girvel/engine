@@ -28,6 +28,11 @@ api.travel_scripted = function(entity, destination)
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
   end)
+  scene.save_safety = function()
+    local p = assert(State.grids.solids:find_free_position(destination))
+    level.unsafe_move(entity, p)
+    promise:resolve()
+  end
   return promise
 end
 

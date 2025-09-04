@@ -13,11 +13,11 @@ return function()
     if Kernel._load then
       local t = love.timer.getTime()
         State = saves.read(Kernel._load)  --[[@as state]]
-        Log.trace(State._world.systems)
         if State.mode._mode.type == "escape_menu" then
           State.mode:close_menu()
         end
         Kernel._load = nil
+        State.rails.runner:handle_loading()
       save_load_t = save_load_t + love.timer.getTime() - t
     end
 

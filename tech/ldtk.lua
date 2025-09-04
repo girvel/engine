@@ -1,4 +1,6 @@
-local railing = require "engine.tech.railing"
+local runner = require "engine.tech.runner"
+
+
 --- LDtk level parsing
 local ldtk = {}
 
@@ -285,7 +287,7 @@ parser_new = function()
         end
       end
 
-      local rails = level_module.rails.factory(railing.runner(
+      local rails = level_module.rails.factory(runner.new(
         level_module.rails.scenes, self._captures.positions, self._captures.entities
       ))
 

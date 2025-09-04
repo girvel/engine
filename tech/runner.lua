@@ -1,9 +1,9 @@
 local async = require("engine.tech.async")
 
 
-local railing = {}
+local runner = {}
 
---- @alias railing_characters table<string, entity>
+--- @alias rails_characters table<string, entity>
 
 --- @class scene
 --- @field characters? table<string, table>
@@ -13,6 +13,7 @@ local railing = {}
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
+--- @field save_safety? fun(scene) runs when the scene run is discarded during loading
 
 --- @class scene_run
 --- @field coroutine thread
@@ -31,7 +32,7 @@ local mt = {__index = methods}
 
 --- @param scenes scene[]
 --- @return rails_runner
-railing.runner = function(scenes, positions, entities)
+runner.new = function(scenes, positions, entities)
   for _, scene in ipairs(State.args.enable_scenes) do
     scenes[scene].enabled = true
   end
@@ -168,17 +169,25 @@ methods.run_task = function(self, f)
     enabled = true,
     start_predicate = function() return true end,
     run = function(self_scene)
-      self.scenes[key] = nil
       f(self_scene)
       end_promise:resolve()
+      self.scenes[key] = nil  -- not in the beginning: sometimes scene should handle save_safety
     end,
   }
   self.scenes[key] = scene
   return end_promise, scene
 end
 
+methods.handle_loading = function(self)
+  for _, scene in pairs(self.scenes) do
+    if scene.save_safety then
+      scene:save_safety()
+    end
+  end
+end
+
 scene_run_mt.__serialize = function(self)
-  if not self.base_scene.save_flag then
+  if not self.base_scene.save_flag and not self.base_scene.save_safety then
     Log.warn("Scene %s is active when saving" % {self.name})
   end
   return "nil"
@@ -191,5 +200,5 @@ env = function(f, ...)
   return result
 end
 
-Ldump.mark(railing, {}, ...)
-return railing
+Ldump.mark(runner, {}, ...)
+return runner
