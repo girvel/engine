@@ -13,7 +13,7 @@ local smooth_camera_offset
 --- @field sidebar_w integer
 --- @field SCALE integer
 local methods = {}
-local mt = {__index = methods}
+perspective.mt = {__index = methods}
 
 perspective.new = function()
   return setmetatable({
@@ -23,7 +23,7 @@ perspective.new = function()
     vision_end = Vector.zero,
     sidebar_w = 0,
     SCALE = 4,
-  }, mt)
+  }, perspective.mt)
 end
 
 methods.center_camera = function(self, target_x, target_y)
@@ -123,5 +123,5 @@ smooth_camera_offset = {
   end,
 }
 
-Ldump.mark(perspective, {}, ...)
+Ldump.mark(perspective, {mt = "const"}, ...)
 return perspective
