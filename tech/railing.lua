@@ -162,17 +162,19 @@ methods.run_task = function(self, f)
     if not self.scenes[key] then break end
   end
 
-  local result = {
+  local end_promise = Promise.new()
+  local scene = {
     boring_flag = true,
     enabled = true,
     start_predicate = function() return true end,
     run = function(self_scene)
       self.scenes[key] = nil
       f(self_scene)
+      end_promise:resolve()
     end,
   }
-  self.scenes[key] = result
-  return result
+  self.scenes[key] = scene
+  return end_promise, scene
 end
 
 scene_run_mt.__serialize = function(self)

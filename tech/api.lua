@@ -20,11 +20,15 @@ end
 --- @async
 --- @param entity entity
 --- @param destination vector
+--- @return promise
 api.travel_scripted = function(entity, destination)
-  api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs() / 3))
-  if entity.position == destination then return end
-  local p = assert(State.grids.solids:find_free_position(destination))
-  level.unsafe_move(entity, p)
+  local promise, scene = State.rails.runner:run_task(function()
+    api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs() / 3))
+    if entity.position == destination then return end
+    local p = assert(State.grids.solids:find_free_position(destination))
+    level.unsafe_move(entity, p)
+  end)
+  return promise
 end
 
 --- @async
