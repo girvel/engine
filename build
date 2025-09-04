@@ -3,14 +3,15 @@
 local log = require("engine.lib.log")
 local argparse = require("engine.lib.argparse")
 
-local read_run = function(command)
-  local f = assert(io.popen("zsh -c '" .. command .. "'"))
+local read_run = function(command, ...)
+  local f = assert(io.popen("zsh -c '" .. command:format(...) .. "'"))
   local result = f:read("*a")
   f:close()
   return result
 end
 
-local verbose_run = function(command)
+local run = function(command, ...)
+  command = command:format(...)
   print(command)
   local exit_code = os.execute(command)
   if exit_code ~= 0 then
@@ -33,6 +34,11 @@ local parse_cli = function()
   exe:option(
     "-l --love-path",
     "Full path of the love executable; defaults to $(which love.exe); should have love dlls nearby"
+  )
+
+  exe:option(
+    "-v --verbose",
+    "Display more output"
   )
 
   return parser:parse()
@@ -95,17 +101,33 @@ cli.exe = function(args)
     log.info("Found love.exe at", love_path)
   end
 
-  verbose_run("mkdir -p .build")
-  verbose_run("rm -rf .build/*")
-  verbose_run("echo '*' > .build/.gitignore")
+  local name do
+    love = {}
+    local ok, msg = pcall(require, "conf")
+    if ok then
+      local config = {window = {}}
+      love.conf(config)
+      name = config.identity
+      log.info("Indentified the project as", name)
+    else
+      name = "game"
+      log.error(msg)
+    end
+    love = nil
+  end
 
-  verbose_run("zip -9 -r .build/dot.love assets engine levels conf.lua main.lua")
-  verbose_run(("cat '%s/love.exe' .build/dot.love > .build/dot.exe"):format(love_path))
-  verbose_run("mkdir -p .build/dot_win64")
-  verbose_run("mv .build/dot.exe .build/dot_win64/dot.exe")
-  verbose_run(("cp '%s'/*.dll .build/dot_win64/"):format(love_path))
-  verbose_run("cp engine/lib/*.dll .build/dot_win64/")
-  verbose_run("cd .build; zip -9 -r dot_win64.zip dot_win64; cd ..")
+  run("mkdir -p .build")
+  run("rm -rf .build/*")
+  run("echo '*' > .build/.gitignore")
+
+  run("zip -9 -r%s .build/%s.love assets engine levels conf.lua main.lua",
+    args.verbose and "" or " -q", name)
+  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", love_path, name, name)
+  run("mkdir -p .build/%s_win64", name)
+  run("mv .build/%s.exe .build/%s_win64/%s.exe", name, name, name)
+  run("cp '%s'/*.dll .build/%s_win64/", love_path, name)
+  run("cp engine/lib/*.dll .build/%s_win64/", name)
+  run("cd .build; zip -9 -r %s_win64.zip %s_win64; cd ..", name, name)
 
   log.info("Build finished.")
 end
