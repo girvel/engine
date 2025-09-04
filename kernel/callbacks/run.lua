@@ -13,6 +13,7 @@ return function()
     if Kernel._load then
       local t = love.timer.getTime()
         State = saves.read(Kernel._load)  --[[@as state]]
+        Log.trace(State._world.systems)
         if State.mode._mode.type == "escape_menu" then
           State.mode:close_menu()
         end

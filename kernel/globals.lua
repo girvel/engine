@@ -55,7 +55,12 @@ Ldump.mark_module("engine.lib.tiny", {
 Tiny.worldMetaTable.__serialize = function(self)
   local entities = self.entities
   return function()
-    local result = Tiny.world(require("engine.systems"))
+    local systems = require("engine.systems")
+    for _, system in ipairs(systems) do
+      system.world = nil
+    end
+
+    local result = Tiny.world(unpack(systems))
     for _, e in ipairs(entities) do
       result:add(e)
     end

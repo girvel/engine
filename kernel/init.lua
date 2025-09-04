@@ -20,14 +20,14 @@ init.new = function()
   }, mt)
 end
 
---- @param filepath string
-methods.plan_save = function(self, filepath)
-  self._save = "saves/" .. filepath .. ".ldump.gz"
+--- @param name string
+methods.plan_save = function(self, name)
+  self._save = "saves/" .. name .. ".ldump.gz"
 end
 
---- @param filepath string
-methods.plan_load = function(self, filepath)
-  self._load = "saves/" .. filepath .. ".ldump.gz"
+--- @param name string
+methods.plan_load = function(self, name)
+  self._load = "saves/" .. name .. ".ldump.gz"
 end
 
 --- @return string[]
