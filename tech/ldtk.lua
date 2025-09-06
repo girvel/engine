@@ -160,11 +160,11 @@ parser_new = function()
           end
 
           local f = get_field(instance, "rails_name")
-          if f then
+          if f and f.__value then
             assert(
               not rails_name,
               "Collision: entity %s at %s%s has rails_name %s and captured as %s" % {
-                Name.code(entity), layer_id, entity.position, rails_name, f.__value,
+                Name.code(entity), layer_id, entity.position, rails_name, tostring(f.__value),
               }
             )
             this_parser._captures.entities[f.__value] = entity

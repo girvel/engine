@@ -1,7 +1,9 @@
+local async = require("engine.tech.async")
 local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
 local iteration = require("engine.tech.iteration")
 local animated  = require("engine.tech.animated")
+local actions   = require("engine.mech.actions")
 
 
 local combat_ai = {}
@@ -41,8 +43,16 @@ methods.control = function(entity)
     return
   end
 
-  api.travel(entity, target.position)
-  api.attack(entity, target)
+  local weapon = entity.inventory.hand
+  if weapon and weapon.tags.ranged then
+    local bow_attack = actions.bow_attack(target)
+    while bow_attack:act(entity) do
+      async.sleep(.66)
+    end
+  else
+    api.travel(entity, target.position)
+    api.attack(entity, target)
+  end
 end
 
 local OBSERVE_PERIOD = .5

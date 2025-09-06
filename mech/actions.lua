@@ -1,3 +1,4 @@
+local xp = require("engine.mech.xp")
 local level = require "engine.tech.level"
 local action = require "engine.tech.action"
 local health = require "engine.mech.health"
@@ -263,6 +264,41 @@ base_attack = function(entity, slot)
       target.sounds.hit:play_at(target.position)
     end
   end)
+end
+
+actions.bow_attack = function(target)
+  return Table.extend({
+    name = "выстрелить",
+    codename = "bow_attack",
+
+    cost = {
+      actions = 1,
+    },
+
+    _is_available = function(self, entity)
+      return target
+        and target.hp
+        and entity.inventory
+        and entity.inventory.hand
+        and entity.inventory.hand.tags.ranged
+    end,
+
+    _act = function(self, entity)
+      entity:rotate((target.position - entity.position):normalized2())
+      entity:animate("bow_attack"):next(function()
+        -- SOUND bow
+        local bow = entity.inventory.hand
+        local dex_modifier = entity:get_modifier("dex")
+        health.attack(
+          target,
+          D(20) + dex_modifier + xp.get_proficiency_bonus(entity.level),
+          bow.damage_roll + (bow.bonus or 0) + dex_modifier
+        )
+        -- SOUND hit
+      end)
+      return true
+    end,
+  }, action.base)
 end
 
 actions.interact = Table.extend({
