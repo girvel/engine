@@ -280,8 +280,8 @@ actions.bow_attack = function(target)
       if not (target
         and target.hp
         and entity.inventory
-        and entity.inventory.hand
-        and entity.inventory.hand.tags.ranged)
+        and entity.inventory.offhand
+        and entity.inventory.offhand.tags.ranged)
       then return false end
 
       local snapshot = tcod.copy(State.grids.solids)
@@ -295,7 +295,7 @@ actions.bow_attack = function(target)
       entity:rotate((target.position - entity.position):normalized2())
       entity:animate("bow_attack"):next(function()
         -- SOUND bow
-        local bow = entity.inventory.hand
+        local bow = entity.inventory.offhand
         local dex_modifier = entity:get_modifier("dex")
         health.attack(
           target,

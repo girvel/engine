@@ -43,8 +43,8 @@ methods.control = function(entity)
     return
   end
 
-  local weapon = entity.inventory.hand
-  if weapon and weapon.tags.ranged then
+  local bow = entity.inventory.offhand
+  if bow and bow.tags.ranged then
     local bow_attack = actions.bow_attack(target)
     while bow_attack:act(entity) do
       async.sleep(.66)
