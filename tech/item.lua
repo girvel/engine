@@ -27,6 +27,7 @@ item.mixin = function(animation_path)
       inventory = {
         highlight = item.cues.highlight(),
       },
+      tags = {},
       direction = Vector.right,  -- needed to initially animate into idle_right instead of idle
     }
   )
@@ -55,58 +56,24 @@ item.drop = function(parent, slot)
   return true
 end
 
+local give_to_hands
+
 --- Put item in the entity's inventory. 
 --- Drops the item if entity can't take the item; contains logic for taking weapons.
 --- @param entity entity entity to receive the item
 --- @param this_item item item to give
 --- @return boolean success did item make it to the entity's inventory
 item.give = function(entity, this_item)
-  local slot
   local is_free
+  local slot
   if this_item.slot == "hands" then
-    if this_item.tags.two_handed then
-      is_free = (
-        (not entity.inventory.hand or item.drop(entity, "hand"))
-        and (not entity.inventory.offhand
-          or item.drop(entity, "offhand"))
-      )
-      slot = "hand"
-    elseif not this_item.tags.light then
-      is_free = (
-        (not entity.inventory.hand or item.drop(entity, "hand"))
-        and (not entity.inventory.offhand
-          or not entity.inventory.offhand.damage_roll
-          or item.drop(entity, "offhand"))
-      )
-      slot = "hand"
-    else
-      if not entity.inventory.hand
-        or (not entity.inventory.hand.tags.light and item.drop(entity, "hand"))
-      then
-        slot = "hand"
-        is_free = true
-      elseif entity.inventory.hand.tags.light and not entity.inventory.offhand then
-        slot = "offhand"
-        is_free = true
-      elseif
-        entity.inventory.hand.tags.light
-        and this_item.tags.light
-        and item.drop(entity, "offhand")
-      then
-        entity.inventory.offhand = entity.inventory.hand
-        entity.inventory.hand = nil
-        slot = "hand"
-        is_free = true
-      else
-        is_free = false
-      end
-    end
+    is_free, slot = give_to_hands(entity, this_item)
   elseif this_item.slot == "offhand" then
     slot = "offhand"
     is_free = (
       (not entity.inventory.offhand or item.drop(entity, "offhand"))
       and (not entity.inventory.hand
-        or not entity.inventory.hand.tags.two_handed
+        or (not entity.inventory.hand.tags.two_handed and not this_item.tags.two_handed)
         or item.drop(entity, "hand"))
     )
   else
@@ -170,6 +137,54 @@ item.cues = {
     )
   end,
 }
+
+--- @return boolean, string?
+give_to_hands = function(entity, this_item)
+  if this_item.tags.two_handed then
+    return (
+      (not entity.inventory.hand or item.drop(entity, "hand"))
+      and (not entity.inventory.offhand or item.drop(entity, "offhand"))
+    ), "hand"
+  end
+
+  if not this_item.tags.light then
+    return (
+      (not entity.inventory.hand or item.drop(entity, "hand"))
+      and (not entity.inventory.offhand
+        or not entity.inventory.offhand.damage_roll
+        or item.drop(entity, "offhand"))
+    ), "hand"
+  end
+
+  if not entity.inventory.hand then
+    if entity.inventory.offhand
+      and entity.inventory.offhand.tags.two_handed
+      and not item.drop(entity, "offhand")
+    then
+      return false
+    end
+    return true, "hand"
+  end
+
+  if not entity.inventory.hand.tags.light then
+    if not item.drop(entity, "hand") then
+      return false
+    end
+    return true, "hand"
+  end
+
+  if not entity.inventory.offhand then
+    return true, "offhand"
+  end
+
+  if not item.drop(entity, "offhand") then
+    return false
+  end
+
+  entity.inventory.offhand = entity.inventory.hand
+  entity.inventory.hand = nil
+  return true, "hand"
+end
 
 Ldump.mark(item, {}, ...)
 return item
