@@ -134,7 +134,10 @@ actions.hand_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp and State.hostility:get(entity, target) ~= "ally"
+    return target
+      and target.hp
+      and (not entity.inventory.offhand or not entity.inventory.offhand.tags.ranged)
+      and State.hostility:get(entity, target) ~= "ally"
   end,
 
   _act = function(_, entity)
@@ -165,6 +168,7 @@ actions.offhand_attack = Table.extend({
       and target.hp
       and entity.inventory.offhand
       and entity.inventory.offhand.damage_roll
+      and not entity.inventory.offhand.tags.ranged
       and State.hostility:get(entity, target) ~= "ally"
   end,
 
@@ -267,14 +271,16 @@ base_attack = function(entity, slot)
   end)
 end
 
+local bow_attack_cost = {
+  actions = 1,
+}
+
 actions.bow_attack = function(target)
   return Table.extend({
     name = "выстрелить",
     codename = "bow_attack",
 
-    cost = {
-      actions = 1,
-    },
+    cost = bow_attack_cost,
 
     _is_available = function(self, entity)
       if not (target
@@ -307,6 +313,10 @@ actions.bow_attack = function(target)
       return true
     end,
   }, action.base)
+end
+
+actions.is_bow_attack_available = function(entity)
+  return action.base.is_available({cost = bow_attack_cost}, entity)
 end
 
 actions.interact = Table.extend({

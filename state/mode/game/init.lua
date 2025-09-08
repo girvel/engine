@@ -2,6 +2,7 @@ local game = {}
 
 --- @class state_mode_game
 --- @field type "game"
+--- @field input_mode "keyboard"|"mouse"
 --- @field _sprite_batches table<string, love.SpriteBatch>
 --- @field _temp_canvas love.Canvas
 local methods = {
@@ -15,6 +16,7 @@ local mt = {__index = methods}
 game.new = function()
   return setmetatable({
     type = "game",
+    input_mode = "keyboard",
     _sprite_batches = Fun.iter(State.level.atlases)
       :map(function(layer, base_image) return layer, love.graphics.newSpriteBatch(base_image) end)
       :tomap(),

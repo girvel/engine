@@ -12,15 +12,17 @@ local interactive = require("engine.tech.interactive")
 
 local cost, hint
 local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
-  draw_dialogue, draw_notification, draw_suggestion
+  draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
+  draw_mouse_action_grid, use_mouse
 
 --- @param self state_mode_game
 --- @param dt number
 local draw_gui = function(self, dt)
-  draw_sidebar()
+  draw_sidebar(self)
   draw_dialogue()
   draw_notification()
   draw_suggestion()
+  use_mouse(self)
 end
 
 local PADDING_LX = 48
@@ -29,7 +31,7 @@ local PADDING_Y = 40
 
 local SIDEBAR_W = 344  -- (usable)
 
-draw_sidebar = function()
+draw_sidebar = function(self)
   if State.rails.runner.locked_entities[State.player] then
     State.perspective.sidebar_w = 0
     return
@@ -50,7 +52,7 @@ draw_sidebar = function()
     ui.br()
     ui.br()
 
-    draw_action_grid()
+    draw_action_grid(self)
 
     ui.br()
     ui.br()
@@ -130,7 +132,7 @@ draw_hp_bar = function()
   ui.finish_frame(true)
 end
 
-draw_action_grid = function()
+draw_action_grid = function(self)
   cost = nil
   hint = nil
 
@@ -139,72 +141,12 @@ draw_action_grid = function()
   ui.finish_frame()
 
   ui.start_frame(4)
-    ui.start_line()
-      do
-        local button = ui.key_button(gui.escape_menu, "escape")
-        if button.is_clicked then
-          State.mode:open_escape_menu()
-        end
-        if button.is_mouse_over then
-          hint = "меню"
-        end
-      end
-      ui.offset(4)
-
-      do
-        local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
-        local button = ui.key_button(journal_image, "j")
-        if button.is_clicked then
-          State.mode:open_journal()
-        end
-        if button.is_mouse_over then
-          hint = "журнал"
-        end
-      end
-      ui.offset(4)
-
-      action_button(fighter.hit_dice, "h")
-      ui.offset(4)
-    ui.finish_line()
-    ui.offset(0, 4)
-
-    ui.start_line()
-      if State.combat then
-        action_button(base_player.skip_turn, "space")
-        ui.offset(4)
-        action_button(actions.disengage, "g")
-      else
-        ui.offset(132)
-      end
-      ui.offset(4)
-
-      action_button(actions.dash, "lshift")
-      ui.offset(4)
-
-      action_button(actions.interact, "e")
-      ui.offset(4)
-    ui.finish_line()
-    ui.offset(0, 4)
-
-    ui.start_line()
-      action_button(actions.hand_attack, "1")
-      ui.offset(4)
-
-      if State.player.inventory.offhand and State.player.inventory.offhand.damage_roll then
-        action_button(actions.offhand_attack, "2")
-      else
-        action_button(actions.shove, "2")
-      end
-      ui.offset(4)
-
-      action_button(fighter.second_wind, "3")
-      ui.offset(4)
-
-      action_button(fighter.action_surge, "4")
-      ui.offset(4)
-
-      action_button(fighter.fighting_spirit, "5")
-    ui.finish_line()
+    if self.input_mode == "keyboard" then
+      draw_keyboard_action_grid(self)
+    else
+      assert(self.input_mode == "mouse")
+      draw_mouse_action_grid(self)
+    end
   ui.finish_frame()
   ui.offset(0, 208)
 
@@ -217,6 +159,103 @@ draw_action_grid = function()
     if ui.keyboard(key) then
       table.insert(State.player.ai.next_actions, actions.move(direction))
     end
+  end
+end
+
+draw_keyboard_action_grid = function(self)
+  ui.start_line()
+    do
+      local button = ui.key_button(gui.escape_menu, "escape")
+      if button.is_clicked then
+        State.mode:open_escape_menu()
+      end
+      if button.is_mouse_over then
+        hint = "меню"
+      end
+    end
+    ui.offset(4)
+
+    do
+      local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
+      local button = ui.key_button(journal_image, "j")
+      if button.is_clicked then
+        State.mode:open_journal()
+      end
+      if button.is_mouse_over then
+        hint = "журнал"
+      end
+    end
+    ui.offset(4)
+
+    action_button(fighter.hit_dice, "h")
+    ui.offset(4)
+  ui.finish_line()
+  ui.offset(0, 4)
+
+  ui.start_line()
+    if State.combat then
+      action_button(base_player.skip_turn, "space")
+      ui.offset(4)
+      action_button(actions.disengage, "g")
+    else
+      ui.offset(132)
+    end
+    ui.offset(4)
+
+    action_button(actions.dash, "lshift")
+    ui.offset(4)
+
+    action_button(actions.interact, "e")
+    ui.offset(4)
+  ui.finish_line()
+  ui.offset(0, 4)
+
+  ui.start_line()
+    local offhand = State.player.inventory.offhand
+    if offhand and offhand.tags.ranged then
+      local is_available = actions.is_bow_attack_available(State.player)
+      local image = is_available
+        and gui_elements.bow_attack
+        or gui_elements.bow_attack_inactive
+      local button = ui.key_button(image, "1", not is_available)
+      if button.is_clicked then
+        self.input_mode = "mouse"
+      end
+      if button.is_mouse_over then
+        hint = "выстрелить"
+      end
+    else
+      action_button(actions.hand_attack, "1")
+    end
+    ui.offset(4)
+
+    if offhand
+      and offhand.damage_roll
+      and not offhand.tags.ranged
+    then
+      action_button(actions.offhand_attack, "2")
+    else
+      action_button(actions.shove, "2")
+    end
+    ui.offset(4)
+
+    action_button(fighter.second_wind, "3")
+    ui.offset(4)
+
+    action_button(fighter.action_surge, "4")
+    ui.offset(4)
+
+    action_button(fighter.fighting_spirit, "5")
+  ui.finish_line()
+end
+
+draw_mouse_action_grid = function(self)
+  local escape_button = ui.key_button(gui_elements.escape, "escape")
+  if escape_button.is_clicked then
+    self.input_mode = "keyboard"
+  end
+  if escape_button.is_mouse_over then
+    hint = "отмена"
   end
 end
 
@@ -471,6 +510,25 @@ draw_suggestion = function()
     ui.text("[E] для взаимодействия с " .. Name.game(target))
   ui.finish_font()
   ui.finish_alignment()
+  ui.finish_frame()
+end
+
+use_mouse = function(self)
+  if not self.input_mode == "mouse" then return end
+
+  ui.start_frame(nil, nil, -State.perspective.sidebar_w)
+    if ui.mousedown() then
+      local position = V(love.mouse.getPosition())
+        :sub_mut(State.perspective.camera_offset)
+        :div_mut(State.level.cell_size * 4)
+        :map_mut(math.floor)
+      local target = State.grids.solids:slow_get(position)
+      Log.trace(target)
+      if target then
+        table.insert(State.player.ai.next_actions, actions.bow_attack(target))
+      end
+      self.input_mode = "keyboard"
+    end
   ui.finish_frame()
 end
 

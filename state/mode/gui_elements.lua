@@ -32,6 +32,12 @@ local gui_elements = {
   escape_menu = nth(18),
   journal_inactive = nth(25),
 
+  escape = nth(21),
+  escape_inactive = nth(29),
+
+  bow_attack = nth(22),
+  bow_attack_inactive = nth(30),
+
   second_wind = nth(33),
   action_surge = nth(34),
   fighting_spirit = nth(35),
