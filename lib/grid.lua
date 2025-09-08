@@ -42,9 +42,6 @@ local methods = {}
 --- @param v vector
 --- @return boolean
 methods.can_fit = function(self, v)
-  for _, value in ipairs(v) do
-    if value <= 0 then return false end
-  end
   return vector.zero < v and self.size >= v
 end
 
@@ -218,7 +215,7 @@ grid.mt = {
       getmetatable(v) == vector.mt,
       ("Attempt to index grid with %s which is neither vector nor a method name"):format(v)
     )
-    assert(self:can_fit(v), ("%s is too big"):format(v))
+    assert(self:can_fit(v), ("%s does not fit in grid border %s"):format(v, self.size))
     return self._inner_array[self:_get_inner_index(unpack(v))]
   end,
 

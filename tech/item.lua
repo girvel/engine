@@ -1,3 +1,4 @@
+local iteration = require("engine.tech.iteration")
 local level = require("engine.tech.level")
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
@@ -37,13 +38,16 @@ end
 --- @param slot string | integer
 --- @return boolean
 item.drop = function(parent, slot)
-  local drop_position = Fun.chain({Vector.zero}, Vector.directions)
-    :map(function(d) return parent.position + d end)
-    :filter(function(v)
-      return (v == parent.position or not State.grids.solids:slow_get(v, true))
-        and not State.grids.items[v]
-    end)
-    :nth(1)
+  local drop_position
+  for d in iteration.expanding_rhombus(2) do
+    local p = d + parent.position
+    if (d == Vector.zero or not State.grids.solids:slow_get(p, true))
+      and not State.grids.items[p]
+    then
+      drop_position = p
+      break
+    end
+  end
   if not drop_position then return false end
 
   local this_item = parent.inventory[slot]
