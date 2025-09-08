@@ -5,6 +5,7 @@ local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
+local tcod        = require "engine.tech.tcod"
 
 
 local actions = {}
@@ -276,11 +277,18 @@ actions.bow_attack = function(target)
     },
 
     _is_available = function(self, entity)
-      return target
+      if not (target
         and target.hp
         and entity.inventory
         and entity.inventory.hand
-        and entity.inventory.hand.tags.ranged
+        and entity.inventory.hand.tags.ranged)
+      then return false end
+
+      local snapshot = tcod.copy(State.grids.solids)
+      snapshot:refresh_fov(entity.position, 15)
+      local result = snapshot:is_visible_unsafe(unpack(target.position))
+      snapshot:free()
+      return result
     end,
 
     _act = function(self, entity)

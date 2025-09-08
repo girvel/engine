@@ -17,6 +17,8 @@ ffi.cdef([[
 
   struct TCOD_Map *TCOD_map_new(int width, int height);
   void TCOD_map_clear(struct TCOD_Map *map, bool transparent, bool walkable);
+  void TCOD_map_copy(struct TCOD_Map *source, struct TCOD_Map *dest);
+  void TCOD_map_delete(struct TCOD_Map *map);
 
   void TCOD_map_set_properties(
     struct TCOD_Map *map, int x, int y, bool is_transparent, bool is_walkable
@@ -95,10 +97,28 @@ if tcod_c then
     })
   end
 
-  --- @param grid grid
+  --- @param wrapped_grid grid Actually, not grid but a tcod.observer
   --- @return snapshot
-  tcod.snapshot = function(grid)
-    do return rawget(grid, "_tcod__snapshot") end
+  tcod.snapshot = function(wrapped_grid)
+    return rawget(wrapped_grid, "_tcod__snapshot")
+  end
+
+  --- @param wrapped_grid grid Actually, not grid but a tcod.observer
+  --- @return snapshot
+  tcod.copy = function(wrapped_grid)
+    local inner = rawget(wrapped_grid, "_tcod__snapshot")
+    local w, h = unpack(inner._grid.size)
+    local map = tcod_c.TCOD_map_new(w, h)
+    tcod_c.TCOD_map_copy(inner._map, map)
+    return setmetatable({_map = map}, {
+      __index = snapshot_methods,
+    })
+  end
+
+  --- For some reason even manually triggered __gc doesn't work
+  snapshot_methods.free = function(self)
+    tcod_c.TCOD_map_delete(self._map)
+    self._map = nil
   end
 
   --- @return nil
@@ -154,8 +174,12 @@ else
     return grid
   end
 
-  tcod.snapshot = function(grid)
-    return setmetatable({_grid = grid}, {__index = snapshot_methods})
+  tcod.snapshot = function(wrapped_grid)
+    return setmetatable({_grid = wrapped_grid}, {__index = snapshot_methods})
+  end
+
+  tcod.copy = function(wrapped_grid)
+    return setmetatable({_grid = wrapped_grid}, {__index = snapshot_methods})
   end
 
   snapshot_methods.refresh_fov = function(self, position, r)
