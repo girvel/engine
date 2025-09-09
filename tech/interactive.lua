@@ -7,10 +7,10 @@ local methods = {}
 --- @return entity?
 interactive.get_for = function(interactor)
   for _, x in ipairs {
-    State.grids.items[interactor.position],
-    State.grids.tiles[interactor.position],
-    State.grids.solids:slow_get(interactor.position + interactor.direction),
-    State.grids.on_solids:slow_get(interactor.position + interactor.direction),
+    State.grids.items[interactor.position] or false,
+    State.grids.tiles[interactor.position] or false,
+    State.grids.solids:slow_get(interactor.position + interactor.direction) or false,
+    State.grids.on_solids:slow_get(interactor.position + interactor.direction) or false,
   } do
     if x and x.interact then
       return x
