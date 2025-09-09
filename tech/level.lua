@@ -48,11 +48,12 @@ end
 level.put = function(entity)
   local grid = assert(State.grids[entity.grid_layer], "Invalid grid_layer %s" % entity.grid_layer)
 
-  if grid[entity.position] then
+  if State.is_loaded and grid[entity.position] then
     Log.warn("Grid collision at %s[%s]: %s replaces %s" % {
       entity.grid_layer, entity.position, Name.code(entity), Name.code(grid[entity.position])
     })
   end
+
   grid[entity.position] = entity
 end
 
