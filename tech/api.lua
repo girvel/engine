@@ -23,7 +23,7 @@ end
 --- @return promise
 api.travel_scripted = function(entity, destination)
   local promise, scene = State.rails.runner:run_task(function()
-    api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs() / 3))
+    api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs2() / 3))
     if entity.position == destination then return end
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
@@ -45,7 +45,7 @@ api.travel_persistent = function(entity, destination, attempts_n)
     api.travel(entity, destination)
     if entity.position == destination or (
       State.grids.solids:slow_get(destination, true)
-      and (entity.position - destination):abs() == 1)
+      and (entity.position - destination):abs2() == 1)
     then return end
     async.sleep(.5)
   end
@@ -57,15 +57,15 @@ end
 api.travel = function(entity, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
-    and (entity.position - destination):abs() == 1)
+    and (entity.position - destination):abs2() == 1)
   then return end
 
   local possible_destinations = {unpack(Vector.extended_directions)}
   table.sort(possible_destinations, function(a, b)
-    local abs_a = a:abs()
-    local abs_b = b:abs()
+    local abs_a = a:abs2()
+    local abs_b = b:abs2()
     if abs_a == abs_b then
-      return (entity.position - destination - a):abs() < (entity.position - destination - b):abs()
+      return (entity.position - destination - a):abs2() < (entity.position - destination - b):abs2()
     end
 
     return abs_a < abs_b
@@ -101,7 +101,7 @@ end
 --- @param target entity
 api.attack = function(entity, target)
   local direction = target.position - entity.position
-  if direction:abs() ~= 1 then return end
+  if direction:abs2() ~= 1 then return end
 
   Log.debug("Attempt at attacking %s" % Name.code(target))
   entity:rotate(direction)

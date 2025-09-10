@@ -12,10 +12,12 @@ local pull_anchors
 --- @field image love.Image
 --- @field anchors table<anchor, vector?>
 --- @field color vector
+--- @field rotation? number
 
 --- @param base string|love.ImageData
+--- @param rotation? number
 --- @return sprite_image
-sprite.image = function(base)
+sprite.image = function(base, rotation)
   if type(base) == "string" then
     base = love.image.newImageData(base)
   end
@@ -26,6 +28,7 @@ sprite.image = function(base)
     anchors = anchors,
     image = love.graphics.newImage(base),
     color = main_color,
+    rotation = rotation,
   }
 end
 

@@ -287,6 +287,16 @@ end
 vector_methods.abs = function(self)
   local result = 0
   for _, value in ipairs(self) do
+    result = result + value^2
+  end
+  return math.sqrt(result)
+end
+
+--- @param self vector
+--- @return number
+vector_methods.abs2 = function(self)
+  local result = 0
+  for _, value in ipairs(self) do
     result = result + math.abs(value)
   end
   return result

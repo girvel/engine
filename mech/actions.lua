@@ -6,6 +6,7 @@ local sound  = require "engine.tech.sound"
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
 local tcod        = require "engine.tech.tcod"
+local projectile  = require "engine.tech.projectile"
 
 
 local actions = {}
@@ -319,18 +320,23 @@ actions.bow_attack = function(target)
         entity:rotate(d:normalized2())
       end
       entity:animate("bow_attack"):next(function()
-        -- SOUND bow
         local attack_roll = entity:get_ranged_attack_roll()
-        if d:abs() == 1 then
-          attack_roll = attack_roll:extended({advantage = "disadvantage"})
-        end
-        health.attack(
-          target,
-          attack_roll,
-          entity:get_ranged_damage_roll()
-        )
-        State.hostility:register(entity, target)
-        -- SOUND hit
+        local damage_roll = entity:get_ranged_damage_roll()
+
+        -- SOUND bow
+        -- NEXT! chain
+        projectile.launch(entity.position, target, damage_roll:max() * 2):next(function()
+          -- SOUND hit?
+          if d:abs2() == 1 then
+            attack_roll = attack_roll:extended({advantage = "disadvantage"})
+          end
+          health.attack(
+            target,
+            attack_roll,
+            damage_roll
+          )
+          State.hostility:register(entity, target)
+        end)
       end)
       return true
     end,
