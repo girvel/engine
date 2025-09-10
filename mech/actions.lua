@@ -195,7 +195,9 @@ actions.opportunity_attack = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target and target.hp
+    return target
+      and target.hp
+      and (not target.inventory.offhand or not target.inventory.offhand.tags.ranged)
   end,
 
   _act = function(_, entity)
@@ -316,9 +318,13 @@ actions.bow_attack = function(target)
       end
       entity:animate("bow_attack"):next(function()
         -- SOUND bow
+        local attack_roll = entity:get_ranged_attack_roll()
+        if d:abs() == 1 then
+          attack_roll = attack_roll:extended({advantage = "disadvantage"})
+        end
         health.attack(
           target,
-          entity:get_ranged_attack_roll(),
+          attack_roll,
           entity:get_ranged_damage_roll()
         )
         State.hostility:register(entity, target)

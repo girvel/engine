@@ -71,7 +71,7 @@ local fighting_spirit_condition = function()
     life_time = 6,
 
     modify_attack_roll = function(self, entity, roll, slot)
-      return roll:extended({advantage = true})  -- OPT prevent reallocation
+      return roll:extended({advantage = "advantage"})  -- OPT prevent reallocation
     end,
   }
 end

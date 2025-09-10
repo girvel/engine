@@ -6,9 +6,11 @@ local d = setmetatable({}, module_mt)
 -- [SECTION] Die
 ----------------------------------------------------------------------------------------------------
 
+--- @alias die_advantage "none"|"advantage"|"disadvantage"
+
 --- @class die
 --- @field sides_n integer
---- @field advantage boolean
+--- @field advantage die_advantage
 --- @field reroll integer[]
 local die_methods = {}
 d.die_mt = {__index = die_methods}
@@ -16,15 +18,21 @@ d.die_mt = {__index = die_methods}
 d.die_new = function(sides_n)
   return setmetatable({
     sides_n = sides_n,
-    advantage = false,
+    advantage = "none",
     reroll = {},
   }, d.die_mt)
 end
 
+local ADVANTAGE_CHAR = {
+  none = "",
+  advantage = "↑",
+  disadvantage = "↓",
+}
+
 d.die_mt.__tostring = function(self)
   return "d%s%s%s" % {
     self.sides_n,
-    self.advantage and "↑" or "",
+    ADVANTAGE_CHAR[self.advantage],
     #self.reroll > 0 and ("🗘(%s)" % table.concat(self.reroll, ",")) or ""
   }
 end
@@ -32,8 +40,10 @@ end
 --- @return integer
 die_methods.roll = function(self)
   local result = math.random(self.sides_n)
-  if self.advantage then
+  if self.advantage == "advantage" then
     result = math.max(result, math.random(self.sides_n))
+  elseif self.advantage == "disadvantage" then
+    result = math.min(result, math.random(self.sides_n))
   end
   if Table.contains(self.reroll, result) then
     result = math.random(self.sides_n)
