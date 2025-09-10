@@ -33,6 +33,27 @@ methods.init = function(entity)
   end)
 end
 
+local preserve_line_of_fire = function(entity, target)
+  -- NEXT! follow player
+  local best_p = entity.position
+  for d in iteration.expanding_rhombus(entity.resources.movement) do
+    local p = entity.position + d
+    if not State.grids.solids:can_fit(p) then goto continue end
+
+    local snapshot = tcod.copy(State.grids.solids)
+    snapshot:refresh_fov(p, actions.BOW_ATTACK_RANGE)
+
+    if snapshot:is_visible_unsafe(unpack(target.position)) then
+      best_p = p
+      break
+    end
+    snapshot:free()
+
+    ::continue::
+  end
+  api.travel(entity, best_p)
+end
+
 --- @param entity entity
 methods.control = function(entity)
   if not State.combat or State.rails.runner.locked_entities[State.player] then return end
@@ -45,6 +66,7 @@ methods.control = function(entity)
 
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
+    preserve_line_of_fire(entity, target)
     local bow_attack = actions.bow_attack(target)
     while bow_attack:act(entity) do
       async.sleep(.66)

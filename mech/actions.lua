@@ -295,6 +295,8 @@ actions.bow_attack_base = Table.extend({
   end
 }, action.base)
 
+actions.BOW_ATTACK_RANGE = 15
+
 actions.bow_attack = function(target)
   return Table.extend({}, actions.bow_attack_base, {
     _is_available = function(self, entity)
@@ -305,7 +307,7 @@ actions.bow_attack = function(target)
       then return false end
 
       local snapshot = tcod.copy(State.grids.solids)
-      snapshot:refresh_fov(entity.position, 15)
+      snapshot:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
       local result = snapshot:is_visible_unsafe(unpack(target.position))
       snapshot:free()
       return result
