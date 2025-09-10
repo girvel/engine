@@ -9,11 +9,12 @@ local item = {}
 item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 
 --- @class item: entity
---- @field damage_roll? d
---- @field bonus? integer
+--- @field damage_roll? d present only in weapons
+--- @field bonus? integer bonus damage
 --- @field tags table<string, true>
 --- @field slot string
 --- @field anchor? string
+--- @field projectile_factory? fun(): entity present only in ranged weapons
 
 item.mixin = function(animation_path)
   return Table.extend(
