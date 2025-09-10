@@ -160,6 +160,8 @@ draw_action_grid = function(self)
     d = Vector.right,
   } do
     if ui.keyboard(key) then
+      movement_destination = nil
+      movement_last_t = love.timer.getTime()
       table.insert(State.player.ai.next_actions, actions.move(direction))
     end
   end
@@ -524,7 +526,9 @@ use_mouse = function(self)
   if movement_destination then
     if love.timer.getTime() - movement_last_t >= 1/8 then
       movement_last_t = love.timer.getTime()
-      local path = tcod.snapshot(State.grids.solids):find_path(State.player.position, movement_destination)
+      local path = tcod.snapshot(State.grids.solids)
+        :find_path(State.player.position, movement_destination)
+
       if #path > 0 then
         table.insert(State.player.ai.next_actions, actions.move(path[1] - State.player.position))
       else
@@ -532,7 +536,7 @@ use_mouse = function(self)
       end
     end
 
-    if State.player.position == movement_destination then
+    if ui.mousedown(1) or State.player.position == movement_destination then
       movement_destination = nil
     end
   end
