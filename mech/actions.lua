@@ -320,10 +320,8 @@ actions.bow_attack = function(target)
         entity:rotate(d:normalized2())
       end
 
-      local arrow = State:add(animated.mixin("assets/sprites/animations/arrow"), {
-        codename = "arrow",
-        direction = entity.direction,
-      })
+      local arrow = State:add(entity.inventory.offhand.projectile_factory())
+      arrow.direction = entity.direction
       assert(not entity.inventory.hand)
       entity.inventory.hand = arrow
 
