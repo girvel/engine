@@ -179,6 +179,7 @@ end
 
 --- @param self entity
 --- @param slot string
+--- @return d
 methods.get_melee_attack_roll = function(self, slot)
   local roll = D(20)
     + xp.get_proficiency_bonus(self.level)
@@ -194,6 +195,7 @@ end
 
 --- @param self entity
 --- @param slot string
+--- @return d
 methods.get_melee_damage_roll = function(self, slot)
   local weapon = self.inventory[slot]
   if not weapon then
@@ -214,6 +216,26 @@ methods.get_melee_damage_roll = function(self, slot)
   end
 
   return self:modify("damage_roll", roll, slot)
+end
+
+-- local bow = entity.inventory.offhand
+-- local dex_modifier = entity:get_modifier("dex")
+-- health.attack(
+--   target,
+--   D(20) + dex_modifier + xp.get_proficiency_bonus(entity.level),
+--   bow.damage_roll + (bow.bonus or 0) + dex_modifier
+
+--- @param self entity
+--- @return d
+methods.get_ranged_attack_roll = function(self)
+  return D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level)
+end
+
+--- @param self entity
+--- @return d
+methods.get_ranged_damage_roll = function(self)
+  local bow = assert(self.inventory.offhand)
+  return bow.damage_roll + (bow.bonus or 0) + self:get_modifier("dex")
 end
 
 --- @param self entity

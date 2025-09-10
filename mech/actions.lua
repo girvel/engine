@@ -284,6 +284,13 @@ actions.bow_attack_base = Table.extend({
       and entity.inventory.offhand
       and entity.inventory.offhand.tags.ranged
   end,
+
+  get_hint = function(self, entity)
+    return "%s (%s)" % {
+      Name.game(self),
+      entity:get_ranged_damage_roll():simplified(),
+    }
+  end
 }, action.base)
 
 actions.bow_attack = function(target)
@@ -306,12 +313,10 @@ actions.bow_attack = function(target)
       entity:rotate((target.position - entity.position):normalized2())
       entity:animate("bow_attack"):next(function()
         -- SOUND bow
-        local bow = entity.inventory.offhand
-        local dex_modifier = entity:get_modifier("dex")
         health.attack(
           target,
-          D(20) + dex_modifier + xp.get_proficiency_bonus(entity.level),
-          bow.damage_roll + (bow.bonus or 0) + dex_modifier
+          entity:get_ranged_attack_roll(),
+          entity:get_ranged_damage_roll()
         )
         State.hostility:register(entity, target)
         -- SOUND hit

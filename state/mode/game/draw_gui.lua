@@ -213,6 +213,10 @@ draw_keyboard_action_grid = function(self)
   ui.start_line()
     local offhand = State.player.inventory.offhand
     if offhand and offhand.tags.ranged then
+      -- when there would be multiple parametrized actions, we can redo this hardcode into an
+      -- action_button branch; instead of base action + action factory we can do like an action
+      -- class with static methods and like .producer_flag = true; if action_button receives an
+      -- action, it does action; if it receives a producer, it does parametrized two-step action.
       local is_available = actions.bow_attack_base:is_available(State.player)
       local image = is_available
         and gui_elements.bow_attack
@@ -222,7 +226,7 @@ draw_keyboard_action_grid = function(self)
         self.input_mode = "mouse"
       end
       if button.is_mouse_over then
-        hint = "выстрелить"
+        hint = actions.bow_attack_base:get_hint(State.player)
       end
     else
       action_button(actions.hand_attack, "1")
