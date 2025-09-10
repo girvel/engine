@@ -310,7 +310,10 @@ actions.bow_attack = function(target)
     end,
 
     _act = function(self, entity)
-      entity:rotate((target.position - entity.position):normalized2())
+      local d = (target.position - entity.position)
+      if d ~= Vector.zero then
+        entity:rotate(d:normalized2())
+      end
       entity:animate("bow_attack"):next(function()
         -- SOUND bow
         health.attack(

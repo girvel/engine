@@ -435,7 +435,7 @@ draw_line = function(line)
   end
   ui.text(text)
 
-  if ui.keyboard("space") or ui.mousedown() then
+  if ui.keyboard("space") or ui.mousedown(1) then
     State.player.hears = nil
     SKIP_SOUNDS:play()
   end
@@ -518,19 +518,29 @@ draw_suggestion = function()
 end
 
 use_mouse = function(self)
-  if not self.input_mode == "mouse" then return end
+  if self.input_mode ~= "mouse" then return end
 
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
-    if ui.mouse().is_clicked then
-      local position = V(love.mouse.getPosition())
-        :sub_mut(State.perspective.camera_offset)
-        :div_mut(State.level.cell_size * 4)
-        :map_mut(math.floor)
-      local target = State.grids.solids:slow_get(position)
-      if target then
-        table.insert(State.player.ai.next_actions, actions.bow_attack(target))
-      end
+    local mouse = ui.mouse("target_inactive")
+    local position = V(love.mouse.getPosition())
+      :sub_mut(State.perspective.camera_offset)
+      :div_mut(State.level.cell_size * 4)
+      :map_mut(math.floor)
+    local target = State.grids.solids:slow_get(position)
+
+    if ui.mousedown(2) or mouse.is_clicked then
       self.input_mode = "keyboard"
+    end
+
+    if target then
+      local action = actions.bow_attack(target)
+
+      if action:is_available(State.player) then
+        ui.cursor("target_active")
+        if mouse.is_clicked then
+          table.insert(State.player.ai.next_actions, action)
+        end
+      end
     end
   ui.finish_frame()
 end

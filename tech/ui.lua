@@ -20,8 +20,7 @@ local model = {
 
  -- accumulated state --
   selection = {
-    i = 1,
-    max_i = 0,
+    i = 1, max_i = 0,
     is_pressed = false,
   },
   cursor = nil,
@@ -39,8 +38,11 @@ local model = {
   line_last_h = {},
 }
 
+--- @enum (key) ui_cursor_type
 local CURSORS = {
-  normal = love.mouse.newCursor("engine/assets/sprites/gui/cursor.png"),
+  normal = love.mouse.newCursor("engine/assets/sprites/gui/cursor/normal.png"),
+  target_active = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_active.png"),
+  target_inactive = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_inactive.png"),
   hand = love.mouse.getSystemCursor("hand"),
 }
 
@@ -509,14 +511,30 @@ ui.keyboard = function(...)
   return false
 end
 
-ui.mousedown = function()
-  return Table.contains(model.mouse.button_pressed, 1)
+--- @param ... integer mouse button number (love-compatible)
+ui.mousedown = function(...)
+  for i = 1, select("#", ...) do
+    if Table.contains(model.mouse.button_pressed, select(i, ...)) then
+      return true
+    end
+  end
+  return false
 end
 
+--- @param cursor_type? ui_cursor_type
 --- @return ui_button_out
-ui.mouse = function()
+ui.mouse = function(cursor_type)
   local frame = Table.last(model.frame)
-  return button(frame.w, frame.h)
+  local result = button(frame.w, frame.h)
+  if cursor_type and result.is_mouse_over then
+    model.cursor = cursor_type
+  end
+  return result
+end
+
+--- @param cursor_type ui_cursor_type
+ui.cursor = function(cursor_type)
+  model.cursor = cursor_type
 end
 
 ui.get_frame = function()
@@ -545,12 +563,12 @@ ui.handle_mousemove = function(x, y)
   model.mouse.y = y
 end
 
-ui.handle_mousepress = function(button)
-  table.insert(model.mouse.button_pressed, button)
+ui.handle_mousepress = function(button_i)
+  table.insert(model.mouse.button_pressed, button_i)
 end
 
-ui.handle_mouserelease = function(button)
-  table.insert(model.mouse.button_released, button)
+ui.handle_mouserelease = function(button_i)
+  table.insert(model.mouse.button_released, button_i)
 end
 
 ui.handle_update = function(dt)
