@@ -55,6 +55,7 @@ end
 --- @param entity entity
 --- @param destination vector
 api.travel = function(entity, destination)
+  Log.trace("travel", Name.code(entity), entity.position, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
     and (entity.position - destination):abs2() == 1)
@@ -75,6 +76,7 @@ api.travel = function(entity, destination)
   local path
   for _, d in ipairs(possible_destinations) do
     path = tcod.snapshot(State.grids.solids):find_path(entity.position, destination + d)
+    Log.trace(path)
     if #path > 0 then
       api.follow_path(entity, path)
       return

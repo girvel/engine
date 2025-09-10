@@ -123,9 +123,9 @@ if tcod_c then
 
   --- @return nil
   snapshot_methods.refresh_fov = function(self, position, r)
-    local px, py = unpack(position - Vector.one)
+    local px, py = unpack(position)
     tcod_c.TCOD_map_compute_fov(
-      self._map, px, py, r, true, tcod_c.FOV_PERMISSIVE_8
+      self._map, px - 1, py - 1, r, true, tcod_c.FOV_PERMISSIVE_8
     )
   end
 

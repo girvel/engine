@@ -19,57 +19,6 @@ describe("Grid library", function()
     end)
   end)
 
-  describe("find_path", function()
-    it("should find paths", function()
-      local this_grid = grid.from_matrix({
-        {nil, nil, nil},
-        {nil, 1,   nil},
-        {nil, nil, nil},
-      }, v(3, 3))
-
-      assert.are_same(
-        {v(1, 1), v(2, 1), v(3, 1)},
-        this_grid:find_path(v(1, 2), v(3, 1))
-      )
-    end)
-
-    it("should work with start & end occupied", function()
-      local this_grid = grid.from_matrix({
-        {nil, nil, 1  },
-        {1,   1,   nil},
-        {nil, nil, nil},
-      }, v(3, 3))
-
-      assert.are_same(
-        {v(1, 1), v(2, 1), v(3, 1)},
-        this_grid:find_path(v(1, 2), v(3, 1))
-      )
-    end)
-
-    it("should find the next best thing if there is no full path", function()
-      local this_grid = grid.from_matrix({
-        {1,   1,   1  },
-        {1,   1,   1  },
-        {nil, nil, nil},
-      }, v(3, 3))
-
-      assert.are_same(
-        {v(2, 3), v(3, 3)},
-        this_grid:find_path(v(1, 3), v(3, 1))
-      )
-    end)
-
-    it("should work with distance limit", function()
-      local this_grid = grid.from_matrix({
-        {nil, nil, nil, nil, nil},
-      }, v(5, 1))
-      local max_distance = 3
-      local path = this_grid:find_path(v(1, 1), v(5, 1), max_distance)
-      assert.is_true(#path >= max_distance)
-      assert.is_true(#path < this_grid.size[1])
-    end)
-  end)
-
   describe("find_free_position", function()
     it("finds the closest nil", function()
       local this_grid = grid.from_matrix({

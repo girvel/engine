@@ -8,9 +8,12 @@ local gui = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 local tk = require("engine.state.mode.tk")
 local interactive = require("engine.tech.interactive")
+local tcod        = require("engine.tech.tcod")
 
 
-local cost, hint
+local cost, hint, movement_destination, movement_last_t
+movement_last_t = 0
+
 local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
   draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, use_mouse
@@ -518,6 +521,22 @@ draw_suggestion = function()
 end
 
 use_mouse = function(self)
+  if movement_destination then
+    if love.timer.getTime() - movement_last_t >= 1/8 then
+      movement_last_t = love.timer.getTime()
+      local path = tcod.snapshot(State.grids.solids):find_path(State.player.position, movement_destination)
+      if #path > 0 then
+        table.insert(State.player.ai.next_actions, actions.move(path[1] - State.player.position))
+      else
+        movement_destination = nil
+      end
+    end
+
+    if State.player.position == movement_destination then
+      movement_destination = nil
+    end
+  end
+
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
     local mouse = ui.mouse(self.input_mode == "target" and "target_inactive" or nil)
     local position = V(love.mouse.getPosition())
@@ -544,7 +563,12 @@ use_mouse = function(self)
       end
     else
       local offhand = State.player.inventory.offhand
-      if offhand and offhand.tags.ranged and target then
+      if not target then
+        if ui.mousedown(2) then
+          movement_destination = position
+          movement_last_t = love.timer.getTime()
+        end
+      elseif offhand and offhand.tags.ranged then
         local action = actions.bow_attack(target)
 
         if action:is_available(State.player)
