@@ -308,6 +308,7 @@ actions.bow_attack = function(target)
           D(20) + dex_modifier + xp.get_proficiency_bonus(entity.level),
           bow.damage_roll + (bow.bonus or 0) + dex_modifier
         )
+        State.hostility:register(entity, target)
         -- SOUND hit
       end)
       return true
