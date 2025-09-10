@@ -513,22 +513,11 @@ ui.mousedown = function()
   return Table.contains(model.mouse.button_pressed, 1)
 end
 
--- --- @param is_global? boolean use all screen instead of current frame
--- --- @return boolean
--- ui.mouse = function(is_global)
---   if is_global then
---     table.insert(model.frame, {
---       x = 0, y = 0,
---       w = love.graphics.getWidth(), h = love.graphics.getHeight()
---     })
---   end
---   local frame = Table.last(model.frame)
---   local result = button(frame.w, frame.h).is_clicked
---   if is_global then
---     table.remove(model.frame)
---   end
---   return result
--- end
+--- @return ui_button_out
+ui.mouse = function()
+  local frame = Table.last(model.frame)
+  return button(frame.w, frame.h)
+end
 
 ui.get_frame = function()
   return Table.shallow_copy(Table.last(model.frame))

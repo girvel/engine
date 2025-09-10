@@ -517,7 +517,7 @@ use_mouse = function(self)
   if not self.input_mode == "mouse" then return end
 
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
-    if ui.mousedown() then
+    if ui.mouse().is_clicked then
       local position = V(love.mouse.getPosition())
         :sub_mut(State.perspective.camera_offset)
         :div_mut(State.level.cell_size * 4)
