@@ -523,7 +523,6 @@ use_mouse = function(self)
         :div_mut(State.level.cell_size * 4)
         :map_mut(math.floor)
       local target = State.grids.solids:slow_get(position)
-      Log.trace(target)
       if target then
         table.insert(State.player.ai.next_actions, actions.bow_attack(target))
       end

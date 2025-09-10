@@ -285,6 +285,7 @@ actions.bow_attack = function(target)
     _is_available = function(self, entity)
       if not (target
         and target.hp
+        and State.hostility:get(entity, target) ~= "ally"
         and entity.inventory
         and entity.inventory.offhand
         and entity.inventory.offhand.tags.ranged)
