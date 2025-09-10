@@ -34,8 +34,7 @@ methods.init = function(entity)
 end
 
 local preserve_line_of_fire = function(entity, target)
-  -- NEXT! follow player
-  local best_p = entity.position
+  local best_p
   for d in iteration.expanding_rhombus(entity.resources.movement) do
     local p = entity.position + d
     if not State.grids.solids:can_fit(p) then goto continue end
@@ -51,7 +50,12 @@ local preserve_line_of_fire = function(entity, target)
 
     ::continue::
   end
-  api.travel(entity, best_p)
+
+  if best_p then
+    api.travel(entity, best_p)
+  else
+    api.travel(entity, target.position)
+  end
 end
 
 --- @param entity entity
