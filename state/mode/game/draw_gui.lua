@@ -213,7 +213,7 @@ draw_keyboard_action_grid = function(self)
   ui.start_line()
     local offhand = State.player.inventory.offhand
     if offhand and offhand.tags.ranged then
-      local is_available = actions.is_bow_attack_available(State.player)
+      local is_available = actions.bow_attack_base:is_available(State.player)
       local image = is_available
         and gui_elements.bow_attack
         or gui_elements.bow_attack_inactive

@@ -271,24 +271,28 @@ base_attack = function(entity, slot)
   end)
 end
 
-local bow_attack_cost = {
-  actions = 1,
-}
+actions.bow_attack_base = Table.extend({
+  name = "выстрелить",
+  codename = "bow_attack",
+
+  cost = {
+    actions = 1,
+  },
+
+  _is_available = function(self, entity)
+    return entity.inventory
+      and entity.inventory.offhand
+      and entity.inventory.offhand.tags.ranged
+  end,
+}, action.base)
 
 actions.bow_attack = function(target)
-  return Table.extend({
-    name = "выстрелить",
-    codename = "bow_attack",
-
-    cost = bow_attack_cost,
-
+  return Table.extend({}, actions.bow_attack_base, {
     _is_available = function(self, entity)
-      if not (target
+      if not (actions.bow_attack_base:_is_available(entity)
+        and target
         and target.hp
-        and State.hostility:get(entity, target) ~= "ally"
-        and entity.inventory
-        and entity.inventory.offhand
-        and entity.inventory.offhand.tags.ranged)
+        and State.hostility:get(entity, target) ~= "ally")
       then return false end
 
       local snapshot = tcod.copy(State.grids.solids)
@@ -314,11 +318,7 @@ actions.bow_attack = function(target)
       end)
       return true
     end,
-  }, action.base)
-end
-
-actions.is_bow_attack_available = function(entity)
-  return action.base.is_available({cost = bow_attack_cost}, entity)
+  })
 end
 
 actions.interact = Table.extend({
