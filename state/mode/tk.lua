@@ -76,7 +76,7 @@ tk.draw_entity = function(entity, x, y, scale)
     if is_offhand_bg then display_slot("offhand") end
   end
 
-  love.graphics.draw(entity.sprite.image, x, y, entity.sprite.rotation or 0, scale)
+  love.graphics.draw(entity.sprite.image, x, y, entity.rotation or 0, scale)
 
   if entity.inventory then
     display_slot("tatoo")

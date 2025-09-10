@@ -319,13 +319,24 @@ actions.bow_attack = function(target)
       if d ~= Vector.zero then
         entity:rotate(d:normalized2())
       end
+
+      local arrow = State:add(animated.mixin("assets/sprites/animations/arrow"), {
+        codename = "arrow",
+        direction = entity.direction,
+      })
+      assert(not entity.inventory.hand)
+      entity.inventory.hand = arrow
+
       entity:animate("bow_attack"):next(function()
         local attack_roll = entity:get_ranged_attack_roll()
         local damage_roll = entity:get_ranged_damage_roll()
 
         -- SOUND bow
-        -- NEXT! chain
-        projectile.launch(entity.position, target, damage_roll:max() * 2):next(function()
+        arrow.layer = "fx_over"
+        arrow.position = entity.position + entity.sprite.anchors.hand / 16
+        arrow.direction = Vector.right
+        arrow:animate()
+        projectile.launch(arrow, target, damage_roll:max() * 2):next(function()
           -- SOUND hit?
           if d:abs2() == 1 then
             attack_roll = attack_roll:extended({advantage = "disadvantage"})
@@ -337,6 +348,7 @@ actions.bow_attack = function(target)
           )
           State.hostility:register(entity, target)
         end)
+        entity.inventory.hand = nil
       end)
       return true
     end,
