@@ -141,10 +141,10 @@ draw_action_grid = function(self)
   ui.finish_frame()
 
   ui.start_frame(4)
-    if self.input_mode == "keyboard" then
+    if self.input_mode == "normal" then
       draw_keyboard_action_grid(self)
     else
-      assert(self.input_mode == "mouse")
+      assert(self.input_mode == "target")
       draw_mouse_action_grid(self)
     end
   ui.finish_frame()
@@ -223,7 +223,7 @@ draw_keyboard_action_grid = function(self)
         or gui_elements.bow_attack_inactive
       local button = ui.key_button(image, "1", not is_available)
       if button.is_clicked then
-        self.input_mode = "mouse"
+        self.input_mode = "target"
       end
       if button.is_mouse_over then
         hint = actions.bow_attack_base:get_hint(State.player)
@@ -256,7 +256,7 @@ end
 draw_mouse_action_grid = function(self)
   local escape_button = ui.key_button(gui_elements.escape, "escape")
   if escape_button.is_clicked then
-    self.input_mode = "keyboard"
+    self.input_mode = "normal"
   end
   if escape_button.is_mouse_over then
     hint = "отмена"
@@ -518,27 +518,43 @@ draw_suggestion = function()
 end
 
 use_mouse = function(self)
-  if self.input_mode ~= "mouse" then return end
-
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
-    local mouse = ui.mouse("target_inactive")
+    local mouse = ui.mouse(self.input_mode == "target" and "target_inactive" or nil)
     local position = V(love.mouse.getPosition())
       :sub_mut(State.perspective.camera_offset)
       :div_mut(State.level.cell_size * 4)
       :map_mut(math.floor)
     local target = State.grids.solids:slow_get(position)
 
-    if ui.mousedown(2) or mouse.is_clicked then
-      self.input_mode = "keyboard"
-    end
+    local is_clicked = ui.mousedown(2) or mouse.is_clicked
+    if self.input_mode == "target" then
+      if is_clicked then
+        self.input_mode = "normal"
+      end
 
-    if target then
-      local action = actions.bow_attack(target)
+      if target then
+        local action = actions.bow_attack(target)
 
-      if action:is_available(State.player) then
-        ui.cursor("target_active")
-        if mouse.is_clicked then
-          table.insert(State.player.ai.next_actions, action)
+        if action:is_available(State.player) then
+          ui.cursor("target_active")
+          if is_clicked then
+            table.insert(State.player.ai.next_actions, action)
+          end
+        end
+      end
+    else
+      local offhand = State.player.inventory.offhand
+      if offhand and offhand.tags.ranged and target then
+        local action = actions.bow_attack(target)
+
+        if action:is_available(State.player)
+          and (State.hostility:get(State.player, target) == "enemy"
+            or State.hostility:get(target, State.player) == "enemy")
+        then
+          ui.cursor("target_active")
+          if ui.mousedown(2) then
+            table.insert(State.player.ai.next_actions, action)
+          end
         end
       end
     end
