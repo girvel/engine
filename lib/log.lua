@@ -124,7 +124,9 @@ log.report = function()
     level = "warn"
   end
 
-  log[level](("%s warnings, %s errors, %s fatal"):format(count.warn, count.error, count.fatal))
+  levels.rep = levels[level]
+
+  log("rep", 1, ("%s warnings, %s errors, %s fatal"):format(count.warn, count.error, count.fatal))
 end
 
 
