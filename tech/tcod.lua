@@ -55,6 +55,8 @@ local tcod_c = ffi_fix.load("libtcod")
 --- @field py integer
 local snapshot_methods = {}
 
+tcod.ok = not not tcod_c
+
 if tcod_c then
   --- To be called on empty grid
   --- @generic T

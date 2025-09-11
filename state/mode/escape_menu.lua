@@ -40,7 +40,7 @@ methods.draw_gui = function(self, dt)
       "Выход",
     })
 
-    local escape_pressed = ui.keyboard("escape") and not self._display_confirmation
+    local escape_pressed = ui.keyboard("escape")
 
     if n or escape_pressed then
       ui.handle_selection_reset()
