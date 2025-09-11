@@ -1,3 +1,4 @@
+local safety = require("engine.tech.safety")
 local async = require("engine.tech.async")
 
 
@@ -84,9 +85,7 @@ methods.update = function(self, dt)
             Log.info("Scene %q starts" % {scene_name})
           end
 
-          -- NEXT (safety) safe call
-          -- Debug.call(scene.run, scene, self, characters)
-          scene:run(characters)
+          safety.call(scene.run, scene, characters)
 
           for _, character in pairs(characters) do
             self.locked_entities[character] = nil
