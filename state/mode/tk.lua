@@ -93,6 +93,7 @@ end
 
 local SIDEBAR_BLOCK_PADDING = 10
 
+--- @nodiscard
 tk.start_block = function()
   local frame = ui.get_frame()
   ui.start_frame(

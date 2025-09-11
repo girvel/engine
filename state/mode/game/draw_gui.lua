@@ -11,7 +11,7 @@ local interactive = require("engine.tech.interactive")
 local tcod        = require("engine.tech.tcod")
 
 
-local cost, hint, movement_destination, movement_last_t
+local cost, hint, movement_destination, movement_last_t, is_compact
 movement_last_t = 0
 
 local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
@@ -21,6 +21,8 @@ local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources
 --- @param self state_mode_game
 --- @param dt number
 local draw_gui = function(self, dt)
+  is_compact = love.graphics.getHeight() < 900
+
   draw_sidebar(self)
   draw_dialogue()
   draw_notification()
@@ -53,17 +55,17 @@ draw_sidebar = function(self)
     draw_hp_bar()
 
     ui.br()
-    ui.br()
+    if not is_compact then ui.br() end
 
     draw_action_grid(self)
 
     ui.br()
-    ui.br()
+    if not is_compact then ui.br() end
 
     draw_resources()
 
     ui.br()
-    ui.br()
+    if not is_compact then ui.br() end
 
     if State.combat then
       draw_move_order()
@@ -301,10 +303,12 @@ local PRIMITIVE_RESOURCES = {
 
 draw_resources = function()
   local start = tk.start_block()
-    ui.start_alignment("center")
-      ui.text("Ресурсы")
-    ui.finish_alignment()
-    ui.br()
+    if not is_compact then
+      ui.start_alignment("center")
+        ui.text("Ресурсы")
+      ui.finish_alignment()
+      ui.br()
+    end
 
     for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
       local amount = State.player.resources[r]
@@ -349,10 +353,12 @@ local HOSTILITY_COLOR = {
 
 draw_move_order = function()
   local start = tk.start_block()
-    ui.start_alignment("center")
-      ui.text("Очередь ходов")
-    ui.finish_alignment()
-    ui.br()
+    if not is_compact then
+      ui.start_alignment("center")
+        ui.text("Очередь ходов")
+      ui.finish_alignment()
+      ui.br()
+    end
 
     for i, e in ipairs(State.combat.list) do
       ui.start_line()
