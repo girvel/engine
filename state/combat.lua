@@ -1,5 +1,5 @@
 local combat = {}
--- NEXT rename to round_robin
+-- TODO rename to round_robin?
 
 --- @class state_combat
 --- @field list entity[]

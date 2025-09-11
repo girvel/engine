@@ -8,6 +8,8 @@ local animated = require "engine.tech.animated"
 --- @field control? fun(base_entity)
 --- @field observe? fun(base_entity, number)
 
+local MOVE_TIMEOUT = 6
+
 return Tiny.processingSystem {
   codename = "acting",
   base_callback = "update",
@@ -56,8 +58,9 @@ return Tiny.processingSystem {
     end
   end,
 
+  _move_start_t = nil,
+
   _process_inside_combat = function(self, entity, dt)
-    -- NEXT timeout (safety)
     local ai = entity.ai
 
     if ai.observe then
@@ -74,19 +77,27 @@ return Tiny.processingSystem {
 
     if not ai._control_coroutine then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
+      self._move_start_t = love.timer.getTime()
     end
 
     async.resume(ai._control_coroutine, entity, dt)
-    if coroutine.status(ai._control_coroutine) == "dead" then
+
+    local is_timeout_reached = current ~= State.player
+      and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
+
+    if is_timeout_reached then
+      Log.warn("%s's combat move timed out" % {Name.code(current)})
+    end
+
+    if is_timeout_reached or coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil
       if current.rest then
         current:rest("move")
       end
       State.combat:_pass_turn()
 
-      local current = State.combat:get_current()
+      current = State.combat:get_current()
       Log.info("%s's turn" % {Name.code(current)})
-      -- NEXT reset timeout (safety)
       State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 
       self:_update_conditions(entity, 6)
