@@ -50,6 +50,7 @@ local FRAME = "engine/assets/sprites/gui/button_frame.png"
 local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
 local SCALE = 4  -- TODO extract scale here
+local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
 
 local get_font, get_batch, get_mouse_over, button
 
@@ -219,11 +220,11 @@ ui.text = function(text)
         frame.x = frame.x + font:getWidth(text)
         model.line_last_h[#model.line_last_h] = math.max(
           Table.last(model.line_last_h),
-          font:getHeight() * 1.25
+          font:getHeight() * LINE_K
         )
       else
-        frame.y = frame.y + font:getHeight() * 1.25
-        frame.h = frame.h - font:getHeight() * 1.25
+        frame.y = frame.y + font:getHeight() * LINE_K
+        frame.h = frame.h - font:getHeight() * LINE_K
       end
     end
   end
@@ -462,7 +463,7 @@ ui.choice = function(options)
   local frame = Table.last(model.frame)
 
   for i, option in ipairs(options) do
-    local button_out = button(frame.w, font:getHeight() * 1.25)
+    local button_out = button(frame.w, font:getHeight() * LINE_K)
 
     if button_out.is_mouse_over then
       model.selection.i = model.selection.max_i + i
