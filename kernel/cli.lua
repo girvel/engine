@@ -2,8 +2,15 @@ local cli = {}
 
 cli.parse = function(args)
   local parser = Argparse()
-    :name("love <game root path>")
+    :name("love")
     :description("Launch the game")
+
+  parser
+    :argument(
+      "game root path",
+      "not required; windows version of LOVE passes the path argument, linux doesn't. This argument"
+      .. "makes them compatible")
+    :args("?")
 
   parser:flag(
     "-d --debug",
