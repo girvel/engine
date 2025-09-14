@@ -11,16 +11,22 @@ local interactive = require("engine.tech.interactive")
 local tcod        = require("engine.tech.tcod")
 
 
+-- Internal state
 local cost, hint, movement_destination, movement_last_t, is_compact
 movement_last_t = 0
 
-local draw_sidebar, action_button, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
+-- Utility functions
+local action_button
+
+-- Render functions
+local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
   draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, use_mouse
 
+
 --- @param self state_mode_game
 --- @param dt number
-local draw_gui = function(self, dt)
+draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
 
   draw_sidebar(self)
