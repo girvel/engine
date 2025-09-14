@@ -72,4 +72,8 @@ Vector = require("engine.lib.vector")
 V = Vector.new
 Ldump.mark_module("engine.lib.vector", "const")
 
+Vector4 = require("engine.lib.vector4")
+V4 = Vector4.new
+Log.trace(V4(1, 2, 3, 4))
+
 Log.info("Initialized globals")
