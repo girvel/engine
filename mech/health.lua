@@ -4,8 +4,8 @@ local item   = require "engine.tech.item"
 
 local health = {}
 
-health.COLOR_DAMAGE = Vector.hex("e7573e")
-health.COLOR_HEALING = Vector.hex("c3e06c")
+health.COLOR_DAMAGE  = Vector4.hex("e7573e")
+health.COLOR_HEALING = Vector4.hex("c3e06c")
 
 --- Restores `amount` of `target`'s health with FX
 --- @param target entity
@@ -119,7 +119,7 @@ end
 --- Floating text for damage & such
 --- @param text string|number
 --- @param grid_position vector
---- @param color vector
+--- @param color vector4
 health.floater = function(text, grid_position, color)
   return {
     boring_flag = true,

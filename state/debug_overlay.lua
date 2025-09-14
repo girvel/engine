@@ -44,7 +44,7 @@ methods.draw = function(self, dt)
   if self._show_points then
     ui.start_font(12)
     for k, point in pairs(self.points) do
-      love.graphics.setColor(point.color)
+      love.graphics.setColor(point.color:unpack())
       local v
       if point.view == "grid" then
         v = point.position * 4 * State.level.cell_size + State.perspective.camera_offset
@@ -58,7 +58,7 @@ methods.draw = function(self, dt)
       local x, y = unpack(v)
       love.graphics.circle("fill", x, y, 3)
       love.graphics.print(k, x, y)
-      love.graphics.setColor(Vector.white)
+      love.graphics.setColor(Vector4.white:unpack())
     end
     ui.finish_font()
   end
@@ -78,7 +78,7 @@ end
 
 --- @class overlay_point
 --- @field position vector
---- @field color vector
+--- @field color vector4
 --- @field view "grid"|"gui"|"absolute"
 
 Ldump.mark(debug_overlay, {}, ...)

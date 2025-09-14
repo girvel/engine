@@ -25,9 +25,9 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local DIMMED = Vector.hex("2a3e34")
-local HIGHLIGHTED = Vector.hex("cfa867")
-local WHITE = Vector.hex("ffffff")
+local DIMMED = Vector4.hex("2a3e34")
+local HIGHLIGHTED = Vector4.hex("cfa867")
+local WHITE = Vector4.hex("ffffff")
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
@@ -44,9 +44,9 @@ methods.draw_gui = function(self, dt)
 
       ui.start_font(36)
         ui.start_line()
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(DIMMED:unpack())
           ui.text("# ")
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(WHITE:unpack())
           ui.text(quest.name)
         ui.finish_line()
       ui.finish_font()
@@ -56,13 +56,13 @@ methods.draw_gui = function(self, dt)
         local prefix
         local needs_color_reset = true
         if objective.status == "done" then
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(DIMMED:unpack())
           prefix = "+ "
         elseif objective.status == "failed" then
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(DIMMED:unpack())
           prefix = "x "
         elseif objective.status == "new" then
-          love.graphics.setColor(HIGHLIGHTED)
+          love.graphics.setColor(HIGHLIGHTED:unpack())
           prefix = "- "
         else
           prefix = "- "
@@ -72,7 +72,7 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. objective.text)
 
         if needs_color_reset then
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(WHITE:unpack())
         end
 
       end

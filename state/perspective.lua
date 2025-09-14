@@ -43,7 +43,7 @@ methods.update = function(self, dt)
     self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
     State.debug_overlay.points.camera = {
       position = -self.camera_offset + V(734, 540) + V(32, 32),
-      color = V(0, 0, 1),
+      color = V4(0, 0, 1),
       view = "absolute",
     }
   end
@@ -91,7 +91,7 @@ smooth_camera_offset = {
     if State.debug then
       State.debug_overlay.points.vp = {
         position = V(vx + .5, vy + .5),
-        color = V(1, 0, 0),
+        color = V4(1, 0, 0),
         view = "grid",
       }
     end
@@ -101,7 +101,7 @@ smooth_camera_offset = {
     if State.debug then
       State.debug_overlay.points.target = {
         position = V(734 + 32 - target_x, 540 + 32 - target_y),
-        color = V(0, 1, 0),
+        color = V4(0, 1, 0),
         view = "absolute",
       }
     end

@@ -33,7 +33,7 @@ local draw_entity = function(self, entity, dt)
     self._sprite_batches[entity.grid_layer]:add(sprite.quad, x, y, 0, State.perspective.SCALE)
   elseif sprite.type == "text" then
     love.graphics.setFont(sprite.font)
-    love.graphics.print({sprite.color, sprite.text}, x, y)
+    love.graphics.print({sprite.color:pack(), sprite.text}, x, y)
   else
     assert(false)
   end

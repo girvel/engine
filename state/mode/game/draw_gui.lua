@@ -291,14 +291,14 @@ local ICONS = {
 local DEFAULT_ICON = "'"
 
 local COLORS = {
-  actions = Vector.hex("79ad9c"),
-  bonus_actions = Vector.hex("c3e06c"),
-  reactions = Vector.hex("fcea9b"),
-  movement = Vector.hex("429858"),
+  actions = Vector4.hex("79ad9c"),
+  bonus_actions = Vector4.hex("c3e06c"),
+  reactions = Vector4.hex("fcea9b"),
+  movement = Vector4.hex("429858"),
 }
 
-local WHITE = Vector.hex("ffffff")
-local HIGHLIGHTED = Vector.hex("e7573e")
+local WHITE = Vector4.hex("ffffff")
+local HIGHLIGHTED = Vector4.hex("e7573e")
 
 local PRIMITIVE_RESOURCES = {
   "movement",
@@ -327,19 +327,19 @@ draw_resources = function()
         local icon = ICONS[r] or DEFAULT_ICON
         local highlighted_n = cost and cost[r]
         if highlighted_n then
-          love.graphics.setColor(HIGHLIGHTED)
+          love.graphics.setColor(HIGHLIGHTED:unpack())
             ui.text(icon * highlighted_n)
-          love.graphics.setColor(COLORS[r] or WHITE)
+          love.graphics.setColor((COLORS[r] or WHITE):unpack())
             ui.text(icon * math.max(0, amount - highlighted_n))
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(WHITE:unpack())
         else
-          love.graphics.setColor(COLORS[r] or WHITE)
+          love.graphics.setColor((COLORS[r] or WHITE):unpack())
             if amount <= 12 then
               ui.text(icon * amount)
             else
               ui.text("x" .. amount)
             end
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(WHITE:unpack())
         end
       ui.finish_line()
       ui.finish_frame()
@@ -351,10 +351,10 @@ draw_resources = function()
   tk.finish_block(start)
 end
 
-local BORDERS = Vector.hex("191919")
+local BORDERS = Vector4.hex("191919")
 local HOSTILITY_COLOR = {
-  enemy = Vector.hex("99152c"),
-  ally = Vector.hex("5d863f"),
+  enemy = Vector4.hex("99152c"),
+  ally  = Vector4.hex("5d863f"),
 }
 
 draw_move_order = function()
@@ -371,16 +371,16 @@ draw_move_order = function()
         if State.combat.current_i == i then
           ui.text("x ")
         else
-          love.graphics.setColor(BORDERS)
+          love.graphics.setColor(BORDERS:unpack())
           ui.text("- ")
         end
 
         local hostility = State.hostility:get(e, State.player)
         local color = hostility and HOSTILITY_COLOR[hostility] or Vector.white
 
-        love.graphics.setColor(color)
+        love.graphics.setColor(color:unpack())
           ui.text(Name.game(e))
-        love.graphics.setColor(Vector.white)
+        love.graphics.setColor(Vector4.white:unpack())
       ui.finish_line()
     end
   tk.finish_block(start)
@@ -413,8 +413,8 @@ end
 
 local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
 
-local FAILURE = Vector.hex("e7573e")
-local SUCCESS = Vector.hex("c3e06c")
+local FAILURE = Vector4.hex("e7573e")
+local SUCCESS = Vector4.hex("c3e06c")
 
 draw_line = function(line)
   local text = line.text
@@ -422,9 +422,9 @@ draw_line = function(line)
     ui.start_frame()
     ui.start_line()
       local name = Name.game(line.source)
-      love.graphics.setColor(line.source.sprite.color)
+      love.graphics.setColor(line.source.sprite.color:unpack())
         ui.text(name)
-      love.graphics.setColor(Vector.white)
+      love.graphics.setColor(Vector4.white:unpack())
       ui.text(": ")
 
       local color
@@ -440,9 +440,9 @@ draw_line = function(line)
 
       local offset = name:utf_len() + 2
       if highlighted then
-        love.graphics.setColor(color)
+        love.graphics.setColor(color:unpack())
           ui.text(highlighted)
-        love.graphics.setColor(Vector.white)
+        love.graphics.setColor(Vector4.white:unpack())
         offset = offset + highlighted:utf_len()
         text = text:sub(j + 1)
       end

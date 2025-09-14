@@ -20,7 +20,7 @@ return function(msg)
     end
 
     love.graphics.clear()
-      love.graphics.setColor(Vector.white)
+      love.graphics.setColor(Vector4.white:unpack())
       love.graphics.setFont(FONT)
 
       love.graphics.print("Игра потерпела крушение", 200, 200)

@@ -56,6 +56,11 @@ end
 vector4.white = vector4.new(1, 1, 1, 1)
 vector4.black = vector4.new(0, 0, 0, 1)
 
+--- @return number[]
+methods.pack = function(self)
+  return {self:unpack()}
+end
+
 --- @return number, number, number, number
 methods.unpack = function(self)
   return self.items[0], self.items[1], self.items[2], self.items[3]

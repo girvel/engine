@@ -24,8 +24,8 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local WHITE = Vector.hex("ffffff")
-local RED = Vector.hex("99152c")
+local WHITE = Vector4.hex("ffffff")
+local RED = Vector4.hex("99152c")
 
 methods.draw_gui = function(self)
   local W = 470
@@ -42,10 +42,10 @@ methods.draw_gui = function(self)
     ui.br()
 
     if self._prev.has_saved == false then
-      love.graphics.setColor(RED)
+      love.graphics.setColor(RED:unpack())
       ui.text("Игра не сохранена")
       ui.br()
-      love.graphics.setColor(WHITE)
+      love.graphics.setColor(WHITE:unpack())
     end
 
     local n = ui.choice({
