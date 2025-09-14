@@ -55,7 +55,12 @@ return function()
 
     love.draw(dt)
 
-    love.graphics.present()
+    do
+      local t = love.timer.getTime()
+      love.graphics.present()
+      t = love.timer.getTime() - t
+      Kernel._total_time = Kernel._total_time - t
+    end
 
     if Kernel._save then
       local t = love.timer.getTime()
