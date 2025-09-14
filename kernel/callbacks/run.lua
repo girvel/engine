@@ -7,8 +7,6 @@ return function()
 	love.timer.step()
 	local dt = 0
   local KEY_REPETITION_DELAY = .3
-  local save_load_t = 0
-
 	return function()
     if Kernel._load then
       local t = love.timer.getTime()
@@ -18,7 +16,7 @@ return function()
         end
         Kernel._load = nil
         State.rails.runner:handle_loading()
-      save_load_t = save_load_t + love.timer.getTime() - t
+      Kernel._total_time = math.max(Kernel._total_time - (love.timer.getTime() - t))
     end
 
     love.event.pump()
@@ -35,10 +33,9 @@ return function()
       love.handlers[name](a,b,c,d,e,f)
     end
 
-		dt = love.timer.step() - save_load_t
+		dt = love.timer.step()
     Kernel._total_time = Kernel._total_time + dt
     Kernel._total_frames = Kernel._total_frames + 1
-    save_load_t = 0
 
     for k, v in pairs(Kernel._delays) do
       Kernel._delays[k] = math.max(0, v - dt)
@@ -57,16 +54,15 @@ return function()
 
     do
       local t = love.timer.getTime()
-      love.graphics.present()
-      t = love.timer.getTime() - t
-      Kernel._total_time = Kernel._total_time - t
+        love.graphics.present()
+      Kernel._total_time = math.max(0, Kernel._total_time - (love.timer.getTime() - t))
     end
 
     if Kernel._save then
       local t = love.timer.getTime()
         saves.write(State, Kernel._save)
         Kernel._save = nil
-      save_load_t = save_load_t + love.timer.getTime() - t
+      Kernel._total_time = math.max(0, Kernel._total_time - (love.timer.getTime() - t))
     end
   end
 end
