@@ -1,6 +1,6 @@
+local ai = require("engine.state.player.ai")
 local action = require("engine.tech.action")
 local creature = require "engine.mech.creature"
-local sound    = require "engine.tech.sound"
 
 
 local base_player = {}
@@ -23,44 +23,13 @@ local base_player = {}
 --- @field type "options"
 --- @field options table<integer, string>
 
---- @class player_ai: ai
---- @field next_actions action[]
---- @field finish_turn true?
-
-local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
-
 base_player.mixin = function()
   local result = Table.extend(creature.mixin(), {
     codename = "player",
     player_flag = true,
     fov_r = 16,
 
-    ai = {
-      next_actions = {},
-      finish_turn = nil,
-      control = function(entity)
-        if State.combat then
-          YOUR_TURN:play()
-        end
-
-        while true do
-          for _, a in ipairs(entity.ai.next_actions) do
-            a:act(entity)
-          end
-          entity.ai.next_actions = {}
-
-          if not State.combat or entity.ai.finish_turn then break end
-          coroutine.yield()
-        end
-        entity.ai.finish_turn = false
-      end,
-
-      observe = function(entity, dt)
-        if State.combat and not Table.contains(State.combat.list, entity) then
-          State:start_combat({entity})
-        end
-      end,
-    },
+    ai = ai.new(),
   })
 
   return result

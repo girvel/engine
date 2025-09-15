@@ -1,5 +1,5 @@
 local sound = require("engine.tech.sound")
-local base_player = require("engine.state.base_player")
+local base_player = require("engine.state.player.base")
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
@@ -93,7 +93,7 @@ action_button = function(action, hotkey)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_clicked and State.player:can_act() then
-    table.insert(player.ai.next_actions, action)
+    player.ai:plan_action(action)
   end
   if button.is_mouse_over then
     cost = action.cost
@@ -170,7 +170,7 @@ draw_action_grid = function(self)
     if ui.keyboard(key) then
       movement_destination = nil
       movement_last_t = love.timer.getTime()
-      table.insert(State.player.ai.next_actions, actions.move(direction))
+      State.player.ai:plan_action(actions.move(direction))
     end
   end
 end
@@ -542,7 +542,11 @@ use_mouse = function(self)
         :find_path(State.player.position, movement_destination)
 
       if #path > 0 then
-        table.insert(State.player.ai.next_actions, actions.move(path[1] - State.player.position))
+        State.player.ai:plan_action(actions.move(path[1] - State.player.position)):next(function(ok)
+          if not ok then
+            movement_destination = nil
+          end
+        end)
       else
         movement_destination = nil
       end
@@ -573,7 +577,7 @@ use_mouse = function(self)
         if action:is_available(State.player) then
           ui.cursor("target_active")
           if is_clicked then
-            table.insert(State.player.ai.next_actions, action)
+            State.player.ai:plan_action(action)
           end
         end
       end
@@ -593,7 +597,7 @@ use_mouse = function(self)
         then
           ui.cursor("target_active")
           if ui.mousedown(2) then
-            table.insert(State.player.ai.next_actions, action)
+            State.player.ai:plan_action(action)
           end
         end
       end
