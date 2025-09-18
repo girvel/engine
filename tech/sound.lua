@@ -47,6 +47,20 @@ sound.multiple = Memoize(function(dir_path, volume)
   return result
 end)
 
+sound.source = function(dir_path, volume, size)
+  local soundpack = sound.multiple(dir_path, volume)
+  return {
+    ai = {
+      _last_sound = nil,
+      observe = function(entity, dt)
+        if entity.ai._last_sound and entity.ai._last_sound.source:isPlaying() then return end
+        local current = Random.choice(soundpack)
+        entity.ai._last_sound = current:place(entity.position, size):play()
+      end,
+    }
+  }
+end
+
 --- @enum (key) sound_size
 sound.sizes = {
   small = {1, 10},

@@ -49,19 +49,23 @@ local handle_tiles_or_intgrid = function(is_tiles)
       layer_id = layer_id:sub(1, -#postfix - 1)
     end
 
+    local is_invisible = layer_id:ends_with("_invisible")
+
     local layer_palette = assert(
       palette[layer_id],
       "Missing palette element %q" % {layer_id}
     )
 
-    if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
-      table.insert(this_parser._level_info.grid_layers, layer_id)
-    end
+    if not is_invisible then
+      if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+        table.insert(this_parser._level_info.grid_layers, layer_id)
+      end
 
-    this_parser._level_info.atlases[layer_id] = assert(
-      layer_palette.ATLAS_IMAGE,
-      "Palette for tile layer %q doesn't have .ATLAS_IMAGE" % {layer_id}
-    )
+      this_parser._level_info.atlases[layer_id] = assert(
+        layer_palette.ATLAS_IMAGE,
+        "Palette for tile layer %q doesn't have .ATLAS_IMAGE" % {layer_id}
+      )
+    end
 
     local to_iterate if is_tiles then
       to_iterate = layer.gridTiles
@@ -80,7 +84,10 @@ local handle_tiles_or_intgrid = function(is_tiles)
         :div_mut(this_parser._level_info.cell_size)
         :add_mut(Vector.one)
         :add_mut(offset)
-      e.grid_layer = layer_id
+
+      if not is_invisible then
+        e.grid_layer = layer_id
+      end
 
       local rails_name = this_parser._to_capture[layer_id][e.position]
       if rails_name then
@@ -115,14 +122,19 @@ parser_new = function()
       intgrid = handle_tiles_or_intgrid(false),
 
       entities = function(this_parser, layer, palette, offset)
-        local layer_id, layer_palette do
+        local layer_id, layer_palette, is_invisible do
           local raw = get_identifier(layer)
-          local POSTFIX = "_entities"
-          assert(
-            raw:ends_with(POSTFIX),
-            "Entity layer name %s should end with %q" % {raw, POSTFIX}
-          )
-          layer_id = raw:sub(1, #raw - #POSTFIX)
+          is_invisible = raw:ends_with("_invisible")
+          if not is_invisible then
+            local POSTFIX = "_entities"
+            assert(
+              raw:ends_with(POSTFIX),
+              "Entity layer name %s should end with %q" % {raw, POSTFIX}
+            )
+            layer_id = raw:sub(1, #raw - #POSTFIX)
+          else
+            layer_id = raw
+          end
 
           layer_palette = assert(
             palette[raw],
@@ -130,7 +142,7 @@ parser_new = function()
           )
         end
 
-        if not Table.contains(this_parser._level_info.grid_layers, layer_id) then
+        if not is_invisible and not Table.contains(this_parser._level_info.grid_layers, layer_id) then
           table.insert(this_parser._level_info.grid_layers, layer_id)
         end
 
@@ -138,7 +150,7 @@ parser_new = function()
           local codename = get_identifier(instance)
           local factory = assert(
             layer_palette[codename],
-            "Entity factory %q is not defined for factory layer %q" % {codename, layer_id}
+            ("Entity factory %q is not defined for factory layer %q"):format(codename, layer_id)
           )
 
           local args_expression = get_field(instance, "args")
@@ -151,12 +163,17 @@ parser_new = function()
           entity.position = Vector.own(instance.__grid)
             :add_mut(Vector.one)
             :add_mut(offset)
-          entity.grid_layer = layer_id
+          if not is_invisible then
+            entity.grid_layer = layer_id
+          end
 
-          local rails_name = this_parser._to_capture[layer_id][entity.position]
-          if rails_name then
-            this_parser._were_captured[rails_name] = true
-            this_parser._captures.entities[rails_name] = entity
+          local rails_name
+          if not is_invisible then
+            rails_name = this_parser._to_capture[layer_id][entity.position]
+            if rails_name then
+              this_parser._were_captured[rails_name] = true
+              this_parser._captures.entities[rails_name] = entity
+            end
           end
 
           local f = get_field(instance, "rails_name")
