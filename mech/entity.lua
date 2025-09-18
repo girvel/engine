@@ -37,3 +37,4 @@
 --- @field low_flag true? entity is low: disable reflections, shove may go over
 --- @field boring_flag true? disable log messages about the entity because it's dull
 --- @field no_blood_flag true? disable blood cue
+--- @field no_sound_flag true? disable movement sounds

@@ -62,19 +62,21 @@ actions.move = Memoize(function(direction)
       local tile = State.grids.tiles[entity.position]
       local on_tile = State.grids.on_tiles[entity.position]
 
-      local sounds =
-        love.timer.getTime() - (last_walk_sound_t[entity] or 0) >= 1 / MAX_SOUNDS_PER_SECOND and (
-          on_tile and on_tile.sounds and on_tile.sounds.walk
-          or tile and tile.sounds and tile.sounds.walk
-        )
+      if not entity.no_sound_flag then
+        local sounds =
+          love.timer.getTime() - (last_walk_sound_t[entity] or 0) >= 1 / MAX_SOUNDS_PER_SECOND and (
+            on_tile and on_tile.sounds and on_tile.sounds.walk
+            or tile and tile.sounds and tile.sounds.walk
+          )
 
-      if sounds then
-        if entity == State.player then
-          sounds:play()
-        else
-          sounds:play_at(entity.position)
+        if sounds then
+          if entity == State.player then
+            sounds:play()
+          else
+            sounds:play_at(entity.position)
+          end
+          last_walk_sound_t[entity] = love.timer.getTime()
         end
-        last_walk_sound_t[entity] = love.timer.getTime()
       end
 
       return result
