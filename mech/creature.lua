@@ -62,18 +62,13 @@ methods.modify = function(self, modification, value, ...)
     )
 end
 
---- @alias rest_type "free"|"move"|"short"|"long"|"full"
+--- @alias rest_type "move"|"short"|"long"|"full"
 
 --- @param self entity
 --- @param rest_type rest_type
 methods.get_resources = function(self, rest_type)
   local result = {}
-  if rest_type == "free" then  -- TODO is free needed?
-    result = {
-      movement = 6,
-      bonus_actions = 1,
-    }
-  elseif rest_type == "move" then
+  if rest_type == "move" then
     result = {
       actions = 1,
       bonus_actions = 1,
