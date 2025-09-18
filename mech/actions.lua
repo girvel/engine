@@ -196,7 +196,7 @@ actions.offhand_attack = Table.extend({
 
 --- @type action
 actions.opportunity_attack = Table.extend({
-  codename = "reaction_attack",
+  codename = "opportunity_attack",
 
   cost = {
     reactions = 1,
@@ -206,7 +206,7 @@ actions.opportunity_attack = Table.extend({
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
     return target
       and target.hp
-      and (not target.inventory.offhand or not target.inventory.offhand.tags.ranged)
+      and (not entity.inventory.offhand or not entity.inventory.offhand.tags.ranged)
   end,
 
   _act = function(_, entity)
