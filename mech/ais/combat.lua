@@ -56,7 +56,8 @@ local preserve_line_of_fire = function(entity, target)
             if snapshot:is_visible_unsafe(p.x + dx, p.y + dy) then
               State.debug_overlay.points[i] = {
                 position = p + V(dx, dy),
-                color = (not snapshot:is_transparent_unsafe(p.x + dx, p.y + dy)) and Vector.hex("ff0000") or Vector.white,
+                color = (not snapshot:is_transparent_unsafe(p.x + dx, p.y + dy))
+                  and Vector.hex("ff0000") or Vector.white,
                 view = "grid",
               }
             end
