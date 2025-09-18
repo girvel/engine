@@ -42,7 +42,7 @@ end
 --- @return boolean
 item.drop = function(parent, slot)
   local drop_position
-  for d in iteration.expanding_rhombus(2) do
+  for d in iteration.rhombus(2) do
     local p = d + parent.position
     if (d == Vector.zero or not State.grids.solids:slow_get(p, true))
       and not State.grids.items[p]

@@ -85,9 +85,12 @@ api.build_path = function(start, destination)
 
   local path
   for _, d in ipairs(possible_destinations) do
-    path = tcod.snapshot(State.grids.solids):find_path(start, destination + d)
-    if #path > 0 then
-      return path
+    local p = destination + d
+    if State.grids.solids:can_fit(p) then
+      path = tcod.snapshot(State.grids.solids):find_path(start, destination + d)
+      if #path > 0 then
+        return path
+      end
     end
   end
 end

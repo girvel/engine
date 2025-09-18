@@ -149,8 +149,14 @@ if tcod_c then
   --- @param destination vector
   --- @return vector[]
   snapshot_methods.find_path = function(self, origin, destination)
-    assert(self._grid:can_fit(origin))
-    assert(self._grid:can_fit(destination))
+    assert(
+      self._grid:can_fit(origin),
+      ("find_path origin %s is out of grid borders"):format(origin)
+    )
+    assert(
+      self._grid:can_fit(destination),
+      ("find_path destination %s is out of grid borders"):format(destination)
+    )
 
     local raw_path = tcod_c.TCOD_path_new_using_map(self._map, 0)
     local ox, oy = unpack(origin - Vector.one)

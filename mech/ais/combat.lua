@@ -1,3 +1,4 @@
+local tk = require("engine.mech.ais.tk")
 local async = require("engine.tech.async")
 local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
@@ -20,8 +21,6 @@ end
 local HOSTILITY_RANGE = 10
 local FOLLOW_RANGE = 20
 
-local find_target
-
 --- @param entity entity
 methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
@@ -35,7 +34,7 @@ end
 
 local preserve_line_of_fire = function(entity, target)
   local best_p
-  for d in iteration.expanding_rhombus(entity.resources.movement) do
+  for d in iteration.rhombus(entity.resources.movement) do
     local p = entity.position + d
     if not State.grids.solids:can_fit(p) then goto continue end
 
@@ -82,7 +81,7 @@ end
 methods.control = function(entity)
   if not State.combat or State.rails.runner.locked_entities[State.player] then return end
 
-  local target = find_target(entity, FOLLOW_RANGE)
+  local target = tk.find_target(entity, FOLLOW_RANGE)
   if not target then
     State.combat:remove(entity)
     return
@@ -111,9 +110,9 @@ methods.observe = function(entity, dt)
 
   -- starting/joining combat
   if (not State.combat or not Table.contains(State.combat.list, entity)) then
-    local target = find_target(entity, HOSTILITY_RANGE)
+    local target = tk.find_target(entity, HOSTILITY_RANGE)
 
-    local condition = target
+    local condition = not not target
     if target == State.player then
       condition = (
         not State.rails.runner.locked_entities[State.player]
@@ -125,16 +124,6 @@ methods.observe = function(entity, dt)
     if condition then
       State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
       State:start_combat({target, entity})
-    end
-  end
-end
-
---- @return entity?
-find_target = function(entity, r)
-  for d in iteration.expanding_rhombus(r) do
-    local e = State.grids.solids:slow_get(entity.position + d)
-    if e and State.hostility:get(entity, e) then
-      return e
     end
   end
 end
