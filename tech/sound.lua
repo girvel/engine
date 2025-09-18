@@ -47,6 +47,9 @@ sound.multiple = Memoize(function(dir_path, volume)
   return result
 end)
 
+--- @param dir_path string
+--- @param volume? number
+--- @param size? sound_size
 sound.source = function(dir_path, volume, size)
   local soundpack = sound.multiple(dir_path, volume)
   return {
@@ -54,8 +57,7 @@ sound.source = function(dir_path, volume, size)
       _last_sound = nil,
       observe = function(entity, dt)
         if entity.ai._last_sound and entity.ai._last_sound.source:isPlaying() then return end
-        local current = Random.choice(soundpack)
-        entity.ai._last_sound = current:place(entity.position, size):play()
+        entity.ai._last_sound = soundpack:play_at(entity.position, size)
       end,
     }
   }
@@ -151,8 +153,9 @@ methods.set_looping = function(self, value)
 end
 
 --- @param position vector
-multiple_methods.play_at = function(self, position)
-  return Random.choice(self):clone():place(position):play()
+--- @param size? sound_size
+multiple_methods.play_at = function(self, position, size)
+  return Random.choice(self):clone():place(position, size):play()
 end
 
 multiple_methods.play = function(self)

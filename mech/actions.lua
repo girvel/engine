@@ -322,6 +322,8 @@ actions.bow_attack = function(target)
       return result
     end,
 
+    sounds = sound.multiple("engine/assets/sounds/bow"),
+
     _act = function(self, entity)
       local d = (target.position - entity.position)
       if d ~= Vector.zero then
@@ -337,7 +339,7 @@ actions.bow_attack = function(target)
         local attack_roll = entity:get_ranged_attack_roll()
         local damage_roll = entity:get_ranged_damage_roll()
 
-        -- SOUND bow
+        self.sounds:play_at(entity.position, "medium")
         arrow.layer = "fx_over"
         arrow.position = entity.position + entity.sprite.anchors.hand / 16
         arrow.direction = Vector.right
