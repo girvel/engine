@@ -540,6 +540,7 @@ draw_suggestion = function()
 end
 
 local movement_interact = nil
+local PATH_MAX_LENGTH = 50
 
 use_mouse = function(self)
   if movement_path then
@@ -617,7 +618,7 @@ use_mouse = function(self)
         else
           local path = api.build_path(State.player.position, position)
 
-          if #path > 0 then
+          if #path > 0 and #path <= PATH_MAX_LENGTH then
             if State.player.position ~= position then
               movement_path = path
               movement_last_t = love.timer.getTime()

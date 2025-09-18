@@ -18,11 +18,16 @@ local last_walk_sound = setmetatable({}, {__mode = "k"})
 --- @return action
 actions.move = Memoize(function(direction)
   return Table.extend({
-    codename = "move_" .. Vector.name_from_direction(direction),
+    codename = "move_" .. (Vector.name_from_direction(direction) or tostring(direction)),
 
     cost = {
       movement = 1,
     },
+
+    _is_available = function(_, entity)
+      return direction:abs2() == 1
+    end,
+
     _act = function(_, entity)
       if entity.rotate then
         entity:rotate(direction)
