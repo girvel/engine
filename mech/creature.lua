@@ -17,6 +17,7 @@ creature.mixin = function()
     sounds = {
       hit = sound.multiple("engine/assets/sounds/hit/body", .3),
     },
+    transparent_flag = true,
   }, methods)
 
   return result
@@ -27,6 +28,14 @@ creature.init = function(entity)
   Table.assert_fields(entity, {"base_abilities", "level"})
   entity:rest("full")
   entity:rotate(entity.direction or Vector.right)
+end
+
+--- @param ... table
+--- @return entity
+creature.make = function(...)
+  local result = Table.extend(...)
+  creature.init(result)
+  return result
 end
 
 --- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"|"dex_armor_bonus"
