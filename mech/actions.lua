@@ -264,12 +264,14 @@ actions.shove = Table.extend({
 
 local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
 
+--- @param entity entity
+--- @param slot string
 base_attack = function(entity, slot)
   local target = State.grids.solids:slow_get(entity.position + entity.direction)
 
   WHOOSH:play_at(entity.position)
 
-  entity:animate(slot .. "_attack"):next(function()
+  entity:animate(slot .. "_attack", true):next(function()
     State.hostility:register(entity, target)
 
     if not health.attack(

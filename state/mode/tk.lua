@@ -58,6 +58,8 @@ tk.draw_entity = function(entity, x, y, scale)
       if not this_item then return end
 
       local item_sprite = this_item.sprite
+      if not item_sprite then return end
+
       local entity_anchor = entity.sprite.anchors[this_item.anchor or slot]
       local item_anchor = item_sprite.anchors.parent
       local item_x, item_y = x, y

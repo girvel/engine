@@ -15,6 +15,8 @@ item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 --- @field slot string
 --- @field anchor? string
 --- @field projectile_factory? fun(): entity present only in ranged weapons
+--- @field no_drop_flag? true
+--- @field animated_independently_flag? true
 
 item.mixin = function(animation_path)
   return Table.extend(

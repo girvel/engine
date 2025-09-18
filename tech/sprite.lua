@@ -21,6 +21,7 @@ sprite.image = function(base)
   end
 
   local main_color, anchors = pull_anchors(base)
+  assert(main_color, "Empty sprite")
   return {
     type = "image",
     anchors = anchors,
@@ -146,6 +147,8 @@ pull_anchors = function(base)
       break
     end
   end
+
+  if not main_color then return end
 
   local result = {}
 

@@ -48,7 +48,7 @@ health.damage = function(target, amount, is_critical)
     if target.inventory then
       for _, slot in ipairs(item.DROPPING_SLOTS) do
         local this_item = target.inventory[slot]
-        if this_item then
+        if this_item and not this_item.no_drop_flag then
           item.drop(target, slot)
         end
       end

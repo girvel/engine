@@ -55,8 +55,9 @@ end
 
 --- @param self entity
 --- @param animation_name? string
+--- @param assertive? boolean whether to assert that animation exists
 --- @return promise
-methods.animate = function(self, animation_name)
+methods.animate = function(self, animation_name, assertive)
   animation_name = animation_name or "idle"
   local animation = self.animation
 
@@ -70,11 +71,13 @@ methods.animate = function(self, animation_name)
     local dirname = Vector.name_from_direction(self.direction)
     animation.current = animation_name .. "_" .. dirname
     if not animation.pack[animation.current] then
+      assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
       animation.current = "idle_" .. dirname
     end
   else
     animation.current = animation_name
     if not animation.pack[animation.current] then
+      assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
       animation.current = "idle"
     end
   end
@@ -83,7 +86,7 @@ methods.animate = function(self, animation_name)
 
   if self.inventory then
     for _, item in pairs(self.inventory) do
-      if not item.animated_independently_flag then
+      if item.animate and not item.animated_independently_flag then
         item:animate(animation_name)
       end
     end
@@ -93,13 +96,14 @@ methods.animate = function(self, animation_name)
   return animation._end_promise
 end
 
+--- @param self entity
 --- @param value boolean
 methods.animation_set_paused = function(self, value)
   self.animation.paused = value
 
   if self.inventory then
     for _, item in pairs(self.inventory) do
-      if not item.animated_independently_flag then
+      if item.animation and not item.animated_independently_flag then
         item.animation.paused = value
       end
     end
