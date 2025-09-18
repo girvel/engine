@@ -229,7 +229,9 @@ actions.shove = Table.extend({
     return target
       and target.hp
       and target.get_modifier
-      and not (entity.inventory.offhand and entity.inventory.offhand.damage_roll)
+      and (not entity.inventory.offhand
+        or not entity.inventory.offhand.damage_roll
+        or entity.inventory.offhand.tags.ranged)
       and State.hostility:get(entity, target) ~= "ally"
   end,
 
