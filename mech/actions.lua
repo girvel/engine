@@ -11,8 +11,9 @@ local projectile  = require "engine.tech.projectile"
 
 local actions = {}
 
---- @type table<entity, sound>
-local last_walk_sound = setmetatable({}, {__mode = "k"})
+--- @type table<entity, number>
+local last_walk_sound_t = setmetatable({}, {__mode = "k"})
+local MAX_SOUNDS_PER_SECOND = 5
 
 --- @param direction vector
 --- @return action
@@ -58,22 +59,22 @@ actions.move = Memoize(function(direction)
         entity:animate("move")
       end
 
-      local prev_tile = State.grids.tiles[entity.position - entity.direction]
       local tile = State.grids.tiles[entity.position]
       local on_tile = State.grids.on_tiles[entity.position]
 
-      local sounds = (
-        on_tile and on_tile.sounds and on_tile.sounds.walk
-        or tile and tile.sounds and tile.sounds.walk
-      )
+      local sounds =
+        love.timer.getTime() - (last_walk_sound_t[entity] or 0) >= 1 / MAX_SOUNDS_PER_SECOND and (
+          on_tile and on_tile.sounds and on_tile.sounds.walk
+          or tile and tile.sounds and tile.sounds.walk
+        )
 
-      -- TODO MAX_SOUNDS_PER_SECOND
       if sounds then
         if entity == State.player then
-          last_walk_sound[entity] = sounds:play()
+          sounds:play()
         else
-          last_walk_sound[entity] = sounds:play_at(entity.position)
+          sounds:play_at(entity.position)
         end
+        last_walk_sound_t[entity] = love.timer.getTime()
       end
 
       return result
