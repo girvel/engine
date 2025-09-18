@@ -99,13 +99,18 @@ item.give = function(entity, this_item)
   return true
 end
 
---- Sets whether given cue should be or not be displayed
+--- Sets whether given cue should (not) be or displayed
+---
+--- Cues are simplistic items that exist for visualization only, like blood marks or a highlight.
 --- @param entity entity
 --- @param slot cue_slot
 --- @param value boolean
 --- @return nil
 item.set_cue = function(entity, slot, value)
-  local factory = assert(item.cues[slot], "Slot %q is not supported" % {slot})
+  local factory = assert(
+    entity.cues and entity.cues[slot] or item.cues[slot],
+    ("Slot %q is not supported"):format(slot)
+  )
 
   if not entity.inventory then entity.inventory = {} end
   if (not not value) == (not not entity.inventory[slot]) then return end
