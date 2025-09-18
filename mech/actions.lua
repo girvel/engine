@@ -58,15 +58,17 @@ actions.move = Memoize(function(direction)
         entity:animate("move")
       end
 
-      local tile = State.grids.tiles[entity.position]
       local prev_tile = State.grids.tiles[entity.position - entity.direction]
-      local sounds = tile and tile.sounds and tile.sounds.walk
-      if sounds and (  -- preventing ear DDOS with repetitive sounds
-        not prev_tile
-        or prev_tile.codename ~= tile.codename
-        or not last_walk_sound[entity]
-        or not last_walk_sound[entity].source:isPlaying()
-      ) then
+      local tile = State.grids.tiles[entity.position]
+      local on_tile = State.grids.on_tiles[entity.position]
+
+      local sounds = (
+        on_tile and on_tile.sounds and on_tile.sounds.walk
+        or tile and tile.sounds and tile.sounds.walk
+      )
+
+      -- TODO MAX_SOUNDS_PER_SECOND
+      if sounds then
         if entity == State.player then
           last_walk_sound[entity] = sounds:play()
         else
