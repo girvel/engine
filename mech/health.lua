@@ -62,13 +62,13 @@ health.damage = function(target, amount, is_critical)
 end
 
 --- Set HP, update blood cue
---- @param target table
+--- @param target entity
 --- @param value integer
 --- @return nil
 health.set_hp = function(target, value)
   target.hp = value
 
-  if target.get_max_hp then
+  if target.get_max_hp and not target.no_blood_flag then
     item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
   end
 end

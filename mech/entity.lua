@@ -36,3 +36,4 @@
 --- @field perspective_flag true? marks entities that could be seen only from below
 --- @field low_flag true? entity is low: disable reflections, shove may go over
 --- @field boring_flag true? disable log messages about the entity because it's dull
+--- @field no_blood_flag true? disable blood cue

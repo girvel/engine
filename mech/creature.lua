@@ -33,7 +33,7 @@ end
 --- @param ... table
 --- @return entity
 creature.make = function(...)
-  local result = Table.extend(...)
+  local result = Table.extend(creature.mixin(), ...)
   creature.init(result)
   return result
 end
