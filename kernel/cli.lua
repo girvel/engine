@@ -47,14 +47,8 @@ cli.parse = function(args)
   args[-2] = nil
   args[-1] = nil
 
-  if Table.last(args) == "-debug" then
-    local ok, mobdebug = pcall(require, "mobdebug")
-    assert(
-      ok,
-      "-debug option provided, but mobdebug is not found. Are you running this from ZeroBrane?"
-    )
-
-    mobdebug.start()
+  local is_mobdebug_attached = Table.last(args) == "-debug"
+  if is_mobdebug_attached then
     table.remove(args)
   end
 
@@ -73,6 +67,8 @@ cli.parse = function(args)
     result.resolution = builtin_resolutions[result.resolution]
       or Vector.own(Fun.iter(result.resolution / "x"):map(tonumber):totable())
   end
+
+  result.mobdebug = is_mobdebug_attached
 
   return result
 end

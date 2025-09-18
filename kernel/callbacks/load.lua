@@ -17,6 +17,17 @@ return function(args)
     async.lag_threshold = 1
   end
 
+  if args.mobdebug then
+    local ok, mobdebug = pcall(require, "mobdebug")
+    assert(
+      ok,
+      "-debug option provided, but mobdebug is not found. Are you running this from ZeroBrane?"
+    )
+
+    mobdebug.start()
+    async.lag_threshold = 2
+  end
+
   if not args.debug then
     Lp = {
       start = function() end,
