@@ -61,12 +61,22 @@ api.travel = function(entity, destination)
     and (entity.position - destination):abs2() == 1)
   then return end
 
+  local path = api.build_path(entity.position, destination)
+  if path then
+    api.follow_path(entity, path)
+  end
+end
+
+--- @param start vector
+--- @param destination vector
+--- @return vector[]?
+api.build_path = function(start, destination)
   local possible_destinations = {unpack(Vector.extended_directions)}
   table.sort(possible_destinations, function(a, b)
     local abs_a = a:abs2()
     local abs_b = b:abs2()
     if abs_a == abs_b then
-      return (entity.position - destination - a):abs2() < (entity.position - destination - b):abs2()
+      return (start - destination - a):abs2() < (start - destination - b):abs2()
     end
 
     return abs_a < abs_b
@@ -75,11 +85,10 @@ api.travel = function(entity, destination)
 
   local path
   for _, d in ipairs(possible_destinations) do
-    path = tcod.snapshot(State.grids.solids):find_path(entity.position, destination + d)
+    path = tcod.snapshot(State.grids.solids):find_path(start, destination + d)
     Log.trace(path)
     if #path > 0 then
-      api.follow_path(entity, path)
-      return
+      return path
     end
   end
 end
@@ -210,7 +219,9 @@ end
 --- @param entity entity
 --- @param target entity
 api.rotate = function(entity, target)
-  entity:rotate((target.position - entity.position):normalized2())
+  local d = target.position - entity.position
+  if d == Vector.zero then return end
+  entity:rotate(d:normalized2())
 end
 
 local NOTIFICATION_SOUND = sound.multiple("engine/assets/sounds/notification", .01)

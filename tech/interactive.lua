@@ -18,6 +18,17 @@ interactive.get_for = function(interactor)
   end
 end
 
+--- @param position vector
+--- @return entity?
+interactive.get_at = function(position)
+  for _, layer in ipairs(State.level.grid_layers) do
+    local e = State.grids[layer]:slow_get(position)
+    if e and e.interact then
+      return e
+    end
+  end
+end
+
 --- @param callback? fun(entity, entity)
 interactive.mixin = function(callback)
   return Table.extend({
