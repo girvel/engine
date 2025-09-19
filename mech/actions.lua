@@ -204,7 +204,7 @@ actions.opportunity_attack = Table.extend({
     reactions = 1,
   },
 
-  _is_available = function(_, entity)
+  _is_available = function(self, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
     return target
       and target.hp
