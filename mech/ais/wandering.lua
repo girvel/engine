@@ -1,8 +1,6 @@
 local tk = require("engine.mech.ais.tk")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
-local iteration = require("engine.tech.iteration")
-local api       = require("engine.tech.api")
 
 
 local wandering = {}
@@ -33,7 +31,7 @@ end
 
 --- @param entity entity
 methods.init = function(entity)
-  State.hostility:subscribe(function(attacker, target)
+  entity.ai._hostility_subcription = State.hostility:subscribe(function(attacker, target)
     if entity.faction and target.faction == entity.faction then
       local ai = entity.ai  --[[@as wandering_ai]]
       State.hostility:set(entity.faction, attacker.faction, "enemy")
@@ -41,6 +39,11 @@ methods.init = function(entity)
       ai._control_coroutine = nil
     end
   end)
+end
+
+--- @param entity entity
+methods.deinit = function(entity)
+  State.hostility:unsubscribe(entity.ai._hostility_subcription)
 end
 
 --- @param entity entity

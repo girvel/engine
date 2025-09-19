@@ -180,11 +180,9 @@ end
 --- @param list entity[]
 methods.start_combat = function(self, list)
   self.rails.runner:run_task(function()
-    if State.combat then
-      list = Fun.iter(list)
-        :filter(function(e) return not Table.contains(State.combat.list, e) end)
-        :totable()
-    end
+    list = Fun.iter(list)
+      :filter(function(e) return not self:in_combat(e) and self:exists(e) end)
+      :totable()
 
     local initiatives = {}
     for _, e in ipairs(list) do
@@ -208,6 +206,11 @@ methods.start_combat = function(self, list)
       State.combat = combat.new(list)
     end
   end)
+end
+
+--- @param entity entity
+methods.in_combat = function(self, entity)
+  return State.combat and Table.contains(State.combat.list, entity)
 end
 
 Ldump.mark(state, {}, ...)

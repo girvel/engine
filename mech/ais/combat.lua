@@ -11,6 +11,7 @@ local combat_ai = {}
 
 --- @class combat_ai: ai
 --- @field targeting ai_targeting
+--- @field _hostility_subcription function
 local methods = {}
 local mt = {__index = methods}
 
@@ -31,15 +32,22 @@ end
 
 --- @param entity entity
 methods.init = function(entity)
-  State.hostility:subscribe(function(attacker, target)
+  entity.ai._hostility_subcription = State.hostility:subscribe(function(attacker, target)
     if entity.faction and target == entity then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
-      if not State.combat or not Table.contains(State.combat.list, entity) then
+      if not State:in_combat(entity) then
+        Log.trace("AGGRESSIVE!")
         State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
         State:start_combat({entity, attacker})
       end
     end
   end)
+end
+
+--- @param entity entity
+methods.deinit = function(entity)
+  Log.trace("Combat AI unsubscribes", Name.code(entity))
+  State.hostility:unsubscribe(entity.ai._hostility_subscription)
 end
 
 local preserve_line_of_fire = function(entity, target)
