@@ -60,19 +60,23 @@ methods.control = function(entity)
   local ai = entity.ai  --[[@as wandering_ai]]
 
   if ai._target then
-    local path = {}
-    for p in iteration.rhombus_edge(entity.resources.movement) do
-      p:add_mut(entity.position)
-      if State.grids.solids:can_fit(p) then
-        local next_path = api.build_path(entity.position, p)
-        if next_path and #next_path > #path then
-          path = next_path
+    while ai._target and entity.resources.movement > 0 do
+      local distance = 0
+      local direction
+      for _, d in ipairs(Vector.directions) do
+        local p = entity.position + d
+        if not State.grids.solids:slow_get(p, true) then
+          local this_distance = (ai._target.position - p):abs2()
+          if this_distance > distance then
+            distance = this_distance
+            direction = d
+          end
         end
       end
+      if not direction then break end
+      actions.move(direction):act(entity)
+      async.sleep(.2)
     end
-
-    api.follow_path(entity, path)
-    async.sleep(.5)
   else
     async.sleep(math.random(0.5, 7) / ai._frequency_k)
     actions.move(Random.choice(Vector.directions)):act(entity)

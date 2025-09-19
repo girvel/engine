@@ -2,6 +2,9 @@ local ffi = require("ffi")
 local ffi_fix = require("engine.tech.ffi_fix")
 
 
+-- Rewrite:
+-- orient on multiple visions
+
 local tcod = {}
 
 ffi.cdef([[
