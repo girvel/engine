@@ -15,4 +15,9 @@ tk.find_target = function(entity, r)
   end
 end
 
+--- @class ai_targeting
+--- @field scan_period number time period determining target search frequency
+--- @field scan_range number radius in which to search for target
+--- @field range number radius in which to continue targeting a single entity
+
 return tk

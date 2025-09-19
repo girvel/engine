@@ -18,6 +18,21 @@ tablex.extend = function(base, extension, ...)
   return tablex.extend(base, ...)
 end
 
+--- Sets values in base if they are nil
+--- @generic T: table
+--- @param base table?
+--- @param defaults T
+--- @return T
+tablex.defaults = function(base, defaults)
+  base = base or {}
+  for k, v in pairs(defaults) do
+    if base[k] == nil then
+      base[k] = v
+    end
+  end
+  return base
+end
+
 --- Concatenates lists into the base
 -- Modifies first argument, copying all the fields via ipairs of the following arguments in order
 -- from left to right

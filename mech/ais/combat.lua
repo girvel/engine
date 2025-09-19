@@ -10,16 +10,24 @@ local actions   = require("engine.mech.actions")
 local combat_ai = {}
 
 --- @class combat_ai: ai
+--- @field targeting ai_targeting
 local methods = {}
 local mt = {__index = methods}
 
---- @return combat_ai
-combat_ai.new = function()
-  return setmetatable({}, mt)
-end
+--- @type ai_targeting
+local DEFAULT_TARGETING = {
+  scan_period = .5,
+  scan_range = 10,
+  range = 20,
+}
 
-local HOSTILITY_RANGE = 10
-local FOLLOW_RANGE = 20
+--- @param targeting ai_targeting
+--- @return combat_ai
+combat_ai.new = function(targeting)
+  return setmetatable({
+    targeting = Table.defaults(targeting, DEFAULT_TARGETING),
+  }, mt)
+end
 
 --- @param entity entity
 methods.init = function(entity)
@@ -81,7 +89,8 @@ end
 methods.control = function(entity)
   if not State.combat or State.rails.runner.locked_entities[State.player] then return end
 
-  local target = tk.find_target(entity, FOLLOW_RANGE)
+  local ai = entity.ai  --[[@as combat_ai]]
+  local target = tk.find_target(entity, ai.targeting.range)
   if not target then
     State.combat:remove(entity)
     return
@@ -100,24 +109,24 @@ methods.control = function(entity)
   end
 end
 
-local OBSERVE_PERIOD = .5
-
 --- @param entity entity
 --- @param dt number
 methods.observe = function(entity, dt)
   if State.rails.runner.locked_entities[State.player] then return end
-  if not Random.chance(dt / OBSERVE_PERIOD) then return end
+  local ai = entity.ai  --[[@as combat_ai]]
+
+  if not Random.chance(dt / ai.targeting.scan_period) then return end
 
   -- starting/joining combat
   if (not State.combat or not Table.contains(State.combat.list, entity)) then
-    local target = tk.find_target(entity, HOSTILITY_RANGE)
+    local target = tk.find_target(entity, ai.targeting.scan_range)
 
     local condition = not not target
     if target == State.player then
       condition = (
         not State.rails.runner.locked_entities[State.player]
         and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-        and (State.player.position - entity.position):abs2() <= HOSTILITY_RANGE
+        and (State.player.position - entity.position):abs2() <= ai.targeting.scan_range
       )
     end
 

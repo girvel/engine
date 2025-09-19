@@ -8,15 +8,27 @@ local api       = require("engine.tech.api")
 local wandering = {}
 
 --- @class wandering_ai: ai
+--- @field targeting ai_targeting
 --- @field _frequency_k number
 --- @field _target? entity
 local methods = {}
 wandering.mt = {__index = methods}
 
+--- @type ai_targeting
+local DEFAULT_TARGETING = {
+  scan_period = .5,
+  scan_range = 10,
+  range = 20,
+}
+
+--- @param targeting ai_targeting
 --- @param frequency_k? number
 --- @return wandering_ai
-wandering.new = function(frequency_k)
-  return setmetatable({_frequency_k = frequency_k or 1}, wandering.mt)
+wandering.new = function(frequency_k, targeting)
+  return setmetatable({
+    targeting = Table.defaults(targeting, DEFAULT_TARGETING),
+    _frequency_k = frequency_k or 1,
+  }, wandering.mt)
 end
 
 --- @param entity entity
@@ -31,19 +43,14 @@ methods.init = function(entity)
   end)
 end
 
--- TODO common looking constants with ais.combat
-local TARGET_SCAN_PERIOD = .5
-local TARGET_RANGE = 20
-local TARGET_SEARCH_RANGE = 10
-
 --- @param entity entity
 --- @param dt number
 methods.observe = function(entity, dt)
   local ai = entity.ai  --[[@as wandering_ai]]
-  if (not ai._target or (ai._target.position - entity.position):abs2() > TARGET_RANGE)
-    and Period(TARGET_SCAN_PERIOD, ai, "target_scan")
+  if (not ai._target or (ai._target.position - entity.position):abs2() > ai.targeting.range)
+    and Period(ai.targeting.scan_period, ai, "target_scan")
   then
-    ai._target = tk.find_target(entity, TARGET_SEARCH_RANGE)
+    ai._target = tk.find_target(entity, ai.targeting.scan_range)
   end
 end
 
