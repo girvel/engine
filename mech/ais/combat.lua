@@ -21,7 +21,7 @@ local DEFAULT_TARGETING = {
   range = 20,
 }
 
---- @param targeting ai_targeting
+--- @param targeting? ai_targeting
 --- @return combat_ai
 combat_ai.new = function(targeting)
   return setmetatable({

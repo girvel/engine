@@ -38,7 +38,6 @@ methods.init = function(entity)
       local ai = entity.ai  --[[@as wandering_ai]]
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       ai._target = attacker
-      Log.trace("coroutine reset for", Name.code(entity))
       ai._control_coroutine = nil
     end
   end)
