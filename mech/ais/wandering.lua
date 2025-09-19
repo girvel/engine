@@ -34,10 +34,11 @@ end
 --- @param entity entity
 methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
-    if entity.faction and target == entity then
+    if entity.faction and target.faction == entity.faction then
       local ai = entity.ai  --[[@as wandering_ai]]
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       ai._target = attacker
+      Log.trace("coroutine reset for", Name.code(entity))
       ai._control_coroutine = nil
     end
   end)
@@ -59,18 +60,18 @@ methods.control = function(entity)
   local ai = entity.ai  --[[@as wandering_ai]]
 
   if ai._target then
-    local max_distance = 0
-    local run_to
+    local path = {}
     for p in iteration.rhombus_edge(entity.resources.movement) do
       p:add_mut(entity.position)
-      local d = (p - ai._target.position):abs2()
-      if State.grids.solids:can_fit(p) and d > max_distance then
-        max_distance = d
-        run_to = p
+      if State.grids.solids:can_fit(p) then
+        local next_path = api.build_path(entity.position, p)
+        if next_path and #next_path > #path then
+          path = next_path
+        end
       end
     end
 
-    api.travel(entity, run_to)
+    api.follow_path(entity, path)
     async.sleep(.5)
   else
     async.sleep(math.random(0.5, 7) / ai._frequency_k)
