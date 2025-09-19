@@ -30,39 +30,6 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(self, entity, dt)
-    if State.combat_queue then
-      local list = {unpack(State.combat_queue)}
-      State.combat_queue = nil
-
-      if State.combat then
-        list = Fun.iter(list)
-          :filter(function(e) return not Table.contains(State.combat.list, e) end)
-          :totable()
-      end
-
-      local initiatives = {}
-      for _, e in ipairs(list) do
-        initiatives[e] = e:get_initiative_roll():roll()
-      end
-
-      table.sort(list, function(a, b) return initiatives[a] > initiatives[b] end)
-      local repr = table.concat(Fun.iter(list):map(Name.code):totable(), ", ")
-
-      for _, e in ipairs(list) do
-        if e.ai then
-          e.ai._control_coroutine = nil
-        end
-      end
-
-      if State.combat then
-        Log.info("Joining the combat: %s" % {repr})
-        Table.concat(State.combat.list, list)
-      else
-        Log.info("Combat starts: %s" % {repr})
-        State.combat = combat.new(list)
-      end
-    end
-
     if State.combat and Fun.iter(State.combat.list)
       :all(function(a) return Fun.iter(State.combat.list)
         :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)

@@ -11,7 +11,6 @@ local state = {}
 --- @field mode state_mode
 --- @field perspective state_perspective
 --- @field combat state_combat?
---- @field combat_queue? entity[]
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
@@ -180,7 +179,35 @@ end
 
 --- @param list entity[]
 methods.start_combat = function(self, list)
-  self.combat_queue = list
+  self.rails.runner:run_task(function()
+    if State.combat then
+      list = Fun.iter(list)
+        :filter(function(e) return not Table.contains(State.combat.list, e) end)
+        :totable()
+    end
+
+    local initiatives = {}
+    for _, e in ipairs(list) do
+      initiatives[e] = e:get_initiative_roll():roll()
+    end
+
+    table.sort(list, function(a, b) return initiatives[a] > initiatives[b] end)
+    local repr = table.concat(Fun.iter(list):map(Name.code):totable(), ", ")
+
+    for _, e in ipairs(list) do
+      if e.ai then
+        e.ai._control_coroutine = nil
+      end
+    end
+
+    if State.combat then
+      Log.info("Joining the combat: %s" % {repr})
+      Table.concat(State.combat.list, list)
+    else
+      Log.info("Combat starts: %s" % {repr})
+      State.combat = combat.new(list)
+    end
+  end)
 end
 
 Ldump.mark(state, {}, ...)
