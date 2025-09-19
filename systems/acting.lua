@@ -30,6 +30,14 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(self, entity, dt)
+    if State.combat then
+      while true do
+        local current = State.combat:get_current()
+        if State:exists(current) then break end
+        State.combat:remove(current)
+      end
+    end
+
     if State.combat and Fun.iter(State.combat.list)
       :all(function(a) return Fun.iter(State.combat.list)
         :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
