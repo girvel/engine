@@ -21,7 +21,7 @@ local DEFAULT_TARGETING = {
   range = 20,
 }
 
---- @param targeting? ai_targeting
+--- @param targeting? ai_targeting_optional
 --- @param frequency_k? number
 --- @return wandering_ai
 wandering.new = function(frequency_k, targeting)

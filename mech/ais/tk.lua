@@ -20,4 +20,9 @@ end
 --- @field scan_range number radius in which to search for target
 --- @field range number radius in which to continue targeting a single entity
 
+--- @class ai_targeting_optional
+--- @field scan_period? number time period determining target search frequency
+--- @field scan_range? number radius in which to search for target
+--- @field range? number radius in which to continue targeting a single entity
+
 return tk

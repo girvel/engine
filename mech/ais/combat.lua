@@ -21,7 +21,7 @@ local DEFAULT_TARGETING = {
   range = 20,
 }
 
---- @param targeting? ai_targeting
+--- @param targeting? ai_targeting_optional
 --- @return combat_ai
 combat_ai.new = function(targeting)
   return setmetatable({
@@ -32,10 +32,12 @@ end
 --- @param entity entity
 methods.init = function(entity)
   State.hostility:subscribe(function(attacker, target)
-    if entity.faction and target == entity and not State.hostility:get(entity, attacker) then
+    if entity.faction and target == entity then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
-      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
-      State:start_combat({entity, attacker})
+      if not State.combat or not Table.contains(State.combat.list, entity) then
+        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+        State:start_combat({entity, attacker})
+      end
     end
   end)
 end
