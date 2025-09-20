@@ -7,7 +7,7 @@ local debug_overlay = {}
 --- @field points table<string, overlay_point>
 --- @field _show_points boolean
 --- @field _show_fps boolean
---- @field _show_scenes boolean
+--- @field _show_stats boolean
 local methods = {}
 local mt = {__index = methods}
 
@@ -18,7 +18,7 @@ debug_overlay.new = function(is_debug)
     points = {},
     _show_points = false,
     _show_fps = is_debug,
-    _show_scenes = is_debug,
+    _show_stats = is_debug,
   }, mt)
 end
 
@@ -27,16 +27,24 @@ methods.draw = function(self, dt)
     ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
   end
 
-  if State.rails and self._show_scenes then
-    ui.text("enabled:")
-    for k, v in pairs(State.rails.runner.scenes) do
+  if State.rails and self._show_stats then
+    local active_ais = State.stats.active_ais
+    ui.text(("active AIs (%s):"):format(#active_ais))
+    for _, codename in ipairs(active_ais) do
+      ui.text("- " .. codename)
+    end
+
+    local scenes = State.rails.runner.scenes
+    ui.text(("enabled scenes (%s):"):format(#scenes))
+    for k, v in pairs(scenes) do
       if v.enabled then
         ui.text("- " .. k)
       end
     end
 
-    ui.text("running:")
-    for _, v in ipairs(State.rails.runner._scene_runs) do
+    local running = State.rails.runner._scene_runs
+    ui.text(("running scenes (%s):"):format(#running))
+    for _, v in ipairs(running) do
       ui.text("- " .. v.name)
     end
   end
@@ -72,7 +80,7 @@ methods.draw = function(self, dt)
   end
 
   if ui.keyboard("f3") then
-    self._show_scenes = not self._show_scenes
+    self._show_stats = not self._show_stats
   end
 end
 

@@ -16,6 +16,7 @@ local state = {}
 --- @field audio state_audio
 --- @field debug_overlay state_debug
 --- @field uid state_uid
+--- @field stats state_stats
 --- @field debug boolean
 --- @field args table CLI args
 --- @field rails rails
@@ -40,6 +41,7 @@ state.new = function(systems, args)
     audio = require("engine.state.audio").new(),
     debug_overlay = require("engine.state.debug_overlay").new(args.debug),
     uid = require("engine.state.uid").new(),
+    stats = require("engine.state.stats").new(),
     debug = args.debug,
 
     args = args,

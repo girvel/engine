@@ -11,11 +11,14 @@ local animated = require "engine.tech.animated"
 --- @field _control_coroutine? thread
 
 local MOVE_TIMEOUT = 6
+local AI_RANGE = 50
 
 return Tiny.processingSystem {
   codename = "acting",
   base_callback = "update",
   filter = Tiny.requireAll("ai"),
+
+  _active_ais = nil,
 
   onAdd = function(self, entity)
     if entity.ai.init then
@@ -30,6 +33,8 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(self, entity, dt)
+    self._active_ais = {}
+
     -- a safety measure
     if State.combat then
       while true do
@@ -65,9 +70,13 @@ return Tiny.processingSystem {
 
     if State.combat then
       self:_process_inside_combat(entity, dt)
-    else
+    elseif (entity.position - State.player.position):abs2() <= AI_RANGE then
       self:_process_outside_combat(entity, dt)
     end
+  end,
+
+  postProcess = function(self, dt)
+    State.stats.active_ais = self._active_ais
   end,
 
   _move_start_t = nil,
@@ -75,6 +84,7 @@ return Tiny.processingSystem {
   _process_inside_combat = function(self, entity, dt)
     local ai = entity.ai
 
+    table.insert(self._active_ais, Name.code(entity))
     if ai.observe then
       ai.observe(entity, dt)
     end
@@ -119,6 +129,7 @@ return Tiny.processingSystem {
   _process_outside_combat = function(self, entity, dt)
     local ai = entity.ai
 
+    table.insert(self._active_ais, Name.code(entity))
     if ai.observe then
       ai.observe(entity, dt)
     end
