@@ -31,6 +31,10 @@
 --- @field was_interacted_by entity?
 --- @field on_interact fun(entity, entity)?
 ---
+--- @field on_add fun(entity)
+--- @field on_remove fun(entity)
+--- @field on_death fun(entity)
+---
 --- @field player_flag true? marks player character for level loading
 --- @field transparent_flag true? marks entities that block path, but not vision
 --- @field perspective_flag true? marks entities that could be seen only from below

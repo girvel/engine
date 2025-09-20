@@ -40,6 +40,10 @@ health.damage = function(target, amount, is_critical)
 
   health.set_hp(target, target.hp - amount)
   if target.hp <= 0 then
+    if target.on_death then
+      target:on_death()
+    end
+
     if target.player_flag then
       State.mode:player_has_died()
       return

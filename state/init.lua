@@ -70,15 +70,23 @@ methods.add = function(self, entity, ...)
     Fun.iter(entity.inventory)
       :each(function(slot, it) self:add(it) end)
   end
+  if entity.on_add then
+    entity:on_add()
+  end
   return entity
 end
 
---- @generic T: table
+--- @generic T: entity
 --- @param self state
 --- @param entity T
 --- @param silently? boolean
 --- @return T
 methods.remove = function(self, entity, silently)
+  --- @cast entity entity
+  if entity.on_remove then
+    entity:on_remove()
+  end
+
   --- @cast entity table
   if not silently and not entity.boring_flag then
     Log.debug("State:remove(%s)" % Name.code(entity))
@@ -100,10 +108,6 @@ methods.remove = function(self, entity, silently)
   if self.combat then
     self.combat:remove(entity)
   end
-
-  -- if entity.on_remove then
-  --   entity:on_remove()
-  -- end
 
   return entity
 end
