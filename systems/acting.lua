@@ -19,6 +19,7 @@ return Tiny.processingSystem {
   filter = Tiny.requireAll("ai"),
 
   _active_ais = nil,
+  _start_time = nil,
 
   onAdd = function(self, entity)
     if entity.ai.init then
@@ -33,6 +34,7 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(self, entity, dt)
+    self._start_time = love.timer.getTime()
     self._active_ais = {}
 
     -- a safety measure
@@ -77,6 +79,7 @@ return Tiny.processingSystem {
 
   postProcess = function(self, dt)
     State.stats.active_ais = self._active_ais
+    State.stats.ai_frame_time = love.timer.getTime() - self._start_time
   end,
 
   _move_start_t = nil,

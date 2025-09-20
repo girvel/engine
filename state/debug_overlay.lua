@@ -22,14 +22,26 @@ debug_overlay.new = function(is_debug)
   }, mt)
 end
 
+local ai_load_percent_average = 0
+local sum = 0
+local frames_n = 0
+
 methods.draw = function(self, dt)
   if self._show_fps then
     ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
   end
 
   if State.rails and self._show_stats then
+    if Period(1, self, "ai_load_percent") then
+      ai_load_percent_average = sum / frames_n
+      sum = 0
+      frames_n = 0
+    end
+    sum = sum + State.stats.ai_frame_time * 100 / love.timer.getAverageDelta()
+    frames_n = frames_n + 1
+
     local active_ais = State.stats.active_ais
-    ui.text(("active AIs (%s):"):format(#active_ais))
+    ui.text(("active AIs (%s, %.2f%%):"):format(#active_ais, ai_load_percent_average))
     for _, codename in ipairs(active_ais) do
       ui.text("- " .. codename)
     end
