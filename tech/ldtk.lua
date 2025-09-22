@@ -87,12 +87,12 @@ local handle_tiles_or_intgrid = function(is_tiles)
 
       if not is_invisible then
         e.grid_layer = layer_id
-      end
 
-      local rails_name = this_parser._to_capture[layer_id][e.position]
-      if rails_name then
-        this_parser._were_captured[rails_name] = true
-        this_parser._captures.entities[rails_name] = e
+        local rails_name = this_parser._to_capture[layer_id][e.position]
+        if rails_name then
+          this_parser._were_captured[rails_name] = true
+          this_parser._captures.entities[rails_name] = e
+        end
       end
 
       table.insert(this_parser._entities, e)

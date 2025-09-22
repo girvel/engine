@@ -69,16 +69,8 @@ if tcod_c then
     --- @cast grid grid
     local w, h = unpack(grid.size)
     local map = tcod_c.TCOD_map_new(w, h)
-    for x = 1, w do
-      for y = 1, h do
-        local e = grid:unsafe_get(x, y)
-        tcod_c.TCOD_map_set_properties(
-          map, x - 1, y - 1, not e or not not e.transparent_flag, not e
-        )
-      end
-    end
     local snapshot = setmetatable({_grid = grid, _map = map}, {__index = snapshot_methods})
-    return setmetatable({
+    local result = setmetatable({
       _tcod__snapshot = snapshot,
     }, {
       __index = grid,
@@ -100,6 +92,8 @@ if tcod_c then
         end
       end,
     })
+    result._tcod__snapshot:update_transparency()
+    return result
   end
 
   --- @param wrapped_grid grid Actually, not grid but a tcod.observer
@@ -124,6 +118,18 @@ if tcod_c then
   snapshot_methods.free = function(self)
     tcod_c.TCOD_map_delete(self._map)
     self._map = nil
+  end
+
+  snapshot_methods.update_transparency = function(self)
+    local w, h = unpack(self._grid.size)
+    for x = 1, w do
+      for y = 1, h do
+        local e = self._grid:unsafe_get(x, y)
+        tcod_c.TCOD_map_set_properties(
+          self._map, x - 1, y - 1, not e or not not e.transparent_flag, not e
+        )
+      end
+    end
   end
 
   --- @return nil

@@ -8,7 +8,7 @@ local runner = {}
 
 --- @class scene
 --- @field characters? table<string, table>
---- @field start_predicate fun(scene, integer, characters)
+--- @field start_predicate fun(scene, integer, characters): boolean
 --- @field run fun(scene, characters)
 --- @field enabled? true
 --- @field boring_flag? true don't log scene beginning and ending
