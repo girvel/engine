@@ -135,7 +135,11 @@ tostring_custom = function(...)
     end
     local x = select(i, ...)
     if type(x) == "number" then
-      x = ("%.2f"):format(x)
+      if x % 1 > 0 then
+        x = ("%.2f"):format(x)
+      else
+        x = ("%s"):format(x)
+      end
     elseif type(x) == "table" then
       x = inspect(x, {depth = 3})
     else
