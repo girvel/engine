@@ -40,10 +40,15 @@ methods.draw = function(self, dt)
     sum = sum + State.stats.ai_frame_time * 100 / love.timer.getAverageDelta()
     frames_n = frames_n + 1
 
-    local active_ais = State.stats.active_ais
-    ui.text(("active AIs (%s, %.2f%%):"):format(#active_ais, ai_load_percent_average))
-    for _, codename in ipairs(active_ais) do
-      ui.text("- " .. codename)
+    ui.text(("active AIs (%s, %.2f%%):"):format(#State.stats.active_ais, ai_load_percent_average))
+
+    local active_ais = {}
+    for _, codename in ipairs(State.stats.active_ais) do
+      active_ais[codename] = active_ais[codename] and active_ais[codename] + 1 or 1
+    end
+
+    for codename, count in pairs(active_ais) do
+      ui.text("- " .. codename .. (count > 1 and (" (%s)"):format(count) or ""))
     end
 
     local scenes = State.rails.runner.scenes
