@@ -16,6 +16,7 @@ local result = {
   require("engine.systems.ui_mousereleased"),
 
   -- love.update
+  require("engine.systems.genesis"),
   safety.live_system(require("engine.systems.update_sound")),
   safety.live_system(require("engine.systems.update_rails")),  -- together with acting
   safety.live_system(require("engine.systems.acting")),

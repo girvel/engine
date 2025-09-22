@@ -26,7 +26,9 @@ local state = {}
 --- @field player player
 --- @field is_loaded boolean is level fully loaded
 --- @field _world table
---- @field _entities table
+--- @field _entities table<entity, true>
+--- @field _entities_to_add entity[]
+--- @field _entities_to_remove [entity, boolean][]
 local methods = {}
 state.mt = {__index = methods}
 
@@ -50,10 +52,12 @@ state.new = function(systems, args)
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},
+    _entities_to_add = {},
+    _entities_to_remove = {},
   }, state.mt)
 end
 
---- Modifies entity
+--- Schedules entity to be added
 --- @generic T: entity
 --- @param self state
 --- @param entity T
@@ -63,21 +67,11 @@ methods.add = function(self, entity, ...)
   --- @cast entity entity
 
   Table.extend(entity, ...)
-  self._world:add(entity)
-  self._entities[entity] = true
-  if entity.position and entity.grid_layer then
-    level.put(entity)
-  end
-  if entity.inventory then
-    Fun.iter(entity.inventory)
-      :each(function(slot, it) self:add(it) end)
-  end
-  if entity.on_add then
-    entity:on_add()
-  end
+  table.insert(self._entities_to_add, entity)
   return entity
 end
 
+--- Schedules entity to be removed
 --- @generic T: entity
 --- @param self state
 --- @param entity T
@@ -85,37 +79,62 @@ end
 --- @return T
 methods.remove = function(self, entity, silently)
   --- @cast entity entity
-  if entity.on_remove then
-    entity:on_remove()
-  end
-
-  --- @cast entity table
-  if not silently and not entity.boring_flag then
-    Log.debug("State:remove(%s)" % Name.code(entity))
-  end
-
-  self._world:remove(entity)
-  self._entities[entity] = nil
-
-  if entity.position and entity.grid_layer then
-    level.remove(entity)
-  end
-
-  if entity.inventory then
-    for _, item in pairs(entity.inventory) do
-      self:remove(item, silently)
-    end
-  end
-
-  if self.combat then
-    self.combat:remove(entity)
-  end
-
+  table.insert(self._entities_to_remove, {entity, silently})
   return entity
 end
 
 methods.exists = function(self, entity)
   return self._entities[entity]
+end
+
+--- Removes & adds scheduled entities
+methods.flush = function(self)
+  for _, pair in ipairs(self._entities_to_remove) do
+    local entity, silently = unpack(pair)
+    if entity.on_remove then
+      entity:on_remove()
+    end
+
+    if not silently and not entity.boring_flag then
+      Log.debug("State:remove(%s)" % Name.code(entity))
+    end
+
+    self._world:remove(entity)
+    self._entities[entity] = nil
+
+    if entity.position and entity.grid_layer then
+      level.remove(entity)
+    end
+
+    if entity.inventory then
+      for _, item in pairs(entity.inventory) do
+        self:remove(item, silently)
+      end
+    end
+
+    if self.combat then
+      self.combat:remove(entity)
+    end
+  end
+  self._entities_to_remove = {}
+  self._world:refresh()
+
+  for _, entity in ipairs(self._entities_to_add) do
+    self._world:add(entity)
+    self._entities[entity] = true
+    if entity.position and entity.grid_layer then
+      level.put(entity)
+    end
+    if entity.inventory then
+      Fun.iter(entity.inventory)
+        :each(function(slot, it) self:add(it) end)
+    end
+    if entity.on_add then
+      entity:on_add()
+    end
+  end
+  self._entities_to_add = {}
+  self._world:refresh()
 end
 
 methods.reset = function(self)
@@ -175,6 +194,7 @@ methods.load_level = function(self, path)
 
   self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
 
+  coroutine.yield()
   local end_time = love.timer.getTime()
   Log.info("Added entities in %.2f s, total time %.2f s" % {
     end_time - read_time, end_time - start_time,

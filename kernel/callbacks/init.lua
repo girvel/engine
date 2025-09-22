@@ -9,7 +9,6 @@ for callback_name, _ in pairs(
 ) do
   love[callback_name] = function(...)
     State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
-    State._world:refresh()
   end
 end
 
