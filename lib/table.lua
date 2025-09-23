@@ -3,6 +3,17 @@
 --- Contains additional functions for complex table manipulation
 local tablex = {}
 
+--- Returns the pairs-based entry count
+--- @param t table
+--- @return integer
+tablex.count = function(t)
+  local result = 0
+  for _ in pairs(t) do
+    result = result + 1
+  end
+  return result
+end
+
 --- Copies all fields into the base mutating first argument
 -- Modifies first argument, copying all the fields via pairs of the following arguments in order
 -- from left to right.

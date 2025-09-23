@@ -52,7 +52,15 @@ methods.draw = function(self, dt)
     end
 
     local scenes = State.rails.runner.scenes
-    ui.text(("enabled scenes (%s):"):format(#scenes))
+    local enabled_n do
+      enabled_n = 0
+      for _, v in pairs(scenes) do
+        if v.enabled then
+          enabled_n = enabled_n + 1
+        end
+      end
+    end
+    ui.text(("enabled scenes (%s):"):format(enabled_n))
     for k, v in pairs(scenes) do
       if v.enabled then
         ui.text("- " .. k)
