@@ -8,6 +8,7 @@ local methods = {}
 local mt = {__index = methods}
 
 --- @param path string
+--- @param characters table<string, entity>
 --- @return screenplay
 screenplay.new = function(path, characters)
   return setmetatable({

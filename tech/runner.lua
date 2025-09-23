@@ -59,7 +59,12 @@ local env
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
     local characters = Fun.pairs(scene.characters or {})
-      :map(function(name, opts) return name, self.entities[name] end)
+      :map(function(name, opts)
+        return name, assert(
+          self.entities[name],
+          ("Character %q does not exist in State.rails.runner.entities"):format(name)
+        )
+      end)
       :tomap()
 
     if scene.enabled
