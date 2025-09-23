@@ -123,8 +123,7 @@ return Tiny.processingSystem {
 
       current = State.combat:get_current()
       Log.info("%s's turn" % {Name.code(current)})
-      -- State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
-      -- NEXT!
+      State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 
       self:_update_conditions(entity, 6)
     end

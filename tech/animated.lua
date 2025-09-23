@@ -18,14 +18,14 @@ local methods = {}
 local load_pack
 
 --- @param path string
---- @param n? integer if nil, interprets animation atlas as directional; else, uses nth cell from each frame
+--- @param atlas_n (integer|nil|"no_atlas") if nil, interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
 --- @return table
-animated.mixin = function(path, n)
+animated.mixin = function(path, atlas_n)
   local pack do
-    local base_pack = load_pack(path)
-    if n then
-      pack = base_pack[n]
-    elseif #base_pack == 1 then
+    local base_pack = load_pack(path, atlas_n ~= "no_atlas")
+    if type(atlas_n) == "number" then
+      pack = base_pack[atlas_n]
+    elseif atlas_n == "no_atlas" or #base_pack == 1 then
       pack = base_pack[1]
     else
       assert(#base_pack == 4)
@@ -59,7 +59,7 @@ end
 --- @param position vector
 --- @param is_over? boolean
 animated.fx = function(path, position, is_over)
-  local result = animated.mixin(path)
+  local result = animated.mixin(path, "no_atlas")
 
   local _, _, head = path:find("/?([^/]+)$")
   result.codename = head and (head .. "_fx") or "unnamed_fx"
@@ -131,7 +131,7 @@ end
 
 --- @param folder_path string
 --- @return animation_pack[]
-load_pack = Memoize(function(folder_path)
+load_pack = Memoize(function(folder_path, is_atlas)
   local info = love.filesystem.getInfo(folder_path)
   assert(info, "No folder %q, unable to load animation" % {folder_path})
   assert(info.type == "directory", "%q is not a folder, unable to load animation" % {folder_path})
@@ -157,9 +157,14 @@ load_pack = Memoize(function(folder_path)
         assert(not h)
         w = next_w
         h = next_h
-        parts_n = w * h / 16 / 16
-        for i = 1, parts_n do
-          result[i] = {}
+
+        if is_atlas then
+          parts_n = w * h / 16 / 16
+          for i = 1, parts_n do
+            result[i] = {}
+          end
+        else
+          result[1] = {}
         end
       else
         assert(
@@ -173,13 +178,19 @@ load_pack = Memoize(function(folder_path)
       end
     end
 
-    local image = love.graphics.newImage(data)
-    for i = 1, parts_n do
-      local pack = result[i]
+    if is_atlas then
+      local image = love.graphics.newImage(data)
+      for i = 1, parts_n do
+        local pack = result[i]
+        pack[animation_name] = pack[animation_name] or {}
+        pack[animation_name][frame_i] = sprite.image(
+          sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, 16, w, h))
+        )
+      end
+    else
+      local pack = result[1]
       pack[animation_name] = pack[animation_name] or {}
-      pack[animation_name][frame_i] = sprite.image(
-        sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, 16, w, h))
-      )
+      pack[animation_name][frame_i] = sprite.image(data)
     end
 
     ::continue::
