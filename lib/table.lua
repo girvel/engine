@@ -269,4 +269,20 @@ _table.assert_fields = function(t, fields)
   end
 end
 
+--- @param modpath string
+--- @return table<string, any>
+_table.require_folder = function(modpath)
+  local result = {}
+  local path = modpath:gsub("%.", "/")
+  for _, name in ipairs(love.filesystem.getDirectoryItems(path)) do
+    if love.filesystem.getInfo(path .. "/" .. name, "directory") then
+      result[name] = _table.require_folder(modpath .. "." .. name)
+    elseif name:ends_with(".lua") then
+      name = name:sub(1, -5)
+      result[name] = require(modpath .. "." .. name)
+    end
+  end
+  return result
+end
+
 return _table
