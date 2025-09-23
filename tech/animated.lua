@@ -3,8 +3,10 @@ local sprite = require("engine.tech.sprite")
 
 local animated = {}
 
+--- @alias animation_pack table<string, sprite_image[]>
+
 --- @class animation
---- @field pack table<string, sprite_image[]>
+--- @field pack animation_pack
 --- @field paused boolean
 --- @field current string
 --- @field frame number
@@ -16,9 +18,26 @@ local methods = {}
 local load_pack
 
 --- @param path string
+--- @param n? integer if nil, interprets animation atlas as directional; else, uses nth cell from each frame
 --- @return table
-animated.mixin = function(path)
-  local pack = load_pack(path)
+animated.mixin = function(path, n)
+  local pack do
+    local base_pack = load_pack(path)
+    if n then
+      pack = base_pack[n]
+    elseif #base_pack == 1 then
+      pack = base_pack[1]
+    else
+      assert(#base_pack == 4)
+      pack = {}
+      for i, direction_name in ipairs {"up", "left", "down", "right"} do
+        for animation_name, frames in pairs(base_pack[i]) do
+          pack[animation_name .. "_" .. direction_name] = frames
+        end
+      end
+    end
+  end
+
   return Table.extend({
     animation = {
       pack = pack,
@@ -110,11 +129,14 @@ methods.animation_set_paused = function(self, value)
   end
 end
 
+--- @param folder_path string
+--- @return animation_pack[]
 load_pack = Memoize(function(folder_path)
   local info = love.filesystem.getInfo(folder_path)
   assert(info, "No folder %q, unable to load animation" % {folder_path})
   assert(info.type == "directory", "%q is not a folder, unable to load animation" % {folder_path})
 
+  local w, h, parts_n
   local result = {}
   for _, file_name in ipairs(love.filesystem.getDirectoryItems(folder_path)) do
     local animation_name, frame_i do
@@ -123,31 +145,41 @@ load_pack = Memoize(function(folder_path)
       frame_i = assert(
         tonumber(frame_i),
         "%q not in format <animation name>_<frame index>.png" % {file_name}
-      )
+      )  --[[@as number]]
     end
 
     local full_path = folder_path .. "/" .. file_name
-
     local data = love.image.newImageData(full_path)
-    local w, h = data:getDimensions()
 
-    if w == h then
-      if not result[animation_name] then
-        result[animation_name] = {}
-      end
-
-      result[animation_name][frame_i] = sprite.image(data)
-    else
-      local image = love.graphics.newImage(data)
-      for i, direction in ipairs {"up", "left", "down", "right"} do
-        local full_name = animation_name .. "_" .. direction
-        if not result[full_name] then
-          result[full_name] = {}
+    do
+      local next_w, next_h = data:getDimensions()
+      if not w then
+        assert(not h)
+        w = next_w
+        h = next_h
+        parts_n = w * h / 16 / 16
+        for i = 1, parts_n do
+          result[i] = {}
         end
-        result[full_name][frame_i] = sprite.image(
-          sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, h, w, h))
+      else
+        assert(
+          next_w == w,
+          ("%q's width %s is not equal to previous encountered %s"):format(full_path, next_w, w)
+        )
+        assert(
+          next_h == h,
+          ("%q's height %s is not equal to previous encountered %s"):format(full_path, next_h, h)
         )
       end
+    end
+
+    local image = love.graphics.newImage(data)
+    for i = 1, parts_n do
+      local pack = result[i]
+      pack[animation_name] = pack[animation_name] or {}
+      pack[animation_name][frame_i] = sprite.image(
+        sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, 16, w, h))
+      )
     end
 
     ::continue::
