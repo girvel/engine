@@ -142,7 +142,8 @@ api.line = function(source, text)
   State.player.hears = t
 
   if source then
-    State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", source.position))
+    -- State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", source.position))
+    -- NEXT!
   end
 
   while State.player.hears == t do

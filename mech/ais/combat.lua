@@ -46,7 +46,6 @@ end
 
 --- @param entity entity
 methods.deinit = function(entity)
-  Log.trace("Combat AI unsubscribes", Name.code(entity))
   State.hostility:unsubscribe(entity.ai._hostility_subscription)
 end
 
