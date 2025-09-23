@@ -18,7 +18,7 @@ local built_in_assert = assert
 
 --- @generic T
 --- @param condition T
---- @param message string
+--- @param message? string
 --- @return T
 safety.assert = function(condition, message)
   if State.debug then
