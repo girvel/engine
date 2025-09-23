@@ -36,11 +36,13 @@ log.log = function(level, trace_shift, ...)
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
   local nameupper = (level --[[@as string]]):upper()
+  local frame_number = Kernel and (" %03d"):format(Kernel._total_frames % 1000) or ""
 
-  print(("%s[%-6s%s]%s %s: %s"):format(
+  print(("%s[%-6s%s%s]%s %s: %s"):format(
     log.usecolor and levels[level].color or "",
     nameupper,
     os.date("%H:%M:%S"),
+    frame_number,
     log.usecolor and "\27[0m" or "",
     lineinfo,
     msg
