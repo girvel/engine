@@ -118,9 +118,9 @@ methods.update = function(self, dt)
   Table.remove_breaking_in_bulk(self._scene_runs, indexes_to_remove)
 end
 
---- @param scene string|scene
+--- @param scene integer|string|scene
 methods.is_running = function(self, scene)
-  if type(scene) == "string" then
+  if type(scene) ~= "table" then
     scene = self.scenes[scene]
   end
 
@@ -128,9 +128,9 @@ methods.is_running = function(self, scene)
     :any(function(r) return r.base_scene == scene end)
 end
 
---- @param scene string|scene
+--- @param scene integer|string|scene
 methods.stop = function(self, scene)
-  if type(scene) == "string" then
+  if type(scene) ~= "table" then
     scene = self.scenes[scene]
   end
 
@@ -151,12 +151,12 @@ methods.stop = function(self, scene)
   })
 end
 
---- @param scene string|scene
+--- @param scene integer|string|scene
 methods.remove = function(self, scene)
   self:stop(scene)
-  local key = type(scene) == "string" and scene or Table.key_of(self.scenes, scene)
+  local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
   self.scenes[key] = nil
-  Log.info("Removed scene %s")
+  Log.info("Removed scene", key)
 end
 
 --- @param f fun(scene, characters)
