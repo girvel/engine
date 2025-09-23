@@ -1,12 +1,12 @@
 --- Table extension modules
 ---
 --- Contains additional functions for complex table manipulation
-local tablex = {}
+local _table = {}
 
 --- Returns the pairs-based entry count
 --- @param t table
 --- @return integer
-tablex.count = function(t)
+_table.count = function(t)
   local result = 0
   for _ in pairs(t) do
     result = result + 1
@@ -21,12 +21,12 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-tablex.extend = function(base, extension, ...)
+_table.extend = function(base, extension, ...)
   if extension == nil then return base end
   for k, v in pairs(extension) do
     base[k] = v
   end
-  return tablex.extend(base, ...)
+  return _table.extend(base, ...)
 end
 
 --- Sets values in base if they are nil
@@ -34,7 +34,7 @@ end
 --- @param base table?
 --- @param defaults T
 --- @return T
-tablex.defaults = function(base, defaults)
+_table.defaults = function(base, defaults)
   base = base or {}
   for k, v in pairs(defaults) do
     if base[k] == nil then
@@ -51,12 +51,12 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-tablex.concat = function(base, extension, ...)
+_table.concat = function(base, extension, ...)
   if extension == nil then return base end
   for _, v in ipairs(extension) do
     table.insert(base, v)
   end
-  return tablex.concat(base, ...)
+  return _table.concat(base, ...)
 end
 
 --- Concatenates and extends into the base
@@ -66,7 +66,7 @@ end
 --- @param extension table? table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-tablex.join = function(base, extension, ...)
+_table.join = function(base, extension, ...)
   if extension == nil then return base end
   local length = #base
   for k, v in pairs(extension) do
@@ -77,7 +77,7 @@ tablex.join = function(base, extension, ...)
       base[k] = v
     end
   end
-  return tablex.join(base, ...)
+  return _table.join(base, ...)
 end
 
 --- Copies all fields to the base, merging them with existing tables recursively and mutating 
@@ -86,16 +86,16 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-tablex.merge = function(base, extension, ...)
+_table.merge = function(base, extension, ...)
   if extension == nil then return base end
   for k, v in pairs(extension) do
     if base[k] and type(base[k]) == "table" and type(v) == "table" then
-      base[k] = tablex.merge({}, base[k], v)
+      base[k] = _table.merge({}, base[k], v)
     else
       base[k] = v
     end
   end
-  return tablex.merge(base, ...)
+  return _table.merge(base, ...)
 end
 
 --- Return the first index of the item in the table
@@ -103,7 +103,7 @@ end
 --- @param t T[]
 --- @param item T
 --- @return integer?
-tablex.index_of = function(t, item)
+_table.index_of = function(t, item)
   for i, x in ipairs(t) do
     if x == item then
       return i
@@ -116,7 +116,7 @@ end
 --- @param t table
 --- @param item any
 --- @return any
-tablex.key_of = function(t, item)
+_table.key_of = function(t, item)
   for k, v in pairs(t) do
     if v == item then
       return k
@@ -129,7 +129,7 @@ end
 --- @param t1 table
 --- @param t2 table
 --- @return boolean
-tablex.shallow_same = function(t1, t2)
+_table.shallow_same = function(t1, t2)
   for k, v in pairs(t1) do
     if v ~= t2[k] then return false end
   end
@@ -142,7 +142,7 @@ end
 --- @generic T: table
 --- @param t T
 --- @return T
-tablex.shallow_copy = function(t)
+_table.shallow_copy = function(t)
   local result = setmetatable({}, getmetatable(t))
   for k, v in pairs(t) do
     result[k] = v
@@ -154,7 +154,7 @@ end
 --- @param o T
 --- @param seen? table
 --- @return T
-tablex.deep_copy = function(o, seen)
+_table.deep_copy = function(o, seen)
   seen = seen or {}
   if o == nil then return nil end
   if seen[o] then return seen[o] end
@@ -165,9 +165,9 @@ tablex.deep_copy = function(o, seen)
     seen[o] = no
 
     for k, v in next, o, nil do
-      no[tablex.deep_copy(k, seen)] = tablex.deep_copy(v, seen)
+      no[_table.deep_copy(k, seen)] = _table.deep_copy(v, seen)
     end
-    setmetatable(no, tablex.deep_copy(getmetatable(o), seen))
+    setmetatable(no, _table.deep_copy(getmetatable(o), seen))
   else
     no = o
   end
@@ -177,7 +177,7 @@ end
 --- @param t table
 --- @param item any
 --- @return table
-tablex.remove = function(t, item)
+_table.remove = function(t, item)
   for k, v in pairs(t) do
     if v == item then
       if type(k) == "number" and math.ceil(k) == k then
@@ -190,25 +190,34 @@ tablex.remove = function(t, item)
   return t
 end
 
+--- Uses pairs
+_table.remove_pair = function(t, item)
+  for k, v in pairs(t) do
+    if v == item then
+      t[k] = nil
+    end
+  end
+end
+
 --- @param t any[]
 --- @param i integer
-tablex.remove_breaking = function(t, i)
+_table.remove_breaking = function(t, i)
   t[i] = t[#t]
   t[#t] = nil
 end
 
 --- @param t any[]
 --- @param indexes integer[]
-tablex.remove_breaking_in_bulk = function(t, indexes)
+_table.remove_breaking_in_bulk = function(t, indexes)
   for i = #indexes, 1, -1 do
-    tablex.remove_breaking(t, indexes[i])
+    _table.remove_breaking(t, indexes[i])
   end
 end
 
 --- @param t table
 --- @param item any
 --- @return boolean
-tablex.contains = function(t, item)
+_table.contains = function(t, item)
   for _, x in ipairs(t) do
     if x == item then
       return true
@@ -220,12 +229,12 @@ end
 --- @generic T
 --- @param t T[]
 --- @return T
-tablex.last = function(t)
+_table.last = function(t)
   return t[#t]
 end
 
 --- @return table
-tablex.pack = function(...)
+_table.pack = function(...)
   local n = select("#", ...)
   local result = {}
   for i = 1, n do
@@ -238,7 +247,7 @@ end
 --- @generic T
 --- @param list T[]
 --- @return table<T, true?>
-tablex.set = function(list)
+_table.set = function(list)
   local result = {}
   for _, v in ipairs(list) do
     result[v] = true
@@ -248,7 +257,7 @@ end
 
 --- @param t table
 --- @param fields string[]
-tablex.assert_fields = function(t, fields)
+_table.assert_fields = function(t, fields)
   local missing_fields = {}
   for _, field in ipairs(fields) do
     if t[field] == nil then
@@ -260,4 +269,4 @@ tablex.assert_fields = function(t, fields)
   end
 end
 
-return tablex
+return _table

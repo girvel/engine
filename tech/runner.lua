@@ -128,6 +128,7 @@ methods.is_running = function(self, scene)
     :any(function(r) return r.base_scene == scene end)
 end
 
+--- @async
 --- @param scene integer|string|scene
 methods.stop = function(self, scene)
   if type(scene) ~= "table" then
@@ -153,10 +154,10 @@ end
 
 --- @param scene integer|string|scene
 methods.remove = function(self, scene)
-  self:stop(scene)
   local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
   self.scenes[key] = nil
   Log.info("Removed scene", key)
+  self:stop(scene)  -- yields => goes last
 end
 
 --- @param f fun(scene, characters)
