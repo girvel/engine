@@ -60,7 +60,7 @@ methods.draw = function(self, dt)
         end
       end
     end
-    ui.text(("enabled scenes (%s):"):format(enabled_n))
+    ui.text(("enabled scenes (%s/%s):"):format(enabled_n, Table.count(scenes)))
     for k, v in pairs(scenes) do
       if v.enabled then
         ui.text("- " .. k)
