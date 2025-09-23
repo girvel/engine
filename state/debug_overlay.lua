@@ -72,6 +72,11 @@ methods.draw = function(self, dt)
     for _, v in ipairs(running) do
       ui.text("- " .. v.name)
     end
+
+    ui.text("Rails state:")
+    for k, v in pairs(State.rails) do
+      ui.text(("  %s: %s"):format(k, v))
+    end
   end
 
   if self._show_points then
