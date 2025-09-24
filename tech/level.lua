@@ -9,6 +9,7 @@ local level = {}
 --- @return nil
 level.unsafe_move = function(entity, position)
   assert(entity.position, "Can not move an entity without the current position")
+  if entity.position == position then return end
 
   local grid = State.grids[entity.grid_layer]
   if grid[position] then
