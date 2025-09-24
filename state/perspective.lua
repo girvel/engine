@@ -6,6 +6,8 @@ local perspective = {}
 local smooth_camera_offset
 
 --- @class state_perspective
+--- @field target_override entity?
+--- @field is_moving boolean
 --- @field is_camera_following boolean
 --- @field camera_offset vector
 --- @field vision_start vector
@@ -17,6 +19,7 @@ perspective.mt = {__index = methods}
 
 perspective.new = function()
   return setmetatable({
+    is_moving = false,
     is_camera_following = true,
     camera_offset = Vector.zero,
     vision_start = Vector.zero,
@@ -40,12 +43,19 @@ methods.update = function(self, dt)
   if not State.player then return end
 
   if self.is_camera_following and State.is_loaded then
-    self.camera_offset = smooth_camera_offset:next(self.camera_offset, dt)
+    local next_offset = smooth_camera_offset:next(
+      self.target_override or State.player, self.camera_offset, dt
+    )
+    self.is_moving = next_offset ~= self.camera_offset
+    self.camera_offset = next_offset
+
     State.debug_overlay.points.camera = {
       position = -self.camera_offset + V(734, 540) + V(32, 32),
       color = V(0, 0, 1),
       view = "absolute",
     }
+  else
+    self.is_moving = false
   end
 
   do
@@ -69,7 +79,7 @@ local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 smooth_camera_offset = {
   vx = 0,
   vy = 0,
-  next = function(self, prev, dt)
+  next = function(self, target, prev, dt)
     prev = prev:map(function(v) return v ~= v and 0 or v end)
     local prev_x, prev_y = unpack(prev)
 
@@ -77,26 +87,29 @@ smooth_camera_offset = {
       return V(State.perspective:center_camera(unpack(State.player.position)))
     end
 
-    local vx, vy = unpack(State.player.position)
-    if State.player:can_act() and State.player.resources.movement > 0 then
-      vx = vx
+    local tx, ty = unpack(target.position)
+    if target == State.player
+      and State.player:can_act()
+      and State.player.resources.movement > 0
+    then
+      tx = tx
         + math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
         - math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
 
-      vy = vy
+      ty = ty
         + math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
         - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
     end
 
     if State.debug then
-      State.debug_overlay.points.vp = {
-        position = V(vx + .5, vy + .5),
+      State.debug_overlay.points.target_position = {
+        position = V(tx + .5, ty + .5),
         color = V(1, 0, 0),
         view = "grid",
       }
     end
 
-    local target_x, target_y = State.perspective:center_camera(vx, vy)
+    local target_x, target_y = State.perspective:center_camera(tx, ty)
 
     if State.debug then
       State.debug_overlay.points.target = {

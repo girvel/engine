@@ -11,8 +11,12 @@ local mt = {__index = methods}
 --- @param characters table<string, entity>
 --- @return screenplay
 screenplay.new = function(path, characters)
+  local content, _, _, err = love.filesystem.read(path)
+  assert(not err, err)
+  assert(content, ("Can't read moonspeak file %q"):format(path))
+
   return setmetatable({
-    stack = {Moonspeak.read(love.filesystem.read(path))},
+    stack = {Moonspeak.read(content)},
     characters = characters,
   }, mt)
 end

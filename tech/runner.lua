@@ -161,6 +161,7 @@ methods.remove = function(self, scene)
 end
 
 --- @param f fun(scene, characters)
+--- @return promise, scene
 methods.run_task = function(self, f)
   local key
   for i = 1, math.huge do

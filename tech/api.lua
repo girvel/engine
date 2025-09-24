@@ -207,6 +207,18 @@ api.fade_move = function(position)
   State.perspective.is_camera_following = true
 end
 
+--- @param position vector
+--- @return promise, scene
+api.move_camera = function(position)
+  return State.rails.runner:run_task(function()
+    --- @diagnostic disable-next-line
+    State.perspective.target_override = {position = position}
+    while State.perspective.is_moving do coroutine.yield() end
+    State.perspective.target_override = nil
+    State.perspective.is_camera_following = false
+  end)
+end
+
 api.autosave = function()
   State.rails.runner:run_task(function()
     assert(
