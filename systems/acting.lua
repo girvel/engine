@@ -68,7 +68,12 @@ return Tiny.processingSystem {
   end,
 
   process = function(self, entity, dt)
-    if State.rails.runner.locked_entities[entity] then return end
+    if State.rails.runner.locked_entities[entity] then
+      if entity.rest and Period(1, entity, "resource_restoration") then
+        entity:rest("move")
+      end
+      return
+    end
 
     if State.combat then
       self:_process_inside_combat(entity, dt)
@@ -137,7 +142,12 @@ return Tiny.processingSystem {
       ai.observe(entity, dt)
     end
 
-    if not ai.control then return end
+    if not ai.control then
+      if entity.rest and Period(1, entity, "resource_restoration") then
+        entity:rest("move")
+      end
+      return
+    end
 
     if not ai._control_coroutine then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
