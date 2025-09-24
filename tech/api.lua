@@ -23,8 +23,11 @@ end
 --- @return promise
 api.travel_scripted = function(entity, destination)
   local promise, scene = State.rails.runner:run_task(function()
-    api.travel_persistent(entity, destination, math.ceil((entity.position - destination):abs2() / 3))
-    if entity.position == destination then return end
+    local ok = api.travel_persistent(
+      entity, destination, math.ceil((entity.position - destination):abs2() / 3)
+    )
+    if ok then return end
+
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
   end)
@@ -40,15 +43,17 @@ end
 --- @param entity entity
 --- @param destination vector
 --- @param attempts_n? vector
+--- @return boolean
 api.travel_persistent = function(entity, destination, attempts_n)
   for _ = 1, attempts_n or 3 do
     api.travel(entity, destination)
     if entity.position == destination or (
       State.grids.solids:slow_get(destination, true)
       and (entity.position - destination):abs2() == 1)
-    then return end
+    then return true end
     async.sleep(.5)
   end
+  return false
 end
 
 --- @async
