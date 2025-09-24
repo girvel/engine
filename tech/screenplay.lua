@@ -32,6 +32,7 @@ methods.lines = function(self)
   end
 end
 
+--- @nodiscard
 --- @return table<integer, string>
 methods.start_options = function(self)
   local block = get_block(self, "options")  --[[@as moonspeak_options]]

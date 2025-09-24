@@ -483,6 +483,7 @@ draw_options = function(line)
   end
   if n then
     State.player.speaks = sorted[n][1]
+    State.player.hears = nil
   end
 end
 
