@@ -30,16 +30,14 @@ methods.draw_gui = function(self, dt)
   ui.start_font(24)
     ui.h1("Загрузить игру")
 
-    local options = Kernel:list_saves()
-
-    local n = ui.choice(options)
+    local save = tk.choose_save(false)
     local escape_pressed = ui.keyboard("escape")
 
-    if n then
-      Kernel:plan_load(options[n])
+    if save then
+      Kernel:plan_load(save)
     end
 
-    if n or escape_pressed then
+    if save or escape_pressed then
       ui.handle_selection_reset()
       State.mode:close_menu()
     end

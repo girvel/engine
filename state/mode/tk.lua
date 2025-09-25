@@ -112,5 +112,36 @@ tk.finish_block = function(start)
   ui.offset(0, h)
 end
 
+tk.choose_save = function(show_new_save)
+  local options = {}
+  local dates = {}
+
+  for _, name in ipairs(love.filesystem.getDirectoryItems("saves")) do
+    local full_path = "saves/" .. name
+    if love.filesystem.getInfo(full_path).type ~= "file" or
+      not name:ends_with(".ldump.gz")
+    then
+      goto continue
+    end
+
+    name = name:sub(1, -10)
+    table.insert(options, name)
+    dates[name] = love.filesystem.getInfo(full_path).modtime
+
+    ::continue::
+  end
+
+  table.sort(options, function(a, b) return dates[a] > dates[b] end)
+  if show_new_save then
+    table.insert(options, 1, "<новое сохранение>")
+  end
+
+  local i = ui.choice(options)
+  if show_new_save and i == 1 then
+    return "save_" .. os.date("%Y-%m-%d_%H-%M-%S")
+  end
+  return options[i]
+end
+
 Ldump.mark(tk, {}, ...)
 return tk

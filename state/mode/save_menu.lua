@@ -48,23 +48,18 @@ methods.draw_gui = function(self, dt)
   ui.start_font(24)
     ui.h1("Сохранить игру")
 
-    local options = Kernel:list_saves()
-    table.insert(options, 1, "<новое сохранение>")
+    local save = tk.choose_save(true)
+    if save then
+      Kernel:plan_save(save)
 
-    local n = ui.choice(options)
+      if self._prev.type == "escape_menu" then
+        self._prev.has_saved = true
+      end
+    end
+
     local escape_pressed = ui.keyboard("escape")
 
-    if n == 1 then
-      Kernel:plan_save("save_" .. os.date("%Y-%m-%d_%H-%M-%S"))
-    elseif n then
-      Kernel:plan_save(options[n])
-    end
-
-    if n and self._prev.type == "escape_menu" then
-      self._prev.has_saved = true
-    end
-
-    if n or escape_pressed then
+    if save or escape_pressed then
       ui.handle_selection_reset()
       State.mode:close_menu()
     end
