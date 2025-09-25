@@ -21,7 +21,7 @@
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer
 --- @field resources table<string, integer> resources to spend on actions
---- @field inventory table<string, item>
+--- @field inventory table<inventory_slot, item>
 --- @field hp integer current health points
 --- @field max_hp integer max health points, overrides base :get_max_hp value
 --- @field armor integer static armor class; less priority than :get_armor

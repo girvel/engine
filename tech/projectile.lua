@@ -1,22 +1,22 @@
 local sprite = require("engine.tech.sprite")
+local item   = require("engine.tech.item")
 
 
 local projectile = {}
 
-local TIMEOUT = 4
+local TIMEOUT = 40
 
 --- @param parent entity
---- @param entity item entity to be launched
+--- @param slot string which inventory slot's content to launch
 --- @param target entity|vector
 --- @param speed number
 --- @return promise
-projectile.launch = function(parent, entity, target, speed)
+projectile.launch = function(parent, slot, target, speed)
   local promise = Promise.new()
-  State:add(entity, {
+  local this_item = assert(parent.inventory[slot])
+  State:add(this_item, {
     layer = "fx_over",
-    -- TODO item.get_anchor_offset, considering slot may == "hands" or anchors may mismatch
-    --   returning Vector.zero, and using two offsets
-    position = parent.position + parent.sprite.anchors[entity.anchor or entity.slot] / 16,
+    position = parent.position + item.anchor_offset(parent, slot),
     direction = Vector.right,
     drift = Vector.zero,
     ai = {
@@ -44,7 +44,9 @@ projectile.launch = function(parent, entity, target, speed)
       end,
     }
   })
-  entity:animate(nil, true)
+
+  parent.inventory[slot] = nil
+  this_item:animate(nil, true)
 
   return promise
 end

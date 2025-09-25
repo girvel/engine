@@ -346,7 +346,7 @@ actions.bow_attack = function(target)
         local damage_roll = entity:get_ranged_damage_roll()
 
         self.sounds:play_at(entity.position, "medium")
-        projectile.launch(entity, arrow, target, damage_roll:max() * 2):next(function()
+        projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()
           -- SOUND hit?
           if d:abs2() == 1 then
             attack_roll = attack_roll:extended({advantage = "disadvantage"})
@@ -358,7 +358,6 @@ actions.bow_attack = function(target)
           )
           State.hostility:register(entity, target)
         end)
-        entity.inventory.hand = nil
       end)
       return true
     end,

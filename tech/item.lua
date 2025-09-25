@@ -12,8 +12,8 @@ item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 --- @field damage_roll? d present only in weapons
 --- @field bonus? integer bonus damage
 --- @field tags table<string, true>
---- @field slot string
---- @field anchor? string
+--- @field slot item_slot
+--- @field anchor? anchor overrides .slot for anchoring
 --- @field projectile_factory? fun(): entity present only in ranged weapons
 --- @field no_drop_flag? true
 --- @field animated_independently_flag? true
@@ -35,6 +35,32 @@ item.mixin = function(animation_path)
       direction = Vector.right,  -- needed to initially animate into idle_right instead of idle
     }
   )
+end
+
+--- @param slot string
+item.mixin_min = function(slot)
+  return {
+    tags = {},
+    direction = Vector.right,
+    slot = slot,
+  }
+end
+
+--- @param entity entity
+--- @param slot inventory_slot
+item.anchor_offset = function(entity, slot)
+  local this_item = assert(
+    entity.inventory[slot],
+    ("anchor_offset for empty %s's inventory slot %s"):format(Name.code(entity), slot)
+  )
+
+  local parent_anchor = entity.sprite.anchors[this_item.anchor or slot]
+  if not parent_anchor then return Vector.zero end
+
+  local item_anchor = this_item.sprite and this_item.sprite.anchors.parent
+  if not item_anchor then return Vector.zero end
+
+  return (parent_anchor - item_anchor):div_mut(16)
 end
 
 --- @param parent entity
