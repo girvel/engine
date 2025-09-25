@@ -22,7 +22,12 @@ local built_in_assert = assert
 --- @return T
 safety.assert = function(condition, message)
   if State.debug then
-    return built_in_assert(condition, message)
+    -- without this if, single argument assert attaches no stacktrace
+    if message then
+      return built_in_assert(condition, message)
+    else
+      return built_in_assert(condition)
+    end
   end
 
   if condition then
