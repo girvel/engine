@@ -99,6 +99,11 @@ methods.update = function(self, dt)
             self.locked_entities[character] = nil
           end
 
+          if Table.key_of(characters, State.player) then
+            State.perspective.target_override = nil
+            State.perspective.is_camera_following = true
+          end
+
           if not scene.boring_flag then
             Log.info("Scene %q ends" % {scene_name})
           end
