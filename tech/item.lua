@@ -164,7 +164,7 @@ item.cues = {
 
   highlight = function()
     return Table.extend(
-      animated.mixin("engine/assets/sprites/animations/highlight"),
+      animated.mixin("engine/assets/sprites/animations/highlight", 1),
       {
         name = "Хайлайт",
         codename = "highlight",

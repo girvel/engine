@@ -23,12 +23,14 @@ local load_pack
 animated.mixin = function(path, atlas_n)
   local pack do
     local base_pack = load_pack(path, atlas_n ~= "no_atlas")
-    if type(atlas_n) == "number" then
+    if atlas_n then
+      if atlas_n == "no_atlas" then atlas_n = 1 end
       pack = base_pack[atlas_n]
-    elseif atlas_n == "no_atlas" or #base_pack == 1 then
-      pack = base_pack[1]
     else
-      assert(#base_pack == 4)
+      assert(
+        #base_pack == 4,
+        ("Directional animation atlas %s should contain 4 cells, got %s"):format(path, #base_pack)
+      )
       pack = {}
       for i, direction_name in ipairs {"up", "left", "down", "right"} do
         for animation_name, frames in pairs(base_pack[i]) do
