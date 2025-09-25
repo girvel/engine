@@ -377,7 +377,9 @@ actions.interact = Table.extend({
   end,
 
   _act = function(self, entity)
-    assert(interactive.get_for(entity)):interact(entity)
+    entity:animate("interact"):next(function()
+      assert(interactive.get_for(entity)):interact(entity)
+    end)
     return true
   end,
 }, action.base)
