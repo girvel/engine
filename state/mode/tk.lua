@@ -1,5 +1,6 @@
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
+local item = require("engine.tech.item")
 
 
 local tk = {}
@@ -60,14 +61,9 @@ tk.draw_entity = function(entity, x, y, scale)
       local item_sprite = this_item.sprite
       if not item_sprite then return end
 
-      local entity_anchor = entity.sprite.anchors[this_item.anchor or slot]
-      local item_anchor = item_sprite.anchors.parent
-      local item_x, item_y = x, y
-      if entity_anchor and item_anchor then
-        local offset = (entity_anchor - item_anchor):mul_mut(scale)
-        item_x = item_x + offset[1]
-        item_y = item_y + offset[2]
-      end
+      local dx, dy = unpack(item.anchor_offset(entity, slot):mul_mut(scale * 16))
+      local item_x = x + dx
+      local item_y = y + dy
       love.graphics.draw(item_sprite.image, item_x, item_y, 0, scale)
     end
 
