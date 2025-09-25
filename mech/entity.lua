@@ -42,3 +42,4 @@
 --- @field boring_flag true? disable log messages about the entity because it's dull
 --- @field no_blood_flag true? disable blood cue
 --- @field no_sound_flag true? disable movement sounds
+--- @field essential_flag true? can't die, gets incapacitated in combat

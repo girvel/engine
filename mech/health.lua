@@ -49,6 +49,18 @@ health.damage = function(target, amount, is_critical)
       return
     end
 
+    if target.essential_flag then
+      State.rails.runner:run_task(function()
+        target:animate("lying")
+        coroutine.yield()
+        target:animation_set_paused(true)
+      end)
+      if State:in_combat(target) then
+        State.combat:remove(target)
+      end
+      return
+    end
+
     if target.inventory then
       for _, slot in ipairs(item.DROPPING_SLOTS) do
         local this_item = target.inventory[slot]

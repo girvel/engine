@@ -33,7 +33,7 @@ end
 --- @param entity entity
 methods.init = function(entity)
   entity.ai._hostility_subcription = State.hostility:subscribe(function(attacker, target)
-    if entity.faction and target == entity then
+    if entity.hp > 0 and entity.faction and target == entity then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       if not State:in_combat(entity) then
         Log.trace("AGGRESSIVE!")
@@ -121,7 +121,7 @@ end
 --- @param entity entity
 --- @param dt number
 methods.observe = function(entity, dt)
-  if State.rails.runner.locked_entities[State.player] then return end
+  if State.rails.runner.locked_entities[State.player] or entity.hp <= 0 then return end
   local ai = entity.ai  --[[@as combat_ai]]
 
   if not Random.chance(dt / ai.targeting.scan_period) then return end
