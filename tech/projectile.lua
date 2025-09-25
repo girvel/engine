@@ -14,15 +14,26 @@ projectile.launch = function(parent, entity, target, speed)
   local promise = Promise.new()
   State:add(entity, {
     layer = "fx_over",
-    -- TODO item.get_anchor, considering slot may == "hands" or anchors may mismatch returning
-    --   Vector.zero
+    -- TODO item.get_anchor_offset, considering slot may == "hands" or anchors may mismatch
+    --   returning Vector.zero, and using two offsets
     position = parent.position + parent.sprite.anchors[entity.anchor or entity.slot] / 16,
     direction = Vector.right,
     drift = Vector.zero,
     ai = {
       observe = function(entity)
-        local target_position = (getmetatable(target) == Vector.mt and target or target.position)
-          + V(.5, .5)
+        local target_position if getmetatable(target) == Vector.mt then
+          target_position = target + V(.5, .5)
+        else
+          target_position = target.position + V(.5, .5)
+        end
+
+        if State.debug then
+          State.debug_overlay.points.projectile_target = {
+            position = target_position,
+            color = Vector.white,
+            view = "grid",
+          }
+        end
 
         entity.drift = (target_position - entity.position):normalized_mut():mul_mut(speed)
         entity.rotation = math.atan2(entity.drift.y, entity.drift.x)
