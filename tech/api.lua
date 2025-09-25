@@ -226,15 +226,21 @@ api.move_camera = function(position)
   end)
 end
 
-api.autosave = function()
+--- @param name? string
+api.autosave = function(name)
   State.rails.runner:run_task(function()
-    assert(
-      not State.rails.runner.locked_entities[State.player],
-      "Autosave when the player is locked in a cutscene"
-    )
-    Kernel:plan_save("autosave")
+    Log.debug("Planned autosave")
+    while State.rails.runner.locked_entities[State.player] do
+      coroutine.yield()
+    end
+    -- assert(
+    --   not State.rails.runner.locked_entities[State.player],
+    --   "Autosave when the player is locked in a cutscene"
+    -- )
+    Kernel:plan_save(name or "autosave")
     Log.info("Autosave")
   end)
+  api.notification("Игра сохранена")
 end
 
 --- @param entity entity
@@ -257,8 +263,17 @@ api.notification = function(text)
   end)
 end
 
-api.journal_update = function()
-  api.notification("Новая задача")
+--- @param kind "new_task"|"task_completed"
+api.journal_update = function(kind)
+  local text
+  if kind == "new_task" then
+    text = "Новая задача"
+  elseif kind == "task_completed" then
+    text = "Задача выполнена"
+  else
+    assert(false, ("Unknown journal update %s"):format(kind))
+  end
+  api.notification(text)
   State.quests.has_new_content = true
 end
 
