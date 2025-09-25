@@ -285,4 +285,19 @@ _table.require_folder = function(modpath)
   return result
 end
 
+--- @generic T: table
+--- @param t T
+--- @param item_name string?
+--- @return T
+_table.strict = function(t, item_name)
+  return setmetatable(t, {
+    __index = function(self, index)
+      return assert(
+        rawget(self, index),
+        ("There's no %s %q"):format(item_name or "item", index)
+      )
+    end
+  })
+end
+
 return _table

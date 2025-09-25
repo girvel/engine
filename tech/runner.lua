@@ -44,8 +44,8 @@ runner.new = function(scenes, positions, entities)
 
   return setmetatable({
     scenes = scenes,
-    positions = positions,
-    entities = entities,
+    positions = Table.strict(positions, "runner position"),
+    entities = Table.strict(entities, "runner entity"),
     _scene_runs = {},
     locked_entities = {},
   }, mt)
@@ -58,14 +58,17 @@ local env
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
-    local characters = Fun.pairs(scene.characters or {})
-      :map(function(name, opts)
-        return name, assert(
-          self.entities[name],
-          ("Character %q does not exist in State.rails.runner.entities"):format(name)
-        )
-      end)
-      :tomap()
+    local characters = Table.strict(
+      Fun.pairs(scene.characters or {})
+        :map(function(name, opts)
+          return name, assert(
+            self.entities[name],
+            ("Character %q does not exist in State.rails.runner.entities"):format(name)
+          )
+        end)
+        :tomap(),
+      ("scene %q's character"):format(scene_name)
+    )
 
     if scene.enabled
       and (scene.mode == "parallel" or not self:is_running(scene))

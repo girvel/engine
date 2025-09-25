@@ -28,11 +28,11 @@ methods.lines = function(self)
   local block = get_block(self, "lines")  --[[@as moonspeak_lines]]
 
   for _, line in ipairs(block.lines) do
-    assert(
-      line.source == "narration" or self.characters[line.source],
-      "Unknown character %s" % {line.source}
-    )
-    api.line(self.characters[line.source], line.text)
+    local character
+    if line.source ~= "narration" then
+      character = self.characters[line.source]
+    end
+    api.line(character, line.text)
   end
 end
 
