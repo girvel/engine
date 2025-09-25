@@ -14,6 +14,27 @@ promise.new = function()
   }, promise.mt)
 end
 
+--- @param ... promise
+--- @return promise
+promise.all = function(...)
+  local result = promise.new()
+  local count = select("#", ...)
+  for i = 1, count do
+    local item = select(i, ...)  --[[@as promise]]
+    if i ~= count or getmetatable(item) == promise.mt then
+      item:next(function()
+        count = count - 1
+        if count == 0 then
+          result:resolve()
+        end
+      end)
+    else
+      count = count - 1
+    end
+  end
+  return result
+end
+
 --- @param callback function
 --- @return promise
 promise_methods.next = function(self, callback)
