@@ -17,4 +17,12 @@ random.choice = function(list)
 	return list[math.ceil(math.random(#list))]
 end
 
+--- Random float in range
+--- @param a number
+--- @param b number
+--- @return number
+random.float = function(a, b)
+  return math.random() * (b - a) + a
+end
+
 return random
