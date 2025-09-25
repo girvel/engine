@@ -47,10 +47,12 @@ end
 api.travel_persistent = function(entity, destination, attempts_n)
   for _ = 1, attempts_n or 3 do
     api.travel(entity, destination)
-    if entity.position == destination or (
-      State.grids.solids:slow_get(destination, true)
-      and (entity.position - destination):abs2() == 1)
-    then return true end
+    if entity.position == destination then return true end
+    local d = destination - entity.position
+    if State.grids.solids:slow_get(destination, true) and d:abs2() == 1 then
+      entity:rotate(d)
+      return true
+    end
     async.sleep(.5)
   end
   return false
