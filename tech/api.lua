@@ -236,9 +236,9 @@ api.autosave = function()
 end
 
 --- @param entity entity
---- @param target entity
+--- @param target entity|vector
 api.rotate = function(entity, target)
-  local d = target.position - entity.position
+  local d = (getmetatable(target) == Vector.mt and target or target.position) - entity.position
   if d == Vector.zero then return end
   entity:rotate(d:normalized2())
 end
