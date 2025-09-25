@@ -36,11 +36,16 @@ actions.move = Memoize(function(direction)
         entity.direction = direction
       end
 
-      if State.grids.solids:slow_get(entity.position + direction, true) then
+      if State.grids[entity.grid_layer]:slow_get(entity.position + direction, true) then
         return false
       end
 
-      if entity:modify("opportunity_attack_trigger", true) then
+      if entity.grid_layer ~= "solids" then
+        local solid = State.grids.solids:slow_get(entity.position + direction)
+        if solid and not solid.transparent_flag then return false end
+      end
+
+      if entity:modify("opportunity_attack_trigger", true) and entity.grid_layer == "solids" then
         Fun.iter(Vector.directions)
           :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
           :filter(function(e)
@@ -62,7 +67,7 @@ actions.move = Memoize(function(direction)
       local tile = State.grids.tiles[entity.position]
       local on_tile = State.grids.on_tiles[entity.position]
 
-      if not entity.no_sound_flag then
+      if not entity.no_sound_flag and entity.grid_layer == "solids" then
         local sounds =
           love.timer.getTime() - (last_walk_sound_t[entity] or 0) >= 1 / MAX_SOUNDS_PER_SECOND and (
             on_tile and on_tile.sounds and on_tile.sounds.walk
