@@ -542,6 +542,10 @@ ui.get_frame = function()
   return Table.shallow_copy(Table.last(model.frame))
 end
 
+ui.get_font = function()
+  return Table.last(model.font)
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Event handlers
 ----------------------------------------------------------------------------------------------------

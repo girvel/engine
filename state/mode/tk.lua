@@ -112,29 +112,51 @@ tk.finish_block = function(start)
   ui.offset(0, h)
 end
 
-tk.choose_save = function(show_new_save)
-  local options = {}
-  local dates = {}
+-- TODO tk color constants
+local DIMMED = Vector.hex("2a3e34")
 
-  for _, name in ipairs(love.filesystem.getDirectoryItems("saves")) do
-    local full_path = "saves/" .. name
-    if love.filesystem.getInfo(full_path).type ~= "file" or
-      not name:ends_with(".ldump.gz")
-    then
-      goto continue
+tk.choose_save = function(show_new_save)
+  local options, dates do
+    options = {}
+    dates = {}
+
+    for _, name in ipairs(love.filesystem.getDirectoryItems("saves")) do
+      local full_path = "saves/" .. name
+      if love.filesystem.getInfo(full_path).type ~= "file" or
+        not name:ends_with(".ldump.gz")
+      then
+        goto continue
+      end
+
+      name = name:sub(1, -10)
+      table.insert(options, name)
+      dates[name] = love.filesystem.getInfo(full_path).modtime
+
+      ::continue::
     end
 
-    name = name:sub(1, -10)
-    table.insert(options, name)
-    dates[name] = love.filesystem.getInfo(full_path).modtime
-
-    ::continue::
+    table.sort(options, function(a, b) return dates[a] > dates[b] end)
+    if show_new_save then
+      table.insert(options, 1, "<новое сохранение>")
+    end
   end
 
-  table.sort(options, function(a, b) return dates[a] > dates[b] end)
-  if show_new_save then
-    table.insert(options, 1, "<новое сохранение>")
-  end
+  local nice_date = "%Y.%m.%d %H:%M  "
+  local char_w = math.floor(ui.get_frame().w / ui.get_font():getWidth("w")) - #os.date(nice_date)
+
+  ui.start_frame()
+  ui.start_alignment("right")
+  love.graphics.setColor(DIMMED)
+    for i, option in ipairs(options) do
+      if show_new_save and i == 1 then
+        ui.br()
+      else
+        ui.text("." * (char_w - option:utf_len()) .. os.date(nice_date, dates[option]))
+      end
+    end
+  love.graphics.setColor(Vector.white)
+  ui.finish_alignment()
+  ui.finish_frame()
 
   local i = ui.choice(options)
   if show_new_save and i == 1 then
