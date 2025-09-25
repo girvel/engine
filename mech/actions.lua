@@ -346,11 +346,7 @@ actions.bow_attack = function(target)
         local damage_roll = entity:get_ranged_damage_roll()
 
         self.sounds:play_at(entity.position, "medium")
-        arrow.layer = "fx_over"
-        arrow.position = entity.position + entity.sprite.anchors.hand / 16
-        arrow.direction = Vector.right
-        arrow:animate()
-        projectile.launch(arrow, target, damage_roll:max() * 2):next(function()
+        projectile.launch(entity, arrow, target, damage_roll:max() * 2):next(function()
           -- SOUND hit?
           if d:abs2() == 1 then
             attack_roll = attack_roll:extended({advantage = "disadvantage"})

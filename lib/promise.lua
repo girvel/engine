@@ -15,6 +15,7 @@ promise.new = function()
 end
 
 --- @param callback function
+--- @return promise
 promise_methods.next = function(self, callback)
   table.insert(self.queue, callback)
   return self

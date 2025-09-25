@@ -16,12 +16,17 @@ return Tiny.processingSystem {
     local animation = entity.animation
     if animation.paused then return end
 
-    if not animation.current:starts_with("idle") or #animation.pack[animation.current] > 1 then
+    local current_pack = assert(
+      animation.pack[animation.current],
+      ("%s is missing animation %s"):format(Name.code(entity), animation.current)
+    )
+
+    if not animation.current:starts_with("idle") or #current_pack > 1 then
       animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
-      if math.floor(animation.frame) > #animation.pack[animation.current] then
+      if math.floor(animation.frame) > #current_pack then
         entity:animate("idle")
       end
     end
-    entity.sprite = animation.pack[animation.current][math.floor(animation.frame)]
+    entity.sprite = current_pack[math.floor(animation.frame)]
   end,
 }

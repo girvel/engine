@@ -5,17 +5,25 @@ local projectile = {}
 
 local TIMEOUT = 4
 
---- @param entity entity entity to be launched
---- @param target entity
+--- @param parent entity
+--- @param entity item entity to be launched
+--- @param target entity|vector
 --- @param speed number
 --- @return promise
-projectile.launch = function(entity, target, speed)
+projectile.launch = function(parent, entity, target, speed)
   local promise = Promise.new()
   State:add(entity, {
+    layer = "fx_over",
+    -- TODO item.get_anchor, considering slot may == "hands" or anchors may mismatch returning
+    --   Vector.zero
+    position = parent.position + parent.sprite.anchors[entity.anchor or entity.slot] / 16,
+    direction = Vector.right,
     drift = Vector.zero,
     ai = {
       observe = function(entity)
-        local target_position = target.position + V(.5, .5)
+        local target_position = (getmetatable(target) == Vector.mt and target or target.position)
+          + V(.5, .5)
+
         entity.drift = (target_position - entity.position):normalized_mut():mul_mut(speed)
         entity.rotation = math.atan2(entity.drift.y, entity.drift.x)
         if Period(TIMEOUT, promise) or (target_position - entity.position):abs() < .25 then
@@ -25,6 +33,7 @@ projectile.launch = function(entity, target, speed)
       end,
     }
   })
+  entity:animate(nil, true)
 
   return promise
 end
