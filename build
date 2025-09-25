@@ -7,6 +7,9 @@ local read_run = function(command, ...)
   local f = assert(io.popen("zsh -c '" .. command:format(...) .. "'"))
   local result = f:read("*a")
   f:close()
+  if result:sub(-1, -1) == "\n" then
+    result = result:sub(1, -2)
+  end
   return result
 end
 
@@ -66,10 +69,30 @@ cli.stat = function(args)
     )
     local total = excessive_total - vendor
 
-    print("# Engine")
-    print("Total:", total)
-    print("Fallen total:", FALLEN_TOTAL)
-    print(("Progress estimate: %.2f%%"):format(total / FALLEN_TOTAL * 100))
+    local engine = read_run("cat engine/**/*.lua | wc -l") - vendor
+    local scripts = read_run("cat levels/main/scenes/**/*.lua | wc -l")
+    local palette = read_run("cat levels/main/palette/**/*.lua | wc -l")
+    local other = total - engine - scripts - palette
+
+    print("# Code")
+    print("Engine:  " .. engine)
+    print("Scripts: " .. scripts)
+    print("Palette: " .. palette)
+    print("Other:   " .. other)
+    print()
+    print("Total:   " .. total)
+  end
+
+  do
+    local dot_commits = read_run("git log --oneline --graph | wc -l")
+    local engine_commits = read_run("cd engine; git log --oneline --graph | wc -l")
+    local tags = read_run("git tag -l | wc -l")
+
+    print()
+    print("# Git")
+    print("DOT commits:    " .. dot_commits)
+    print("Engine commits: " .. engine_commits)
+    print("Tags:           " .. tags)
   end
 
   do
