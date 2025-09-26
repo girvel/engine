@@ -1,25 +1,25 @@
 local iteration = {}
 
 --- Guarantees that returned vectors are not references anywhere else
---- @param radius? integer
---- @param step? integer (default 1)
 --- @return fun(): vector
-iteration.rhombus = function(radius, step)
+iteration.rhombus = function(a, b, c)
   return coroutine.wrap(function()
     coroutine.yield(Vector.zero:copy())
 
-    step = step or 1
-    radius = radius or 100
-    local a, b if step > 0 then
-      a = 1
-      b = radius
-    else
-      assert(step ~= 0)
-      a = radius
-      b = 1
+    if not c then
+      if not b then
+        if not a then
+          a = 100
+        end
+        b = a
+        a = 1
+        c = 1
+      else
+        c = Math.sign(b - a)
+      end
     end
 
-    for r = a, b, step do
+    for r = a, b, c do
       for x = 0, r - 1 do
         coroutine.yield(V(x, x - r))
       end
