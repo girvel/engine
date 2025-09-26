@@ -369,6 +369,7 @@ actions.bow_attack = function(target)
   })
 end
 
+--- @type action
 actions.interact = Table.extend({
   name = "взаимодействовать",
   codename = "interact",

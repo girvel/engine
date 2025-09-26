@@ -20,7 +20,7 @@ end
 --- @async
 --- @param entity entity
 --- @param destination vector
---- @return promise
+--- @return promise, scene
 api.travel_scripted = function(entity, destination)
   local promise, scene = State.rails.runner:run_task(function()
     local ok = api.travel_persistent(
@@ -36,7 +36,7 @@ api.travel_scripted = function(entity, destination)
     level.unsafe_move(entity, p)
     promise:resolve()
   end
-  return promise
+  return promise, scene
 end
 
 --- @async
@@ -219,6 +219,7 @@ end
 --- @return promise, scene
 api.move_camera = function(position)
   return State.rails.runner:run_task(function()
+    State.perspective.is_camera_following = true
     --- @diagnostic disable-next-line
     State.perspective.target_override = {position = position}
     coroutine.yield()
