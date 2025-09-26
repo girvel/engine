@@ -89,6 +89,16 @@ methods.finish_branch = function(self)
   assert(Table.last(self.stack).type == "branches")
 end
 
+methods.start_single_branch = function(self)
+  self:start_branches()
+  self:start_branch(1)
+end
+
+methods.finish_single_branch = function(self)
+  self:finish_branch()
+  self:finish_branches()
+end
+
 --- @return string
 methods.literal = function(self)
   local block = get_block(self, "literal")  --[[@as moonspeak_literal]]
