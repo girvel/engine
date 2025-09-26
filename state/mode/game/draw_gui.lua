@@ -423,15 +423,19 @@ local SUCCESS = Vector.hex("c3e06c")
 
 draw_line = function(line)
   local text = line.text
-  if line.source then
-    ui.start_frame()
-    ui.start_line()
+  ui.start_frame()
+  ui.start_line()
+    local offset = 0
+    if line.source then
       local name = Name.game(line.source)
       love.graphics.setColor(line.source.sprite.color)
         ui.text(name)
       love.graphics.setColor(Vector.white)
       ui.text(": ")
+      offset = offset + name:utf_len() + 2
+    end
 
+    do
       local color
       local _, j, highlighted = text:find("^(%[[^%]]+ — успех%] )")
       if highlighted then
@@ -443,7 +447,6 @@ draw_line = function(line)
         end
       end
 
-      local offset = name:utf_len() + 2
       if highlighted then
         love.graphics.setColor(color)
           ui.text(highlighted)
@@ -451,10 +454,11 @@ draw_line = function(line)
         offset = offset + highlighted:utf_len()
         text = text:sub(j + 1)
       end
-      text = (" " * offset) .. text
-    ui.finish_line()
-    ui.finish_frame()
-  end
+    end
+
+    text = (" " * offset) .. text
+  ui.finish_line()
+  ui.finish_frame()
   ui.text(text)
 
   if ui.keyboard("space") or ui.mousedown(1) then
