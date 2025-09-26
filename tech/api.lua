@@ -109,6 +109,7 @@ api.follow_path = function(entity, path)
     if entity.resources.movement <= 0 and not actions.dash:act(entity) then
       break
     end
+    if entity.position == Table.last(path) then break end
 
     coroutine.yield()
     if Random.chance(.1) then coroutine.yield() end
@@ -220,6 +221,7 @@ api.move_camera = function(position)
   return State.rails.runner:run_task(function()
     --- @diagnostic disable-next-line
     State.perspective.target_override = {position = position}
+    coroutine.yield()
     while State.perspective.is_moving do coroutine.yield() end
     State.perspective.target_override = nil
     State.perspective.is_camera_following = false
