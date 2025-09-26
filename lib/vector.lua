@@ -370,4 +370,21 @@ vector.mt.__index = function(self, key)
   error(("No .%s in vector"):format(key))
 end
 
+vector.mt.__newindex = function(self, key, value)
+  if type(key) == "number" then
+    rawset(self, key, value)
+    return
+  end
+
+  for _, base in ipairs(SWIZZLE_BASES) do
+    local index = base[key]
+    if index then
+      rawset(self, index, value)
+      return
+    end
+  end
+
+  error(("No .%s in vector"):format(key))
+end
+
 return vector
