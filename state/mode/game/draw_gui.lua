@@ -529,13 +529,21 @@ end
 
 draw_suggestion = function()
   if State.rails.runner.locked_entities[State.player] then return end
-  local target = interactive.get_for(State.player)
+  local target = interactive.get_for(State.player)  --[[@as item]]
   if not target then return end
 
   ui.start_frame(nil, love.graphics.getHeight() - 100)
   ui.start_alignment("center")
   ui.start_font(32)
-    ui.text("[E] для взаимодействия с " .. Name.game(target))
+    local name = Name.game(target)
+    local roll = target.damage_roll
+    if roll then
+      if target.bonus then
+        roll = roll + target.bonus
+      end
+      name = ("%s (%s)"):format(name, roll:simplified())
+    end
+    ui.text("[E] для взаимодействия с " .. name)
   ui.finish_font()
   ui.finish_alignment()
   ui.finish_frame()
