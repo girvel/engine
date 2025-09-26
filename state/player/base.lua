@@ -3,7 +3,7 @@ local action = require("engine.tech.action")
 local creature = require "engine.mech.creature"
 
 
-local base_player = {}
+local base = {}
 
 --- @class base_player: entity
 --- @field fov_r integer
@@ -11,6 +11,7 @@ local base_player = {}
 --- @field hears? dialogue_line
 --- @field speaks? integer
 --- @field notification? string
+--- @field curtain_color vector
 
 --- @alias dialogue_line plain_dialogue_line | dialogue_options
 
@@ -23,11 +24,12 @@ local base_player = {}
 --- @field type "options"
 --- @field options table<integer, string>
 
-base_player.mixin = function()
+base.mixin = function()
   local result = Table.extend(creature.mixin(), {
     codename = "player",
     player_flag = true,
     fov_r = 16,
+    curtain_color = Vector.transparent,
 
     ai = ai.new(),
   })
@@ -36,7 +38,7 @@ base_player.mixin = function()
 end
 
 --- @type action
-base_player.skip_turn = Table.extend({
+base.skip_turn = Table.extend({
   name = "Завершить ход",
   codename = "skip_turn",
 
@@ -49,5 +51,5 @@ base_player.skip_turn = Table.extend({
   end,
 }, action.base)
 
-Ldump.mark(base_player, {}, ...)
-return base_player
+Ldump.mark(base, {}, ...)
+return base

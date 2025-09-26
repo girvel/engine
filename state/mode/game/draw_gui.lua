@@ -26,7 +26,7 @@ local action_button
 -- Render functions
 local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
   draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
-  draw_mouse_action_grid, use_mouse
+  draw_mouse_action_grid, use_mouse, draw_curtain
 
 
 --- @param self state_mode_game
@@ -34,11 +34,20 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
 
+  draw_curtain()
   draw_sidebar(self)
   draw_dialogue()
   draw_notification()
   draw_suggestion()
   use_mouse(self)
+end
+
+draw_curtain = function()
+  if State.player.curtain_color == Vector.transparent then return end
+  local w, h = love.graphics.getDimensions()
+  love.graphics.setColor(State.player.curtain_color)
+    love.graphics.rectangle("fill", 0, 0, w, h)
+  love.graphics.setColor(Vector.white)
 end
 
 local PADDING_LX = 48

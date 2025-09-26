@@ -41,16 +41,15 @@ end
 
 --- Creates vector from its hexadecimal representation; each coordinate is between 0 and 1
 --- @param hex string
---- @param number_length? integer length of a single number, default 2
 --- @return vector
-vector.hex = function(hex, number_length)
-  number_length = number_length or 2
-  assert(#hex % number_length == 0)
+vector.hex = function(hex)
+  assert(#hex == 6 or #hex == 8)
   local base = {}
-  local d = 16 ^ number_length
-  for i = 1, #hex, number_length do
-    table.insert(base, tonumber(hex:sub(i, i + number_length - 1), 16) / d)
+  local d = 256
+  for i = 1, #hex, 2 do
+    table.insert(base, tonumber(hex:sub(i, i + 1), 16) / d)
   end
+  base[4] = base[4] or 1
   return vector.own(base)
 end
 
@@ -61,8 +60,9 @@ vector.down = vector.new(0, 1)
 vector.left = vector.new(-1, 0)
 vector.right = vector.new(1, 0)
 
-vector.white = vector.new(1, 1, 1)
-vector.black = vector.new(0, 0, 0)
+vector.white = vector.new(1, 1, 1, 1)
+vector.black = vector.new(0, 0, 0, 1)
+vector.transparent = vector.new(0, 0, 0, 0)
 
 --- @alias direction_name "up" | "left" | "down" | "right"
 
