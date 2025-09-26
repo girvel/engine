@@ -74,8 +74,10 @@ animated.fx = function(path, position, is_over)
   return result
 end
 
+--- @alias animation_name "idle"|"move"|"hand_attack"|"offhand_attack"|"gesture"|"lying"|"interact"|"throw"|"bow_attack"
+
 --- @param self entity
---- @param animation_name? string
+--- @param animation_name? string|animation_name
 --- @param assertive? boolean whether to assert that animation exists
 --- @return promise
 methods.animate = function(self, animation_name, assertive)
