@@ -528,6 +528,7 @@ draw_notification = function()
 end
 
 draw_suggestion = function()
+  if State.rails.runner.locked_entities[State.player] then return end
   local target = interactive.get_for(State.player)
   if not target then return end
 
