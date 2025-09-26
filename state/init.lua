@@ -68,6 +68,11 @@ methods.add = function(self, entity, ...)
 
   Table.extend(entity, ...)
   table.insert(self._entities_to_add, entity)
+  if entity.inventory then
+    for _, it in pairs(entity.inventory) do
+      self:add(it)
+    end
+  end
   return entity
 end
 
@@ -124,10 +129,6 @@ methods.flush = function(self)
     self._entities[entity] = true
     if entity.position and entity.grid_layer then
       level.put(entity)
-    end
-    if entity.inventory then
-      Fun.iter(entity.inventory)
-        :each(function(slot, it) self:add(it) end)
     end
     if entity.on_add then
       entity:on_add()
