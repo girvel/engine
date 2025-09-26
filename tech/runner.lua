@@ -149,20 +149,25 @@ methods.stop = function(self, scene)
     :filter(function(r) return r.base_scene ~= scene end)
     :totable()
 
-  coroutine.yield()
-  for character, _ in pairs(scene.characters or {}) do
-    self.locked_entities[self.entities[character]] = nil
+  local new_length = #self._scene_runs
+
+  if new_length ~= old_length then
+    coroutine.yield()
+    for character, _ in pairs(scene.characters or {}) do
+      self.locked_entities[self.entities[character]] = nil
+    end
   end
 
   Log.info("Stopping scene %s; interrupted %s runs" % {
-    Table.key_of(self.scenes, scene),
-    old_length - #self._scene_runs,
+    Table.key_of(self.scenes, scene) or Inspect(scene),
+    old_length - new_length,
   })
 end
 
 --- @param scene integer|string|scene
 methods.remove = function(self, scene)
   local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
+  if not key then return end
   self.scenes[key] = nil
   Log.info("Removed scene", key)
   self:stop(scene)  -- yields => goes last
