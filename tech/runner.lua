@@ -102,6 +102,7 @@ methods.update = function(self, dt)
           if Table.key_of(characters, State.player) then
             State.perspective.target_override = nil
             State.perspective.is_camera_following = true
+            State.player.curtain_color = Vector.transparent
           end
 
           if not scene.boring_flag then
@@ -155,6 +156,12 @@ methods.stop = function(self, scene)
     coroutine.yield()
     for character, _ in pairs(scene.characters or {}) do
       self.locked_entities[self.entities[character]] = nil
+    end
+
+    if scene.characters and scene.characters.player then
+      State.perspective.target_override = nil
+      State.perspective.is_camera_following = true
+      State.player.curtain_color = Vector.transparent
     end
   end
 

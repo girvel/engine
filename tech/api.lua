@@ -4,6 +4,7 @@ local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
 local sound= require("engine.tech.sound")
+local iteration = require("engine.tech.iteration")
 
 
 --- API for asynchronous scripting, both AI and rails
@@ -17,7 +18,19 @@ api.wait = function(seconds)
   end
 end
 
---- @async
+--- @param entity entity
+--- @param intermediate_point vector
+--- @param destination vector
+--- @return promise, scene
+api.fast_travel = function(entity, intermediate_point, destination)
+  local promise, scene = api.travel_scripted(entity, intermediate_point)
+  promise:next(function()
+    local p = State.grids.solids:find_free_position(destination)
+    level.unsafe_move(entity, p or destination)
+  end)
+  return promise, scene
+end
+
 --- @param entity entity
 --- @param destination vector
 --- @return promise, scene
@@ -288,6 +301,26 @@ api.journal_update = function(kind)
   end
   api.notification(text)
   State.quests.has_new_content = true
+end
+
+--- @param duration number time to full saturation in seconds
+--- @param color vector
+--- @return promise, scene
+api.curtain = function(duration, color)
+  return Runner:run_task(function()
+    local start_time = love.timer.getTime()
+    local start_color = State.player.curtain_color
+    local dcolor = color - start_color
+    while true do
+      local dt = love.timer.getTime() - start_time
+      if dt >= duration then
+        break
+      end
+      State.player.curtain_color = start_color + dcolor * (dt / duration)
+      coroutine.yield()
+    end
+    State.player.curtain_color = color
+  end)
 end
 
 Ldump.mark(api, {}, ...)
