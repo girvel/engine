@@ -74,7 +74,7 @@ animated.fx = function(path, position, is_over)
   return result
 end
 
---- @alias animation_name "idle"|"move"|"hand_attack"|"offhand_attack"|"gesture"|"lying"|"interact"|"throw"|"bow_attack"
+--- @alias animation_name "idle"|"move"|"hand_attack"|"offhand_attack"|"gesture"|"fast_gesture"|"clap"|"lying"|"interact"|"throw"|"bow_attack"
 
 --- @param self entity
 --- @param animation_name? string|animation_name
