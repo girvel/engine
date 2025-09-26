@@ -228,6 +228,16 @@ api.move_camera = function(position)
   end)
 end
 
+api.free_camera = function()
+  return State.rails.runner:run_task(function()
+    --- @diagnostic disable-next-line
+    State.perspective.target_override = nil
+    State.perspective.is_camera_following = true
+    coroutine.yield()
+    while State.perspective.is_moving do coroutine.yield() end
+  end)
+end
+
 --- @param name? string
 api.autosave = function(name)
   State.rails.runner:run_task(function()

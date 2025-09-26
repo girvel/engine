@@ -22,7 +22,7 @@ local runner = {}
 --- @field base_scene scene
 
 --- @class rails_runner
---- @field scenes table<string|integer, scene>
+--- @field scenes table<string|integer, scene|table>
 --- @field positions table<string, vector>
 --- @field entities table<string, entity>
 --- @field locked_entities table<entity, true>
