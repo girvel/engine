@@ -43,10 +43,8 @@ local draw_entity = function(self, entity, dt)
 
   if entity.shader then
     love.graphics.setCanvas()
-    if State.shader then
-      --- @diagnostic disable-next-line
-      love.graphics.setShader(State.shader and State.shader.love_shader)
-    end
+    --- @diagnostic disable-next-line
+    love.graphics.setShader(State.shader and State.shader.love_shader)
     love.graphics.draw(self._temp_canvas)
   end
 end
