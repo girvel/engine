@@ -15,7 +15,10 @@ end
 
 --- @type shader
 local winter = {
-  love_shader = build_love_shader(Vector.hex("3e4957"):swizzle("rgb"), .5, .8),
+  love_shader = build_love_shader(
+    Vector.hex("3e4957"):swizzle("rgb"),
+    .3, .9
+  ),
 }
 
 Ldump.mark(winter, "const", ...)
