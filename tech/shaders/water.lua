@@ -1,11 +1,7 @@
-local shaders = {}
+local water = {}
 
---- @class shader
---- @field love_shader love.Shader
---- @field preprocess? fun(shader, base_entity)
-
-local water_love_shader
-water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
+local build_love_shader
+build_love_shader = function(palette_path, palette_real_colors_n)
   local result = love.graphics.newShader([[
     uniform vec4 palette[%s];
 
@@ -56,14 +52,17 @@ water_love_shader = Memoize(function(palette_path, palette_real_colors_n)
   end
 
   Ldump.serializer.handlers[result] = function()
-    return water_love_shader(palette_path, palette_real_colors_n)
+    return build_love_shader(palette_path, palette_real_colors_n)
   end
   return result
-end)
+end
 
-shaders.water = function(palette_path, palette_real_colors_n)
+--- @param palette_path string
+--- @param palette_real_colors_n number
+--- @return shader
+water.new = Memoize(function(palette_path, palette_real_colors_n)
   return {
-    love_shader = water_love_shader(palette_path, palette_real_colors_n),
+    love_shader = build_love_shader(palette_path, palette_real_colors_n),
 
     preprocess = function(self, entity, dt)
       local offset = ((love.timer.getTime() * entity.water_velocity) % 16):map(math.floor) / 16
@@ -80,39 +79,9 @@ shaders.water = function(palette_path, palette_real_colors_n)
       return reflected.sprite.image
     end
   }
-end
+end)
 
---- @param tint vector 3-dimensional
---- @param intensity number
---- @param darkness_factor number
-local winter_shader = function(tint, intensity, darkness_factor)
-  assert(#tint == 3)
-
-  local result = love.graphics.newShader [[
-    uniform vec3 tint;
-    uniform float intensity;
-    uniform float darkness_factor;
-    vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
-    {
-      vec4 it = Texel(tex, texture_coords);
-      vec3 mixed_color = mix(it.rgb, tint, intensity) * darkness_factor;
-      return vec4(mixed_color, it.a);
-    }
-  ]]
-  result:send("tint", tint)
-  result:send("intensity", intensity)
-  result:send("darkness_factor", darkness_factor)
-  return result
-end
-
-shaders.winter = {
-  love_shader = winter_shader(Vector.hex("3e4957"):swizzle("rgb"), .5, .8),
-}
-
-Ldump.mark(shaders, {
-  water = {
-    water_love_shader = {},
-  },
-  winter = "const",
+Ldump.mark(water, {
+  new = {build_love_shader = {}},
 }, ...)
-return shaders
+return water
