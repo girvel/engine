@@ -352,6 +352,31 @@ local SWIZZLE_BASES = {
   },
 }
 
+--- @param pattern string
+--- @return vector
+vector_methods.swizzle = function(self, pattern)
+  local base do
+    local first_char = pattern:sub(1, 1)
+    for _, potential_base in ipairs(SWIZZLE_BASES) do
+      if potential_base[first_char] then
+        base = potential_base
+        goto found
+      end
+    end
+
+    error(("No swizzle base contains character %q"):format(first_char))
+    ::found::
+  end
+
+  local result = {}
+  for i = 1, #pattern do
+    local char = pattern:sub(i, i)
+    local index = base[char] or error(("Invalid swizzle character %q"):format(char))
+    result[i] = self[index] or error(("No .%s in vector %s"):format(char, self))
+  end
+  return vector.own(result)
+end
+
 vector.mt.__index = function(self, key)
   if type(key) == "number" then
     return rawget(self, key)

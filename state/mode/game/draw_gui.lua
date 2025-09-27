@@ -32,6 +32,8 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 --- @param self state_mode_game
 --- @param dt number
 draw_gui = function(self, dt)
+  love.graphics.setShader()
+
   is_compact = love.graphics.getHeight() < 900
 
   draw_curtain()
@@ -40,6 +42,10 @@ draw_gui = function(self, dt)
   draw_notification()
   draw_suggestion()
   use_mouse(self)
+
+  if State.shader then
+    love.graphics.setShader(State.shader.love_shader)
+  end
 end
 
 draw_curtain = function()

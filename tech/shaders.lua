@@ -82,9 +82,37 @@ shaders.water = function(palette_path, palette_real_colors_n)
   }
 end
 
+--- @param tint vector 3-dimensional
+--- @param intensity number
+--- @param darkness_factor number
+local winter_shader = function(tint, intensity, darkness_factor)
+  assert(#tint == 3)
+
+  local result = love.graphics.newShader [[
+    uniform vec3 tint;
+    uniform float intensity;
+    uniform float darkness_factor;
+    vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
+    {
+      vec4 it = Texel(tex, texture_coords);
+      vec3 mixed_color = mix(it.rgb, tint, intensity) * darkness_factor;
+      return vec4(mixed_color, it.a);
+    }
+  ]]
+  result:send("tint", tint)
+  result:send("intensity", intensity)
+  result:send("darkness_factor", darkness_factor)
+  return result
+end
+
+shaders.winter = {
+  love_shader = winter_shader(Vector.hex("3e4957"):swizzle("rgb"), .5, .8),
+}
+
 Ldump.mark(shaders, {
   water = {
     water_love_shader = {},
-  }
+  },
+  winter = "const",
 }, ...)
 return shaders

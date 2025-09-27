@@ -17,6 +17,7 @@ local state = {}
 --- @field debug_overlay state_debug
 --- @field uid state_uid
 --- @field stats state_stats
+--- @field shader shader?
 --- @field debug boolean
 --- @field args table CLI args
 --- @field rails rails
