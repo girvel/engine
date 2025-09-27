@@ -18,13 +18,16 @@ local draw_entity = function(self, entity, dt)
   if entity.shader then
     love.graphics.setShader(entity.shader.love_shader)
     love.graphics.setCanvas(self._temp_canvas)
+    -- OPT isn't it too expensive to draw the image the size of the screen?
     love.graphics.clear()
     if entity.shader.preprocess then
       entity.shader:preprocess(entity, dt)
     end
   end
 
-  -- TODO global shader
+  if State.shader and State.shader.preprocess then
+    State.shader:preprocess(entity, dt)
+  end
 
   local sprite = entity.sprite
   if sprite.type == "image" or (sprite.type == "atlas" and entity.shader) then
@@ -40,7 +43,10 @@ local draw_entity = function(self, entity, dt)
 
   if entity.shader then
     love.graphics.setCanvas()
-    love.graphics.setShader(State.shader and State.shader.love_shader)
+    if State.shader then
+      --- @diagnostic disable-next-line
+      love.graphics.setShader(State.shader and State.shader.love_shader)
+    end
     love.graphics.draw(self._temp_canvas)
   end
 end

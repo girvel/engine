@@ -4,10 +4,10 @@ local animated = require "engine.tech.animated"
 
 
 --- @class ai
---- @field init? fun(base_entity)
---- @field deinit? fun(base_entity)
---- @field control? fun(base_entity)
---- @field observe? fun(base_entity, number)
+--- @field init? fun(entity)
+--- @field deinit? fun(entity)
+--- @field control? fun(entity)
+--- @field observe? fun(entity, number)
 --- @field _control_coroutine? thread
 
 local MOVE_TIMEOUT = 6

@@ -1,3 +1,3 @@
 --- @class shader
 --- @field love_shader love.Shader
---- @field preprocess? fun(shader, base_entity)
+--- @field preprocess? fun(shader, entity, number)
