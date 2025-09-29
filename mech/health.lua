@@ -29,7 +29,7 @@ end
 --- @return nil
 health.damage = function(target, amount, is_critical)
   amount = math.max(0, amount)
-  Log.debug("%s damage to %s" % {amount, Name.code(target)})
+  Log.debug("%s damage to %s", amount, Name.code(target))
 
   local repr = tostring(amount)
   if is_critical then
@@ -99,7 +99,7 @@ health.attack = function(target, attack_roll, damage_roll)
   local is_nat_miss = attack == attack_roll:min()
   local ac = target.get_armor and target:get_armor() or target.armor or 0
 
-  Log.info("%s is attacked; attack roll: %s, armor: %s" % {Name.code(target), attack, ac})
+  Log.info("%s is attacked; attack roll: %s, armor: %s", Name.code(target), attack, ac)
 
   if is_nat_miss then
     State:add(health.floater("!", target.position, health.COLOR_DAMAGE))

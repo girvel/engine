@@ -102,7 +102,7 @@ methods.flush = function(self)
     end
 
     if not silently and not entity.boring_flag then
-      Log.debug("State:remove(%s)" % Name.code(entity))
+      Log.debug("State:remove(%s)", Name.code(entity))
     end
 
     self._world:remove(entity)
@@ -153,15 +153,15 @@ end
 --- @param path string
 methods.load_level = function(self, path)
   self.is_loaded = false
-  Log.info("Loading level %s" % {path})
+  Log.info("Loading level %s", path)
   local start_time = love.timer.getTime()
 
   local load_data = ldtk.load(path)
   local read_time = love.timer.getTime()
-  Log.info("Read level files in %.2f s" % {read_time - start_time})
+  Log.info("Read level files in %.2f s", read_time - start_time)
 
   self.level = load_data.level_info
-  Log.info("State.level is", self.level)
+  Log.info("State.level == %s", self.level)
 
   self.rails = load_data.rails
 
@@ -198,9 +198,9 @@ methods.load_level = function(self, path)
 
   coroutine.yield()
   local end_time = love.timer.getTime()
-  Log.info("Added entities in %.2f s, total time %.2f s" % {
-    end_time - read_time, end_time - start_time,
-  })
+  Log.info("Added entities in %.2f s, total time %.2f s",
+    end_time - read_time, end_time - start_time
+  )
 
   self.is_loaded = true
 end
@@ -227,10 +227,10 @@ methods.start_combat = function(self, list)
     end
 
     if State.combat then
-      Log.info("Joining the combat: %s" % {repr})
+      Log.info("Joining the combat: %s", repr)
       Table.concat(State.combat.list, list)
     else
-      Log.info("Combat starts: %s" % {repr})
+      Log.info("Combat starts: %s", repr)
       State.combat = combat.new(list)
     end
   end)

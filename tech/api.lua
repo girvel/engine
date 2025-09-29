@@ -86,7 +86,7 @@ end
 --- @param entity entity
 --- @param destination vector
 api.travel = function(entity, destination)
-  Log.trace("travel", Name.code(entity), entity.position, destination)
+  Log.trace("travel %s %s -> %s", Name.code(entity), entity.position, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
     and (entity.position - destination):abs2() == 1)
@@ -148,7 +148,7 @@ api.attack = function(entity, target)
   local direction = target.position - entity.position
   if direction:abs2() ~= 1 then return end
 
-  Log.debug("Attempt at attacking %s" % Name.code(target))
+  Log.debug("Attempt at attacking %s", Name.code(target))
   entity:rotate(direction)
   while actions.hand_attack:act(entity) or actions.offhand_attack:act(entity) do
     while not entity.animation.current:starts_with("idle") do

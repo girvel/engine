@@ -54,7 +54,7 @@ methods.report = function(self)
     Log.info(line_report)
   end
 
-  Log.info("Average FPS is %.2f" % {self._total_frames / self._total_time})
+  Log.info("Average FPS is %.2f", self._total_frames / self._total_time)
   Log.report()
 end
 

@@ -80,7 +80,7 @@ local methods = {
   end,
 
   close_menu = function(self)
-    Log.info("Closing", self._mode.type)
+    Log.info("Closing %s", self._mode.type)
     if self._mode.type == "journal" then
       CLOSE_JOURNAL:play()
     end

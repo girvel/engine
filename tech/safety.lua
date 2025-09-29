@@ -51,7 +51,7 @@ safety.call = function(f, ...)
   end, ...)
   if ok then return result end
 
-  Log.error("safety.call error:", result)
+  Log.error("safety.call error: %s", result)
 end
 
 --- Prevents the system from running if the level is not fully loaded

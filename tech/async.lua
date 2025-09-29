@@ -10,11 +10,11 @@ async.resume = function(coroutine_, ...)
   local success, result = coroutine.resume(coroutine_, ...)
   t = love.timer.getTime() - t
   if t > async.lag_threshold then
-    Log.warn("Coroutine lags (%.2f s)\n%s" % {t, debug.traceback()})
+    Log.warn("Coroutine lags (%.2f s)\n%s", t, debug.traceback())
   end
 
   if not success then
-    local message = "Coroutine error: %s\ncoroutine %s" % {result, debug.traceback(coroutine_)}
+    local message = ("Coroutine error: %s\ncoroutine %s"):format(result, debug.traceback(coroutine_))
     if State.debug then
       error(message)
     else

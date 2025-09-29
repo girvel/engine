@@ -156,9 +156,9 @@ methods.ability_check = function(self, to_check, dc)
   local roll = D(20) + self:get_modifier(to_check)
   local result = roll:roll()
 
-  Log.debug("%s rolls check %s: %s against %s" % {
+  Log.debug("%s rolls check %s: %s against %s",
     Name.code(self), to_check, result, dc
-  })
+  )
 
   local success = result >= dc
 

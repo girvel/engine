@@ -20,9 +20,10 @@ local levels, count, tostring_custom
 --- @generic T
 --- @param level log_level
 --- @param trace_shift integer
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.log = function(level, trace_shift, ...)
+log.log = function(level, trace_shift, fmt, ...)
   if count[level] then
     count[level] = count[level] + 1
   end
@@ -31,7 +32,7 @@ log.log = function(level, trace_shift, ...)
     return ...
   end
 
-  local msg = tostring_custom(...)
+  local msg = tostring_custom(fmt):format(...)
 
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
@@ -58,45 +59,51 @@ log.log = function(level, trace_shift, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.trace = function(...)
-  return log.log("trace", 0, ...)
+log.trace = function(fmt, ...)
+  return log.log("trace", 0, fmt, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.debug = function(...)
-  return log.log("debug", 0, ...)
+log.debug = function(fmt, ...)
+  return log.log("debug", 0, fmt, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.info = function(...)
-  return log.log("info", 0, ...)
+log.info = function(fmt, ...)
+  return log.log("info", 0, fmt, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.warn = function(...)
-  return log.log("warn", 0, ...)
+log.warn = function(fmt, ...)
+  return log.log("warn", 0, fmt, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.error = function(...)
-  return log.log("error", 0, ...)
+log.error = function(fmt, ...)
+  return log.log("error", 0, fmt, ...)
 end
 
 --- @generic T
+--- @param fmt any
 --- @param ... T
 --- @return T
-log.fatal = function(...)
-  return log.log("fatal", 0, ...)
+log.fatal = function(fmt, ...)
+  return log.log("fatal", 0, fmt, ...)
 end
 
 log.report = function()

@@ -40,7 +40,7 @@ end
 --- @param other entity
 methods.interact = function(self, other)
   local item = require("engine.tech.item")
-  Log.debug("%s interacts with %s" % {Name.code(other), Name.code(self)})
+  Log.debug("%s interacts with %s", Name.code(other), Name.code(self))
   self.was_interacted_by = other
   item.set_cue(self, "highlight", false)
   if self.on_interact then

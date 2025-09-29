@@ -22,7 +22,7 @@ ffi_fix.load = function(name)
     "engine/lib/" .. name .. extension,
   }) do
     local ok, result = pcall(ffi.load, path)
-    Log.info("Loading %s @ %s: %s, %s" % {name, path, ok, result})
+    Log.info("Loading %s @ %s: %s, %s", name, path, ok, result)
     if ok then return result end
   end
 

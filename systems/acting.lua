@@ -53,8 +53,8 @@ return Tiny.processingSystem {
       end)
     then
       Log.info(
-        "Combat ends as only %s are left standing"
-         % table.concat(Fun.iter(State.combat.list)
+        "Combat ends as only %s are left standing",
+         table.concat(Fun.iter(State.combat.list)
           :map(Name.code)
           :totable(), ", ")
       )
@@ -116,7 +116,7 @@ return Tiny.processingSystem {
       and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
 
     if is_timeout_reached then
-      Log.warn("%s's combat move timed out" % {Name.code(current)})
+      Log.warn("%s's combat move timed out", Name.code(current))
     end
 
     if is_timeout_reached or coroutine.status(ai._control_coroutine) == "dead" then
@@ -127,7 +127,7 @@ return Tiny.processingSystem {
       State.combat:_pass_turn()
 
       current = State.combat:get_current()
-      Log.info("%s's turn" % {Name.code(current)})
+      Log.info("%s's turn", Name.code(current))
       State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 
       self:_update_conditions(entity, 6)

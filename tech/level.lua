@@ -13,7 +13,7 @@ level.unsafe_move = function(entity, position)
 
   local grid = State.grids[entity.grid_layer]
   if grid[position] then
-    Log.warn("level.unsafe_move: replacing %s with %s" % {Name.code(grid[position]), Name.code(entity)})
+    Log.warn("level.unsafe_move: replacing %s with %s", Name.code(grid[position]), Name.code(entity))
   end
   grid[entity.position] = nil
   grid[position] = entity
@@ -52,9 +52,9 @@ level.put = function(entity)
   if prev == entity then return end
 
   if State.is_loaded and prev then
-    Log.warn("Grid collision at %s[%s]: %s replaces %s" % {
+    Log.warn("Grid collision at %s[%s]: %s replaces %s",
       entity.grid_layer, entity.position, Name.code(entity), Name.code(grid[entity.position])
-    })
+    )
   end
 
   grid[entity.position] = entity

@@ -10,7 +10,7 @@ return function(args)
   Log.info("Started love.load")
 
   args = cli.parse(args)
-  Log.info("CLI args:", args)
+  Log.info("CLI args: %s", args)
 
   if args.profiler then
     Profile.start()

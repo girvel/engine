@@ -33,11 +33,11 @@ methods.set = function(self, faction_a, faction_b, value)
   local key = faction_a .. "_to_" .. faction_b
   if self._are_hostile[key] == value then return end
 
-  Log.info("%s %s hostile towards %s" % {
+  Log.info("%s %s hostile towards %s",
     faction_a,
     value and "becomes" or "stops being",
-    faction_b,
-  })
+    faction_b
+  )
   self._are_hostile[key] = value
 end
 

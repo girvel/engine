@@ -90,7 +90,7 @@ methods.update = function(self, dt)
           end
 
           if not scene.boring_flag then
-            Log.info("Scene %q starts" % {scene_name})
+            Log.info("Scene %q starts", scene_name)
           end
 
           safety.call(scene.run, scene, characters)
@@ -106,7 +106,7 @@ methods.update = function(self, dt)
           end
 
           if not scene.boring_flag then
-            Log.info("Scene %q ends" % {scene_name})
+            Log.info("Scene %q ends", scene_name)
           end
         end),
         base_scene = scene,
@@ -165,10 +165,10 @@ methods.stop = function(self, scene)
     end
   end
 
-  Log.info("Stopping scene %s; interrupted %s runs" % {
+  Log.info("Stopping scene %s; interrupted %s runs",
     Table.key_of(self.scenes, scene) or Inspect(scene),
-    old_length - new_length,
-  })
+    old_length - new_length
+  )
 end
 
 --- @param scene integer|string|scene
@@ -176,7 +176,7 @@ methods.remove = function(self, scene)
   local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
   if not key then return end
   self.scenes[key] = nil
-  Log.info("Removed scene", key)
+  Log.info("Removed scene %s", key)
   self:stop(scene)  -- yields => goes last
 end
 
@@ -214,7 +214,7 @@ end
 
 scene_run_mt.__serialize = function(self)
   if not self.base_scene.save_flag and not self.base_scene.save_safety then
-    Log.warn("Scene %s is active when saving" % {self.name})
+    Log.warn("Scene %s is active when saving", self.name)
   end
   return "nil"
 end

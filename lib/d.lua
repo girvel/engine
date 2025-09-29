@@ -146,7 +146,7 @@ methods.roll = function(self)
     table.concat(
       Fun.zip(self.dice, rolls)
         :map(function(d, r)
-          return "%s (%s)" % {r, tostring(d)}
+          return ("%s (%s)"):format(r, tostring(d))
         end)
         :totable(),
       " + "
