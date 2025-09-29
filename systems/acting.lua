@@ -4,11 +4,24 @@ local animated = require "engine.tech.animated"
 
 
 --- @class ai
---- @field init? fun(entity)
---- @field deinit? fun(entity)
---- @field control? fun(entity)
---- @field observe? fun(entity, number)
 --- @field _control_coroutine? thread
+local sample_methods = {}
+
+--- @param entity entity
+sample_methods.init = function(self, entity) end
+
+--- @param entity entity
+sample_methods.deinit = function(self, entity) end
+
+--- @async
+--- @param entity entity
+sample_methods.control = function(self, entity) end
+
+--- @async
+--- @param entity entity
+--- @param dt number
+sample_methods.observe = function(self, entity, dt) end
+
 
 local MOVE_TIMEOUT = 6
 local AI_RANGE = 50
@@ -23,13 +36,13 @@ return Tiny.processingSystem {
 
   onAdd = function(self, entity)
     if entity.ai.init then
-      entity.ai.init(entity)
+      entity.ai:init(entity)
     end
   end,
 
   onRemove = function(self, entity)
     if entity.ai.deinit then
-      entity.ai.deinit(entity)
+      entity.ai:deinit(entity)
     end
   end,
 
@@ -94,7 +107,7 @@ return Tiny.processingSystem {
 
     table.insert(self._active_ais, Name.code(entity))
     if ai.observe then
-      ai.observe(entity, dt)
+      ai:observe(entity, dt)
     end
 
     local current = State.combat:get_current()
@@ -110,7 +123,7 @@ return Tiny.processingSystem {
       self._move_start_t = love.timer.getTime()
     end
 
-    async.resume(ai._control_coroutine, entity, dt)
+    async.resume(ai._control_coroutine, ai, entity)
 
     local is_timeout_reached = current ~= State.player
       and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
@@ -139,7 +152,7 @@ return Tiny.processingSystem {
 
     table.insert(self._active_ais, Name.code(entity))
     if ai.observe then
-      ai.observe(entity, dt)
+      ai:observe(entity, dt)
     end
 
     if not ai.control then
@@ -153,7 +166,7 @@ return Tiny.processingSystem {
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
     end
 
-    async.resume(ai._control_coroutine, entity, dt)
+    async.resume(ai._control_coroutine, ai, entity, dt)
 
     if coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil

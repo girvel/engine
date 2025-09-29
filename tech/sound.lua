@@ -55,9 +55,9 @@ sound.source = function(dir_path, volume, size)
   return {
     ai = {
       _last_sound = nil,
-      observe = function(entity, dt)
-        if entity.ai._last_sound and entity.ai._last_sound.source:isPlaying() then return end
-        entity.ai._last_sound = soundpack:play_at(entity.position, size)
+      observe = function(self, entity, dt)
+        if self._last_sound and self._last_sound.source:isPlaying() then return end
+        self._last_sound = soundpack:play_at(entity.position, size)
       end,
     }
   }

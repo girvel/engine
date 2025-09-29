@@ -11,7 +11,7 @@ local combat_ai = {}
 
 --- @class combat_ai: ai
 --- @field targeting ai_targeting
---- @field _hostility_subcription function
+--- @field _hostility_subscription function
 local methods = {}
 local mt = {__index = methods}
 
@@ -31,8 +31,8 @@ combat_ai.new = function(targeting)
 end
 
 --- @param entity entity
-methods.init = function(entity)
-  entity.ai._hostility_subcription = State.hostility:subscribe(function(attacker, target)
+methods.init = function(self, entity)
+  self._hostility_subscription = State.hostility:subscribe(function(attacker, target)
     if entity.hp > 0 and entity.faction and target == entity then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       if not State:in_combat(entity) then
@@ -45,8 +45,8 @@ methods.init = function(entity)
 end
 
 --- @param entity entity
-methods.deinit = function(entity)
-  State.hostility:unsubscribe(entity.ai._hostility_subscription)
+methods.deinit = function(self, entity)
+  State.hostility:unsubscribe(self._hostility_subscription)
 end
 
 local preserve_line_of_fire = function(entity, target)
@@ -95,11 +95,10 @@ local preserve_line_of_fire = function(entity, target)
 end
 
 --- @param entity entity
-methods.control = function(entity)
+methods.control = function(self, entity)
   if not State.combat or State.rails.runner.locked_entities[State.player] then return end
 
-  local ai = entity.ai  --[[@as combat_ai]]
-  local target = tk.find_target(entity, ai.targeting.range)
+  local target = tk.find_target(entity, self.targeting.range)
   if not target then
     State.combat:remove(entity)
     return
@@ -120,22 +119,21 @@ end
 
 --- @param entity entity
 --- @param dt number
-methods.observe = function(entity, dt)
+methods.observe = function(self, entity, dt)
   if State.rails.runner.locked_entities[State.player] or entity.hp <= 0 then return end
-  local ai = entity.ai  --[[@as combat_ai]]
 
-  if not Random.chance(dt / ai.targeting.scan_period) then return end
+  if not Random.chance(dt / self.targeting.scan_period) then return end
 
   -- starting/joining combat
   if (not State.combat or not Table.contains(State.combat.list, entity)) then
-    local target = tk.find_target(entity, ai.targeting.scan_range)
+    local target = tk.find_target(entity, self.targeting.scan_range)
 
     local condition = not not target
     if target == State.player then
       condition = (
         not State.rails.runner.locked_entities[State.player]
         and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-        and (State.player.position - entity.position):abs2() <= ai.targeting.scan_range
+        and (State.player.position - entity.position):abs2() <= self.targeting.scan_range
       )
     end
 

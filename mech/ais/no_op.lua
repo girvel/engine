@@ -9,12 +9,10 @@ no_op.mt = {__index = methods}
 
 --- @return no_op_ai
 no_op.new = function()
-  return setmetatable({
-    
-  }, no_op.mt)
+  return setmetatable({}, no_op.mt)
 end
 
-methods.control = function(entity)
+methods.control = function(self, entity)
   async.sleep(1)
 end
 

@@ -20,7 +20,7 @@ projectile.launch = function(parent, slot, target, speed)
     direction = Vector.right,
     drift = Vector.zero,
     ai = {
-      observe = function(entity)
+      observe = function(self, entity)
         local target_position if getmetatable(target) == Vector.mt then
           target_position = target + V(.5, .5)
         else

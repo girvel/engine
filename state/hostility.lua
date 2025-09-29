@@ -42,9 +42,11 @@ methods.set = function(self, faction_a, faction_b, value)
 end
 
 --- @param f fun(entity, entity)
+--- @return fun(entity, entity)
 methods.subscribe = function(self, f)
   Ldump.ignore_upvalue_size(f)
   table.insert(self._agression_subscriptions, f)
+  return f
 end
 
 --- @param f fun(entity, entity)

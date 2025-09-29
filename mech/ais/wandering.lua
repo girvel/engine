@@ -9,6 +9,7 @@ local wandering = {}
 --- @field targeting ai_targeting
 --- @field _frequency_k number
 --- @field _target? entity
+--- @field _hostility_sub function
 local methods = {}
 wandering.mt = {__index = methods}
 
@@ -30,8 +31,8 @@ wandering.new = function(frequency_k, targeting)
 end
 
 --- @param entity entity
-methods.init = function(entity)
-  entity.ai._hostility_subcription = State.hostility:subscribe(function(attacker, target)
+methods.init = function(self, entity)
+  self._hostility_sub = State.hostility:subscribe(function(attacker, target)
     if entity.faction and target.faction == entity.faction then
       local ai = entity.ai  --[[@as wandering_ai]]
       State.hostility:set(entity.faction, attacker.faction, "enemy")
@@ -42,33 +43,30 @@ methods.init = function(entity)
 end
 
 --- @param entity entity
-methods.deinit = function(entity)
-  State.hostility:unsubscribe(entity.ai._hostility_subcription)
+methods.deinit = function(self, entity)
+  State.hostility:unsubscribe(self._hostility_sub)
 end
 
 --- @param entity entity
 --- @param dt number
-methods.observe = function(entity, dt)
-  local ai = entity.ai  --[[@as wandering_ai]]
-  if (not ai._target or (ai._target.position - entity.position):abs2() > ai.targeting.range)
-    and Period(ai.targeting.scan_period, ai, "target_scan")
+methods.observe = function(self, entity, dt)
+  if (not self._target or (self._target.position - entity.position):abs2() > self.targeting.range)
+    and Period(self.targeting.scan_period, self, "target_scan")
   then
-    ai._target = tk.find_target(entity, ai.targeting.scan_range)
+    self._target = tk.find_target(entity, self.targeting.scan_range)
   end
 end
 
 --- @param entity entity
-methods.control = function(entity)
-  local ai = entity.ai  --[[@as wandering_ai]]
-
-  if ai._target then
-    while ai._target and entity.resources.movement > 0 do
+methods.control = function(self, entity)
+  if self._target then
+    while self._target and entity.resources.movement > 0 do
       local distance = 0
       local direction
       for _, d in ipairs(Vector.directions) do
         local p = entity.position + d
         if not State.grids.solids:slow_get(p, true) then
-          local this_distance = (ai._target.position - p):abs2()
+          local this_distance = (self._target.position - p):abs2()
           if this_distance > distance then
             distance = this_distance
             direction = d
@@ -80,7 +78,7 @@ methods.control = function(entity)
       async.sleep(.2)
     end
   else
-    async.sleep(math.random(0.5, 7) / ai._frequency_k)
+    async.sleep(math.random(0.5, 7) / self._frequency_k)
     actions.move(Random.choice(Vector.directions)):act(entity)
   end
 end

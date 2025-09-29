@@ -22,28 +22,28 @@ end
 local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
 
 --- @param entity player
-methods.control = function(entity)
+methods.control = function(self, entity)
   if State.combat then
     YOUR_TURN:play()
   end
 
   while true do
-    for i, a in ipairs(entity.ai._next_actions) do
+    for i, a in ipairs(self._next_actions) do
       local ok = a:act(entity)
-      entity.ai._action_promises[i]:resolve(ok)
+      self._action_promises[i]:resolve(ok)
     end
-    entity.ai._next_actions = {}
-    entity.ai._action_promises = {}
+    self._next_actions = {}
+    self._action_promises = {}
 
-    if not State.combat or entity.ai.finish_turn then break end
+    if not State.combat or self.finish_turn then break end
     coroutine.yield()
   end
-  entity.ai.finish_turn = false
+  self.finish_turn = false
 end
 
 --- @param entity player
 --- @param dt number
-methods.observe = function(entity, dt)
+methods.observe = function(self, entity, dt)
   if State.combat and not Table.contains(State.combat.list, entity) then
     State:start_combat({entity})
   end
