@@ -183,12 +183,11 @@ load_pack = Memoize(function(folder_path, is_atlas)
     end
 
     if is_atlas then
-      local image = love.graphics.newImage(data)
       for i = 1, parts_n do
         local pack = result[i]
         pack[animation_name] = pack[animation_name] or {}
         pack[animation_name][frame_i] = sprite.image(
-          sprite.utility.cut_out(image, sprite.utility.get_atlas_quad(i, 16, w, h))
+          sprite.utility.select(data, i)
         )
       end
     else

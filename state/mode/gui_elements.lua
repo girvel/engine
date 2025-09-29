@@ -1,12 +1,10 @@
 local sprite = require("engine.tech.sprite")
 
 
-local ICON_ATLAS = love.graphics.newImage("engine/assets/sprites/gui/icons.png")
+local ICON_ATLAS = love.image.newImageData("engine/assets/sprites/gui/icons.png")
 
 local nth = function(index)
-  return love.graphics.newImage(sprite.utility.cut_out(
-    ICON_ATLAS, sprite.utility.get_atlas_quad(index, 16, ICON_ATLAS:getDimensions())
-  ))
+  return love.graphics.newImage(sprite.utility.select(ICON_ATLAS, index))
 end
 
 local gui_elements = {

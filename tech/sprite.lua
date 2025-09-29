@@ -3,7 +3,7 @@ local ffi = require("ffi")
 
 local sprite = {utility = {}}
 
-local pull_anchors
+local pull_anchors, cut_out
 
 --- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid
 
@@ -41,7 +41,7 @@ sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   return {
     type = "atlas",
     quad = quad,
-    image = love.graphics.newImage(sprite.utility.cut_out(atlas_image, quad)),
+    image = love.graphics.newImage(cut_out(atlas_image, quad)),
   }
 end)
 
@@ -77,10 +77,33 @@ sprite.grid = function(grid)
   }
 end
 
+--- @param base love.ImageData
+--- @param n integer
+sprite.utility.select = function(base, n)
+  local w, h = 16, 16
+  local result = love.image.newImageData(w, h)
+  local base_w = base:getWidth()
+
+  local dx = ((n - 1) * w) % base_w
+  local dy = math.floor(((n - 1) * w) / base_w) * h
+
+  local base_ptr = ffi.cast("Color*", base:getFFIPointer())
+  local result_ptr = ffi.cast("Color*", result:getFFIPointer())
+
+  for x = 0, w - 1 do
+    for y = 0, h - 1 do
+      result_ptr[y * w + x] = base_ptr[(dy + y) * base_w + (dx + x)]
+    end
+  end
+
+  return result
+end
+
 --- @param index integer
 --- @param cell_size integer
 --- @param atlas_w integer
 --- @param atlas_h integer
+--- @return love.Quad
 sprite.utility.get_atlas_quad = function(index, cell_size, atlas_w, atlas_h)
   local w = atlas_w
   local x = (index - 1) * cell_size
@@ -100,7 +123,7 @@ end)
 --- @param image love.Image
 --- @param quad love.Quad
 --- @return love.ImageData
-sprite.utility.cut_out = function(image, quad)
+cut_out = function(image, quad)
   local canvas = image_to_canvas(image)
   return canvas:newImageData(0, nil, quad:getViewport())
 end
