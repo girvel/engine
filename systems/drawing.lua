@@ -16,7 +16,13 @@ return Tiny.sortedProcessingSystem {
   end,
 
   process = function(_, entity, dt)
+    if State.shader then
+      love.graphics.setShader(State.shader.love_shader)
+    end
     State.mode:draw_entity(entity, dt)
+    if State.shader then
+      love.graphics.setShader()
+    end
   end,
 
   postProcess = function(_, dt)
