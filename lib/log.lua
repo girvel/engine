@@ -14,7 +14,7 @@ end
 log.usecolor = true
 log.level = "trace"
 
-local levels, count, tostring_custom
+local levels, count, pretty
 
 
 --- @generic T
@@ -32,7 +32,7 @@ log.log = function(level, trace_shift, fmt, ...)
     return ...
   end
 
-  local msg = tostring_custom(fmt):format(...)
+  local msg = tostring(pretty(fmt)):format(pretty(...))
 
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
@@ -136,27 +136,16 @@ count = {
   fatal = 0,
 }
 
-tostring_custom = function(...)
-  local result = ""
+pretty = function(...)
+  local result = {}
   for i = 1, select('#', ...) do
-    if i > 1 then
-      result = result .. " "
-    end
     local x = select(i, ...)
-    if type(x) == "number" then
-      if x % 1 > 0 then
-        x = ("%.2f"):format(x)
-      else
-        x = ("%s"):format(x)
-      end
-    elseif type(x) == "table" then
-      x = inspect(x, {depth = 3})
-    else
-      x = tostring(x)
+    if type(x) == "table" then
+      x = Name.code(x, nil) or inspect(x, {depth = 3})
     end
-    result = result .. x
+    result[i] = x
   end
-  return result
+  return unpack(result)
 end
 
 return log
