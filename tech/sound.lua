@@ -76,6 +76,7 @@ sound.sizes = {
 methods.clone = function(self)
   return setmetatable({
     source = self.source:clone(),
+    _path = self._path,
   }, mt)
 end
 
