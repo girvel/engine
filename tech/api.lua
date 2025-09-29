@@ -318,7 +318,7 @@ end
 --- @param color vector
 --- @return promise, scene
 api.curtain = function(duration, color)
-  return Runner:run_task(function()
+  return State.runner:run_task(function()
     local start_time = love.timer.getTime()
     local start_color = State.player.curtain_color
     local dcolor = color - start_color

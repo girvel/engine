@@ -44,8 +44,6 @@ end
 
 local scene_run_mt = {}
 
-local env
-
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
@@ -67,7 +65,7 @@ methods.update = function(self, dt)
       and Fun.pairs(characters):all(function(_, c)
         return State:exists(c) and not self.locked_entities[c]
       end)
-      and env(scene.start_predicate, scene, dt, characters)
+      and scene:start_predicate(dt, characters)
     then
       for _, character in pairs(characters) do
         self.locked_entities[character] = true
@@ -108,7 +106,7 @@ methods.update = function(self, dt)
 
   local indexes_to_remove = {}
   for i, run in ipairs(self._scene_runs) do
-    env(async.resume, run.coroutine)
+    async.resume(run.coroutine)
 
     if coroutine.status(run.coroutine) == "dead" then
       table.insert(indexes_to_remove, i)
@@ -208,13 +206,6 @@ scene_run_mt.__serialize = function(self)
     Log.warn("Scene %s is active when saving", self.name)
   end
   return "nil"
-end
-
-env = function(f, ...)
-  Runner = State.runner
-  local result = f(...)
-  Runner = (nil --[[@as state_runner]])
-  return result
 end
 
 Ldump.mark(runner, {}, ...)
