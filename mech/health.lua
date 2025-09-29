@@ -54,10 +54,12 @@ health.damage = function(target, amount, is_critical)
         target:animate("lying")
         coroutine.yield()
         target:animation_set_paused(true)
-      end)
+      end, "essential_down")
+
       if State:in_combat(target) then
         State.combat:remove(target)
       end
+
       return
     end
 

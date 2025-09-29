@@ -54,8 +54,8 @@ api.travel_scripted = function(entity, destination)
 
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
-  end)
-  scene.save_safety = function()
+  end, "travel_scripted")
+  scene.on_cancel = function()
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
     promise:resolve()
@@ -250,7 +250,7 @@ api.move_camera = function(position)
     while State.perspective.is_moving do coroutine.yield() end
     State.perspective.target_override = nil
     State.perspective.is_camera_following = false
-  end)
+  end, "move_camera")
 end
 
 api.free_camera = function()
@@ -260,7 +260,7 @@ api.free_camera = function()
     State.perspective.is_camera_following = true
     coroutine.yield()
     while State.perspective.is_moving do coroutine.yield() end
-  end)
+  end, "free_camera")
 end
 
 --- @param name? string
@@ -276,7 +276,7 @@ api.autosave = function(name)
     -- )
     Kernel:plan_save(name or "autosave")
     Log.info("Autosave")
-  end)
+  end, "autosave")
   api.notification("Игра сохранена")
 end
 
@@ -297,7 +297,7 @@ api.notification = function(text)
     State.player.notification = text
     async.sleep(5)
     State.player.notification = nil
-  end)
+  end, "notification")
 end
 
 --- @param kind "new_task"|"task_completed"
@@ -331,7 +331,7 @@ api.curtain = function(duration, color)
       coroutine.yield()
     end
     State.player.curtain_color = color
-  end)
+  end, "curtain")
 end
 
 Ldump.mark(api, {}, ...)

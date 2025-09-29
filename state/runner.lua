@@ -16,7 +16,7 @@ local runner = {}
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
---- @field save_safety? fun(scene) runs when the scene run is discarded during loading
+--- @field on_cancel? fun(self: scene) runs when the scene run is discarded during loading
 
 --- @class scene_run
 --- @field coroutine thread
@@ -143,6 +143,7 @@ methods.stop = function(self, scene)
 
   local new_length = #self._scene_runs
 
+  local did_on_cancel_run = false
   if new_length ~= old_length then
     coroutine.yield()
     for character, _ in pairs(scene.characters or {}) do
@@ -154,11 +155,17 @@ methods.stop = function(self, scene)
       State.perspective.is_camera_following = true
       State.player.curtain_color = Vector.transparent
     end
+
+    if scene.on_cancel then
+      did_on_cancel_run = true
+      scene:on_cancel()
+    end
   end
 
-  Log.info("Stopping scene %s; interrupted %s runs",
+  Log.info("Stopping scene %s; interrupted %s runs%s",
     Table.key_of(self.scenes, scene) or Inspect(scene),
-    old_length - new_length
+    old_length - new_length,
+    did_on_cancel_run and "; used :on_cancel" or ""
   )
 end
 
@@ -172,13 +179,10 @@ methods.remove = function(self, scene)
 end
 
 --- @param f fun(scene, characters)
+--- @param name? string
 --- @return promise, scene
-methods.run_task = function(self, f)
-  local key
-  for i = 1, math.huge do
-    key = "task_" .. i
-    if not self.scenes[key] then break end
-  end
+methods.run_task = function(self, f, name)
+  local key = ("%s_%s"):format(name or "task", State.uid:next())
 
   local end_promise = Promise.new()
   local scene = {
@@ -188,7 +192,7 @@ methods.run_task = function(self, f)
     run = function(self_scene)
       f(self_scene)
       end_promise:resolve()
-      self.scenes[key] = nil  -- not in the beginning: sometimes scene should handle save_safety
+      self.scenes[key] = nil  -- not in the beginning: sometimes scene should handle on_cancel
     end,
   }
   self.scenes[key] = scene
@@ -196,16 +200,17 @@ methods.run_task = function(self, f)
 end
 
 methods.handle_loading = function(self)
-  for _, scene in pairs(self.scenes) do
-    if scene.save_safety then
-      scene:save_safety()
+  for name, scene in pairs(self.scenes) do
+    if scene.on_cancel then
+      scene:on_cancel()
+      Log.debug("Scene %s safely cancelled in save", name)
     end
   end
 end
 
 scene_run_mt.__serialize = function(self)
-  if not self.base_scene.save_flag and not self.base_scene.save_safety then
-    Log.warn("Scene %s is active when saving", self.name)
+  if not self.base_scene.save_flag and not self.base_scene.on_cancel then
+    Log.warn("Scene %s cancelled in save with no :on_cancel defined", self.name)
   end
   return "nil"
 end

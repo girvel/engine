@@ -247,7 +247,7 @@ methods.start_combat = function(self, list)
       Log.info("Combat starts: %s", repr)
       State.combat = combat.new(list)
     end
-  end)
+  end, "start_combat")
 end
 
 --- @param entity entity
