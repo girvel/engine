@@ -293,11 +293,17 @@ local NOTIFICATION_SOUND = sound.multiple("engine/assets/sounds/notification", .
 --- @param text string
 api.notification = function(text)
   NOTIFICATION_SOUND:play()
-  State.runner:run_task(function()
+  local _, scene = State.runner:run_task(function()
     State.player.notification = text
     async.sleep(5)
     State.player.notification = nil
   end, "notification")
+
+  scene.on_cancel = function()
+    if State.player.notification == text then
+      State.player.notification = nil
+    end
+  end
 end
 
 --- @param kind "new_task"|"task_completed"
