@@ -10,7 +10,7 @@ local parser_new
 --- @field cell_size integer
 --- @field layers string[] global layers in order
 --- @field rails_factory (fun(...): rails)
---- @field scenes table<string|number, scene|table>
+--- @field scenes runner_scenes
 
 --- General information about the level
 --- @class level_info
@@ -26,7 +26,7 @@ local parser_new
 --- @field rails rails
 --- @field runner_entities table<string, entity>
 --- @field runner_positions table<string, vector>
---- @field runner_scenes table<string|number, scene|table>
+--- @field runner_scenes runner_scenes
 
 --- Read LDtk level file
 --- @async

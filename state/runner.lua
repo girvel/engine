@@ -5,6 +5,7 @@ local async = require("engine.tech.async")
 local runner = {}
 
 --- @alias runner_characters table<string, entity>
+--- @alias runner_scenes table<string|integer, scene|table>
 
 --- @class scene
 --- @field characters? table<string, table>
@@ -22,7 +23,7 @@ local runner = {}
 --- @field base_scene scene
 
 --- @class state_runner
---- @field scenes table<string|integer, scene|table>
+--- @field scenes runner_scenes
 --- @field positions table<string, vector>
 --- @field entities table<string, entity>
 --- @field locked_entities table<entity, true>
