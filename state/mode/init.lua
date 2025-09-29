@@ -26,12 +26,12 @@ local empty_f = function() end
 local methods = {
   _set_mode = function(self, mode)
     self._mode = mode
-    self.draw_gui = mode.draw_gui and function(self, ...)
+    self.draw_gui = mode.draw_gui and Ldump.ignore_upvalue_size(function(self, ...)
       return mode:draw_gui(...)
-    end or empty_f
-    self.draw_entity = mode.draw_entity and function(self, ...)
+    end) or empty_f
+    self.draw_entity = mode.draw_entity and Ldump.ignore_upvalue_size(function(self, ...)
       return mode:draw_entity(...)
-    end or empty_f
+    end) or empty_f
   end,
 
   draw_gui = function(self, dt)

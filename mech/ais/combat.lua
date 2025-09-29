@@ -49,51 +49,6 @@ methods.deinit = function(self, entity)
   State.hostility:unsubscribe(self._hostility_subscription)
 end
 
-local preserve_line_of_fire = function(entity, target)
-  local best_p
-  for d in iteration.rhombus(entity.resources.movement) do
-    local p = entity.position + d
-    if not State.grids.solids:can_fit(p) then goto continue end
-
-    local snapshot = tcod.copy(State.grids.solids)
-    snapshot:refresh_fov(p, actions.BOW_ATTACK_RANGE)
-
-    if snapshot:is_visible_unsafe(unpack(target.position)) then
-      best_p = p
-      if State.debug then
-        Log.trace("found %s", best_p)
-        for i in pairs(State.debug_overlay.points) do
-          State.debug_overlay.points[i] = nil
-        end
-        local i = 0
-        for dx = -10, 10 do
-          for dy = -10, 10 do
-            i = i + 1
-            if snapshot:is_visible_unsafe(p.x + dx, p.y + dy) then
-              State.debug_overlay.points[i] = {
-                position = p + V(dx, dy),
-                color = (not snapshot:is_transparent_unsafe(p.x + dx, p.y + dy))
-                  and Vector.hex("ff0000") or Vector.white,
-                view = "grid",
-              }
-            end
-          end
-        end
-      end
-      break
-    end
-    snapshot:free()
-
-    ::continue::
-  end
-
-  if best_p then
-    api.travel(entity, best_p)
-  else
-    api.travel(entity, target.position)
-  end
-end
-
 --- @param entity entity
 methods.control = function(self, entity)
   if not State.combat or State.runner.locked_entities[State.player] then return end
@@ -106,7 +61,7 @@ methods.control = function(self, entity)
 
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
-    preserve_line_of_fire(entity, target)
+    tk.preserve_line_of_fire(entity, target)
     local bow_attack = actions.bow_attack(target)
     while bow_attack:act(entity) do
       async.sleep(.66)
