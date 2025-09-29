@@ -142,7 +142,7 @@ cli.exe = function(args)
   local version_suffix = read_run("git tag --points-at")
   if #version_suffix > 0 then
     log.info("Detected git tag", version_suffix)
-    version_suffix = "_" .. version_suffix:sub(1, -2)
+    version_suffix = "_" .. version_suffix
     -- strips \n
   end
   local versioned_name = name .. version_suffix
