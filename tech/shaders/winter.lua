@@ -1,7 +1,9 @@
 --- @param tint vector 3-dimensional
 --- @param intensity number
---- @param darkness_factor number
-local build_love_shader = function(tint, intensity, darkness_factor)
+--- @param brightness number
+--- @param contrast_midpoint number
+--- @param contrast_factor number
+local build_love_shader = function(tint, intensity, brightness, contrast_midpoint, contrast_factor)
   assert(#tint == 3)
 
   local result = love.graphics.newShader(
@@ -9,7 +11,9 @@ local build_love_shader = function(tint, intensity, darkness_factor)
   )
   result:send("tint", tint)
   result:send("intensity", intensity)
-  result:send("darkness_factor", darkness_factor)
+  result:send("brightness", brightness)
+  result:send("contrast_midpoint", contrast_midpoint)
+  result:send("contrast_factor", contrast_factor)
   return result
 end
 
@@ -17,7 +21,8 @@ end
 local winter = {
   love_shader = build_love_shader(
     Vector.hex("3e4957"):swizzle("rgb"),
-    .3, .9
+    .6, 1.2,
+    V(.5, .5, .5), 1.5
   ),
 }
 
