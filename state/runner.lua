@@ -5,12 +5,13 @@ local async = require("engine.tech.async")
 local runner = {}
 
 --- @alias runner_characters table<string, entity>
+--- @alias runner_positions table<string, vector>
 --- @alias runner_scenes table<string|integer, scene|table>
 
 --- @class scene
 --- @field characters? table<string, table>
---- @field start_predicate fun(scene, integer, characters): boolean
---- @field run fun(scene, characters)
+--- @field start_predicate fun(self: scene, dt: integer, ch: runner_characters, ps: runner_positions): boolean
+--- @field run fun(self: scene, ch: runner_characters, ps: runner_positions)
 --- @field enabled? true
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
@@ -66,7 +67,7 @@ methods.update = function(self, dt)
       and Fun.pairs(characters):all(function(_, c)
         return State:exists(c) and not self.locked_entities[c]
       end)
-      and scene:start_predicate(dt, characters)
+      and scene:start_predicate(dt, characters, self.positions)
     then
       for _, character in pairs(characters) do
         self.locked_entities[character] = true
@@ -83,7 +84,7 @@ methods.update = function(self, dt)
             Log.info("Scene %q starts", scene_name)
           end
 
-          safety.call(scene.run, scene, characters)
+          safety.call(scene.run, scene, characters, self.positions)
 
           for _, character in pairs(characters) do
             self.locked_entities[character] = nil
