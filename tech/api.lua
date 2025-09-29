@@ -19,6 +19,17 @@ api.wait = function(seconds)
 end
 
 --- @param entity entity
+--- @param position vector
+--- @param is_strict? boolean
+api.assert_position = function(entity, position, is_strict)
+  if entity.position == position then return end
+  local free_position = not is_strict
+    and State.grids.solids:find_free_position(position)
+    or position
+  level.unsafe_move(entity, free_position)
+end
+
+--- @param entity entity
 --- @param intermediate_point vector
 --- @param destination vector
 --- @return promise, scene
