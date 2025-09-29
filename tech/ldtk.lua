@@ -9,7 +9,8 @@ local parser_new
 --- @field palette table<string, table<string | integer, function>>
 --- @field cell_size integer
 --- @field layers string[] global layers in order
---- @field rails? {factory: (fun(...): rails), scenes: scene[]}
+--- @field rails_factory (fun(...): rails)
+--- @field scenes table<string|number, scene|table>
 
 --- General information about the level
 --- @class level_info
@@ -309,13 +310,13 @@ parser_new = function()
         end
       end
 
-      local rails = level_module.rails.factory()
+      local rails = level_module.rails_factory()
 
       return {
         entities = self._entities,
         level_info = self._level_info,
         rails = rails,
-        runner_scenes = level_module.rails.scenes,
+        runner_scenes = level_module.scenes,
         runner_positions = self._captures.positions,
         runner_entities = self._captures.entities,
       }
