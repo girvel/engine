@@ -63,7 +63,7 @@ local PADDING_Y = 40
 local SIDEBAR_W = 344  -- (usable)
 
 draw_sidebar = function(self)
-  if State.rails.runner.locked_entities[State.player] then
+  if State.runner.locked_entities[State.player] then
     State.perspective.sidebar_w = 0
     return
   end
@@ -547,7 +547,7 @@ draw_notification = function()
 end
 
 draw_suggestion = function()
-  if State.rails.runner.locked_entities[State.player] then return end
+  if State.runner.locked_entities[State.player] then return end
   local target = interactive.get_for(State.player)  --[[@as item]]
   if not target then return end
 

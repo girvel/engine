@@ -96,7 +96,7 @@ end
 
 --- @param entity entity
 methods.control = function(self, entity)
-  if not State.combat or State.rails.runner.locked_entities[State.player] then return end
+  if not State.combat or State.runner.locked_entities[State.player] then return end
 
   local target = tk.find_target(entity, self.targeting.range)
   if not target then
@@ -120,7 +120,7 @@ end
 --- @param entity entity
 --- @param dt number
 methods.observe = function(self, entity, dt)
-  if State.rails.runner.locked_entities[State.player] or entity.hp <= 0 then return end
+  if State.runner.locked_entities[State.player] or entity.hp <= 0 then return end
 
   if not Random.chance(dt / self.targeting.scan_period) then return end
 
@@ -131,7 +131,7 @@ methods.observe = function(self, entity, dt)
     local condition = not not target
     if target == State.player then
       condition = (
-        not State.rails.runner.locked_entities[State.player]
+        not State.runner.locked_entities[State.player]
         and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
         and (State.player.position - entity.position):abs2() <= self.targeting.scan_range
       )

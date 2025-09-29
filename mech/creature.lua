@@ -249,7 +249,7 @@ methods.get_initiative_roll = function(self)
 end
 
 methods.can_act = function(self)
-  return not State.rails.runner.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
+  return not State.runner.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
 end
 
 Ldump.mark(creature, {

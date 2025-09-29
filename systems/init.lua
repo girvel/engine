@@ -18,7 +18,7 @@ local result = {
   -- love.update
   require("engine.systems.genesis"),
   safety.live_system(require("engine.systems.update_sound")),
-  safety.live_system(require("engine.systems.update_rails")),  -- together with acting
+  safety.live_system(require("engine.systems.update_runner")),  -- together with acting
   safety.live_system(require("engine.systems.acting")),
   safety.live_system(require("engine.systems.animation")),
   require("engine.systems.ui_update"),

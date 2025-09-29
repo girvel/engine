@@ -50,7 +50,7 @@ health.damage = function(target, amount, is_critical)
     end
 
     if target.essential_flag then
-      State.rails.runner:run_task(function()
+      State.runner:run_task(function()
         target:animate("lying")
         coroutine.yield()
         target:animation_set_paused(true)

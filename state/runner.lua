@@ -4,7 +4,7 @@ local async = require("engine.tech.async")
 
 local runner = {}
 
---- @alias rails_characters table<string, entity>
+--- @alias runner_characters table<string, entity>
 
 --- @class scene
 --- @field characters? table<string, table>
@@ -21,7 +21,7 @@ local runner = {}
 --- @field name string
 --- @field base_scene scene
 
---- @class rails_runner
+--- @class state_runner
 --- @field scenes table<string|integer, scene|table>
 --- @field positions table<string, vector>
 --- @field entities table<string, entity>
@@ -31,21 +31,12 @@ local methods = {}
 local mt = {__index = methods}
 
 
---- @param scenes scene[]
---- @return rails_runner
-runner.new = function(scenes, positions, entities)
-  for _, scene in ipairs(State.args.enable_scenes) do
-    scenes[scene].enabled = true
-  end
-
-  for _, scene in ipairs(State.args.disable_scenes) do
-    scenes[scene].enabled = nil
-  end
-
+--- @return state_runner
+runner.new = function()
   return setmetatable({
-    scenes = scenes,
-    positions = Table.strict(positions, "runner position"),
-    entities = Table.strict(entities, "runner entity"),
+    scenes = {},
+    positions = Table.strict({}, "runner position"),
+    entities = Table.strict({}, "runner entity"),
     _scene_runs = {},
     locked_entities = {},
   }, mt)
@@ -63,7 +54,7 @@ methods.update = function(self, dt)
         :map(function(name, opts)
           return name, assert(
             self.entities[name],
-            ("Character %q does not exist in State.rails.runner.entities"):format(name)
+            ("Character %q does not exist in State.runner.entities"):format(name)
           )
         end)
         :tomap(),
@@ -220,9 +211,9 @@ scene_run_mt.__serialize = function(self)
 end
 
 env = function(f, ...)
-  Runner = State.rails.runner
+  Runner = State.runner
   local result = f(...)
-  Runner = (nil --[[@as rails_runner]])
+  Runner = (nil --[[@as state_runner]])
   return result
 end
 

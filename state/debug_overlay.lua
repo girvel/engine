@@ -96,7 +96,7 @@ end
 report_scenes = function()
   if not State.rails then return end
 
-  local scenes = State.rails.runner.scenes
+  local scenes = State.runner.scenes
   local enabled_n, total_n do
     enabled_n = 0
     total_n = 0
@@ -114,7 +114,7 @@ report_scenes = function()
     ui.text((v.enabled and "+" or "-") .. " " .. k)
   end
 
-  local running = State.rails.runner._scene_runs
+  local running = State.runner._scene_runs
   ui.text(("running scenes (%s):"):format(#running))
   for _, v in ipairs(running) do
     ui.text("- " .. v.name)

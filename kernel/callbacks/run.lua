@@ -15,7 +15,7 @@ return function()
           State.mode:close_menu()
         end
         Kernel._load = nil
-        State.rails.runner:handle_loading()
+        State.runner:handle_loading()
       Kernel._total_time = math.max(Kernel._total_time - (love.timer.getTime() - t))
     end
 

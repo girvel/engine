@@ -46,7 +46,7 @@ end
 --- @param destination vector
 --- @return promise, scene
 api.travel_scripted = function(entity, destination)
-  local promise, scene = State.rails.runner:run_task(function()
+  local promise, scene = State.runner:run_task(function()
     local ok = api.travel_persistent(
       entity, destination, math.ceil((entity.position - destination):abs2() / 3)
     )
@@ -162,7 +162,7 @@ end
 --- @param text string
 api.line = function(source, text)
   assert(
-    State.rails.runner.locked_entities[State.player],
+    State.runner.locked_entities[State.player],
     "api.line shouldn't be called when the player is not locked into a cutscene"
   )
 
@@ -242,7 +242,7 @@ end
 --- @param position vector
 --- @return promise, scene
 api.move_camera = function(position)
-  return State.rails.runner:run_task(function()
+  return State.runner:run_task(function()
     State.perspective.is_camera_following = true
     --- @diagnostic disable-next-line
     State.perspective.target_override = {position = position}
@@ -254,7 +254,7 @@ api.move_camera = function(position)
 end
 
 api.free_camera = function()
-  return State.rails.runner:run_task(function()
+  return State.runner:run_task(function()
     --- @diagnostic disable-next-line
     State.perspective.target_override = nil
     State.perspective.is_camera_following = true
@@ -265,13 +265,13 @@ end
 
 --- @param name? string
 api.autosave = function(name)
-  State.rails.runner:run_task(function()
+  State.runner:run_task(function()
     Log.debug("Planned autosave")
-    while State.rails.runner.locked_entities[State.player] do
+    while State.runner.locked_entities[State.player] do
       coroutine.yield()
     end
     -- assert(
-    --   not State.rails.runner.locked_entities[State.player],
+    --   not State.runner.locked_entities[State.player],
     --   "Autosave when the player is locked in a cutscene"
     -- )
     Kernel:plan_save(name or "autosave")
@@ -293,7 +293,7 @@ local NOTIFICATION_SOUND = sound.multiple("engine/assets/sounds/notification", .
 --- @param text string
 api.notification = function(text)
   NOTIFICATION_SOUND:play()
-  State.rails.runner:run_task(function()
+  State.runner:run_task(function()
     State.player.notification = text
     async.sleep(5)
     State.player.notification = nil

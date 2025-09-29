@@ -9,6 +9,7 @@ local state = {}
 
 --- @class state
 --- @field mode state_mode
+--- @field runner state_runner
 --- @field perspective state_perspective
 --- @field combat state_combat?
 --- @field quests state_quests
@@ -38,6 +39,7 @@ state.mt = {__index = methods}
 state.new = function(systems, args)
   return setmetatable({
     mode = require("engine.state.mode").new(),
+    runner = require("engine.state.runner").new(),
     perspective = require("engine.state.perspective").new(),
     quests = require("engine.state.quests").new(),
     hostility = require("engine.state.hostility").new(),
@@ -164,6 +166,18 @@ methods.load_level = function(self, path)
   Log.info("State.level == %s", self.level)
 
   self.rails = load_data.rails
+
+  Table.extend(self.runner.entities, load_data.runner_entities)
+  Table.extend(self.runner.positions, load_data.runner_positions)
+  Table.extend(self.runner.scenes, load_data.runner_scenes)
+
+  for _, name in ipairs(self.args.enable_scenes) do
+    self.runner.scenes[name].enabled = true
+  end
+
+  for _, name in ipairs(self.args.disable_scenes) do
+    self.runner.scenes[name].enabled = nil
+  end
 
   self.grids = Fun.iter(self.level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)

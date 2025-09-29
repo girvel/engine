@@ -27,7 +27,7 @@ end
 
 methods.draw_gui = function(self, dt)
   local in_combat = State.combat
-  local in_cutscene = State.rails.runner.locked_entities[State.player]
+  local in_cutscene = State.runner.locked_entities[State.player]
   if in_combat or in_cutscene then
     tk.start_window("center", "center", 400, 120)
     ui.start_font(28)

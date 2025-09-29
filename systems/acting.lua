@@ -81,7 +81,7 @@ return Tiny.processingSystem {
   end,
 
   process = function(self, entity, dt)
-    if State.rails.runner.locked_entities[entity] then
+    if State.runner.locked_entities[entity] then
       if entity.rest and Period(1, entity, "resource_restoration") then
         entity:rest("move")
       end

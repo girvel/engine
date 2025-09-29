@@ -1,6 +1,3 @@
-local runner = require "engine.tech.runner"
-
-
 --- LDtk level parsing
 local ldtk = {}
 
@@ -22,10 +19,18 @@ local parser_new
 --- @field cell_size integer size of a single grid cell in pixels before scaling
 --- @field grid_size vector
 
+--- @class load_result
+--- @field level_info level_info
+--- @field entities entity[]
+--- @field rails rails
+--- @field runner_entities table<string, entity>
+--- @field runner_positions table<string, vector>
+--- @field runner_scenes table<string|number, scene|table>
+
 --- Read LDtk level file
 --- @async
 --- @param path string
---- @return {level_info: level_info, entities: entity[], rails: rails}
+--- @return load_result
 ldtk.load = function(path)
   return parser_new():parse(path)
 end
@@ -304,14 +309,15 @@ parser_new = function()
         end
       end
 
-      local rails = level_module.rails.factory(runner.new(
-        level_module.rails.scenes, self._captures.positions, self._captures.entities
-      ))
+      local rails = level_module.rails.factory()
 
       return {
         entities = self._entities,
         level_info = self._level_info,
         rails = rails,
+        runner_scenes = level_module.rails.scenes,
+        runner_positions = self._captures.positions,
+        runner_entities = self._captures.entities,
       }
     end,
   }
