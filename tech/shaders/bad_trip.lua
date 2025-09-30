@@ -7,6 +7,7 @@ local bad_trip = {
 
   update = function(self)
     self.love_shader:send("time", love.timer.getTime())
+    self.love_shader:send("sidebar_w", State.perspective.sidebar_w)
   end,
 }
 

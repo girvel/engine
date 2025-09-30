@@ -62,7 +62,7 @@ draw_sidebar = function(self)
     return
   end
 
-  State.perspective.sidebar_w = SIDEBAR_W - PADDING_LX - PADDING_RX
+  State.perspective.sidebar_w = SIDEBAR_W - PADDING_LX - PADDING_RX  -- TODO why -?
 
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING_LX - PADDING_RX)
     ui.tile(gui.window_bg)
