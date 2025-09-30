@@ -10,14 +10,14 @@ local runner = {}
 
 --- @class scene
 --- @field characters? table<string, table>
---- @field start_predicate fun(self: scene, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any
---- @field run fun(self: scene, ch: runner_characters, ps: runner_positions)
+--- @field start_predicate fun(self: scene|table, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any
+--- @field run fun(self: scene|table, ch: runner_characters, ps: runner_positions): any
 --- @field enabled? true
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
---- @field on_add? fun(self: scene) runs when the scene is added
---- @field on_cancel? fun(self: scene) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
+--- @field on_add? fun(self: scene|table) runs when the scene is added
+--- @field on_cancel? fun(self: scene|table) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
