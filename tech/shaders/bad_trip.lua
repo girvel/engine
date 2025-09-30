@@ -29,10 +29,22 @@ bad_trip.mt.__serialize = function(self)
   end
 end
 
+--- @param x number
+--- @param a number left-side slope proportion
+--- @param b number right-side slope proportion
+local pcurve = function(x, a, b)
+  local k = (a + b)^(a + b) / a^a / b^b
+  return k * x^a * (1 - x)^b
+end
+
 methods.update = function(self, dt)
   self.now = self.now + dt
-  local degree = 1 - 2 * math.abs(self.now / self.duration - .5)
-  degree = math.max(degree, 0)
+  local degree
+  if self.now <= self.duration then
+    degree = pcurve(self.now / self.duration, 3, 1)
+  else
+    degree = 0
+  end
   self.love_shader:send("degree", degree)
 end
 
