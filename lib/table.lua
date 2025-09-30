@@ -29,6 +29,18 @@ _table.extend = function(base, extension, ...)
   return _table.extend(base, ...)
 end
 
+--- Same as .extend, but asserts no collisions
+_table.extend_strict = function(base, extension, ...)
+  if extension == nil then return base end
+  for k, v in pairs(extension) do
+    if base[k] then
+      assert(false, "Table.extend_strict collision on key " .. k)
+    end
+    base[k] = v
+  end
+  return _table.extend_strict(base, ...)
+end
+
 --- Sets values in base if they are nil
 --- @generic T: table
 --- @param base table?
