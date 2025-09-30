@@ -1,25 +1,13 @@
 local iteration = {}
 
 --- Guarantees that returned vectors are not references anywhere else
+--- @param radius? integer
 --- @return fun(): vector
-iteration.rhombus = function(a, b, c)
+iteration.rhombus = function(radius)
   return coroutine.wrap(function()
     coroutine.yield(Vector.zero:copy())
 
-    if not c then
-      if not b then
-        if not a then
-          a = 100
-        end
-        b = a
-        a = 1
-        c = 1
-      else
-        c = Math.sign(b - a)
-      end
-    end
-
-    for r = a, b, c do
+    for r = 1, (radius or 50) do
       for x = 0, r - 1 do
         coroutine.yield(V(x, x - r))
       end

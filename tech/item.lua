@@ -1,4 +1,3 @@
-local iteration = require("engine.tech.iteration")
 local level = require("engine.tech.level")
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
@@ -8,7 +7,9 @@ local item = {}
 
 item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 
---- @class item: entity
+--- @alias item item_strict|table
+
+--- @class item_strict: entity_strict
 --- @field damage_roll? d present only in weapons
 --- @field bonus? integer bonus damage
 --- @field tags table<string, true>
@@ -64,32 +65,39 @@ item.anchor_offset = function(entity, slot)
 end
 
 --- @param parent entity
---- @param slot string | integer
+--- @param ... string | integer
 --- @return boolean
-item.drop = function(parent, slot)
-  local drop_position
-  for d in iteration.rhombus(2) do
-    local p = d + parent.position
-    if (d == Vector.zero or not State.grids.solids:slow_get(p, true))
-      and not State.grids.items[p]
-    then
-      drop_position = p
-      break
+item.drop = function(parent, ...)
+  local next_position = Iteration.rhombus(5)
+  for i = 1, select("#", ...) do
+    local slot = select(i, ...)
+
+    local position
+    for d in next_position do
+      local p = d + parent.position
+      if (d == Vector.zero or not State.grids.solids:slow_get(p, true))
+        and not State.grids.items[p]
+      then
+        position = p
+        goto found
+        break
+      end
     end
+    do return false end
+    ::found::
+
+    local this_item = parent.inventory[slot]
+    if not this_item then return true end
+
+    parent.inventory[slot] = nil
+    this_item.position = position
+    this_item.grid_layer = "items"
+    State:add(this_item)
   end
-  if not drop_position then return false end
-
-  local this_item = parent.inventory[slot]
-  if not this_item then return true end
-
-  parent.inventory[slot] = nil
-  this_item.position = drop_position
-  this_item.grid_layer = "items"
-  State:add(this_item)
   return true
 end
 
-local give_to_hands
+local give_to_hands, give_to_offhand
 
 --- Put item in the entity's inventory. 
 --- Drops the item if entity can't take the item; contains logic for taking weapons.
@@ -97,18 +105,15 @@ local give_to_hands
 --- @param this_item item item to give
 --- @return boolean success did item make it to the entity's inventory
 item.give = function(entity, this_item)
+  local inv = entity.inventory
+
   local is_free
   local slot
   if this_item.slot == "hands" then
     is_free, slot = give_to_hands(entity, this_item)
   elseif this_item.slot == "offhand" then
+    is_free = give_to_offhand(entity, this_item)
     slot = "offhand"
-    is_free = (
-      (not entity.inventory.offhand or item.drop(entity, "offhand"))
-      and (not entity.inventory.hand
-        or (not entity.inventory.hand.tags.two_handed and not this_item.tags.two_handed)
-        or item.drop(entity, "hand"))
-    )
   else
     is_free = not entity.inventory[this_item.slot] or item.drop(entity, this_item.slot)
     slot = this_item.slot
@@ -178,25 +183,46 @@ item.cues = {
 
 --- @return boolean, string?
 give_to_hands = function(entity, this_item)
+  local inv = entity.inventory
+  local hand = inv.hand
+  local offhand = inv.offhand
+  local both = hand and offhand
+
   if this_item.tags.two_handed then
-    return (
-      (not entity.inventory.hand or item.drop(entity, "hand"))
-      and (not entity.inventory.offhand or item.drop(entity, "offhand"))
-    ), "hand"
+    local ok
+    if both then
+      ok = item.drop(entity, "hand", "offhand")
+    elseif hand then
+      ok = item.drop(entity, "hand")
+    elseif offhand then
+      ok = item.drop(entity, "offhand")
+    else
+      ok = true
+    end
+    return ok, "hand"
   end
 
   if not this_item.tags.light then
-    return (
-      (not entity.inventory.hand or item.drop(entity, "hand"))
-      and (not entity.inventory.offhand
-        or not entity.inventory.offhand.damage_roll
-        or item.drop(entity, "offhand"))
-    ), "hand"
+    local ok
+    if both then
+      if offhand.damage_roll then
+        ok = item.drop(entity, "hand", "offhand")
+      else
+        ok = item.drop(entity, "hand")
+      end
+    else
+      if offhand.damage_roll then
+        ok = item.drop(entity, "offhand")
+      else
+        ok = true
+      end
+    end
+    return ok, "hand"
   end
 
-  if not entity.inventory.hand then
-    if entity.inventory.offhand
-      and entity.inventory.offhand.tags.two_handed
+  if not inv.hand then
+    if inv.offhand
+      and inv.offhand.tags.two_handed
       and not item.drop(entity, "offhand")
     then
       return false
@@ -204,14 +230,14 @@ give_to_hands = function(entity, this_item)
     return true, "hand"
   end
 
-  if not entity.inventory.hand.tags.light then
+  if not inv.hand.tags.light then
     if not item.drop(entity, "hand") then
       return false
     end
     return true, "hand"
   end
 
-  if not entity.inventory.offhand then
+  if not inv.offhand then
     return true, "offhand"
   end
 
@@ -219,9 +245,28 @@ give_to_hands = function(entity, this_item)
     return false
   end
 
-  entity.inventory.offhand = entity.inventory.hand
-  entity.inventory.hand = nil
+  inv.offhand = inv.hand
+  inv.hand = nil
   return true, "hand"
+end
+
+give_to_offhand = function(entity, this_item)
+  local inv = entity.inventory
+  local hand = inv.hand
+  local offhand = inv.offhand
+  local both = hand and offhand
+
+  if both then
+    if hand.tags.two_handed or this_item.tags.two_handed then
+      
+    end
+  end
+    is_free = (
+      (not entity.inventory.offhand or item.drop(entity, "offhand"))
+      and (not entity.inventory.hand
+        or (not entity.inventory.hand.tags.two_handed and not this_item.tags.two_handed)
+        or item.drop(entity, "hand"))
+    )
 end
 
 Ldump.mark(item, {}, ...)

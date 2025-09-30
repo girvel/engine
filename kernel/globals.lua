@@ -15,14 +15,14 @@ Ldump.mark_module("engine.lib.composite_map", "const")
 D = require("engine.lib.d")
 Ldump.mark_module("engine.lib.d", "const")
 
-Name = require("engine.lib.name")
-
 Fun = require("engine.lib.fun")
 
 Grid = require("engine.lib.grid")
 Ldump.mark_module("engine.lib.grid", "const")
 
 Inspect = function(x) return require("engine.lib.inspect")(x, {keys_limit = 20}) end
+
+Iteration = require("engine.lib.iteration")
 
 Json = require("engine.lib.json")
 
@@ -34,6 +34,8 @@ Math = require("engine.lib.math")
 Memoize = require("engine.lib.memoize")
 
 Moonspeak = require("engine.lib.moonspeak")
+
+Name = require("engine.lib.name")
 
 Period = require("engine.lib.period")
 

@@ -1,4 +1,5 @@
 local vector = require("engine.lib.vector")
+local iteration = require("engine.lib.iteration")
 
 --- indexing starts from 1
 local grid = {}
@@ -76,44 +77,26 @@ end
 --- @param self grid<T>
 --- @param start vector
 --- @param max_radius? integer
+--- @return fun(): vector
+methods.find_free_positions = function(self, start, max_radius)
+  return coroutine.wrap(function()
+    for d in iteration.rhombus(max_radius) do
+      local p = d:add_mut(start)
+      if not self:slow_get(p, true) then
+        coroutine.yield(p)
+      end
+    end
+  end)
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param start vector
+--- @param max_radius? integer
 --- @return vector?
 methods.find_free_position = function(self, start, max_radius)
-  -- TODO OPT can be optimized replacing slow_get with fast_get + min/max
-  if self[start] == nil then return start end
-
-  max_radius = math.min(
-    max_radius or math.huge,
-    math.max(
-      start[1] - 1,
-      start[2] - 1,
-      self.size[1] - start[1],
-      self.size[2] - start[2]
-    ) * 2
-  )
-
-  for r = 1, max_radius do
-    for x = 0, r - 1 do
-      local v = vector.new(x, x - r) + start
-      if not self:slow_get(v, true) then return v end
-    end
-
-    for x = r, 1, -1 do
-      local v = vector.new(x, r - x) + start
-      if not self:slow_get(v, true) then return v end
-    end
-
-    for x = 0, 1 - r, -1 do
-      local v = vector.new(x, x + r) + start
-      if not self:slow_get(v, true) then return v end
-    end
-
-    for x = -r, 1 do
-      local v = vector.new(x, -r - x) + start
-      if not self:slow_get(v, true) then return v end
-    end
-  end
-
-  return nil
+  local list = self:find_free_positions(start, 1, max_radius)
+  return list and list[1]
 end
 
 --- @generic T

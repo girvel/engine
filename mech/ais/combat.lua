@@ -2,7 +2,6 @@ local tk = require("engine.mech.ais.tk")
 local async = require("engine.tech.async")
 local api = require("engine.tech.api")
 local tcod = require("engine.tech.tcod")
-local iteration = require("engine.tech.iteration")
 local animated  = require("engine.tech.animated")
 local actions   = require("engine.mech.actions")
 

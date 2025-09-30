@@ -4,7 +4,6 @@ local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
 local sound= require("engine.tech.sound")
-local iteration = require("engine.tech.iteration")
 
 
 --- API for asynchronous scripting, both AI and rails

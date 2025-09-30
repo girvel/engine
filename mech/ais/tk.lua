@@ -1,6 +1,5 @@
 local tcod = require("engine.tech.tcod")
 local actions = require("engine.mech.actions")
-local iteration = require("engine.tech.iteration")
 local api = require("engine.tech.api")
 
 
@@ -10,7 +9,7 @@ local tk = {}
 --- @param r number
 --- @return entity?
 tk.find_target = function(entity, r)
-  for d in iteration.rhombus(r) do
+  for d in Iteration.rhombus(r) do
     local e = State.grids.solids:slow_get(entity.position + d)
     if e and State.hostility:get(entity, e) then
       return e
@@ -20,7 +19,7 @@ end
 
 tk.preserve_line_of_fire = function(entity, target)
   local best_p
-  for d in iteration.rhombus(entity.resources.movement) do
+  for d in Iteration.rhombus(entity.resources.movement) do
     local p = entity.position + d
     if not State.grids.solids:can_fit(p) then goto continue end
 
