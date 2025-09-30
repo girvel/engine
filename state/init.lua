@@ -221,7 +221,7 @@ end
 
 --- @param list entity[]
 methods.start_combat = function(self, list)
-  self.rails.runner:run_task(function()
+  self.runner:run_task(function()
     list = Fun.iter(list)
       :filter(function(e) return not self:in_combat(e) and self:exists(e) end)
       :totable()
