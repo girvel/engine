@@ -10,7 +10,7 @@ local pull_anchors, cut_out
 --- @class sprite_image
 --- @field type "image"
 --- @field image love.Image
---- @field anchors table<anchor, vector?>
+--- @field anchors table<anchor, vector>
 --- @field color vector
 
 --- @param base string|love.ImageData
@@ -21,12 +21,11 @@ sprite.image = function(base)
   end
 
   local main_color, anchors = pull_anchors(base)
-  assert(main_color, "Empty sprite")
   return {
     type = "image",
-    anchors = anchors,
+    anchors = anchors or {},
     image = love.graphics.newImage(base),
-    color = main_color,
+    color = main_color or Vector.white,
   }
 end
 
