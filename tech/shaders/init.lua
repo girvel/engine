@@ -1,4 +1,4 @@
 --- @class shader
 --- @field love_shader love.Shader
---- @field preprocess? fun(shader, entity, number)
---- @field update? fun(shader, number)
+--- @field preprocess? fun(self: shader, entity: entity, dt: number)
+--- @field update? fun(self: shader, dt: number)
