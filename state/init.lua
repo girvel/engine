@@ -169,7 +169,7 @@ methods.load_level = function(self, path)
 
   Table.extend(self.runner.entities, load_data.runner_entities)
   Table.extend(self.runner.positions, load_data.runner_positions)
-  Table.extend(self.runner.scenes, load_data.runner_scenes)
+  self.runner:add(load_data.runner_scenes)
 
   for _, name in ipairs(self.args.enable_scenes) do
     self.runner.scenes[name].enabled = true
