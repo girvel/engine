@@ -1,7 +1,9 @@
 --- @meta
 
+--- @alias entity entity_strict|table
+
 --- Any in-game entity except items. All fields and methods are optional.
---- @class entity: _creature_methods, _animated_methods, _interactive_methods
+--- @class entity_strict: _creature_methods, _animated_methods, _interactive_methods
 --- @field name string in-game name
 --- @field codename string in-code name
 --- @field position vector position in grid cells; can be float if .grid_layer is nil
