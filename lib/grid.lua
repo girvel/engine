@@ -95,8 +95,7 @@ end
 --- @param max_radius? integer
 --- @return vector?
 methods.find_free_position = function(self, start, max_radius)
-  local list = self:find_free_positions(start, 1, max_radius)
-  return list and list[1]
+  return self:find_free_positions(start, max_radius)()
 end
 
 --- @generic T

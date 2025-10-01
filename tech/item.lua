@@ -72,6 +72,9 @@ item.drop = function(parent, ...)
   for i = 1, select("#", ...) do
     local slot = select(i, ...)
 
+    local this_item = parent.inventory[slot]
+    if not this_item then goto continue end
+
     local position
     for d in next_position do
       local p = d + parent.position
@@ -86,18 +89,17 @@ item.drop = function(parent, ...)
     do return false end
     ::found::
 
-    local this_item = parent.inventory[slot]
-    if not this_item then return true end
-
     parent.inventory[slot] = nil
     this_item.position = position
     this_item.grid_layer = "items"
     State:add(this_item)
+
+    ::continue::
   end
   return true
 end
 
-local give_to_hands, give_to_offhand
+local give_to_hands, give_to_a_hand
 
 --- Put item in the entity's inventory. 
 --- Drops the item if entity can't take the item; contains logic for taking weapons.
@@ -108,15 +110,13 @@ item.give = function(entity, this_item)
   local inv = entity.inventory
 
   local is_free
-  local slot
-  if this_item.slot == "hands" then
+  local slot = this_item.slot
+  if slot == "hands" then
     is_free, slot = give_to_hands(entity, this_item)
-  elseif this_item.slot == "offhand" then
-    is_free = give_to_offhand(entity, this_item)
-    slot = "offhand"
+  elseif slot == "offhand" or slot == "hand" then
+    is_free = give_to_a_hand(slot, entity, this_item)
   else
-    is_free = not entity.inventory[this_item.slot] or item.drop(entity, this_item.slot)
-    slot = this_item.slot
+    is_free = not entity.inventory[slot] or item.drop(entity, slot)
   end
 
   if not is_free then return false end
@@ -186,58 +186,30 @@ give_to_hands = function(entity, this_item)
   local inv = entity.inventory
   local hand = inv.hand
   local offhand = inv.offhand
-  local both = hand and offhand
 
   if this_item.tags.two_handed then
-    local ok
-    if both then
-      ok = item.drop(entity, "hand", "offhand")
-    elseif hand then
-      ok = item.drop(entity, "hand")
-    elseif offhand then
-      ok = item.drop(entity, "offhand")
-    else
-      ok = true
-    end
-    return ok, "hand"
+    return item.drop(entity, "hand", "offhand"), "hand"
   end
 
   if not this_item.tags.light then
-    local ok
-    if both then
-      if offhand.damage_roll then
-        ok = item.drop(entity, "hand", "offhand")
-      else
-        ok = item.drop(entity, "hand")
-      end
+    if offhand and offhand.damage_roll then
+      return item.drop(entity, "hand", "offhand"), "hand"
     else
-      if offhand.damage_roll then
-        ok = item.drop(entity, "offhand")
-      else
-        ok = true
-      end
+      return item.drop(entity, "hand"), "hand"
     end
-    return ok, "hand"
   end
 
-  if not inv.hand then
-    if inv.offhand
-      and inv.offhand.tags.two_handed
-      and not item.drop(entity, "offhand")
-    then
-      return false
-    end
-    return true, "hand"
+  if not hand then
+    return not offhand
+      or (not offhand.tags.two_handed and (offhand.tags.light or not offhand.damage_roll))
+      or item.drop(entity, "offhand"), "hand"
   end
 
-  if not inv.hand.tags.light then
-    if not item.drop(entity, "hand") then
-      return false
-    end
-    return true, "hand"
+  if not hand.tags.light then
+    return item.drop(entity, "hand"), "hand"
   end
 
-  if not inv.offhand then
+  if not offhand then
     return true, "offhand"
   end
 
@@ -250,23 +222,21 @@ give_to_hands = function(entity, this_item)
   return true, "hand"
 end
 
-give_to_offhand = function(entity, this_item)
-  local inv = entity.inventory
-  local hand = inv.hand
-  local offhand = inv.offhand
-  local both = hand and offhand
+give_to_a_hand = function(slot, entity, this_item)
+  assert(slot == "hand" or slot == "offhand")
+  local other = entity.inventory[slot == "hand" and "offhand" or "hand"]
 
-  if both then
-    if hand.tags.two_handed or this_item.tags.two_handed then
-      
-    end
+  local needs_two_hands = this_item.tags.two_handed
+    or other.tags.two_handed
+    or (not this_item.tags.light or not other.tags.light)
+      and this_item.damage_roll
+      and other.damage_roll
+
+  if needs_two_hands then
+    return item.drop(entity, "hand", "offhand")
   end
-    is_free = (
-      (not entity.inventory.offhand or item.drop(entity, "offhand"))
-      and (not entity.inventory.hand
-        or (not entity.inventory.hand.tags.two_handed and not this_item.tags.two_handed)
-        or item.drop(entity, "hand"))
-    )
+
+  return item.drop(entity, slot)
 end
 
 Ldump.mark(item, {}, ...)
