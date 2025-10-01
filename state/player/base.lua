@@ -5,7 +5,7 @@ local creature = require "engine.mech.creature"
 
 local base = {}
 
---- @class base_player: entity
+--- @class base_player: entity_strict
 --- @field fov_r integer
 --- @field ai player_ai
 --- @field hears? dialogue_line

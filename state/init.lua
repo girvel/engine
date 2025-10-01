@@ -200,7 +200,7 @@ methods.load_level = function(self, path)
   local BATCH_SIZE = 1024
   for i, e in ipairs(load_data.entities) do
     e = self:add(e)
-    if e.player_flag then self.player = e end
+    if e.player_flag then self.player = e --[[@as player]] end
     -- if e.on_load then e:on_load() end
 
     if i % BATCH_SIZE == 0 then
@@ -212,8 +212,9 @@ methods.load_level = function(self, path)
 
   coroutine.yield()
   local end_time = love.timer.getTime()
-  Log.info("Added entities in %.2f s, total time %.2f s",
-    end_time - read_time, end_time - start_time
+  Log.info(
+    "Added %s entities in %.2f s, total time %.2f s",
+    #load_data.entities, end_time - read_time, end_time - start_time
   )
 
   self.is_loaded = true
