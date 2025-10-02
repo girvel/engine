@@ -127,9 +127,7 @@ cut_out = function(image, quad)
   return canvas:newImageData(0, nil, quad:getViewport())
 end
 
---- @alias inventory_slot "hand"|"offhand"|"head"|"right_pocket"
---- @alias item_slot "hands"|inventory_slot
---- @alias anchor "parent"|inventory_slot
+--- @enum (key) anchor
 local anchors = {
   parent       = Vector.hex("ff0000"):mul_mut(256):map(math.floor),
   hand         = Vector.hex("fb0000"):mul_mut(256):map(math.floor),
