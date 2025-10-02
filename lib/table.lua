@@ -312,4 +312,14 @@ _table.strict = function(t, item_name)
   })
 end
 
+--- @param t table
+--- @return any[]
+_table.keys = function(t)
+  local result = {}
+  for k in pairs(t) do
+    table.insert(result, k)
+  end
+  return result
+end
+
 return _table
