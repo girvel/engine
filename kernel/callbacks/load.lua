@@ -48,6 +48,7 @@ return function(args)
 
   State = state.new(systems, args)
   assert = safety.assert
+  Error = safety.error
 
   Log.info("Finished love.load")
 end

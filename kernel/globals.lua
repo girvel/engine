@@ -74,4 +74,6 @@ Vector = require("engine.lib.vector")
 V = Vector.new
 Ldump.mark_module("engine.lib.vector", "const")
 
+-- assert & Error are assigned in engine/kernel/callbacks/load.lua
+
 Log.info("Initialized globals")

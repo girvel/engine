@@ -16,6 +16,7 @@ end
 
 local built_in_assert = assert
 
+--- Normal assert in debug mode, just a warning in release
 --- @generic T
 --- @param condition T
 --- @param message? string
@@ -36,6 +37,18 @@ safety.assert = function(condition, message)
 
   Log.error(message)
   return condition
+end
+
+--- Errors in debug mode, warns in release
+--- @param fmt string
+--- @param ... any
+safety.error = function(fmt, ...)
+  local message = Log.format(fmt, ...)
+  if State.debug then
+    error(message, 1)
+  else
+    Log.log("warn", 1, message)
+  end
 end
 
 --- @param f function

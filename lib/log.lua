@@ -17,6 +17,13 @@ log.level = "trace"
 local levels, count, pretty
 
 
+--- @param fmt any
+--- @param ... any
+--- @return string
+log.format = function(fmt, ...)
+  return tostring(pretty(fmt)):format(pretty(...))
+end
+
 --- @generic T
 --- @param level log_level
 --- @param trace_shift integer
@@ -32,7 +39,7 @@ log.log = function(level, trace_shift, fmt, ...)
     return ...
   end
 
-  local msg = tostring(pretty(fmt)):format(pretty(...))
+  local msg = log.format(fmt, ...)
 
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
