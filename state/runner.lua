@@ -16,7 +16,7 @@ local runner = {}
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
---- @field on_add? fun(self: scene|table) runs when the scene is added
+--- @field on_add? fun(self: scene|table, ch: runner_characters, ps: runner_positions) runs when the scene is added
 --- @field on_cancel? fun(self: scene|table) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
 
 --- @class scene_run
@@ -173,11 +173,15 @@ end
 --- @param scenes runner_scenes
 methods.add = function(self, scenes)
   Table.extend_strict(self.scenes, scenes)
-  for _, scene in pairs(scenes) do
+  local on_adds_repr = ""
+  for name, scene in pairs(scenes) do
     if scene.on_add then
-      scene:on_add()
+      scene:on_add(self.entities, self.positions)
+      on_adds_repr = on_adds_repr .. "\n  " .. name .. ":on_add()"
     end
   end
+
+  Log.info("Added %s scenes%s", Table.count(scenes), on_adds_repr)
 end
 
 --- @param scene integer|string|scene
