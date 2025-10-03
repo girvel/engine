@@ -118,5 +118,16 @@ fighter.fighting_styles.two_weapon_fighting = {
   end,
 }
 
+fighter.fighting_styles.defence = {
+  codename = "defence",
+
+  modify_armor = function(self, entity, value)
+    if entity.inventory.body or entity.inventory.head then
+      return value + 1
+    end
+    return value
+  end,
+}
+
 Ldump.mark(fighter, "const", ...)
 return fighter
