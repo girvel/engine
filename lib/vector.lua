@@ -1,3 +1,5 @@
+unpack = unpack or table.unpack
+
 local vector = {}
 
 --- @class vector: number[]

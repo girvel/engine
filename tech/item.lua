@@ -86,7 +86,6 @@ item.drop = function(parent, ...)
       then
         position = p
         goto found
-        break
       end
     end
     do return false end

@@ -127,7 +127,7 @@ cut_out = function(image, quad)
   return canvas:newImageData(0, nil, quad:getViewport())
 end
 
---- @enum (key) anchor
+--- @alias anchor "parent"|"hand"|"offhand"|"head"|"right_pocket"
 local anchors = {
   parent       = Vector.hex("ff0000"):mul_mut(256):map(math.floor),
   hand         = Vector.hex("fb0000"):mul_mut(256):map(math.floor),
