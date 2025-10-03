@@ -37,8 +37,6 @@ Moonspeak = require("engine.lib.moonspeak")
 
 Name = require("engine.lib.name")
 
-Period = require("engine.lib.period")
-
 Profile = require("engine.lib.profile")
 
 Promise = require("engine.lib.promise")

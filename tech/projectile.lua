@@ -37,7 +37,7 @@ projectile.launch = function(parent, slot, target, speed)
 
         entity.drift = (target_position - entity.position):normalized_mut():mul_mut(speed)
         entity.rotation = math.atan2(entity.drift.y, entity.drift.x)
-        if Period(TIMEOUT, promise) or (target_position - entity.position):abs() < .25 then
+        if State.period:absolute(TIMEOUT, promise) or (target_position - entity.position):abs() < .25 then
           promise:resolve()
           State:remove(entity)
         end

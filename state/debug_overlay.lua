@@ -72,7 +72,7 @@ local sum = 0
 local frames_n = 0
 
 report_ai = function()
-  if Period(1, report_ai, "ai_load_percent") then
+  if State.period:absolute(1, report_ai, "ai_load_percent") then
     ai_load_percent_average = sum / frames_n
     sum = 0
     frames_n = 0

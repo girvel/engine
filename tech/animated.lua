@@ -59,7 +59,7 @@ end
 
 --- @param path string
 --- @param position vector
---- @param is_over? boolean
+--- @param is_over? boolean whether to display in fx_over or fv_under layer
 animated.fx = function(path, position, is_over)
   local result = animated.mixin(path, "no_atlas")
 

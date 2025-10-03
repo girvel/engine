@@ -38,7 +38,7 @@ creature.make = function(...)
   return result
 end
 
---- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"|"dex_armor_bonus"|"activation"
+--- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"|"dex_armor_bonus"|"activation"|"hp"
 
 --- @param self entity
 --- @param modification creature_modification

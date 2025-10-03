@@ -211,7 +211,7 @@ api.fade_out = function()
   prev_fov = State.player.fov_r
   for i = prev_fov, 0, -1 do
     State.player.fov_r = i
-    while not Period(FADE_DURATION / prev_fov, api.fade_out) do
+    while not State.period:absolute(FADE_DURATION / prev_fov, api.fade_out) do
       coroutine.yield()
     end
   end
@@ -221,7 +221,7 @@ end
 api.fade_in = function()
   for i = 0, prev_fov do
     State.player.fov_r = i
-    while not Period(FADE_DURATION / prev_fov, api.fade_in) do
+    while not State.period:absolute(FADE_DURATION / prev_fov, api.fade_in) do
       coroutine.yield()
     end
   end

@@ -16,6 +16,7 @@ local state = {}
 --- @field hostility state_hostility
 --- @field audio state_audio
 --- @field debug_overlay state_debug
+--- @field period state_period
 --- @field uid state_uid
 --- @field stats state_stats
 --- @field shader shader?
@@ -45,6 +46,7 @@ state.new = function(systems, args)
     hostility = require("engine.state.hostility").new(),
     audio = require("engine.state.audio").new(),
     debug_overlay = require("engine.state.debug_overlay").new(args.debug),
+    period = require("engine.state.period").new(),
     uid = require("engine.state.uid").new(),
     stats = require("engine.state.stats").new(),
     debug = args.debug,

@@ -82,7 +82,7 @@ return Tiny.processingSystem {
 
   process = function(self, entity, dt)
     if State.runner.locked_entities[entity] then
-      if entity.rest and Period(1, entity, "resource_restoration") then
+      if entity.rest and State.period:absolute(1, entity, "resource_restoration") then
         entity:rest("move")
       end
       return
@@ -156,7 +156,7 @@ return Tiny.processingSystem {
     end
 
     if not ai.control then
-      if entity.rest and Period(1, entity, "resource_restoration") then
+      if entity.rest and State.period:absolute(1, entity, "resource_restoration") then
         entity:rest("move")
       end
       return

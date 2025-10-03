@@ -51,7 +51,7 @@ end
 --- @param dt number
 methods.observe = function(self, entity, dt)
   if (not self._target or (self._target.position - entity.position):abs2() > self.targeting.range)
-    and Period(self.targeting.scan_period, self, "target_scan")
+    and State.period:absolute(self.targeting.scan_period, self, "target_scan")
   then
     self._target = tk.find_target(entity, self.targeting.scan_range)
   end
