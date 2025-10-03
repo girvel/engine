@@ -29,6 +29,7 @@ local runner = {}
 --- @field positions table<string, vector>
 --- @field entities table<string, entity>
 --- @field locked_entities table<entity, true>
+--- @field save_lock scene?
 --- @field _scene_runs scene_run[]
 local methods = {}
 local mt = {__index = methods}
@@ -63,6 +64,7 @@ methods.update = function(self, dt)
     )
 
     if scene.enabled
+      and (not self.save_lock or self.save_lock == scene)
       and (scene.mode == "parallel" or not self:is_running(scene))
       -- and (scene.in_combat_flag or not characters.player or not State.combat)
       and Fun.pairs(characters):all(function(_, c)

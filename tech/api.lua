@@ -274,7 +274,12 @@ end
 
 --- @param name? string
 api.autosave = function(name)
-  State.runner:run_task(function()
+  if State.runner.save_lock then
+    Log.warn("Autosave collision for %q", name or "<unnamed autosave>")
+    return
+  end
+
+  local _, scene = State.runner:run_task(function()
     name = name or "autosave"
     Log.debug("Planned autosave %q", name)
     while State.runner.locked_entities[State.player] do
@@ -284,9 +289,18 @@ api.autosave = function(name)
     --   not State.runner.locked_entities[State.player],
     --   "Autosave when the player is locked in a cutscene"
     -- )
-    Kernel:plan_save(name)
     Log.info("Autosave %q", name)
+    Kernel:plan_save(name)
+
+    coroutine.yield()
+    State.runner.save_lock = false
   end, "autosave_" .. (name or "anon"))
+
+  scene.on_cancel = function()
+    State.runner.save_lock = false
+  end
+  State.runner.save_lock = scene
+
   api.notification("Игра сохранена")
 end
 
