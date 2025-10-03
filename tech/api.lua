@@ -20,13 +20,22 @@ end
 
 --- @param entity entity
 --- @param position vector
+--- @param suppress_warning? boolean
 --- @param is_strict? boolean
-api.assert_position = function(entity, position, is_strict)
+api.assert_position = function(entity, position, suppress_warning, is_strict)
   if entity.position == position then return end
+
   local free_position = not is_strict
     and State.grids.solids:find_free_position(position)
     or position
   level.unsafe_move(entity, free_position)
+
+  if not suppress_warning then
+    Log.warn(
+      "Entity %s mispositioned at %s; should be at %s; placing at %s",
+      entity, entity.position, position, free_position
+    )
+  end
 end
 
 --- @param entity entity
