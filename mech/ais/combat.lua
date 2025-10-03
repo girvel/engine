@@ -66,6 +66,10 @@ methods.control = function(self, entity)
       async.sleep(.66)
     end
   else
+    if entity.hp <= entity:get_max_hp() / 2 then
+      api.heal(entity)
+    end
+
     api.travel(entity, target.position)
     api.attack(entity, target)
   end

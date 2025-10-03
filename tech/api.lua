@@ -4,6 +4,7 @@ local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
 local sound= require("engine.tech.sound")
+local fighter = require("engine.mech.class.fighter")
 
 
 --- API for asynchronous scripting, both AI and rails
@@ -149,10 +150,19 @@ api.attack = function(entity, target)
 
   Log.debug("Attempt at attacking %s", Name.code(target))
   entity:rotate(direction)
+
+  fighter.action_surge:act(entity)
   while actions.hand_attack:act(entity) or actions.offhand_attack:act(entity) do
     while not entity.animation.current:starts_with("idle") do
       coroutine.yield()
     end
+  end
+end
+
+--- @param entity entity
+api.heal = function(entity)
+  if fighter.second_wind:act(entity) then
+    async.sleep(.2)
   end
 end
 
