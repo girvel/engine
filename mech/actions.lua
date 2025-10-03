@@ -51,6 +51,8 @@ actions.move = Memoize(function(direction)
           :filter(function(e)
             return e
               and e.resources
+              and e.hp
+              and e.hp > 0
               and State.hostility:get(e, entity) == "enemy"
           end)
           :each(function(e, d)
