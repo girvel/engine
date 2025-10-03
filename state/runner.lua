@@ -16,6 +16,7 @@ local runner = {}
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
+--- @field in_combat_flag? true allows scene to start in combat
 --- @field on_add? fun(self: scene|table, ch: runner_characters, ps: runner_positions) runs when the scene is added
 --- @field on_cancel? fun(self: scene|table) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
 
@@ -66,7 +67,7 @@ methods.update = function(self, dt)
     if scene.enabled
       and (not self.save_lock or self.save_lock == scene)
       and (scene.mode == "parallel" or not self:is_running(scene))
-      -- and (scene.in_combat_flag or not characters.player or not State.combat)
+      and (scene.in_combat_flag or not rawget(characters, "player") or not State.combat)
       and Fun.pairs(characters):all(function(_, c)
         return State:exists(c) and not self.locked_entities[c]
       end)
