@@ -46,8 +46,14 @@ methods.draw_gui = function(self, dt)
         ui.start_line()
           love.graphics.setColor(DIMMED)
           ui.text("# ")
-          love.graphics.setColor(WHITE)
-          ui.text(quest.name)
+
+          if quest.status == "new" or quest.status == "active" then
+            love.graphics.setColor(WHITE)
+            ui.text(quest.name)
+          else
+            ui.text(quest.name)
+            love.graphics.setColor(WHITE)
+          end
         ui.finish_line()
       ui.finish_font()
       ui.br()
