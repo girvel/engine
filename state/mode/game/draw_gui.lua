@@ -106,7 +106,7 @@ action_button = function(action, hotkey)
   local is_available = action:is_available(player)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
-  if button.is_clicked and State.player:can_act() then
+  if button.is_clicked then
     player.ai:plan_action(action)
   end
   if button.is_mouse_over then
@@ -594,6 +594,8 @@ use_mouse = function(self)
       movement_path = nil
     end
   end
+
+  if not State.player:can_act() then return end
 
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
     local mouse = ui.mouse(self.input_mode == "target" and "target_inactive" or nil)

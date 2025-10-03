@@ -44,13 +44,24 @@ end
 --- @param entity player
 --- @param dt number
 methods.observe = function(self, entity, dt)
+  if not entity:can_act() then
+    for _, p in ipairs(self._action_promises) do
+      p:resolve(false)
+    end
+    self._next_actions = {}
+    self._action_promises = {}
+  end
+
   if State.combat and not Table.contains(State.combat.list, entity) then
     State:start_combat({entity})
   end
 end
 
+--- Puts the action into queue to be executed in :control
+---
+--- Promise resolves with false if can't act
 --- @param action action
---- @return promise
+--- @return promise?
 methods.plan_action = function(self, action)
   local promise = Promise.new()
   table.insert(self._next_actions, action)
