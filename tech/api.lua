@@ -275,7 +275,8 @@ end
 --- @param name? string
 api.autosave = function(name)
   State.runner:run_task(function()
-    Log.debug("Planned autosave")
+    name = name or "autosave"
+    Log.debug("Planned autosave %q", name)
     while State.runner.locked_entities[State.player] do
       coroutine.yield()
     end
@@ -283,9 +284,9 @@ api.autosave = function(name)
     --   not State.runner.locked_entities[State.player],
     --   "Autosave when the player is locked in a cutscene"
     -- )
-    Kernel:plan_save(name or "autosave")
-    Log.info("Autosave")
-  end, "autosave")
+    Kernel:plan_save(name)
+    Log.info("Autosave %q", name)
+  end, "autosave_" .. (name or "anon"))
   api.notification("Игра сохранена")
 end
 
