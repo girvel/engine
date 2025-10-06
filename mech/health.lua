@@ -38,10 +38,13 @@ health.damage = function(target, amount, is_critical)
 
   State:add(health.floater(repr, target.position, health.COLOR_DAMAGE))
 
-  health.set_hp(target, target.hp - amount)
+  local before = target.hp
+  health.set_hp(target, before - amount)
   if target.hp <= 0 then
     if target.on_death then
       target:on_death()
+    else
+      health.add_blood(target.position)
     end
 
     if target.player_flag then
@@ -77,6 +80,11 @@ health.damage = function(target, amount, is_critical)
     State:remove(target)
     if not target.boring_flag then
       Log.info(Name.code(target) .. " is killed")
+    end
+  else
+    local half = target:get_max_hp() / 2
+    if before > half and target.hp <= half then
+      health.add_blood(target.position)
     end
   end
 end
@@ -150,6 +158,39 @@ health.floater = function(text, grid_position, color)
     sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,
     layer = "fx_over",
+  }
+end
+
+health.add_blood = function(position)
+  local final_position
+  for d in Iteration.rhombus(2) do
+    local p = d:add_mut(position)
+    if not State.grids.tiles:can_fit(p) then goto continue end
+
+    local on_tile = State.grids.on_tiles[p]
+    if on_tile and on_tile.codename == "blood" then goto continue end
+
+    local solid = State.grids.solids[p]
+    if solid and not solid.transparent_flag then goto continue end
+
+    final_position = p
+    do break end
+
+    ::continue::
+  end
+
+  if not final_position then return end
+
+  local atlas = love.image.newImageData("engine/assets/sprites/blood.png")
+
+  return State:add {
+    codename = "blood",
+    boring_flag = true,
+
+    position = final_position,
+    grid_layer = "on_tiles",
+
+    sprite = sprite.image(sprite.utility.select(atlas, math.random(1, 2))),
   }
 end
 
