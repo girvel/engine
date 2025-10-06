@@ -18,6 +18,7 @@ local mt = {__index = methods}
 local DEFAULT_TARGETING = {
   scan_period = .5,
   scan_range = 10,
+  support_range = 15,
   range = 20,
 }
 
@@ -32,7 +33,18 @@ end
 --- @param entity entity
 methods.init = function(self, entity)
   self._hostility_subscription = State.hostility:subscribe(function(attacker, target)
-    if entity.hp > 0 and entity.faction and target == entity then
+    if entity.hp <= 0 or not entity.faction then return end
+
+    if target == entity then
+      State.hostility:set(entity.faction, attacker.faction, "enemy")
+      if not State:in_combat(entity) then
+        Log.trace("AGGRESSIVE!")
+        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+        State:start_combat({entity, attacker})
+      end
+    elseif target.faction == entity.faction
+      and (target.position - entity.position):abs2() <= self.targeting.support_range
+    then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       if not State:in_combat(entity) then
         Log.trace("AGGRESSIVE!")

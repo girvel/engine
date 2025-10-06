@@ -65,11 +65,13 @@ end
 --- @class ai_targeting
 --- @field scan_period number time period determining target search frequency
 --- @field scan_range number radius in which to search for target
+--- @field support_range number radius in which to support members of the faction in combat
 --- @field range number radius in which to continue targeting a single entity
 
 --- @class ai_targeting_optional
 --- @field scan_period? number time period determining target search frequency
 --- @field scan_range? number radius in which to search for target
+--- @field support_range? number radius in which to support members of the faction in combat
 --- @field range? number radius in which to continue targeting a single entity
 
 Ldump.mark(tk, {}, ...)

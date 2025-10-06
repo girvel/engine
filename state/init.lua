@@ -106,7 +106,7 @@ methods.flush = function(self)
     end
 
     if not silently and not entity.boring_flag then
-      Log.debug("State:remove(%s)", Name.code(entity))
+      Log.debug("Removing %s", Name.code(entity))
     end
 
     self._world:remove(entity)
