@@ -15,7 +15,7 @@ perks.passive = {
 
 perks.relentless = {
   modify_hp = function(self, entity, value)
-    if value <= 0 and State.period:once(perks.relentless, State.combat) then
+    if value <= 0 and State.period:once(perks.relentless, State.combat, entity) then
       State:add(animated.fx("engine/assets/sprites/animations/relentless", entity.position))
       -- SOUND relentless
       return 1
