@@ -173,14 +173,6 @@ methods.load_level = function(self, path)
   Table.extend(self.runner.positions, load_data.runner_positions)
   self.runner:add(load_data.runner_scenes)
 
-  for _, name in ipairs(self.args.enable_scenes) do
-    self.runner.scenes[name].enabled = true
-  end
-
-  for _, name in ipairs(self.args.disable_scenes) do
-    self.runner.scenes[name].enabled = nil
-  end
-
   self.grids = Fun.iter(self.level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
     :tomap()

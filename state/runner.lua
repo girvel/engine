@@ -182,6 +182,14 @@ methods.add = function(self, scenes)
       scene:on_add(self.entities, self.positions)
       on_adds_repr = on_adds_repr .. "\n  " .. name .. ":on_add()"
     end
+
+    if Table.contains(State.args.enable_scenes, name) then
+      scene.enabled = true
+    end
+
+    if Table.contains(State.args.disable_scenes, name) then
+      scene.enabled = nil
+    end
   end
 
   Log.info("Added %s scenes%s", Table.count(scenes), on_adds_repr)
