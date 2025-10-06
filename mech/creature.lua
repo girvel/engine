@@ -208,7 +208,7 @@ methods.get_melee_damage_roll = function(self, slot)
   end
 
   local roll
-  if weapon.tags.versatile and not self.inventory.other_hand then
+  if weapon.tags.versatile and not self.inventory.offhand then
     roll = D(weapon.damage_roll.dice[1].sides_n + 2)
   else
     roll = weapon.damage_roll
