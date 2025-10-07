@@ -55,6 +55,7 @@ methods.report = function(self)
   end
 
   Log.info("Average FPS is %.2f", self._total_frames / self._total_time)
+  Log.info("Saved log to %s%s", love.filesystem.getRealDirectory(Log.outfile), Log.outfile)
   Log.report()
 end
 
