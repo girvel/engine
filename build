@@ -18,7 +18,7 @@ local run = function(command, ...)
   print(command)
   local exit_code = os.execute(command)
   if exit_code ~= 0 then
-    log.fatal("Command exited with code", exit_code)
+    log.fatal("Command exited with code %s", exit_code)
     os.exit(1)
   end
 end
@@ -121,7 +121,7 @@ cli.exe = function(args)
       f:close()
     end
 
-    log.info("Found love.exe at", love_path)
+    log.info("Found love.exe at %s", love_path)
   end
 
   local name do
@@ -131,7 +131,7 @@ cli.exe = function(args)
       local config = {window = {}}
       love.conf(config)
       name = config.identity
-      log.info("Indentified the project as", name)
+      log.info("Indentified the project as %s", name)
     else
       name = "game"
       log.error(msg)
@@ -147,18 +147,31 @@ cli.exe = function(args)
   end
   local versioned_name = name .. version_suffix
 
+  -- prep folder
   run("mkdir -p .build")
   run("rm -rf .build/*")
   run("echo '*' > .build/.gitignore")
 
+  -- build .love
   run("zip -9 -r%s .build/%s.love assets engine levels conf.lua main.lua",
     args.verbose and "" or " -q", versioned_name)
+
+  -- pack linux
+  run("mkdir -p .build/%s_linux", versioned_name)
+  run("cp .build/%s.love .build/%s_linux", versioned_name, versioned_name)
+  run("cp engine/lib/*.so .build/%s_linux", versioned_name)
+  run("cd .build; zip -9 -r %s_linux.zip %s_linux", versioned_name, versioned_name)
+
+  -- pack win64
   run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", love_path, versioned_name, name)
   run("mkdir -p .build/%s_win64", versioned_name)
   run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
   run("cp '%s'/*.dll .build/%s_win64/", love_path, versioned_name)
   run("cp engine/lib/*.dll .build/%s_win64/", versioned_name)
-  run("cd .build; zip -9 -r %s_win64.zip %s_win64; cd ..", versioned_name, versioned_name)
+  run("cd .build; zip -9 -r %s_win64.zip %s_win64", versioned_name, versioned_name)
+
+  -- cleanup
+  run("rm .build/%s.love", versioned_name)
 
   log.info("Build finished.")
 end
