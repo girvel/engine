@@ -32,9 +32,7 @@ return Tiny.sortedProcessingSystem {
     end
     ui.start()
     State.mode:draw_gui(dt)
-    if State.debug then
-      State.debug_overlay:draw(dt)
-    end
+    State.debug_overlay:draw(dt)
     ui.finish()
   end,
 }
