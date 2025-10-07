@@ -533,8 +533,9 @@ ui.mouse = function(cursor_type)
   return result
 end
 
---- @param cursor_type ui_cursor_type
+--- @param cursor_type? ui_cursor_type
 ui.cursor = function(cursor_type)
+  if not cursor_type then return end
   model.cursor = cursor_type
 end
 

@@ -21,11 +21,10 @@ return Tiny.processingSystem {
       ("%s is missing animation %s"):format(Name.code(entity), animation.current)
     )
 
-    if not animation.current:starts_with("idle") or #current_pack > 1 then
-      animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
-      if math.floor(animation.frame) > #current_pack then
-        entity:animate("idle")
-      end
+    -- even if animation is 1 frame idle, still should play out for 1-frame FXs
+    animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
+    if math.floor(animation.frame) > #current_pack then
+      entity:animate("idle")
     end
     entity.sprite = current_pack[math.floor(animation.frame)]
   end,

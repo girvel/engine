@@ -1,3 +1,4 @@
+local animated = require("engine.tech.animated")
 local sound = require("engine.tech.sound")
 local base_player = require("engine.state.player.base")
 local gui_elements = require("engine.state.mode.gui_elements")
@@ -598,7 +599,8 @@ use_mouse = function(self)
   if not State.player:can_act() then return end
 
   ui.start_frame(nil, nil, -State.perspective.sidebar_w)
-    local mouse = ui.mouse(self.input_mode == "target" and "target_inactive" or nil)
+    ui.cursor(self.input_mode == "target" and "target_inactive" or nil)
+
     local position = V(love.mouse.getPosition())
       :sub_mut(State.perspective.camera_offset)
       :div_mut(State.level.cell_size * 4)
@@ -606,9 +608,11 @@ use_mouse = function(self)
     local solid = State.grids.solids:slow_get(position)
     local interaction_target = interactive.get_at(position)
 
-    local is_clicked = ui.mousedown(2) or mouse.is_clicked
+    local lmb = ui.mousedown(1)
+    local rmb = ui.mousedown(2)
+
     if self.input_mode == "target" then
-      if is_clicked then
+      if rmb then
         self.input_mode = "normal"
       end
 
@@ -617,7 +621,7 @@ use_mouse = function(self)
 
         if action:is_available(State.player) then
           ui.cursor("target_active")
-          if is_clicked then
+          if rmb then
             State.player.ai:plan_action(action)
           end
         end
@@ -628,8 +632,6 @@ use_mouse = function(self)
       end
 
       local offhand = State.player.inventory.offhand
-      local lmb = ui.mousedown(1)
-      local rmb = ui.mousedown(2)
       if (lmb and interaction_target) or (rmb and not solid) then
         local is_target_solid = interaction_target
           and Table.contains({"solids", "on_solids"}, interaction_target.grid_layer)
@@ -647,6 +649,7 @@ use_mouse = function(self)
             if State.player.position ~= position then
               movement_path = path
               movement_last_t = love.timer.getTime()
+              State:add(animated.fx("engine/assets/sprites/animations/mouse_travel", position))
             end  -- interact should still work even if no movement is needed
             if lmb then
               movement_interact = interaction_target and position or nil
@@ -663,7 +666,7 @@ use_mouse = function(self)
             or State.hostility:get(solid, State.player) == "enemy")
         then
           ui.cursor("target_active")
-          if ui.mousedown(2) then
+          if rmb then
             State.player.ai:plan_action(action)
           end
         end
