@@ -12,7 +12,7 @@ local runner = {}
 --- @field characters? table<string, table>
 --- @field start_predicate fun(self: scene|table, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any
 --- @field run fun(self: scene|table, ch: runner_characters, ps: runner_positions): any
---- @field enabled? true
+--- @field enabled? boolean
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
 --- @field save_flag? true don't warn about making a save during this scene
