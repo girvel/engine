@@ -52,7 +52,7 @@ promise_methods.resolve = function(self, ...)
 end
 
 --- @async
-promise_methods.await = function(self)
+promise_methods.wait = function(self)
   while not self.is_resolved do
     coroutine.yield()
   end
