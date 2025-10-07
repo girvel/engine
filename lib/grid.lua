@@ -95,7 +95,7 @@ end
 --- @param max_radius? integer
 --- @return vector?
 methods.find_free_position = function(self, start, max_radius)
-  return self:find_free_positions(start, max_radius)()
+  return self:find_free_positions(start, max_radius)() or nil
 end
 
 --- @generic T
