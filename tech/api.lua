@@ -57,7 +57,7 @@ end
 api.travel_scripted = function(entity, destination)
   local promise, scene = State.runner:run_task(function()
     local ok = api.travel_persistent(
-      entity, destination, math.ceil((entity.position - destination):abs2() / 3)
+      entity, destination, math.max(1, math.ceil((entity.position - destination):abs2() / 3))
     )
     if ok then return end
 
