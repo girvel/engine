@@ -1,5 +1,7 @@
 local ui = require("engine.tech.ui")
 
+local BG = Vector.hex("191919")
+
 return Tiny.sortedProcessingSystem {
   codename = "drawing",
   base_callback = "draw",
@@ -20,6 +22,8 @@ return Tiny.sortedProcessingSystem {
         shader:update(dt)
       end
     end
+
+    love.graphics.clear(BG)
   end,
 
   process = function(_, entity, dt)
