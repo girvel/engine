@@ -16,7 +16,7 @@ local mt = {__index = methods}
 --- @param is_debug boolean
 --- @return state_debug
 debug_overlay.new = function(is_debug)
-  is_debug = is_debug or false
+  is_debug = not not is_debug
   return setmetatable({
     points = {},
     _show_points = false,

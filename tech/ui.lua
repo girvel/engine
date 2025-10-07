@@ -168,20 +168,37 @@ end
 -- [SECTION] UI elements
 ----------------------------------------------------------------------------------------------------
 
+--- @param text string
+--- @return string[]
 local wrap = function(text)
+  if #text == 0 then return {""} end
+
+  local max_w do
+    local effective_w = Table.last(model.frame).w
+    local font_w = Table.last(model.font):getWidth("w")
+    max_w = math.floor(effective_w / font_w)
+  end
+
   local result = {}
 
-  local effective_w = Table.last(model.frame).w
-  local font_w = Table.last(model.font):getWidth("w")
-  local chars_per_line = math.floor(effective_w / font_w)
+  local i = 1
+  while true do
+    local line = text:utf_sub(i, i + max_w - 1)
+    local is_rough = i - 1 + line:utf_len() < text:utf_len()
 
-  local lines = math.ceil(text:utf_len() / chars_per_line)
-  if lines == 0 then
-    return {""}
+    if is_rough then
+      local str_break = line:find("%s%S*$")
+      if str_break and str_break > 1 then
+        line = line:sub(1, str_break - 1)
+        i = i + 1
+      end
+      i = i + line:utf_len()
+    end
+
+    table.insert(result, line)
+    if not is_rough then break end
   end
-  for i = 0, lines - 1 do
-    table.insert(result, text:utf_sub(i * chars_per_line + 1, (i + 1) * chars_per_line))
-  end
+
   return result
 end
 
@@ -196,8 +213,8 @@ ui.text = function(text)
 
   local wrapped = wrap(text)
 
-  if is_linear then
-    assert(#wrapped == 1)
+  if is_linear and #wrapped ~= 1 then
+    Error("Unable to do multiline text in linear mode; wrapped=%s", wrapped)
   end
 
   for i, line in ipairs(wrapped) do
