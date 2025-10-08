@@ -102,16 +102,17 @@ health.set_hp = function(target, value)
 end
 
 --- Attacks with given attack/damage rolls
+--- @param source entity attacking entity
 --- @param target entity attacked entity
 --- @param attack_roll table
 --- @return boolean did_hit true if attack landed
-health.attack = function(target, attack_roll, damage_roll)
+health.attack = function(source, target, attack_roll, damage_roll)
   local attack = attack_roll:roll()
   local is_nat = attack == attack_roll:max()
   local is_nat_miss = attack == attack_roll:min()
   local ac = target.get_armor and target:get_armor() or target.armor or 0
 
-  Log.info("%s is attacked; attack roll: %s, armor: %s", Name.code(target), attack, ac)
+  Log.info("%s attacks %s; attack roll: %s, armor: %s", source, target, attack, ac)
 
   if is_nat_miss then
     State:add(health.floater("!", target.position, health.COLOR_DAMAGE))
@@ -128,7 +129,8 @@ health.attack = function(target, attack_roll, damage_roll)
     damage_roll = damage_roll + D.new(damage_roll.dice, 0)
   end
 
-  health.damage(target, damage_roll:roll(), is_critical)
+  local damage_amount = source:modify("outgoing_damage", damage_roll:roll(), target, is_critical)
+  health.damage(target, damage_amount, is_critical)
   return true
 end
 

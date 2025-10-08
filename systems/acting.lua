@@ -183,6 +183,9 @@ return Tiny.processingSystem {
 
     local indexes_to_remove = {}
     for i, condition in ipairs(entity.conditions) do
+      if condition.update then
+        condition:update(entity, dt)
+      end
       condition.life_time = condition.life_time - dt
       if condition.life_time <= 0 then
         table.insert(indexes_to_remove, i)

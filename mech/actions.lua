@@ -284,6 +284,7 @@ base_attack = function(entity, slot)
     State.hostility:register(entity, target)
 
     if not health.attack(
+      entity,
       target,
       entity:get_melee_attack_roll(slot),
       entity:get_melee_damage_roll(slot)
@@ -359,6 +360,7 @@ actions.bow_attack = function(target)
             attack_roll = attack_roll:extended({advantage = "disadvantage"})
           end
           health.attack(
+            entity,
             target,
             attack_roll,
             damage_roll
