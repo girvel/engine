@@ -5,10 +5,13 @@ local animated = {}
 
 --- @alias animation_pack table<string, sprite_image[]>
 
+--- @alias animation_name "idle"|"move"|"hand_attack"|"offhand_attack"|"gesture"|"fast_gesture"|"clap"|"lying"|"interact"|"throw"|"bow_attack"|"hanging"
+
 --- @class animation
 --- @field pack animation_pack
 --- @field paused boolean
---- @field current string
+--- @field current animation_name|string
+--- @field next animation_name
 --- @field frame number
 --- @field _end_promise promise
 
@@ -44,6 +47,7 @@ animated.mixin = function(path, atlas_n)
     animation = {
       pack = pack,
       paused = false,
+      next = "idle",
       _end_promise = nil,
     },
     sprite = select(2, next(pack))[1],
@@ -74,15 +78,14 @@ animated.fx = function(path, position, is_over)
   return result
 end
 
---- @alias animation_name "idle"|"move"|"hand_attack"|"offhand_attack"|"gesture"|"fast_gesture"|"clap"|"lying"|"interact"|"throw"|"bow_attack"
-
 --- @param self entity
 --- @param animation_name? string|animation_name
 --- @param assertive? boolean whether to assert that animation exists
+--- @param looped? boolean
 --- @return promise
-methods.animate = function(self, animation_name, assertive)
-  animation_name = animation_name or "idle"
+methods.animate = function(self, animation_name, assertive, looped)
   local animation = self.animation
+  animation_name = animation_name or animation.next
 
   if animation._end_promise then
     animation._end_promise:resolve()
@@ -90,18 +93,23 @@ methods.animate = function(self, animation_name, assertive)
   end
   self:animation_set_paused(false)
 
-  if self.direction then
-    local dirname = Vector.name_from_direction(self.direction)
+  local dirname = self.direction and Vector.name_from_direction(self.direction)
+  if dirname then
     animation.current = animation_name .. "_" .. dirname
-    if not animation.pack[animation.current] then
-      assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
-      animation.current = "idle_" .. dirname
-    end
   else
     animation.current = animation_name
-    if not animation.pack[animation.current] then
-      assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
-      animation.current = "idle"
+  end
+
+  if animation.pack[animation.current] then
+    if looped then
+      animation.next = animation_name
+    end
+  else
+    assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
+    if dirname then
+      animation.current = animation.next .. "_" .. dirname
+    else
+      animation.current = animation.next
     end
   end
 
@@ -110,7 +118,7 @@ methods.animate = function(self, animation_name, assertive)
   if self.inventory then
     for _, item in pairs(self.inventory) do
       if item.animate and not item.animated_independently_flag then
-        item:animate(animation_name)
+        item:animate(animation_name, false, looped)
       end
     end
   end

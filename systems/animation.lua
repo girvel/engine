@@ -24,7 +24,7 @@ return Tiny.processingSystem {
     -- even if animation is 1 frame idle, still should play out for 1-frame FXs
     animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
     if math.floor(animation.frame) > #current_pack then
-      entity:animate("idle")
+      entity:animate(animation.next)
     end
     entity.sprite = current_pack[math.floor(animation.frame)]
   end,
