@@ -11,7 +11,7 @@ local tk = {}
 tk.find_target = function(entity, r)
   for d in Iteration.rhombus(r) do
     local e = State.grids.solids:slow_get(entity.position + d)
-    if e and State.hostility:get(entity, e) and e.hp and e.hp > 0 then
+    if e and State.hostility:get(entity, e) == "enemy" and e.hp and e.hp > 0 then
       return e
     end
   end

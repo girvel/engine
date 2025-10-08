@@ -34,6 +34,7 @@ end
 methods.init = function(self, entity)
   self._hostility_subscription = State.hostility:subscribe(function(attacker, target)
     if entity.hp <= 0 or not entity.faction then return end
+    if State.hostility:get(entity, attacker) == "ally" then return end
 
     if target == entity then
       State.hostility:set(entity.faction, attacker.faction, "enemy")

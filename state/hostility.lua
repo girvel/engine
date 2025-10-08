@@ -1,6 +1,10 @@
 local hostility = {}
 
---- @alias hostility "ally"|"enemy"|nil
+--- @alias hostility
+--- | '"ally"' # allies can't be attacked; if allies attacks your faction, ignores it
+--- | '"enemy"' # attack on sight
+--- | nil # can be attacked, can become enemies
+---
 
 --- @class state_hostility
 --- @field _are_hostile table<string, hostility>
