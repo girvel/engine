@@ -96,16 +96,17 @@ end
 --- @param destination vector
 --- @param uses_dash? boolean
 --- @param speed? number
+--- @return boolean
 api.travel = function(entity, destination, uses_dash, speed)
   Log.trace("travel %s %s -> %s", Name.code(entity), entity.position, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
     and (entity.position - destination):abs2() == 1)
-  then return end
+  then return true end
 
   local path = api.build_path(entity.position, destination)
   if path then
-    api.follow_path(entity, path, uses_dash, speed)
+    return api.follow_path(entity, path, uses_dash, speed)
   end
 end
 
@@ -142,12 +143,13 @@ end
 --- @param path vector[]
 --- @param uses_dash? boolean
 --- @param speed? number
+--- @return boolean
 api.follow_path = function(entity, path, uses_dash, speed)
   speed = speed or 5
 
   for _, position in ipairs(path) do
     if entity.resources.movement <= 0 and not (uses_dash and actions.dash:act(entity)) then
-      break
+      return false
     end
     if entity.position == Table.last(path) then break end
 
@@ -156,6 +158,8 @@ api.follow_path = function(entity, path, uses_dash, speed)
     if not actions.move(position - entity.position):act(entity) then break end
     async.sleep(1 / speed)
   end
+
+  return true
 end
 
 --- @param entity entity
