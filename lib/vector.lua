@@ -339,6 +339,22 @@ vector_methods.normalized_mut = function(self)
   return self
 end
 
+--- Rotate vector 90 degrees counterclockwise
+--- @return vector
+vector_methods.rotate_mut = function(self)
+  assert(#self == 2)
+  local t = self[1]
+  self[1] = -self[2]
+  self[2] = t
+  return self
+end
+
+--- Rotate vector 90 degrees counterclockwise
+--- @return vector
+vector_methods.rotate = function(self)
+  return self:copy():rotate_mut()
+end
+
 local SWIZZLE_BASES = {
   {
     x = 1,
