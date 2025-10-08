@@ -21,7 +21,17 @@ local levels, count, pretty
 --- @param ... any
 --- @return string
 log.format = function(fmt, ...)
-  return tostring(pretty(fmt)):format(pretty(...))
+  if type(fmt) == "string" then
+    return fmt:format(pretty(...))
+  else
+    if not select("#", ...) == 0 then
+      Error(
+        "Log.format's first argument should be of type string to use formatting args; got %s",
+        type(fmt)
+      )
+    end
+    return tostring(pretty(fmt))
+  end
 end
 
 --- @generic T
