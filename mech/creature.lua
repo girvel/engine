@@ -38,28 +38,54 @@ creature.make = function(...)
   return result
 end
 
---- @alias creature_modification "resources"|"max_hp"|"ability_score"|"skill_score"|"attack_roll"|"damage_roll"|"opportunity_attack_trigger"|"initiative_roll"|"armor"|"dex_armor_bonus"|"activation"|"hp"
+--- @alias creature_modification
+--- | '"resources"'
+--- | '"max_hp"'
+--- | '"ability_score"'
+--- | '"skill_score"'
+--- | '"attack_roll"'
+--- | '"damage_roll"'
+--- | '"opportunity_attack_trigger"'
+--- | '"initiative_roll"'
+--- | '"armor"'
+--- | '"dex_armor_bonus"'
+--- | '"activation"'
+--- | '"hp"'
+--- | '"outgoing_damage"'
 
 --- @param self entity
---- @param modification creature_modification
+--- @param modname creature_modification
 --- @param value any
 --- @param ... any
-methods.modify = function(self, modification, value, ...)
+methods.modify = function(self, modname, value, ...)
   local additional_args = {...}
-  modification = "modify_" .. modification
-  return Fun.iter(self.perks)
-    :chain(self.conditions)
-    :chain(
-      Fun.pairs(self.inventory)
-        :map(function(_, it) return it.perks end)
-        :filter(Fun.op.truth)
-        :reduce(Table.concat, {})
-    )
-    :filter(function(p) return p[modification] end)
-    :reduce(
-      function(acc, p) return p[modification](p, self, acc, unpack(additional_args)) end,
-      value
-    )
+  modname = "modify_" .. modname
+  for _, p in ipairs(self.perks) do
+    local mod = p[modname]
+    if mod then
+      value = mod(p, self, value, ...)
+    end
+  end
+
+  for _, p in ipairs(self.conditions) do
+    local mod = p[modname]
+    if mod then
+      value = mod(p, self, value, ...)
+    end
+  end
+
+  for _, it in pairs(self.inventory) do
+    if it.perks then
+      for _, p in ipairs(it.perks) do
+        local mod = p[modname]
+        if mod then
+          value = mod(p, self, value, ...)
+        end
+      end
+    end
+  end
+
+  return value
 end
 
 --- @alias rest_type "move"|"short"|"long"|"full"
