@@ -94,7 +94,9 @@ end
 --- @async
 --- @param entity entity
 --- @param destination vector
-api.travel = function(entity, destination)
+--- @param uses_dash? boolean
+--- @param speed? number
+api.travel = function(entity, destination, uses_dash, speed)
   Log.trace("travel %s %s -> %s", Name.code(entity), entity.position, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
@@ -103,7 +105,7 @@ api.travel = function(entity, destination)
 
   local path = api.build_path(entity.position, destination)
   if path then
-    api.follow_path(entity, path)
+    api.follow_path(entity, path, uses_dash, speed)
   end
 end
 
@@ -135,11 +137,16 @@ api.build_path = function(start, destination)
   end
 end
 
+--- @async
 --- @param entity entity
 --- @param path vector[]
-api.follow_path = function(entity, path)
+--- @param uses_dash? boolean
+--- @param speed? number
+api.follow_path = function(entity, path, uses_dash, speed)
+  speed = speed or 5
+
   for _, position in ipairs(path) do
-    if entity.resources.movement <= 0 and not actions.dash:act(entity) then
+    if entity.resources.movement <= 0 and not (uses_dash and actions.dash:act(entity)) then
       break
     end
     if entity.position == Table.last(path) then break end
@@ -147,7 +154,7 @@ api.follow_path = function(entity, path)
     coroutine.yield()
     if Random.chance(.1) then coroutine.yield() end
     if not actions.move(position - entity.position):act(entity) then break end
-    async.sleep(.25)
+    async.sleep(1 / speed)
   end
 end
 
