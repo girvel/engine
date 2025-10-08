@@ -146,14 +146,14 @@ vector.mt.__unm = function(self)
 end
 
 vector.mt.__tostring = function(self)
-  local result = "{"
+  local result = "("
   for i, value in ipairs(self) do
     if i > 1 then
-      result = result .. "; "
+      result = result .. ", "
     end
     result = result .. value
   end
-  return result .. "}"
+  return result .. ")"
 end
 
 vector.mt.__le = function(self, other)
