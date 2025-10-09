@@ -42,11 +42,28 @@ item.mixin = function(animation_path)
 end
 
 --- @param slot string
+--- @return item
 item.mixin_min = function(slot)
   return {
     tags = {},
     direction = Vector.right,
     slot = slot,
+  }
+end
+
+--- @param damage_roll d
+--- @param bonus integer?
+--- @return item
+item.natural_weapon = function(damage_roll, bonus)
+  return {
+    damage_roll = damage_roll,
+    bonus = bonus,
+
+    codename = "natural_weapon",
+    boring_flag = true,
+    no_drop_flag = true,
+    slot = "hands",
+    tags = {},
   }
 end
 
