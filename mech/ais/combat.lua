@@ -12,7 +12,7 @@ local combat_ai = {}
 --- @field targeting ai_targeting
 --- @field _hostility_subscription function
 local methods = {}
-local mt = {__index = methods}
+combat_ai.mt = {__index = methods}
 
 --- @type ai_targeting
 local DEFAULT_TARGETING = {
@@ -27,7 +27,7 @@ local DEFAULT_TARGETING = {
 combat_ai.new = function(targeting)
   return setmetatable({
     targeting = Table.defaults(targeting, DEFAULT_TARGETING),
-  }, mt)
+  }, combat_ai.mt)
 end
 
 --- @param entity entity
