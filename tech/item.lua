@@ -157,10 +157,12 @@ end
 --- @param value boolean
 --- @return nil
 item.set_cue = function(entity, slot, value)
-  local factory = assert(
-    entity.cues and entity.cues[slot] or item.cues[slot],
-    ("Slot %q is not supported"):format(slot)
-  )
+  if not item.existing_cues[slot] then
+    Error("Slot %q is not supported", slot)
+  end
+
+  local factory = entity.cues and entity.cues[slot] or item.cues[slot]
+  if not factory then return end
 
   if not entity.inventory then entity.inventory = {} end
   if (not not value) == (not not entity.inventory[slot]) then return end
@@ -173,19 +175,12 @@ item.set_cue = function(entity, slot, value)
 end
 
 --- @enum (key) cue_slot
-item.cues = {
-  blood = function()
-    return Table.extend(
-      animated.mixin("engine/assets/sprites/animations/blood"),
-      {
-        name = "Кровь",
-        codename = "blood",
-        slot = "blood",
-        boring_flag = true,
-      }
-    )
-  end,
+item.existing_cues = {
+  highlight = true,
+  blood = true,
+}
 
+item.cues = {
   highlight = function()
     return Table.extend(
       animated.mixin("engine/assets/sprites/animations/highlight", 1),

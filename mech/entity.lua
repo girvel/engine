@@ -15,11 +15,11 @@
 --- @field grid_layer string name of the grid layer; grid layers are a subset of all layers; mutually exclusive with .layer.
 --- @field ai ai
 --- @field shader shader individial shader to render with
---- @field sprite sprite
+--- @field sprite sprite [CONST]
 --- @field animation animation
 --- @field faction string determines hostility through State.hostility
---- @field sounds table<sound_event, sound_multiple>
---- @field cues table<cue_slot, fun(): item> Cue overrides (see item.set_cue)
+--- @field sounds table<sound_event, sound_multiple> [CONST]
+--- @field cues table<cue_slot, fun(): item> [CONST] Cue overrides (see item.set_cue)
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer
