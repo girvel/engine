@@ -145,7 +145,7 @@ end
 --- @param speed? number
 --- @return boolean
 api.follow_path = function(entity, path, uses_dash, speed)
-  speed = speed or 5
+  speed = speed or entity.speed or 5
 
   for _, position in ipairs(path) do
     if entity.resources.movement <= 0 and not (uses_dash and actions.dash:act(entity)) then
