@@ -396,5 +396,12 @@ api.curtain = function(duration, color)
   end, "curtain")
 end
 
+--- @param position vector
+--- @return boolean
+api.is_visible = function(position)
+  if not State.grids.solids:can_fit(position) then return false end
+  return tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(position))
+end
+
 Ldump.mark(api, {}, ...)
 return api
