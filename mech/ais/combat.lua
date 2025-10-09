@@ -33,22 +33,14 @@ end
 --- @param entity entity
 methods.init = function(self, entity)
   self._hostility_subscription = State.hostility:subscribe(function(attacker, target)
-    if entity.hp <= 0 or not entity.faction then return end
+    if entity.hp <= 0 then return end
     if State.hostility:get(entity, attacker) == "ally" then return end
 
-    if target == entity then
-      State.hostility:set(entity.faction, attacker.faction, "enemy")
-      if not State:in_combat(entity) then
-        Log.trace("AGGRESSIVE!")
-        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
-        State:start_combat({entity, attacker})
-      end
-    elseif target.faction == entity.faction
+    if State.hostility:get(entity, target) == "ally"
       and (target.position - entity.position):abs2() <= self.targeting.support_range
     then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       if not State:in_combat(entity) then
-        Log.trace("AGGRESSIVE!")
         State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
         State:start_combat({entity, attacker})
       end
@@ -92,26 +84,35 @@ end
 --- @param dt number
 methods.observe = function(self, entity, dt)
   if State.runner.locked_entities[State.player] or entity.hp <= 0 then return end
-
   if not Random.chance(dt / self.targeting.scan_period) then return end
 
-  -- starting/joining combat
-  if (not State.combat or not Table.contains(State.combat.list, entity)) then
-    local target = tk.find_target(entity, self.targeting.scan_range)
+  if State.combat then
+    if Table.contains(State.combat.list, entity) then return end
 
-    local condition = not not target
-    if target == State.player then
-      condition = (
-        not State.runner.locked_entities[State.player]
-        and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-        and (State.player.position - entity.position):abs2() <= self.targeting.scan_range
-      )
+    for _, e in ipairs(State.combat.list) do
+      if State.hostility:get(entity, e) == "ally"
+        and (entity.position - e.position):abs2() <= self.targeting.support_range
+      then
+        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+        State:start_combat({entity})
+      end
     end
+  end
 
-    if condition then
-      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
-      State:start_combat({target, entity})
-    end
+  local target = tk.find_target(entity, self.targeting.scan_range)
+
+  local condition = not not target
+  if target == State.player then
+    condition = (
+      not State.runner.locked_entities[State.player]
+      and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
+      and (State.player.position - entity.position):abs2() <= self.targeting.scan_range
+    )
+  end
+
+  if condition then
+    State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+    State:start_combat({target, entity})
   end
 end
 

@@ -1,7 +1,7 @@
 local hostility = {}
 
 --- @alias hostility
---- | '"ally"' # allies can't be attacked; if allies attacks your faction, ignores it
+--- | '"ally"' # allies are equivalent to members of the same faction
 --- | '"enemy"' # attack on sight
 --- | nil # can be attacked, can become enemies
 ---
@@ -22,8 +22,9 @@ end
 
 --- @param a entity
 --- @param b entity
---- @return hostility
+--- @return hostility # nil by default, "ally" if a == b
 methods.get = function(self, a, b)
+  if a == b then return "ally" end
   if not a.faction or not b.faction then
     return nil
   end
