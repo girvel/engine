@@ -280,7 +280,7 @@ base_attack = function(entity, slot)
 
   WHOOSH:play_at(entity.position)
 
-  entity:animate(slot .. "_attack", true):next(function()
+  entity:animate(slot .. "_attack"):next(function()
     State.hostility:register(entity, target)
 
     if not health.attack(

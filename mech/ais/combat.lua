@@ -83,7 +83,7 @@ methods.control = function(self, entity)
       api.heal(entity)
     end
 
-    api.travel(entity, target.position)
+    api.travel(entity, target.position, true)
     api.attack(entity, target)
   end
 end

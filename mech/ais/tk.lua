@@ -56,9 +56,9 @@ tk.preserve_line_of_fire = function(entity, target)
   end
 
   if best_p then
-    api.travel(entity, best_p)
+    api.travel(entity, best_p, true)
   else
-    api.travel(entity, target.position)
+    api.travel(entity, target.position, true)
   end
 end
 
