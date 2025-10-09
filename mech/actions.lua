@@ -102,11 +102,13 @@ actions.dash = Table.extend({
 
   sounds = sound.multiple("engine/assets/sounds/dash", .5),
 
+  _is_available = function()
+    return not not State.combat
+  end,
+
   _act = function(self, entity)
-    if State.combat then
-      State:add(animated.fx("engine/assets/sprites/animations/dash", entity.position))
-      self.sounds:play_at(entity.position)
-    end
+    State:add(animated.fx("engine/assets/sprites/animations/dash", entity.position))
+    self.sounds:play_at(entity.position)
     return true
   end,
 }, action.base)

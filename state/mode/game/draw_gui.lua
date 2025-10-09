@@ -231,7 +231,7 @@ draw_keyboard_action_grid = function(self)
     end
     ui.offset(4)
 
-    action_button(actions.dash, "lshift")
+    action_button(actions.dash, "z")
     ui.offset(4)
 
     action_button(actions.interact, "e")
