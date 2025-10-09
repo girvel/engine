@@ -126,4 +126,47 @@ grid.mt = {
   end,
 }
 
+--- @class iteration_bfs
+--- @field _base grid<any>
+--- @field _seen grid<true>
+--- @field _next vector[]
+--- @field _last vector?
+--- @operator call:vector?
+local bfs_methods = {}
+iteration._bfs_mt = {__index = bfs_methods}
+
+--- @param start vector
+--- @return iteration_bfs
+methods.bfs = function(self, start)
+  local result = setmetatable({
+    _base = self,
+    _seen = grid.new(self.size),
+    _next = {start},
+  }, iteration._bfs_mt)
+  result._seen[start] = true
+  return result
+end
+
+--- @param self iteration_bfs
+--- @return vector?, any
+iteration._bfs_mt.__call = function(self)
+  if self._last then
+    for _, d in ipairs(vector.directions) do
+      local p = self._last + d
+      if self._base:can_fit(p) and not self._seen[p] then
+        self._seen[p] = true
+        table.insert(self._next, p)
+      end
+    end
+  end
+
+  self._last = table.remove(self._next, 1)
+  return self._last, self._base[self._last]
+end
+
+bfs_methods.discard = function(self)
+  self._last = nil
+end
+
+
 return grid
