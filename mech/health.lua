@@ -94,7 +94,11 @@ end
 --- @param value integer
 --- @return nil
 health.set_hp = function(target, value)
-  target.hp = target:modify("hp", value)
+  if target.modify then
+    value = target:modify("hp", value)
+  end
+
+  target.hp = value
 
   if target.get_max_hp and not target.no_blood_flag then
     item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
@@ -129,7 +133,10 @@ health.attack = function(source, target, attack_roll, damage_roll)
     damage_roll = damage_roll + D.new(damage_roll.dice, 0)
   end
 
-  local damage_amount = source:modify("outgoing_damage", damage_roll:roll(), target, is_critical)
+  local damage_amount = damage_roll:roll()
+  if source.modify then
+    damage_amount = source:modify("outgoing_damage", damage_amount, target, is_critical)
+  end
   health.damage(target, damage_amount, is_critical)
   return true
 end

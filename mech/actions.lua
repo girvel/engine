@@ -45,7 +45,9 @@ actions.move = Memoize(function(direction)
         if solid and not solid.transparent_flag then return false end
       end
 
-      if entity:modify("opportunity_attack_trigger", true) and entity.grid_layer == "solids" then
+      if (not entity.modify or entity:modify("opportunity_attack_trigger", true))
+        and entity.grid_layer == "solids"
+      then
         Fun.iter(Vector.directions)
           :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
           :filter(function(e)

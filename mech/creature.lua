@@ -58,7 +58,6 @@ end
 --- @param value any
 --- @param ... any
 methods.modify = function(self, modname, value, ...)
-  local additional_args = {...}
   modname = "modify_" .. modname
   for _, p in ipairs(self.perks) do
     local mod = p[modname]

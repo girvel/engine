@@ -1,4 +1,6 @@
 local safety = require "engine.tech.safety"
+
+
 local action = {}
 
 --- @class action
@@ -21,7 +23,7 @@ action.base = {
   end,
 
   act = function(self, entity)
-    if not entity:modify("activation", true, self.codename) then return false end
+    if entity.modify and not entity:modify("activation", true, self.codename) then return false end
     if not safety.call(self.is_available, self, entity) then return false end
     if self._act then
       local result = safety.call(self._act, self, entity)
