@@ -172,9 +172,21 @@ api.attack = function(entity, target)
   entity:rotate(direction)
 
   fighter.action_surge:act(entity)
-  while actions.hand_attack:act(entity) or actions.offhand_attack:act(entity) do
+  while true do
+    if not actions.hand_attack:is_available(entity)
+      and not actions.offhand_attack:is_available(entity)
+    then
+      break
+    end
+
     while not entity.animation.current:starts_with("idle") do
       coroutine.yield()
+    end
+
+    if not actions.hand_attack:act(entity)
+      and not actions.offhand_attack:act(entity)
+    then
+      break
     end
   end
 end
