@@ -140,8 +140,9 @@ draw_hp_bar = function()
     local base_saturation = math.min(saturation, 1)
     local extra_saturation = saturation > 1 and (1 - 1 / saturation)
 
-    ui.start_frame(8, 8, math.floor((HP_BAR_W - 16) * base_saturation / 4) * 4, HP_BAR_H)
-      ui.tile(gui.hp_bar)
+    local bar_w = math.floor((HP_BAR_W - 16) * base_saturation / 4)
+    ui.start_frame(8, 8, bar_w * 4, HP_BAR_H)
+      ui.tile(bar_w > 3 and gui.hp_bar or gui.hp_bar_min)
     ui.finish_frame()
 
     if extra_saturation then
