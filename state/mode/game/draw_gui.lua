@@ -104,7 +104,7 @@ end
 
 action_button = function(action, hotkey)
   local player = State.player
-  local is_available = action:is_available(player)
+  local is_available = action:is_available(player) and State.player:can_act()
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_clicked then
