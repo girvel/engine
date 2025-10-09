@@ -10,8 +10,8 @@ local runner = {}
 
 --- @class scene
 --- @field characters? table<string, table>
---- @field start_predicate fun(self: scene|table, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any
---- @field run fun(self: scene|table, ch: runner_characters, ps: runner_positions): any
+--- @field start_predicate fun(self: scene|table, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any, ...
+--- @field run fun(self: scene|table, ch: runner_characters, ps: runner_positions, ...): any
 --- @field enabled? boolean
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"
@@ -64,50 +64,56 @@ methods.update = function(self, dt)
       ("scene %q's character"):format(scene_name)
     )
 
-    if scene.enabled
+    if not (scene.enabled
       and (not self.save_lock or self.save_lock == scene or scene.on_cancel)
       and (scene.mode == "parallel" or not self:is_running(scene))
       and (scene.in_combat_flag or not State.combat or Table.count(characters) == 0)
       and Fun.pairs(characters):all(function(_, c)
         return State:exists(c) and not self.locked_entities[c]
-      end)
-      and scene:start_predicate(dt, characters, self.positions)
+      end))
     then
-      for _, character in pairs(characters) do
-        self.locked_entities[character] = true
-      end
-      -- outside coroutine to avoid two scenes with the same character starting in the same frame
-
-      table.insert(self._scene_runs, setmetatable({
-        coroutine = coroutine.create(function()
-          if not scene.mode then
-            scene.enabled = nil
-          end
-
-          if not scene.boring_flag then
-            Log.info("Scene %q starts", scene_name)
-          end
-
-          safety.call(scene.run, scene, characters, self.positions)
-
-          for _, character in pairs(characters) do
-            self.locked_entities[character] = nil
-          end
-
-          if Table.key_of(characters, State.player) then
-            State.perspective.target_override = nil
-            State.perspective.is_camera_following = true
-            State.player.curtain_color = Vector.transparent
-          end
-
-          if not scene.boring_flag then
-            Log.info("Scene %q ends", scene_name)
-          end
-        end),
-        base_scene = scene,
-        name = scene_name,
-      }, scene_run_mt))
+      goto continue
     end
+ 
+    local args = {scene:start_predicate(dt, characters, self.positions)}
+    if not args[1] then goto continue end
+
+    -- outside coroutine to avoid two scenes with the same character starting in the same frame
+    for _, character in pairs(characters) do
+      self.locked_entities[character] = true
+    end
+
+    table.insert(self._scene_runs, setmetatable({
+      coroutine = coroutine.create(function()
+        if not scene.mode then
+          scene.enabled = nil
+        end
+
+        if not scene.boring_flag then
+          Log.info("Scene %q starts", scene_name)
+        end
+
+        safety.call(scene.run, scene, characters, self.positions, unpack(args))
+
+        for _, character in pairs(characters) do
+          self.locked_entities[character] = nil
+        end
+
+        if Table.key_of(characters, State.player) then
+          State.perspective.target_override = nil
+          State.perspective.is_camera_following = true
+          State.player.curtain_color = Vector.transparent
+        end
+
+        if not scene.boring_flag then
+          Log.info("Scene %q ends", scene_name)
+        end
+      end),
+      base_scene = scene,
+      name = scene_name,
+    }, scene_run_mt))
+
+    ::continue::
   end
 
   local indexes_to_remove = {}
