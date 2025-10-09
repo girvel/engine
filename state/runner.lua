@@ -67,7 +67,7 @@ methods.update = function(self, dt)
     if scene.enabled
       and (not self.save_lock or self.save_lock == scene or scene.on_cancel)
       and (scene.mode == "parallel" or not self:is_running(scene))
-      and (scene.in_combat_flag or not rawget(characters, "player") or not State.combat)
+      and (scene.in_combat_flag or not State.combat or Table.count(characters) == 0)
       and Fun.pairs(characters):all(function(_, c)
         return State:exists(c) and not self.locked_entities[c]
       end)
