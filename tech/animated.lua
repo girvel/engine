@@ -20,29 +20,13 @@ local methods = {}
 
 local load_pack
 
+--- @alias atlas_n integer|nil|"no_atlas"
+
 --- @param path string
---- @param atlas_n (integer|nil|"no_atlas") if nil, interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
+--- @param atlas_n atlas_n if nil, interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
 --- @return table
 animated.mixin = function(path, atlas_n)
-  local pack do
-    local base_pack = load_pack(path, atlas_n ~= "no_atlas")
-    if atlas_n then
-      if atlas_n == "no_atlas" then atlas_n = 1 end
-      pack = base_pack[atlas_n]
-    else
-      assert(
-        #base_pack == 4,
-        ("Directional animation atlas %s should contain 4 cells, got %s"):format(path, #base_pack)
-      )
-      pack = {}
-      for i, direction_name in ipairs {"up", "left", "down", "right"} do
-        for animation_name, frames in pairs(base_pack[i]) do
-          pack[animation_name .. "_" .. direction_name] = frames
-        end
-      end
-    end
-  end
-
+  local pack = load_pack(path, atlas_n)
   return Table.extend({
     animation = {
       pack = pack,
@@ -56,8 +40,9 @@ end
 
 --- @param entity entity
 --- @param path string
-animated.change_pack = function(entity, path)
-  entity.animation.pack = load_pack(path)
+--- @param atlas_n atlas_n
+animated.change_pack = function(entity, path, atlas_n)
+  entity.animation.pack = load_pack(path, atlas_n)
   entity:animate()
 end
 
@@ -143,7 +128,7 @@ end
 
 --- @param folder_path string
 --- @return animation_pack[]
-load_pack = Memoize(function(folder_path, is_atlas)
+local load_pack_raw = Memoize(function(folder_path, is_atlas)
   local info = love.filesystem.getInfo(folder_path)
   assert(info, "No folder %q, unable to load animation" % {folder_path})
   assert(info.type == "directory", "%q is not a folder, unable to load animation" % {folder_path})
@@ -209,6 +194,26 @@ load_pack = Memoize(function(folder_path, is_atlas)
 
   return result
 end)
+
+load_pack = function(path, atlas_n)
+  local base_pack = load_pack_raw(path, atlas_n ~= "no_atlas")
+  if atlas_n then
+    if atlas_n == "no_atlas" then atlas_n = 1 end
+    return base_pack[atlas_n]
+  end
+
+  assert(
+    #base_pack == 4,
+    ("Directional animation atlas %s should contain 4 cells, got %s"):format(path, #base_pack)
+  )
+  local pack = {}
+  for i, direction_name in ipairs {"up", "left", "down", "right"} do
+    for animation_name, frames in pairs(base_pack[i]) do
+      pack[animation_name .. "_" .. direction_name] = frames
+    end
+  end
+  return pack
+end
 
 Ldump.mark(animated, {}, ...)
 return animated
