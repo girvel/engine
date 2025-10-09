@@ -245,11 +245,13 @@ give_to_a_hand = function(slot, entity, this_item)
   assert(slot == "hand" or slot == "offhand")
   local other = entity.inventory[slot == "hand" and "offhand" or "hand"]
 
-  local needs_two_hands = this_item.tags.two_handed
+  local needs_two_hands = other and (
+    this_item.tags.two_handed
     or other.tags.two_handed
     or (not this_item.tags.light or not other.tags.light)
       and this_item.damage_roll
       and other.damage_roll
+  )
 
   if needs_two_hands then
     return item.drop(entity, "hand", "offhand")
