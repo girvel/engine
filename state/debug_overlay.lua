@@ -98,21 +98,27 @@ end
 report_scenes = function()
   if not State.rails then return end
 
-  local scenes = State.runner.scenes
+  local scenes = {}
   local enabled_n, total_n do
     enabled_n = 0
     total_n = 0
-    for _, v in pairs(scenes) do
+    for k, v in pairs(State.runner.scenes) do
       if v.enabled then
         enabled_n = enabled_n + 1
       end
       total_n = total_n + 1
+      table.insert(scenes, {k, v})
     end
+
+    table.sort(scenes, function(a, b)
+      return a[1] < b[1]
+    end)
   end
 
   ui.br()
   ui.text(("[F4] enabled scenes (%s/%s):"):format(enabled_n, total_n))
-  for k, v in pairs(scenes) do
+  for _, pair in ipairs(scenes) do
+    k, v = unpack(pair)
     ui.text((v.enabled and "+" or "-") .. " " .. k)
   end
 
