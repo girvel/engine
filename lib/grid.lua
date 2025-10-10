@@ -68,6 +68,15 @@ end
 
 --- @generic T
 --- @param self grid<T>
+--- @param x integer
+--- @param y integer
+--- @param value T
+methods.unsafe_set = function(self, x, y, value)
+  self._inner_array[self:_get_inner_index(x, y)] = value
+end
+
+--- @generic T
+--- @param self grid<T>
 --- @return any
 methods.iter = function(self)
   return Fun.iter(pairs(self._inner_array))
