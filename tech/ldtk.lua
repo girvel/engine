@@ -86,22 +86,24 @@ local handle_tiles_or_intgrid = function(is_tiles)
       )
 
       local e = factory()
-      e.position = Vector.own(instance.px)
-        :div_mut(this_parser._level_info.cell_size)
-        :add_mut(Vector.one)
-        :add_mut(offset)
+      if e then
+        e.position = Vector.own(instance.px)
+          :div_mut(this_parser._level_info.cell_size)
+          :add_mut(Vector.one)
+          :add_mut(offset)
 
-      if not is_invisible then
-        e.grid_layer = layer_id
+        if not is_invisible then
+          e.grid_layer = layer_id
 
-        local rails_name = this_parser._to_capture[layer_id][e.position]
-        if rails_name then
-          this_parser._were_captured[rails_name] = true
-          this_parser._captures.entities[rails_name] = e
+          local rails_name = this_parser._to_capture[layer_id][e.position]
+          if rails_name then
+            this_parser._were_captured[rails_name] = true
+            this_parser._captures.entities[rails_name] = e
+          end
         end
-      end
 
-      table.insert(this_parser._entities, e)
+        table.insert(this_parser._entities, e)
+      end
     end
   end
 end

@@ -23,7 +23,8 @@ local state = {}
 --- @field debug boolean
 --- @field args table CLI args
 --- @field rails rails
---- @field grids table<string, grid<entity>>
+--- @field grids? table<string, grid<entity>>
+--- @field shadow? grid<number>
 --- @field grid_size vector
 --- @field level level_info
 --- @field player player
@@ -182,6 +183,8 @@ methods.load_level = function(self, path)
     "Missing \"solids\" grid_layer; required for FOV and pathing to work"
   ))
 
+  self.shadow = Grid.new(self.level.grid_size, function() return 0 end)
+
   for layer, grid in pairs(self.grids) do
     State:add({
       codename = layer .. "_grid_container",
@@ -189,6 +192,19 @@ methods.load_level = function(self, path)
       layer = layer,
       position = Vector.zero,
     })
+  end
+
+  for x = 1, self.level.grid_size.x do
+    for y = 1, self.level.grid_size.y do
+      State:add({
+        codename = "shadow",
+        boring_flag = true,
+        sprite = sprite.image("engine/assets/sprites/shadow.png"),
+        color = V(1, 1, 1, 0),
+        grid_layer = "shadows",
+        position = V(x, y),
+      })
+    end
   end
 
   local BATCH_SIZE = 1024

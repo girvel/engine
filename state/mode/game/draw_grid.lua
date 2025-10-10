@@ -19,8 +19,8 @@ local draw_grid = function(self, layer, grid, dt)
     sprite_batch:clear()
   end
 
-  for x = State.perspective.vision_start.x, State.perspective.vision_end.x do
-    for y = State.perspective.vision_start.y, State.perspective.vision_end.y do
+  for x = State.perspective.vision_start.x, State.perspective.vision_finish.x do
+    for y = State.perspective.vision_start.y, State.perspective.vision_finish.y do
       if not snapshot:is_visible_unsafe(x, y) then goto continue end
 
       local e = grid:unsafe_get(x, y)

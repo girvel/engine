@@ -11,7 +11,7 @@ local smooth_camera_offset
 --- @field is_camera_following boolean
 --- @field camera_offset vector
 --- @field vision_start vector
---- @field vision_end vector
+--- @field vision_finish vector
 --- @field sidebar_w integer
 --- @field SCALE integer
 local methods = {}
@@ -23,7 +23,7 @@ perspective.new = function()
     is_camera_following = true,
     camera_offset = Vector.zero,
     vision_start = Vector.zero,
-    vision_end = Vector.zero,
+    vision_finish = Vector.zero,
     sidebar_w = 0,
     SCALE = 4,
   }, perspective.mt)
@@ -61,13 +61,13 @@ methods.update = function(self, dt)
   do
     local total_scale = self.SCALE * State.level.cell_size
     self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
-    self.vision_end = self.vision_start
+    self.vision_finish = self.vision_start
       + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)
 
     self.vision_start = Vector.use(
       Math.median, Vector.one, self.vision_start, State.level.grid_size
     )
-    self.vision_end = Vector.use(Math.median, Vector.one, self.vision_end, State.level.grid_size)
+    self.vision_finish = Vector.use(Math.median, Vector.one, self.vision_finish, State.level.grid_size)
   end
 
   tcod.snapshot(State.grids.solids):refresh_fov(State.player.position, State.player.fov_r)

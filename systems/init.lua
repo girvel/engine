@@ -25,6 +25,7 @@ local result = {
   safety.live_system(require("engine.systems.drifting")),     -- small
   safety.live_system(require("engine.systems.timed_death")),  -- small
   safety.live_system(require("engine.systems.running")),      -- small
+  safety.live_system(require("engine.systems.update_shadows")),
 
   -- love.draw
   require("engine.systems.drawing"),
