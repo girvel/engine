@@ -22,6 +22,8 @@ local read_json, put_positions, put_entities, put_tiles
 --- @return preload_level
 local preload = function(path)
   local root = read_json(path)
+
+  local start_t = love.timer.getTime()
   local result = {
     size = Vector.zero,
     positions = {},
@@ -65,6 +67,7 @@ local preload = function(path)
     end
   end
 
+  Log.info("Preloaded the level in %.2f", love.timer.getTime() - start_t)
   return result
 end
 
@@ -80,6 +83,8 @@ end
 --- @param path string
 --- @return table
 read_json = function(path)
+  local start_t = love.timer.getTime()
+
   local content = love.filesystem.read(path)
   coroutine.yield(0)
 
@@ -95,7 +100,10 @@ read_json = function(path)
   while true do
     coroutine.yield(0)
     local result = love.thread.getChannel('json'):pop()
-    if result then return result end
+    if result then
+      Log.info("Read & parsed JSON %q in %.2f s", path, love.timer.getTime() - start_t)
+      return result
+    end
   end
 end
 

@@ -158,11 +158,10 @@ end
 methods.load_level = function(self, path)
   self.is_loaded = false
   Log.info("Loading level %s", path)
-  local start_time = love.timer.getTime()
+  local start_t = love.timer.getTime()
 
   local load_data = ldtk.load(path)
-  local read_time = love.timer.getTime()
-  Log.info("Read level files in %.2f s", read_time - start_time)
+  local read_t = love.timer.getTime()
 
   self.level = load_data.level_info
   Log.info("State.level == %s", self.level)
@@ -205,11 +204,9 @@ methods.load_level = function(self, path)
   self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
 
   coroutine.yield()
-  local end_time = love.timer.getTime()
-  Log.info(
-    "Added %s entities in %.2f s, total time %.2f s",
-    #load_data.entities, end_time - read_time, end_time - start_time
-  )
+  local end_t = love.timer.getTime()
+  Log.info("Added %s entities in %.2f s", #load_data.entities, end_t - read_t)
+  Log.info("Total time %.2f s", end_t - start_t)
 
   self.is_loaded = true
 end

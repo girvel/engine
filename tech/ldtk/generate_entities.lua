@@ -10,6 +10,7 @@ local level = require "engine.tech.level"
 --- @param preload_entities table<layer|string, preload_entity[]>
 --- @return generation_data
 local generate_entities = function(palette, preload_entities)
+  local start_t = love.timer.getTime()
   local result = {
     entities = {},
     runner_entities = {},
@@ -74,6 +75,7 @@ local generate_entities = function(palette, preload_entities)
     ::continue::
   end
 
+  Log.info("Generated entities in %.2f s", love.timer.getTime() - start_t)
   return result
 end
 
