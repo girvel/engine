@@ -9,4 +9,14 @@ common.nil_serialized = function(value)
   return value
 end
 
+--- @param expression string
+--- @return any
+common.eval = function(expression)
+  local f = loadstring("return " .. expression, expression)
+  if not f then
+    error(("Invalid syntax in %q"):format(expression), 1)
+  end
+  return f()
+end
+
 return common

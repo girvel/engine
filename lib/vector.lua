@@ -286,12 +286,18 @@ end
 
 --- @param self vector
 --- @return number
-vector_methods.abs = function(self)
+vector_methods.square_abs = function(self)
   local result = 0
   for _, value in ipairs(self) do
     result = result + value^2
   end
-  return math.sqrt(result)
+  return result
+end
+
+--- @param self vector
+--- @return number
+vector_methods.abs = function(self)
+  return math.sqrt(self:square_abs())
 end
 
 --- @param self vector
