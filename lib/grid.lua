@@ -107,13 +107,17 @@ methods.find_free_position = function(self, start, max_radius)
   return self:find_free_positions(start, max_radius)() or nil
 end
 
---- @generic T
---- @param self grid<T>
 --- @param x integer
 --- @param y integer
 --- @return integer
 methods._get_inner_index = function(self, x, y)
   return x + (y - 1) * self.size[1]
+end
+
+--- @param i integer
+--- @return integer, integer
+methods._get_outer_index = function(self, i)
+  return Math.loopmod(i, self.size.x), math.floor((i - 1) / self.size.x) + 1
 end
 
 grid.mt = {

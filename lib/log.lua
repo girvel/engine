@@ -158,7 +158,7 @@ pretty = function(...)
   for i = 1, select('#', ...) do
     local x = select(i, ...)
     if type(x) == "table" then
-      x = Name.code(x, nil) or inspect(x, {depth = 3})
+      x = Name.code(x, nil) or inspect(x, {depth = 3, keys_limit = 20})
     end
     result[i] = x
   end

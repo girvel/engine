@@ -3,30 +3,30 @@ local ldtk = {}
 
 local parser_new
 
---- Level's init.lua return
---- @class level_definition
---- @field ldtk {path: string, level: string}
---- @field palette table<string, table<string | integer, function>>
---- @field cell_size integer
---- @field layers string[] global layers in order
---- @field rails_factory (fun(...): rails)
---- @field scenes runner_scenes
+-- Level's init.lua return
+-- @class level_definition
+-- @field ldtk {path: string, level: string}
+-- @field palette table<string, table<string | integer, function>>
+-- @field cell_size integer
+-- @field layers string[] global layers in order
+-- @field rails_factory (fun(...): rails)
+-- @field scenes runner_scenes
 
---- General information about the level
---- @class level_info
---- @field grid_layers string[] grid layers in order
---- @field layers string[] global layers in order
---- @field atlases table<string, love.Image> atlas images for each grid_layer that uses them
---- @field cell_size integer size of a single grid cell in pixels before scaling
---- @field grid_size vector
+-- General information about the level
+-- @class level_info
+-- @field grid_layers string[] grid layers in order
+-- @field layers string[] global layers in order
+-- @field atlases table<string, love.Image> atlas images for each grid_layer that uses them
+-- @field cell_size integer size of a single grid cell in pixels before scaling
+-- @field grid_size vector
 
---- @class load_result
---- @field level_info level_info
---- @field entities entity[]
---- @field rails rails
---- @field runner_entities table<string, entity>
---- @field runner_positions table<string, vector>
---- @field runner_scenes runner_scenes
+-- @class load_result
+-- @field level_info level_info
+-- @field entities entity[]
+-- @field rails rails
+-- @field runner_entities table<string, entity>
+-- @field runner_positions table<string, vector>
+-- @field runner_scenes runner_scenes
 
 --- Read LDtk level file
 --- @async
