@@ -31,7 +31,7 @@ water.new = Memoize(function(palette_path, palette_real_colors_n)
     love_shader = build_love_shader(palette_path, palette_real_colors_n),
 
     preprocess = function(self, entity, dt)
-      local offset = ((love.timer.getTime() * entity.water_velocity) % 16):map(math.floor) / 16
+      local offset = ((love.timer.getTime() * entity.water_velocity) % Constants.cell_size):map(math.floor) / Constants.cell_size
       self.love_shader:send("offset", offset)
       local image = self:_get_reflection_image(entity)
       self.love_shader:send("reflects", image ~= nil)

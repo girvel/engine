@@ -270,11 +270,11 @@ api.fade_in = function()
 end
 
 api.fade_move = function(position)
-  local offset = State.perspective.camera_offset + State.player.position * State.level.cell_size * 4
+  local offset = State.perspective.camera_offset + State.player.position * Constants.cell_size * 4
   State.perspective.is_camera_following = false
   api.fade_out()
     level.slow_move(State.player, position)
-    State.perspective.camera_offset = offset - State.player.position * State.level.cell_size * 4
+    State.perspective.camera_offset = offset - State.player.position * Constants.cell_size * 4
     async.sleep(2)
   api.fade_in()
   State.perspective.is_camera_following = true

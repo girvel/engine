@@ -40,7 +40,7 @@ safety.assert = function(condition, message)
 end
 
 --- Errors in debug mode, warns in release
---- @param fmt string
+--- @param fmt any
 --- @param ... any
 safety.error = function(fmt, ...)
   local message = Log.format(fmt, ...)

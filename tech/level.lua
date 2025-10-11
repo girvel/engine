@@ -1,6 +1,28 @@
 --- Module for level grid logic
 local level = {}
 
+--- @alias grid_layer "tiles"|"on_tiles"|"items"|"solids"|"on_solids"|"shadows"
+level.grid_layers = {
+  "tiles",
+  "on_tiles",
+  "items",
+  "solids",
+  "on_solids",
+  "shadows",
+}
+
+--- @alias layer "tiles"|"on_tiles"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"shadows"
+level.layers = {
+  "tiles",
+  "on_tiles",
+  "fx_under",
+  "items",
+  "solids",
+  "fx_over",
+  "on_solids",
+  "shadows",
+}
+
 --- @alias grid_positioned {position: vector, grid_layer: string}
 
 --- Forcefully move entity to a new position

@@ -49,7 +49,7 @@ draw_points = function(points)
     love.graphics.setColor(point.color)
     local v
     if point.view == "grid" then
-      v = point.position * 4 * State.level.cell_size + State.perspective.camera_offset
+      v = point.position * 4 * Constants.cell_size + State.perspective.camera_offset
     elseif point.view == "absolute" then
       v = point.position + State.perspective.camera_offset
     elseif point.view == "gui" then

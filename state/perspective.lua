@@ -1,4 +1,5 @@
 local tcod = require("engine.tech.tcod")
+local level= require("engine.tech.level")
 
 
 local perspective = {}
@@ -30,13 +31,10 @@ perspective.new = function()
 end
 
 methods.center_camera = function(self, target_x, target_y)
-  local k = State.level.cell_size * self.SCALE
+  local k = Constants.cell_size * self.SCALE
   return
     math.floor(love.graphics.getWidth() / 2 - self.sidebar_w - target_x * k),
     math.floor(love.graphics.getHeight() / 2 - target_y * k)
-
-  -- local window_size = V(love.graphics.getDimensions()) - V(self.sidebar_w, 0)
-  -- return -(position) * State.level.cell_size * self.SCALE + window_size / 2
 end
 
 methods.update = function(self, dt)
@@ -59,7 +57,7 @@ methods.update = function(self, dt)
   end
 
   do
-    local total_scale = self.SCALE * State.level.cell_size
+    local total_scale = self.SCALE * Constants.cell_size
     self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
     self.vision_end = self.vision_start
       + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)

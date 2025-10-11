@@ -79,7 +79,7 @@ end
 --- @param base love.ImageData
 --- @param n integer
 sprite.utility.select = function(base, n)
-  local w, h = 16, 16
+  local w, h = Constants.cell_size, Constants.cell_size
   local result = love.image.newImageData(w, h)
   local base_w = base:getWidth()
 

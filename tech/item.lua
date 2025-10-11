@@ -81,7 +81,7 @@ item.anchor_offset = function(entity, slot)
   local item_anchor = this_item.sprite and this_item.sprite.anchors.parent
   if not item_anchor then return Vector.zero end
 
-  return (parent_anchor - item_anchor):div_mut(16)
+  return (parent_anchor - item_anchor):div_mut(Constants.cell_size)
 end
 
 --- @param parent entity

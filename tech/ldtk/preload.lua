@@ -29,8 +29,8 @@ local preload = function(path)
   }  --[[@as preload_level]]
 
   for _, level in ipairs(root.levels) do
-    local offset = V(level.worldX, level.worldY) / 16
-    local size = V(level.pxWid, level.pxHei) / 16
+    local offset = V(level.worldX, level.worldY) / Constants.cell_size
+    local size = V(level.pxWid, level.pxHei) / Constants.cell_size
     result.size = Vector.use(math.max, result.size, offset + size)
 
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
@@ -119,8 +119,8 @@ end
 
 local absolute_position = function(instance)
   return V(
-    instance.__worldX / 16 + 1,
-    instance.__worldY / 16 + 1
+    instance.__worldX / Constants.cell_size + 1,
+    instance.__worldY / Constants.cell_size + 1
   )
 end
 
@@ -129,7 +129,7 @@ local relative_position = function(instance)
 end
 
 local tile_relative_position = function(instance)
-  return Vector.own(instance.px):div_mut(16):add_mut(Vector.one)
+  return Vector.own(instance.px):div_mut(Constants.cell_size):add_mut(Vector.one)
 end
 
 --- @param layer table

@@ -1,6 +1,8 @@
 Log = require("engine.lib.log")
 Ldump = require("engine.lib.ldump")
 
+Constants = require("engine.tech.constants")
+
 
 Kernel = require("engine.kernel").new()
 

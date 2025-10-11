@@ -11,7 +11,7 @@ local draw_entity = function(self, entity, dt)
 
   local x, y = unpack(entity.position)
   local dx, dy = unpack(State.perspective.camera_offset)
-  local k = State.perspective.SCALE * State.level.cell_size
+  local k = State.perspective.SCALE * Constants.cell_size
   x = dx + x * k
   y = dy + y * k
 

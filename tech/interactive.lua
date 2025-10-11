@@ -1,3 +1,4 @@
+local level = require "engine.tech.level"
 local interactive = {}
 
 --- @class _interactive_methods
@@ -21,7 +22,7 @@ end
 --- @param position vector
 --- @return entity?
 interactive.get_at = function(position)
-  for _, layer in ipairs(State.level.grid_layers) do
+  for _, layer in ipairs(level.grid_layers) do
     local e = State.grids[layer]:slow_get(position)
     if e and e.interact then
       return e

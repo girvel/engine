@@ -9,7 +9,7 @@ local death = {}
 local methods = {}
 local mt = {__index = methods}
 
-local SCALE = 16
+local SCALE = Constants.cell_size
 
 methods.draw_gui = function(self)
   local w, h = love.graphics.getDimensions()

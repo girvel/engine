@@ -604,7 +604,7 @@ use_mouse = function(self)
 
     local position = V(love.mouse.getPosition())
       :sub_mut(State.perspective.camera_offset)
-      :div_mut(State.level.cell_size * 4)
+      :div_mut(Constants.cell_size * 4)
       :map_mut(math.floor)
     local solid = State.grids.solids:slow_get(position)
     local interaction_target = interactive.get_at(position)

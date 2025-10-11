@@ -1,4 +1,5 @@
 local preload = require("engine.tech.ldtk.preload")
+local generate_entities = require("engine.tech.ldtk.generate_entities")
 
 
 local ldtk = {}
@@ -7,11 +8,13 @@ local ldtk = {}
 -- [Section] External API
 ----------------------------------------------------------------------------------------------------
 
+--- @alias palette table<string, table<string | integer, function>>
+
 --- Level's init.lua return
 --- @class level_definition
 --- @field ldtk_path string
---- @field palette table<string, table<string | integer, function>>
---- @field rails_factory (fun(...): rails)
+--- @field palette palette
+--- @field rails rails
 --- @field scenes runner_scenes
 
 --- General information about the level
@@ -34,7 +37,19 @@ local ldtk = {}
 ldtk.load = function(path)
   local definition = love.filesystem.load(path .. "/init.lua")() --[[@as level_definition]]
   local preload_data = preload(definition.ldtk_path)
-  Error(preload_data)
+  local generation_data = generate_entities(definition.palette, preload_data.entities)
+
+  return {
+    level_info = {
+      atlases = generation_data.atlases,
+      grid_size = preload_data.size,
+    },
+    entities = generation_data.entities,
+    rails = definition.rails,
+    runner_entities = generation_data.runner_entities,
+    runner_positions = preload_data.positions,
+    runner_scenes = definition.scenes,
+  }
 end
 
 ----------------------------------------------------------------------------------------------------

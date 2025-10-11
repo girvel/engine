@@ -11,8 +11,8 @@
 --- @field speed number
 --- @field rotation number purely visual sprite rotation in radians
 --- @field size vector
---- @field layer string name of the global display layer; nil if entity is in a grid: mutually exclusive with .grid_layer
---- @field grid_layer string name of the grid layer; grid layers are a subset of all layers; mutually exclusive with .layer.
+--- @field layer layer name of the global display layer; nil if entity is in a grid: mutually exclusive with .grid_layer
+--- @field grid_layer grid_layer name of the grid layer; grid layers are a subset of all layers; mutually exclusive with .layer.
 --- @field ai ai
 --- @field shader shader individial shader to render with
 --- @field sprite sprite [CONST]

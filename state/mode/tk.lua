@@ -61,7 +61,7 @@ tk.draw_entity = function(entity, x, y, scale)
       local item_sprite = this_item.sprite
       if not item_sprite then return end
 
-      local dx, dy = unpack(item.anchor_offset(entity, slot):mul_mut(scale * 16))
+      local dx, dy = unpack(item.anchor_offset(entity, slot):mul_mut(scale * Constants.cell_size))
       local item_x = x + dx
       local item_y = y + dy
       love.graphics.draw(item_sprite.image, item_x, item_y, 0, scale)
@@ -106,7 +106,8 @@ tk.finish_block = function(start)
   ui.finish_frame()
 
   local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING + 4
-  ui.start_frame(-16, -16, start.w + 32, h + 32)
+  local k = Constants.cell_size
+  ui.start_frame(-k, -k, start.w + 2*k, h + 2*k)
     ui.tile(gui_elements.sidebar_block_bg)
   ui.finish_frame()
   ui.offset(0, h)
