@@ -111,7 +111,7 @@ methods.get_resources = function(self, rest_type)
       self:get_resources("long")
     )
   else
-    error("Unknown rest type %q" % {rest_type})
+    Error("Unknown rest type %q", rest_type)
   end
 
   return self:modify("resources", result, rest_type)
@@ -161,7 +161,9 @@ methods.get_modifier = function(self, ability)
     ))
   end
 
-  assert(abilities.skill_bases[ability], "%s is not a skill nor an ability" % {ability})
+  if not abilities.skill_bases[ability] then
+    Error("%s is not a skill nor an ability", ability)
+  end
 
   return self:modify(
     "skill_score",

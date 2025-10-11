@@ -30,11 +30,11 @@ local ADVANTAGE_CHAR = {
 }
 
 d.die_mt.__tostring = function(self)
-  return "d%s%s%s" % {
+  return ("d%s%s%s"):format(
     self.sides_n,
     ADVANTAGE_CHAR[self.advantage],
-    #self.reroll > 0 and ("🗘(%s)" % table.concat(self.reroll, ",")) or ""
-  }
+    #self.reroll > 0 and ("🗘(%s)"):format(table.concat(self.reroll, ",")) or ""
+  )
 end
 
 --- @return integer
@@ -89,7 +89,7 @@ d.mt.__add = function(self, other)
     )
   end
 
-  error("Trying to add %s to a dice roll" % type(other))
+  Error("Trying to add %s to a dice roll", type(other))
 end
 
 d.mt.__sub = function(self, other)
@@ -97,7 +97,7 @@ d.mt.__sub = function(self, other)
     return d.new(Table.deep_copy(self.dice), self.bonus - other)
   end
 
-  error("Trying to subtract %s to a dice roll" % type(other))
+  Error("Trying to subtract %s to a dice roll", type(other))
 end
 
 d.mt.__mul = function(self, other)
@@ -121,7 +121,7 @@ d.mt.__tostring = function(self)
   )
   local bonus = ""
   if self.bonus ~= 0 then
-    bonus = "%+i" % self.bonus
+    bonus = ("%+i"):format(self.bonus)
     bonus = " " .. bonus:sub(1, 1) .. " " .. bonus:sub(2)
   end
   return dice .. bonus
@@ -132,7 +132,7 @@ methods.simplified = function(self)
   local min = self:min()
   local max = self:max()
   if min == max then return tostring(min) end
-  return "%s–%s" % {self:min(), self:max()}
+  return ("%s–%s"):format(self:min(), self:max())
 end
 
 --- @return integer

@@ -69,7 +69,11 @@ end
 --- @param entity grid_positioned
 --- @return nil
 level.put = function(entity)
-  local grid = assert(State.grids[entity.grid_layer], "Invalid grid_layer %s" % entity.grid_layer)
+  local grid = State.grids[entity.grid_layer]
+  if not grid then
+    Error("Invalid grid_layer %s", entity.grid_layer)
+  end
+
   local prev = grid[entity.position]
   if prev == entity then return end
 

@@ -370,7 +370,7 @@ api.journal_update = function(kind)
   elseif kind == "task_completed" then
     text = "Задача выполнена"
   else
-    assert(false, ("Unknown journal update %s"):format(kind))
+    Error("Unknown journal update %s", kind)
   end
   api.notification(text)
   State.quests.has_new_content = true

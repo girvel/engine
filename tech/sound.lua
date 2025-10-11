@@ -36,14 +36,22 @@ local multiple_mt = {__index = multiple_methods}
 --- @param volume? number
 --- @return sound_multiple
 sound.multiple = Memoize(function(dir_path, volume)
-  assert(love.filesystem.getInfo(dir_path), "%q doesn't exist" % {dir_path})
+  if not love.filesystem.getInfo(dir_path) then
+    Error("%q doesn't exist", dir_path)
+    return setmetatable({}, multiple_mt)
+  end
+
   local result = setmetatable(
     Fun.iter(love.filesystem.getDirectoryItems(dir_path))
       :map(function(path) return sound.new(dir_path .. "/" .. path, volume) end)
       :totable(),
     multiple_mt
   )
-  assert(#result > 0, "%q is empty" % {dir_path})
+
+  if #result == 0 then
+    Error("%q is empty", dir_path)
+  end
+
   return result
 end)
 
@@ -87,10 +95,10 @@ end
 --- @return T
 methods.place = function(self, position, size)
   --- @cast self sound
-  local limits = assert(
-    sound.sizes[size or "small"],
-    "Incorrect sound size %s; sounds can be small, medium or large" % tostring(size)
-  )
+  local limits = sound.sizes[size or "small"]
+  if not limits then
+    Error("Incorrect sound size %s; sounds can be small, medium or large", size)
+  end
 
   self.source:setRelative(false)
   self.source:setPosition(unpack(position))

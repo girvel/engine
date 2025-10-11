@@ -168,10 +168,10 @@ actions.hand_attack = Table.extend({
   end,
 
   get_hint = function(self, entity)
-    return "%s (%s)" % {
+    return ("%s (%s)"):format(
       Name.game(self),
       entity:get_melee_damage_roll("hand"):simplified()
-    }
+    )
   end,
 }, action.base)
 
@@ -200,10 +200,10 @@ actions.offhand_attack = Table.extend({
   end,
 
   get_hint = function(self, entity)
-    return "%s (%s)" % {
+    return ("%s (%s)"):format(
       Name.game(self),
       entity:get_melee_damage_roll("offhand"):simplified()
-    }
+    )
   end,
 }, action.base)
 
@@ -315,10 +315,10 @@ actions.bow_attack_base = Table.extend({
   end,
 
   get_hint = function(self, entity)
-    return "%s (%s)" % {
+    return ("%s (%s)"):format(
       Name.game(self),
-      entity:get_ranged_damage_roll():simplified(),
-    }
+      entity:get_ranged_damage_roll():simplified()
+    )
   end
 }, action.base)
 

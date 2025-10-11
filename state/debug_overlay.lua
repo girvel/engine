@@ -66,7 +66,7 @@ draw_points = function(points)
 end
 
 report_fps = function()
-  ui.text("%.2f" % {1 / love.timer.getAverageDelta()})
+  ui.text("%.2f", 1 / love.timer.getAverageDelta())
 end
 
 local ai_load_percent_average = 0

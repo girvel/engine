@@ -277,7 +277,7 @@ _table.assert_fields = function(t, fields)
     end
   end
   if #missing_fields > 0 then
-    error("fields %s are required for %s" % {table.concat(missing_fields, ", "), t})
+    Error("fields %s are required for %s", table.concat(missing_fields, ", "), t)
   end
 end
 

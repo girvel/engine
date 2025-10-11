@@ -70,10 +70,11 @@ end
 --- @param entity entity
 --- @param slot inventory_slot
 item.anchor_offset = function(entity, slot)
-  local this_item = assert(
-    entity.inventory[slot],
-    ("anchor_offset for empty %s's inventory slot %s"):format(Name.code(entity), slot)
-  )
+  local this_item = entity.inventory[slot]
+  if not this_item then
+    Error("anchor_offset for empty %s's inventory slot %s", Name.code(entity), slot)
+    return Vector.zero
+  end
 
   local parent_anchor = entity.sprite.anchors[this_item.anchor or slot]
   if not parent_anchor then return Vector.zero end

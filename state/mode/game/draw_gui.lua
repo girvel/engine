@@ -153,7 +153,7 @@ draw_hp_bar = function()
 
     ui.start_alignment("center", "center")
     ui.start_font(32)
-      ui.text("%s/%s" % {player.hp, player:get_max_hp()})
+      ui.text("%s/%s", player.hp, player:get_max_hp())
     ui.finish_font()
     ui.finish_alignment()
   ui.finish_frame(true)

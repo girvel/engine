@@ -14,7 +14,9 @@ local mt = {__index = methods}
 screenplay.new = function(path, characters)
   local content, _, _, err = love.filesystem.read(path)
   assert(not err, err)
-  assert(content, ("Can't read moonspeak file %q"):format(path))
+  if not content then
+    Error("Can't read moonspeak file %q", path)
+  end
 
   return setmetatable({
     stack = {Moonspeak.read(content)},
@@ -151,7 +153,11 @@ get_block = function(player, type)
     block = branch[player.cursor[#player.cursor]]
       or Error("No screenplay elements remain")  --[[@as moonspeak_element]]
   end
-  assert(block.type == type, "Screenplay expected %s, got %s" % {type, block.type})
+
+  if block.type ~= type then
+    Error("Screenplay expected %s, got %s", type, block.type)
+  end
+
   return block
 end
 

@@ -168,11 +168,3 @@ end
 mt.__div = function(a, b)
   return string.split(a, b, true)
 end
-
-mt.__mod = function(a, b)
-   if type(b) == "table" then
-      return a:format(unpack(b))
-   else
-      return a:format(b)
-   end
-end

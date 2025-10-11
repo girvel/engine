@@ -27,12 +27,10 @@ action.base = {
     if not safety.call(self.is_available, self, entity) then return false end
     if self._act then
       local result = safety.call(self._act, self, entity)
-      assert(
-        result == true or result == false,
-        "action %s returned %s; actions must explicitly return true or false" % {
-          Name.code(self), Inspect(result)
-        }
-      )
+      if not (result == true or result == false) then
+        Error("action %s returned %s; actions must explicitly return true or false",
+          Name.code(self), Inspect(result))
+      end
       if not result then return false end
     end
     for k, v in pairs(self.cost or {}) do

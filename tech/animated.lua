@@ -90,7 +90,10 @@ methods.animate = function(self, animation_name, assertive, looped)
       animation.next = animation_name
     end
   else
-    assert(not assertive, ("Missing %s for entity %s"):format(animation_name, Name.code(self)))
+    if assertive then
+      Error("Missing %s for entity %s", animation_name, self)
+    end
+
     if dirname then
       animation.current = animation.next .. "_" .. dirname
     else
@@ -130,8 +133,16 @@ end
 --- @return animation_pack[]
 local load_pack_raw = Memoize(function(folder_path, is_atlas)
   local info = love.filesystem.getInfo(folder_path)
-  assert(info, "No folder %q, unable to load animation" % {folder_path})
-  assert(info.type == "directory", "%q is not a folder, unable to load animation" % {folder_path})
+
+  if not info then
+    Error("No folder %q, unable to load animation", folder_path)
+    return {}
+  end
+
+  if info.type ~= "directory" then
+    Error("%q is not a folder, unable to load animation", folder_path)
+    return {}
+  end
 
   local w, h, parts_n
   local result = {}
@@ -139,10 +150,12 @@ local load_pack_raw = Memoize(function(folder_path, is_atlas)
     local animation_name, frame_i do
       if not file_name:ends_with(".png") then goto continue end
       _, _, animation_name, frame_i = file_name:sub(1, -5):find("^(.+)_(%d+)$")
-      frame_i = assert(
-        tonumber(frame_i),
-        "%q not in format <animation name>_<frame index>.png" % {file_name}
-      )  --[[@as number]]
+      frame_i = tonumber(frame_i)  --[[@as number]]
+
+      if not frame_i then
+        Error("%q not in format <animation name>_<frame index>.png", file_name)
+        goto continue
+      end
     end
 
     local full_path = folder_path .. "/" .. file_name
@@ -164,14 +177,12 @@ local load_pack_raw = Memoize(function(folder_path, is_atlas)
           result[1] = {}
         end
       else
-        assert(
-          next_w == w,
-          ("%q's width %s is not equal to previous encountered %s"):format(full_path, next_w, w)
-        )
-        assert(
-          next_h == h,
-          ("%q's height %s is not equal to previous encountered %s"):format(full_path, next_h, h)
-        )
+        if next_w ~= w then
+          Error("%q's width %s is not equal to previous encountered %s", full_path, next_w, w)
+        end
+        if next_h ~= h then
+          Error("%q's height %s is not equal to previous encountered %s", full_path, next_h, h)
+        end
       end
     end
 
@@ -202,10 +213,10 @@ load_pack = function(path, atlas_n)
     return base_pack[atlas_n]
   end
 
-  assert(
-    #base_pack == 4,
-    ("Directional animation atlas %s should contain 4 cells, got %s"):format(path, #base_pack)
-  )
+  if #base_pack ~= 4 then
+    Error("Directional animation atlas %s should contain 4 cells, got %s", path, #base_pack)
+  end
+
   local pack = {}
   for i, direction_name in ipairs {"up", "left", "down", "right"} do
     for animation_name, frames in pairs(base_pack[i]) do

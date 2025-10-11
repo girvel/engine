@@ -76,7 +76,11 @@ ui.start = function()
 end
 
 ui.finish = function()
-  assert(#model.frame == 1, "Unclosed UI frame(s) (%s)" % {#model.frame})
+  if #model.frame ~= 1 then
+    Error("Unclosed UI frame(s) (%s)", #model.frame)
+    model = {model.frame[1]}
+  end
+
   model.selection.is_pressed = false
   model.mouse.button_pressed = {}
   model.mouse.button_released = {}
@@ -203,8 +207,8 @@ local wrap = function(text)
 end
 
 --- @param text any
-ui.text = function(text)
-  text = tostring(text)
+ui.text = function(text, ...)
+  text = tostring(text):format(...)
 
   local frame = Table.last(model.frame)
   local font = Table.last(model.font)
