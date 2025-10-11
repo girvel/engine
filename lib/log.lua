@@ -125,7 +125,9 @@ end
 
 log.report = function()
   local level = "info"
-  if count.error > 0 then
+  if count.fatal > 0 then
+    level = "fatal"
+  elseif count.error > 0 then
     level = "error"
   elseif count.warn > 0 then
     level = "warn"
