@@ -47,7 +47,7 @@ safety.error = function(fmt, ...)
   if State.debug then
     error(message, 1)
   else
-    Log.log("warn", 1, message)
+    Log.log("error", 1, message)
   end
 end
 

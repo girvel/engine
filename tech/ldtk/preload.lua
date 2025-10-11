@@ -1,3 +1,4 @@
+local level = require "engine.tech.level"
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] External API
 ----------------------------------------------------------------------------------------------------
@@ -5,11 +6,10 @@
 --- @class preload_level
 --- @field size vector
 --- @field positions table<string, vector>
---- @field entities preload_entity[]
+--- @field entities table<string, preload_entity[]>
 
 --- @class preload_entity
 --- @field position vector
---- @field grid_layer string
 --- @field identifier string
 --- @field rails_name? string
 --- @field args? string
@@ -25,16 +25,16 @@ local preload = function(path)
   local result = {
     size = Vector.zero,
     positions = {},
-    entities = {}
+    entities = {},
   }  --[[@as preload_level]]
 
-  for _, level in ipairs(root.levels) do
-    local offset = V(level.worldX, level.worldY) / Constants.cell_size
-    local size = V(level.pxWid, level.pxHei) / Constants.cell_size
+  for _, ldtk_level in ipairs(root.levels) do
+    local offset = V(ldtk_level.worldX, ldtk_level.worldY) / Constants.cell_size
+    local size   = V(ldtk_level.pxWid,  ldtk_level.pxHei)  / Constants.cell_size
     result.size = Vector.use(math.max, result.size, offset + size)
 
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
-    for _, layer in ipairs(level.layerInstances) do
+    for _, layer in ipairs(ldtk_level.layerInstances) do
       if layer.__identifier == "positions" then
         put_positions(layer, result.positions, captures)
         goto continue
@@ -57,7 +57,7 @@ local preload = function(path)
       local missed_captures = Fun.pairs(captures._inner_array)
         :map(function(i, capture)
           return ("%s %s@%s"):format(
-            capture.rails_name, capture.grid_layer, V(captures:_get_outer_index(i))
+            capture.rails_name, capture.layer, V(captures:_get_outer_index(i))
           )
         end)
         :totable()
@@ -74,7 +74,7 @@ end
 
 --- @class preload_capture
 --- @field rails_name string
---- @field grid_layer string
+--- @field layer string
 
 --- @async
 --- @param path string
@@ -149,17 +149,17 @@ put_positions = function(layer, positions, captures)
     elseif instance.__identifier == "entity_capture" then
       local position = relative_position(instance)
 
-      local rails_name, grid_layer = fields(instance, "rails_name", "layer")
+      local rails_name, this_layer = fields(instance, "rails_name", "layer")
       if rails_name == nil or rails_name == "" then
         Error("No rails_name for entity_capture @local:%s", position)
       end
-      if grid_layer == nil or grid_layer == "" then
+      if this_layer == nil or this_layer == "" then
         Error("No layer for entity_capture @local:%s", position)
       end
 
       captures[position] = {
         rails_name = rails_name,
-        grid_layer = grid_layer,
+        layer = this_layer,
       }
     else
       Error("Unknown position layer entity %q", instance.__identifier)
@@ -169,9 +169,10 @@ end
 
 --- @param captures grid<preload_capture>
 --- @param entity preload_entity
-local use_captures = function(captures, entity)
+--- @param layer string
+local use_captures = function(captures, entity, layer)
   local capture = captures[entity.position]
-  if capture and capture.grid_layer == entity.grid_layer then
+  if capture and capture.layer == layer then
     if entity.rails_name then
       Error("Attempt to capture an entity as %q, when it already has rails_name %s",
         capture.rails_name, entity.rails_name)
@@ -184,63 +185,65 @@ end
 --- @param layer table
 --- @param offset vector
 --- @param captures grid<preload_capture>
---- @param entities preload_entity[]
+--- @param entities table<string, preload_entity[]>
 put_entities = function(layer, offset, captures, entities)
-  local grid_layer do
-    grid_layer = layer.__identifier
+  local layer_name do
+    layer_name = layer.__identifier
     local PREFIX = "_entities"
-    if not grid_layer:ends_with(PREFIX) then
-      Error("Expected Entities layer identfier to end with %q, got %q", PREFIX, grid_layer)
+    if not layer_name:ends_with(PREFIX) then
+      Error("Expected Entities layer identfier to end with %q, got %q", PREFIX, layer_name)
     else
-      grid_layer = grid_layer:sub(1, -#PREFIX - 1)
+      layer_name = layer_name:sub(1, -#PREFIX - 1)
     end
   end
+
+  entities[layer_name] = entities[layer_name] or {}
 
   for _, instance in ipairs(layer.entityInstances) do
     local entity = {
       position = relative_position(instance),
-      grid_layer = grid_layer,
       identifier = instance.__identifier,
     }
 
-    local rails_name, args = fields(instance, "rails_name", "args")
+    entity.rails_name, entity.args = fields(instance, "rails_name", "args")
 
-    use_captures(captures, entity)
+    use_captures(captures, entity, layer_name)
     entity.position:add_mut(offset)
 
-    table.insert(entities, entity)
+    table.insert(entities[layer_name], entity)
   end
 end
 
 --- @param layer table
 --- @param offset vector
 --- @param captures grid<preload_capture>
---- @param entities preload_entity[]
+--- @param entities table<string, preload_entity[]>
 --- @param is_auto boolean
 put_tiles = function(layer, offset, captures, entities, is_auto)
-  local grid_layer do
-    grid_layer = layer.__identifier
+  local layer_name do
+    layer_name = layer.__identifier
     if is_auto then
       local PREFIX = "_auto"
-      if not grid_layer:ends_with(PREFIX) then
-        Error("Expected IntGrid layer identfier to end with %q, got %q", PREFIX, grid_layer)
+      if not layer_name:ends_with(PREFIX) then
+        Error("Expected IntGrid layer identfier to end with %q, got %q", PREFIX, layer_name)
       else
-        grid_layer = grid_layer:sub(1, -#PREFIX - 1)
+        layer_name = layer_name:sub(1, -#PREFIX - 1)
       end
     end
   end
 
+  entities[layer_name] = entities[layer_name] or {}
+
   for _, instance in ipairs(layer[is_auto and "autoLayerTiles" or "gridTiles"]) do
     local entity = {
       position = tile_relative_position(instance),
-      grid_layer = grid_layer,
-      identifier = instance.t,
+      identifier = instance.t + 1,
     }
 
-    use_captures(captures, entity)
+    use_captures(captures, entity, layer_name)
     entity.position:add_mut(offset)
 
-    table.insert(entities, entity)
+    table.insert(entities[layer_name], entity)
   end
 end
 

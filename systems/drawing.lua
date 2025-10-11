@@ -1,4 +1,5 @@
 local ui = require("engine.tech.ui")
+local level = require("engine.tech.level")
 
 local BG = Vector.hex("191919")
 
@@ -10,7 +11,7 @@ return Tiny.sortedProcessingSystem {
   end,
 
   compare = function(_, a, b)
-    return Table.index_of(State.level.layers, a.layer) < Table.index_of(State.level.layers, b.layer)
+    return Table.index_of(level.layers, a.layer) < Table.index_of(level.layers, b.layer)
   end,
 
   preProcess = function(_, dt)
