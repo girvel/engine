@@ -1,5 +1,6 @@
 local preload = require("engine.tech.ldtk.preload")
 local generate_entities = require("engine.tech.ldtk.generate_entities")
+local read_json         = require("engine.tech.ldtk.read_json")
 
 
 local ldtk = {}
@@ -36,7 +37,10 @@ local ldtk = {}
 --- @return load_result
 ldtk.load = function(path)
   local definition = love.filesystem.load(path .. "/init.lua")() --[[@as level_definition]]
-  local preload_data = preload(definition.ldtk_path)
+  local json = read_json(definition.ldtk_path)
+  coroutine.yield(.4)
+  local preload_data = preload(json)
+  coroutine.yield(.5)
   local generation_data = generate_entities(definition.palette, preload_data.entities)
 
   return {

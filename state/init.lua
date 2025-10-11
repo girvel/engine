@@ -153,6 +153,8 @@ methods.reset = function(self)
   self.audio:reset()
 end
 
+local YIELD_PERIOD = 1/60
+
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
@@ -162,6 +164,7 @@ methods.load_level = function(self, path)
 
   local load_data = ldtk.load(path)
   local read_t = love.timer.getTime()
+  local last_yield_t = read_t
 
   self.level = load_data.level_info
   Log.info("State.level == %s", self.level)
@@ -190,20 +193,20 @@ methods.load_level = function(self, path)
     })
   end
 
-  local BATCH_SIZE = 1024
   for i, e in ipairs(load_data.entities) do
     e = self:add(e)
     if e.player_flag then self.player = e --[[@as player]] end
     -- if e.on_load then e:on_load() end
 
-    if i % BATCH_SIZE == 0 then
-      coroutine.yield(.5 + .5 * (i / #load_data.entities))
+    if i % 500 == 0 and love.timer.getTime() - last_yield_t >= YIELD_PERIOD then
+      coroutine.yield(.8 + .2 * (i / #load_data.entities))
+      last_yield_t = love.timer.getTime()
     end
   end
 
   self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
 
-  coroutine.yield()
+  coroutine.yield(1)
   local end_t = love.timer.getTime()
   Log.info("Added %s entities in %.2f s", #load_data.entities, end_t - read_t)
   Log.info("Total time %.2f s", end_t - start_t)

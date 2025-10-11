@@ -6,18 +6,26 @@ local level = require "engine.tech.level"
 --- @field runner_entities table<string, entity>
 --- @field atlases table<string, love.Image>
 
+local YIELD_PERIOD = 1/60
+
+--- @async
 --- @param palette palette
 --- @param preload_entities table<layer|string, preload_entity[]>
 --- @return generation_data
 local generate_entities = function(palette, preload_entities)
   local start_t = love.timer.getTime()
+  local last_yield_t = start_t
   local result = {
     entities = {},
     runner_entities = {},
     atlases = {},
   }
 
+  local counter = 0
+  local layers_n = Table.count(preload_entities)
+
   for layer, stream in pairs(preload_entities) do
+    counter = counter + 1
     if #stream == 0 then goto continue end
 
     local subpalette = palette[layer]
@@ -36,7 +44,7 @@ local generate_entities = function(palette, preload_entities)
       result.atlases[layer] = subpalette.ATLAS_IMAGE
     end
 
-    for _, entry in ipairs(stream) do
+    for i, entry in ipairs(stream) do
       local factory = subpalette[entry.identifier]
       if not factory then
         Error("Missing entity factory %q in layer %q", entry.identifier, layer)
@@ -68,6 +76,11 @@ local generate_entities = function(palette, preload_entities)
       end
 
       table.insert(result.entities, entity)
+
+      if i % 500 == 0 and love.timer.getTime() - last_yield_t >= YIELD_PERIOD then
+        coroutine.yield(.5 + .3 * (counter / layers_n))
+        last_yield_t = love.timer.getTime()
+      end
 
       ::continue_stream::
     end

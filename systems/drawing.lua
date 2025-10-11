@@ -15,7 +15,10 @@ return Tiny.sortedProcessingSystem {
   end,
 
   preProcess = function(_, dt)
-    State.perspective:update(dt)
+    if State.is_loaded then
+      State.perspective:update(dt)
+    end
+
     local shader = State.shader
     if shader then
       love.graphics.setShader(shader.love_shader)

@@ -1,4 +1,3 @@
-local level = require "engine.tech.level"
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] External API
 ----------------------------------------------------------------------------------------------------
@@ -14,15 +13,11 @@ local level = require "engine.tech.level"
 --- @field rails_name? string
 --- @field args? string
 
-local read_json, put_positions, put_entities, put_tiles
+local put_positions, put_entities, put_tiles
 
---- Yields values from 0 to 1 indicating progress
---- @async
---- @param path string
+--- @param root table
 --- @return preload_level
-local preload = function(path)
-  local root = read_json(path)
-
+local preload = function(root)
   local start_t = love.timer.getTime()
   local result = {
     size = Vector.zero,
@@ -78,34 +73,6 @@ end
 --- @class preload_capture
 --- @field rails_name string
 --- @field layer string
-
---- @async
---- @param path string
---- @return table
-read_json = function(path)
-  local start_t = love.timer.getTime()
-
-  local content = love.filesystem.read(path)
-  coroutine.yield(0)
-
-  local json_thread = love.thread.newThread [[
-    local content = ...
-
-    love.thread.getChannel('json'):push(
-      require("engine.lib.json").decode(content)
-    )
-  ]]
-  json_thread:start(content)
-
-  while true do
-    coroutine.yield(0)
-    local result = love.thread.getChannel('json'):pop()
-    if result then
-      Log.info("Read & parsed JSON %q in %.2f s", path, love.timer.getTime() - start_t)
-      return result
-    end
-  end
-end
 
 local fields = function(instance, ...)
   local len = select("#", ...)
