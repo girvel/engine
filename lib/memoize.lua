@@ -30,7 +30,7 @@ local memoize = {
 -- Inspired by http://stackoverflow.com/questions/129877/how-do-i-write-a-generic-memoize-function
 
 -- Lua 5.3 compatibility
-local unpack = unpack or table.unpack
+unpack = unpack or table.unpack
 
 -- private stuff
 
