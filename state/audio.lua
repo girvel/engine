@@ -70,7 +70,7 @@ methods._update = function(self, dt)
   if #self._playlist == 0 or self._playlist_paused then return end
 
   while true do
-    self._current = Random.choice(self._playlist)
+    self._current = Random.item(self._playlist)
     if #self._playlist == 1 or self._current ~= last_track then break end
   end
   self._current:play()

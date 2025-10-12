@@ -79,7 +79,7 @@ methods.control = function(self, entity)
     end
   else
     async.sleep(math.random(0.5, 7) / self._frequency_k)
-    actions.move(Random.choice(Vector.directions)):act(entity)
+    actions.move(Random.item(Vector.directions)):act(entity)
   end
 end
 

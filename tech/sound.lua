@@ -164,11 +164,11 @@ end
 --- @param position vector
 --- @param size? sound_size
 multiple_methods.play_at = function(self, position, size)
-  return Random.choice(self):clone():place(position, size):play()
+  return Random.item(self):clone():place(position, size):play()
 end
 
 multiple_methods.play = function(self)
-  return Random.choice(self):clone():play()
+  return Random.item(self):clone():play()
 end
 
 Ldump.mark(sound, {}, ...)
