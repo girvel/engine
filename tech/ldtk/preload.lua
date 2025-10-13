@@ -120,6 +120,13 @@ put_positions = function(layer, positions, captures)
         Error("No rails_name for position %s", position)
       end
 
+      if positions[rails_name] then
+        Error(
+          "Name collision: positions %s and %s both have a rails_name %s",
+          positions[rails_name], position, rails_name
+        )
+      end
+
       positions[rails_name] = position
     elseif instance.__identifier == "entity_capture" then
       local position = relative_position(instance)
