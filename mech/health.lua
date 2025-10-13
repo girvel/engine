@@ -53,12 +53,7 @@ health.damage = function(target, amount, is_critical)
     end
 
     if target.essential_flag then
-      State.runner:run_task(function()
-        target:animate("lying")
-        coroutine.yield()
-        target:animation_set_paused(true)
-      end, "essential_down")
-
+      target:animation_freeze("lying")
       if State:in_combat(target) then
         State.combat:remove(target)
       end

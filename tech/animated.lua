@@ -115,6 +115,28 @@ methods.animate = function(self, animation_name, assertive, looped)
   return animation._end_promise
 end
 
+local DEFAULT_ANIMATION_FPS = 6
+
+--- @param self entity
+--- @param dt? number
+methods.animation_update = function(self, dt)
+  local animation = self.animation
+  if animation.paused or not dt then dt = 0 end
+
+  local current_pack = animation.pack[animation.current]
+  if not current_pack then
+    Error("%s is missing animation %s", Name.code(self), animation.current)
+  end
+
+  -- even if animation is 1 frame idle, still should play out for 1-frame FXs
+  animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
+  if math.floor(animation.frame) > #current_pack then
+    self:animate(animation.next)
+    current_pack = animation.pack[animation.current]
+  end
+  self.sprite = current_pack[math.floor(animation.frame)]
+end
+
 --- @param self entity
 --- @param value boolean
 methods.animation_set_paused = function(self, value)
@@ -127,6 +149,14 @@ methods.animation_set_paused = function(self, value)
       end
     end
   end
+end
+
+--- @param self entity
+--- @param animation_name animation_name
+methods.animation_freeze = function(self, animation_name)
+  self:animate(animation_name)
+  self:animation_set_paused(true)
+  self:animation_update()
 end
 
 --- @param folder_path string
