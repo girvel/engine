@@ -77,7 +77,7 @@ local generate_entities = function(palette, preload_entities)
 
       table.insert(result.entities, entity)
 
-      if i % 500 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
+      if i % 100 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
         coroutine.yield(.5 + .3 * (counter / layers_n))
         last_yield_t = love.timer.getTime()
       end
