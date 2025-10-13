@@ -42,7 +42,9 @@ local generate_entities = function(palette, preload_entities)
       result.atlases[layer] = subpalette.ATLAS_IMAGE
     end
 
-    for i, entry in ipairs(stream) do
+    for i = #stream, 1, -1 do
+      local entry = stream[i]
+
       local factory = subpalette[entry.identifier]
       if not factory then
         Error("Missing entity factory %q in layer %q", entry.identifier, layer)
