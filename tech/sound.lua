@@ -12,6 +12,7 @@ local sound = {}
 local methods = {}
 local mt = {__index = methods}
 
+--- NOTICE immutable (cached)
 --- @param path string
 --- @param volume? number
 --- @return sound
@@ -32,6 +33,8 @@ local multiple_methods = {}
 local multiple_mt = {__index = multiple_methods}
 
 --- Load all sounds from a directory
+---
+--- NOTICE immutable (cached)
 --- @param dir_path string
 --- @param volume? number
 --- @return sound_multiple
