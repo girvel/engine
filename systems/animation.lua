@@ -25,6 +25,7 @@ return Tiny.processingSystem {
     animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
     if math.floor(animation.frame) > #current_pack then
       entity:animate(animation.next)
+      current_pack = animation.pack[animation.current]
     end
     entity.sprite = current_pack[math.floor(animation.frame)]
   end,
