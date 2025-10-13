@@ -6,8 +6,6 @@ local level = require "engine.tech.level"
 --- @field runner_entities table<string, entity>
 --- @field atlases table<string, love.Image>
 
-local YIELD_PERIOD = 1/60
-
 --- @async
 --- @param palette palette
 --- @param preload_entities table<layer|string, preload_entity[]>
@@ -77,7 +75,7 @@ local generate_entities = function(palette, preload_entities)
 
       table.insert(result.entities, entity)
 
-      if i % 500 == 0 and love.timer.getTime() - last_yield_t >= YIELD_PERIOD then
+      if i % 500 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
         coroutine.yield(.5 + .3 * (counter / layers_n))
         last_yield_t = love.timer.getTime()
       end

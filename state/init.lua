@@ -153,8 +153,6 @@ methods.reset = function(self)
   self.audio:reset()
 end
 
-local YIELD_PERIOD = 1/60
-
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
@@ -198,7 +196,7 @@ methods.load_level = function(self, path)
     if e.player_flag then self.player = e --[[@as player]] end
     -- if e.on_load then e:on_load() end
 
-    if i % 500 == 0 and love.timer.getTime() - last_yield_t >= YIELD_PERIOD then
+    if i % 500 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
       coroutine.yield(.8 + .2 * (i / #load_data.entities))
       last_yield_t = love.timer.getTime()
     end
