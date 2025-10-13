@@ -83,7 +83,7 @@ report_ai = function()
   frames_n = frames_n + 1
 
   ui.br()
-  ui.text(("[F3] active AIs (%s, %.2f%%):"):format(#State.stats.active_ais, ai_load_percent_average))
+  ui.text("[F3] active AIs (%s, %.2f%%):", #State.stats.active_ais, ai_load_percent_average)
 
   local active_ais = {}
   for _, codename in ipairs(State.stats.active_ais) do
@@ -91,7 +91,7 @@ report_ai = function()
   end
 
   for codename, count in pairs(active_ais) do
-    ui.text("- " .. codename .. (count > 1 and (" (%s)"):format(count) or ""))
+    ui.text("- %s%s", codename, (count > 1 and (" (%s)"):format(count) or ""))
   end
 end
 
@@ -116,16 +116,16 @@ report_scenes = function()
   end
 
   ui.br()
-  ui.text(("[F4] enabled scenes (%s/%s):"):format(enabled_n, total_n))
+  ui.text("[F4] enabled scenes (%s/%s):", enabled_n, total_n)
   for _, pair in ipairs(scenes) do
-    k, v = unpack(pair)
-    ui.text((v.enabled and "+" or "-") .. " " .. k)
+    local k, v = unpack(pair)
+    ui.text("%s %s", (v.enabled and "+" or "-"), k)
   end
 
   local running = State.runner._scene_runs
-  ui.text(("running scenes (%s):"):format(#running))
+  ui.text("running scenes (%s):", #running)
   for _, v in ipairs(running) do
-    ui.text("- " .. v.name)
+    ui.text("- %s", v.name)
   end
 end
 
@@ -140,7 +140,7 @@ report_rails = function()
   ui.text("[F5] rails state:")
   for k, v in pairs(State.rails) do
     if not hidden_types[type(k)] and not hidden_types[type(v)] then
-      ui.text(("  %s: %s"):format(k, Inspect(v)))
+      ui.text("  %s: %s", k, Inspect(v))
     end
   end
 end
