@@ -396,9 +396,10 @@ api.curtain = function(duration, color)
   end, "curtain")
 end
 
---- @param position vector
+--- @param target vector|entity
 --- @return boolean
-api.is_visible = function(position)
+api.is_visible = function(target)
+  local position = getmetatable(target) == Vector.mt and target or assert(target.position)
   if not State.grids.solids:can_fit(position) then return false end
   return tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(position))
 end
