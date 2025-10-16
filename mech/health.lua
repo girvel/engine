@@ -43,8 +43,10 @@ health.damage = function(target, amount, is_critical)
   if target.hp <= 0 then
     if target.on_death then
       target:on_death()
-    else
-      health.add_blood(target.position)
+    end
+
+    if not target.no_blood_flag then
+      health.add_blood_mark(target.position)
     end
 
     if target.player_flag then
@@ -78,8 +80,8 @@ health.damage = function(target, amount, is_critical)
     end
   else
     local half = target:get_max_hp() / 2
-    if before > half and target.hp <= half then
-      health.add_blood(target.position)
+    if not target.no_blood_flag and before > half and target.hp <= half then
+      health.add_blood_mark(target.position)
     end
   end
 end
@@ -95,7 +97,7 @@ health.set_hp = function(target, value)
 
   target.hp = value
 
-  if target.get_max_hp and not target.no_blood_flag then
+  if target.get_max_hp then
     item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
   end
 end
@@ -165,7 +167,7 @@ health.floater = function(text, grid_position, color)
   }
 end
 
-health.add_blood = function(position)
+health.add_blood_mark = function(position)
   local final_position
   for d in Iteration.rhombus(2) do
     local p = d:add_mut(position)
@@ -185,10 +187,10 @@ health.add_blood = function(position)
 
   if not final_position then return end
 
-  local atlas = love.image.newImageData("engine/assets/sprites/blood.png")
+  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
 
   return State:add {
-    codename = "blood",
+    codename = "blood_mark",
     boring_flag = true,
 
     position = final_position,
