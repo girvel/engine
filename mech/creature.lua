@@ -144,10 +144,11 @@ methods.rotate = function(self, direction)
   end
 end
 
---- Compute armor class; takes priority over .armor
+--- Compute armor class; doesn't take priority over .armor
 --- @param self entity
 methods.get_armor = function(self)
-  return self:modify("armor", 10 + self:modify("dex_armor_bonus", self:get_modifier("dex")))
+  return self.armor
+    or self:modify("armor", 10 + self:modify("dex_armor_bonus", self:get_modifier("dex")))
 end
 
 --- @param self entity
