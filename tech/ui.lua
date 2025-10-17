@@ -26,8 +26,8 @@ local model = {
   cursor = nil,
 
   -- state --
-  active_frames_t = CompositeMap.new(),
-  are_pressed = CompositeMap.new(),  -- TODO weak pointer here
+  active_frames_t = CompositeMap.new("weak"),
+  are_pressed = CompositeMap.new("weak"),
 
   -- context --
   frame = {},
@@ -110,6 +110,7 @@ ui.start_frame = function(x, y, w, h)
   elseif h <= 0 then
     h = prev.h + h
   end
+
   table.insert(model.frame, {
     x = prev.x + x,
     y = prev.y + y,

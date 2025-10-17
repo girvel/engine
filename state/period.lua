@@ -9,8 +9,8 @@ period.mt = {__index = methods}
 --- @return state_period
 period.new = function()
   return setmetatable({
-    _absolute_map = CompositeMap.new(),
-    _once_map = CompositeMap.new(),
+    _absolute_map = CompositeMap.new("weak"),
+    _once_map = CompositeMap.new("weak"),
   }, period.mt)
 end
 
