@@ -125,15 +125,16 @@ ui.start_frame = function(x, y, w, h, identifier)
     h = prev.h + h
   end
 
+  x = x + prev.x
+  y = y + prev.y
+
   table.insert(model.frame, {
-    x = prev.x + x,
-    y = prev.y + y,
-    w = w,
-    h = h,
+    x = x, y = y, w = w, h = h,
     scroll = model.scroll.current[identifier] or 0,
     max_scroll = 0,
     identifier = identifier,
   })
+  love.graphics.setScissor(x, y, w, h)
 end
 
 --- @param push_y? boolean
@@ -148,6 +149,9 @@ ui.finish_frame = function(push_y)
   if pop.identifier then
     model.scroll.max = pop.max_scroll
   end
+
+  local last = Table.last(model.frame)
+  love.graphics.setScissor(last.x, last.y, last.w, last.h)
 end
 
 --- @param x? "left"|"center"|"right"
