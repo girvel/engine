@@ -6,22 +6,11 @@ local ui = {}
 -- [SECTION] Internal state
 ----------------------------------------------------------------------------------------------------
 
---- @class ui_frame
---- @field x number
---- @field y number
---- @field w number
---- @field h number
---- @field scroll number
---- @field max_scroll number
---- @field identifier any
---- @field is_mouse_over? boolean
-
 local model = {
   -- input state --
   mouse = {
     x = 0,
     y = 0,
-    wheelmove = 0,
     button_pressed = {},
     button_released = {},
   },
@@ -29,21 +18,19 @@ local model = {
     pressed = {},
   },
 
-  -- state --
+ -- accumulated state --
   selection = {
     i = 1, max_i = 0,
     is_pressed = false,
   },
-  cursor = nil,  -- last value determines the cursor for the frame
-  active_frames_t = CompositeMap.new("weak"),  -- allows button frames to animate on press
-  are_pressed     = CompositeMap.new("weak"),
-  scroll = {
-    max     = setmetatable({}, {__mode = "k"}),
-    current = setmetatable({}, {__mode = "k"}),
-  },
+  cursor = nil,
+
+  -- state --
+  active_frames_t = CompositeMap.new("weak"),
+  are_pressed = CompositeMap.new("weak"),
 
   -- context --
-  frame = {}  --[=[@as ui_frame[]]=],
+  frame = {},
   alignment = {},
   font = {},
   font_size = {},
@@ -80,8 +67,6 @@ ui.start = function()
     y = 0,
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
-    scroll = 0,
-    max_scroll = 0,
   }}
   model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
@@ -99,7 +84,6 @@ ui.finish = function()
   model.selection.is_pressed = false
   model.mouse.button_pressed = {}
   model.mouse.button_released = {}
-  model.mouse.wheelmove = 0
   model.keyboard.pressed = {}
   love.mouse.setCursor(CURSORS[model.cursor])
 end
@@ -108,8 +92,7 @@ end
 --- @param y? integer?
 --- @param w? integer?
 --- @param h? integer?
---- @param identifier? any
-ui.start_frame = function(x, y, w, h, identifier)
+ui.start_frame = function(x, y, w, h)
   local prev = Table.last(model.frame)
   if not x then
     x = 0
@@ -128,39 +111,16 @@ ui.start_frame = function(x, y, w, h, identifier)
     h = prev.h + h
   end
 
-  x = x + prev.x
-  y = y + prev.y
-
-  if identifier then
-    model.scroll.max[identifier] = -h
-  end
-
   table.insert(model.frame, {
-    x = x, y = y, w = w, h = h,
-    scroll = model.scroll.current[identifier] or 0,
-    max_scroll = 0,
-    identifier = identifier,
-    is_mouse_over = get_mouse_over(x, y, w, h),  -- NEXT hack; remove on cursor
+    x = prev.x + x,
+    y = prev.y + y,
+    w = w,
+    h = h,
   })
-  love.graphics.setScissor(x, y, w, h)
 end
-
-local K = 25
 
 --- @param push_y? boolean
 ui.finish_frame = function(push_y)
-  if model.mouse.wheelmove ~= 0 then
-    local last = Table.last(model.frame)
-    if last.identifier and last.is_mouse_over then
-      model.scroll.current[last.identifier] = Math.median(
-        0,
-        (model.scroll.current[last.identifier] or 0) + model.mouse.wheelmove * K,
-        model.scroll.max[last.identifier]
-      )
-      model.mouse.wheelmove = 0
-    end
-  end
-
   local pop = table.remove(model.frame)
   if push_y then
     local this = Table.last(model.frame)
@@ -168,12 +128,6 @@ ui.finish_frame = function(push_y)
     this.h = this.h - (next_y - this.y)
     this.y = next_y
   end
-  if pop.identifier then
-    model.scroll.max[pop.identifier] = pop.max_scroll
-  end
-
-  local last = Table.last(model.frame)
-  love.graphics.setScissor(last.x, last.y, last.w, last.h)
 end
 
 --- @param x? "left"|"center"|"right"
@@ -271,20 +225,17 @@ ui.text = function(text, ...)
   for i, line in ipairs(wrapped) do
     local dx = 0
     local dy = 0
-
     if alignment.x == "center" then
       dx = (frame.w - font:getWidth(line)) / 2
     elseif alignment.x == "right" then
       dx = frame.w - font:getWidth(line)
     end
-
     if alignment.y == "center" then
       dy = (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
     elseif alignment.y == "bottom" then
       dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
     end
-
-    love.graphics.print(line, frame.x + dx, frame.y + dy + frame.scroll)
+    love.graphics.print(line, frame.x + dx, frame.y + dy)
 
     if alignment.y == "top" then
       if is_linear then
@@ -294,7 +245,6 @@ ui.text = function(text, ...)
           font:getHeight() * LINE_K
         )
       else
-        frame.max_scroll = frame.max_scroll + font:getHeight() * LINE_K
         frame.y = frame.y + font:getHeight() * LINE_K
         frame.h = frame.h - font:getHeight() * LINE_K
       end
@@ -649,10 +599,6 @@ ui.handle_mouserelease = function(button_i)
   table.insert(model.mouse.button_released, button_i)
 end
 
-ui.handle_wheelmove = function(x, y)
-  model.mouse.wheelmove = y
-end
-
 ui.handle_update = function(dt)
   for k, v in model.active_frames_t:iter() do
     local next_v = v - dt
@@ -690,12 +636,13 @@ get_batch = Memoize(function(path)
   return batch, quads, cell_size
 end)
 
-get_mouse_over = function(x, y, w, h)
+get_mouse_over = function(w, h)
+  local frame = Table.last(model.frame)
   return (
-    model.mouse.x > x
-    and model.mouse.y > y
-    and model.mouse.x <= x + w
-    and model.mouse.y <= y + h
+    model.mouse.x > frame.x
+    and model.mouse.y > frame.y
+    and model.mouse.x <= frame.x + w
+    and model.mouse.y <= frame.y + h
   )
 end
 
@@ -713,7 +660,7 @@ button = function(w, h)
   local y = frame.y
   local result = {
     is_clicked = false,
-    is_mouse_over = get_mouse_over(x, y, w, h),
+    is_mouse_over = get_mouse_over(w, h),
   }
 
   result.is_active = result.is_mouse_over and model.are_pressed:get(x, y, w, h)
@@ -742,6 +689,5 @@ end
 -- [SECTION] Footer
 ----------------------------------------------------------------------------------------------------
 
--- TODO maybe it shouldn't be marked so inner state gets serialized?
 Ldump.mark(ui, {}, ...)
 return ui

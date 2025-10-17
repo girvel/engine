@@ -12,8 +12,7 @@ local MAX_READABLE_W = 800
 --- @param y integer|"center"
 --- @param w integer|"max"|"read_max"
 --- @param h integer|"max"
---- @param identifier? any
-tk.start_window = function(x, y, w, h, identifier)
+tk.start_window = function(x, y, w, h)
   if w == "max" then
     w = love.graphics.getWidth() - 4 * PADDING
   elseif w == "read_max" then
@@ -41,7 +40,7 @@ tk.start_window = function(x, y, w, h, identifier)
     ui.tile(gui_elements.window_bg)
   ui.finish_frame()
 
-  ui.start_frame(x, y, w, h, identifier)
+  ui.start_frame(x, y, w, h)
 end
 
 tk.finish_window = function()

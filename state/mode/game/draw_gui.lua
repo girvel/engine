@@ -402,7 +402,6 @@ draw_move_order = function()
   tk.finish_block(start)
 end
 
-local dialogue_window_id = {}
 local H = 200
 local BOTTOM_GAP = 50 + 40  -- (padding)
 local draw_line, draw_options
@@ -411,7 +410,7 @@ draw_dialogue = function()
   local line = State.player.hears
   if not line then return end
 
-  tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H, dialogue_window_id)
+  tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
   ui.start_font(32)
     if line.type == "plain_line" then
       draw_line(line)

@@ -15,9 +15,6 @@ local result = {
   -- love.mousereleased
   require("engine.systems.ui_mousereleased"),
 
-  -- love.wheelmoved
-  require("engine.systems.ui_wheelmoved"),
-
   -- love.update
   require("engine.systems.genesis"),
   safety.live_system(require("engine.systems.update_sound")),
