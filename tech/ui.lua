@@ -14,6 +14,7 @@ local ui = {}
 --- @field scroll number
 --- @field max_scroll number
 --- @field identifier any
+--- @field is_mouse_over? boolean
 
 local model = {
   -- input state --
@@ -37,7 +38,7 @@ local model = {
   active_frames_t = CompositeMap.new("weak"),  -- allows button frames to animate on press
   are_pressed     = CompositeMap.new("weak"),
   scroll = {
-    max = setmetatable({}, {__mode = "k"}),
+    max     = setmetatable({}, {__mode = "k"}),
     current = setmetatable({}, {__mode = "k"}),
   },
 
@@ -130,10 +131,6 @@ ui.start_frame = function(x, y, w, h, identifier)
   x = x + prev.x
   y = y + prev.y
 
-  if identifier then  -- NEXT hack; remove on cursor
-    identifier = get_mouse_over(x, y, w, h) and identifier
-  end
-
   if identifier then
     model.scroll.max[identifier] = -h
   end
@@ -143,6 +140,7 @@ ui.start_frame = function(x, y, w, h, identifier)
     scroll = model.scroll.current[identifier] or 0,
     max_scroll = 0,
     identifier = identifier,
+    is_mouse_over = get_mouse_over(x, y, w, h),  -- NEXT hack; remove on cursor
   })
   love.graphics.setScissor(x, y, w, h)
 end
@@ -153,7 +151,7 @@ local K = 25
 ui.finish_frame = function(push_y)
   if model.mouse.wheelmove ~= 0 then
     local last = Table.last(model.frame)
-    if last.identifier then
+    if last.identifier and last.is_mouse_over then
       model.scroll.current[last.identifier] = Math.median(
         0,
         (model.scroll.current[last.identifier] or 0) + model.mouse.wheelmove * K,
