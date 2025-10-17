@@ -6,6 +6,15 @@ local ui = {}
 -- [SECTION] Internal state
 ----------------------------------------------------------------------------------------------------
 
+--- @class ui_frame
+--- @field x number
+--- @field y number
+--- @field w number
+--- @field h number
+--- @field scroll number
+--- @field max_scroll number
+--- @field idenfifier any
+
 local model = {
   -- input state --
   mouse = {
@@ -18,19 +27,21 @@ local model = {
     pressed = {},
   },
 
- -- accumulated state --
+  -- state --
   selection = {
     i = 1, max_i = 0,
     is_pressed = false,
   },
-  cursor = nil,
-
-  -- state --
-  active_frames_t = CompositeMap.new("weak"),
-  are_pressed = CompositeMap.new("weak"),
+  cursor = nil,  -- last value determines the cursor for the frame
+  active_frames_t = CompositeMap.new("weak"),  -- allows button frames to animate on press
+  are_pressed     = CompositeMap.new("weak"),
+  scroll = {
+    max = setmetatable({}, {__mode = "k"}),
+    current = setmetatable({test = 100}, {__mode = "k"}),
+  },
 
   -- context --
-  frame = {},
+  frame = {}  --[=[@as ui_frame[]]=],
   alignment = {},
   font = {},
   font_size = {},
@@ -67,6 +78,8 @@ ui.start = function()
     y = 0,
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
+    scroll = 0,
+    max_scroll = 0,
   }}
   model.alignment = {{x = "left", y = "top"}}
   model.font = {get_font(20)}
@@ -92,7 +105,8 @@ end
 --- @param y? integer?
 --- @param w? integer?
 --- @param h? integer?
-ui.start_frame = function(x, y, w, h)
+--- @param identifier? any
+ui.start_frame = function(x, y, w, h, identifier)
   local prev = Table.last(model.frame)
   if not x then
     x = 0
@@ -116,6 +130,9 @@ ui.start_frame = function(x, y, w, h)
     y = prev.y + y,
     w = w,
     h = h,
+    scroll = model.scroll.current[identifier] or 0,
+    max_scroll = 0,
+    identifier = identifier,
   })
 end
 
@@ -127,6 +144,9 @@ ui.finish_frame = function(push_y)
     local next_y = pop.y + pop.h
     this.h = this.h - (next_y - this.y)
     this.y = next_y
+  end
+  if pop.identifier then
+    model.scroll.max = pop.max_scroll
   end
 end
 
@@ -225,17 +245,20 @@ ui.text = function(text, ...)
   for i, line in ipairs(wrapped) do
     local dx = 0
     local dy = 0
+
     if alignment.x == "center" then
       dx = (frame.w - font:getWidth(line)) / 2
     elseif alignment.x == "right" then
       dx = frame.w - font:getWidth(line)
     end
+
     if alignment.y == "center" then
       dy = (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
     elseif alignment.y == "bottom" then
       dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
     end
-    love.graphics.print(line, frame.x + dx, frame.y + dy)
+
+    love.graphics.print(line, frame.x + dx, frame.y + dy - frame.scroll)
 
     if alignment.y == "top" then
       if is_linear then
@@ -689,5 +712,6 @@ end
 -- [SECTION] Footer
 ----------------------------------------------------------------------------------------------------
 
+-- TODO maybe it shouldn't be marked so inner state gets serialized?
 Ldump.mark(ui, {}, ...)
 return ui

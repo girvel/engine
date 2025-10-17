@@ -410,7 +410,7 @@ draw_dialogue = function()
   local line = State.player.hears
   if not line then return end
 
-  tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
+  tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H, "test")
   ui.start_font(32)
     if line.type == "plain_line" then
       draw_line(line)
