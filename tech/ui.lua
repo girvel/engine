@@ -13,13 +13,14 @@ local ui = {}
 --- @field h number
 --- @field scroll number
 --- @field max_scroll number
---- @field idenfifier any
+--- @field identifier any
 
 local model = {
   -- input state --
   mouse = {
     x = 0,
     y = 0,
+    wheelmove = 0,
     button_pressed = {},
     button_released = {},
   },
@@ -37,7 +38,7 @@ local model = {
   are_pressed     = CompositeMap.new("weak"),
   scroll = {
     max = setmetatable({}, {__mode = "k"}),
-    current = setmetatable({test = 100}, {__mode = "k"}),
+    current = setmetatable({}, {__mode = "k"}),
   },
 
   -- context --
@@ -97,6 +98,7 @@ ui.finish = function()
   model.selection.is_pressed = false
   model.mouse.button_pressed = {}
   model.mouse.button_released = {}
+  model.mouse.wheelmove = 0
   model.keyboard.pressed = {}
   love.mouse.setCursor(CURSORS[model.cursor])
 end
@@ -128,6 +130,14 @@ ui.start_frame = function(x, y, w, h, identifier)
   x = x + prev.x
   y = y + prev.y
 
+  if identifier then  -- NEXT hack; remove on cursor
+    identifier = get_mouse_over(x, y, w, h) and identifier
+  end
+
+  if identifier then
+    model.scroll.max[identifier] = -h
+  end
+
   table.insert(model.frame, {
     x = x, y = y, w = w, h = h,
     scroll = model.scroll.current[identifier] or 0,
@@ -137,8 +147,22 @@ ui.start_frame = function(x, y, w, h, identifier)
   love.graphics.setScissor(x, y, w, h)
 end
 
+local K = 25
+
 --- @param push_y? boolean
 ui.finish_frame = function(push_y)
+  if model.mouse.wheelmove ~= 0 then
+    local last = Table.last(model.frame)
+    if last.identifier then
+      model.scroll.current[last.identifier] = Math.median(
+        0,
+        (model.scroll.current[last.identifier] or 0) + model.mouse.wheelmove * K,
+        model.scroll.max[last.identifier]
+      )
+      model.mouse.wheelmove = 0
+    end
+  end
+
   local pop = table.remove(model.frame)
   if push_y then
     local this = Table.last(model.frame)
@@ -147,7 +171,7 @@ ui.finish_frame = function(push_y)
     this.y = next_y
   end
   if pop.identifier then
-    model.scroll.max = pop.max_scroll
+    model.scroll.max[pop.identifier] = pop.max_scroll
   end
 
   local last = Table.last(model.frame)
@@ -262,7 +286,7 @@ ui.text = function(text, ...)
       dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
     end
 
-    love.graphics.print(line, frame.x + dx, frame.y + dy - frame.scroll)
+    love.graphics.print(line, frame.x + dx, frame.y + dy + frame.scroll)
 
     if alignment.y == "top" then
       if is_linear then
@@ -272,6 +296,7 @@ ui.text = function(text, ...)
           font:getHeight() * LINE_K
         )
       else
+        frame.max_scroll = frame.max_scroll + font:getHeight() * LINE_K
         frame.y = frame.y + font:getHeight() * LINE_K
         frame.h = frame.h - font:getHeight() * LINE_K
       end
@@ -626,6 +651,10 @@ ui.handle_mouserelease = function(button_i)
   table.insert(model.mouse.button_released, button_i)
 end
 
+ui.handle_wheelmove = function(x, y)
+  model.mouse.wheelmove = y
+end
+
 ui.handle_update = function(dt)
   for k, v in model.active_frames_t:iter() do
     local next_v = v - dt
@@ -663,13 +692,12 @@ get_batch = Memoize(function(path)
   return batch, quads, cell_size
 end)
 
-get_mouse_over = function(w, h)
-  local frame = Table.last(model.frame)
+get_mouse_over = function(x, y, w, h)
   return (
-    model.mouse.x > frame.x
-    and model.mouse.y > frame.y
-    and model.mouse.x <= frame.x + w
-    and model.mouse.y <= frame.y + h
+    model.mouse.x > x
+    and model.mouse.y > y
+    and model.mouse.x <= x + w
+    and model.mouse.y <= y + h
   )
 end
 
@@ -687,7 +715,7 @@ button = function(w, h)
   local y = frame.y
   local result = {
     is_clicked = false,
-    is_mouse_over = get_mouse_over(w, h),
+    is_mouse_over = get_mouse_over(x, y, w, h),
   }
 
   result.is_active = result.is_mouse_over and model.are_pressed:get(x, y, w, h)
