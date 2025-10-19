@@ -74,7 +74,7 @@ methods.update = function(self, dt)
     then
       goto continue
     end
- 
+
     local args = {scene:start_predicate(dt, characters, self.positions)}
     if not args[1] then goto continue end
 
@@ -120,16 +120,26 @@ methods.update = function(self, dt)
     ::continue::
   end
 
-  local indexes_to_remove = {}
-  for i, run in ipairs(self._scene_runs) do
-    async.resume(run.coroutine)
+  local to_remove = {}
+  local runs_copy = Table.shallow_copy(self._scene_runs)
+  -- State.runner:stop may change this collection
+
+  for i, run in ipairs(runs_copy) do
+    local ok, message = pcall(async.resume, run.coroutine)
+    if not ok then
+      Log.trace(run)
+      error(message)
+    end
 
     if coroutine.status(run.coroutine) == "dead" then
-      table.insert(indexes_to_remove, i)
+      to_remove[run] = true
     end
   end
 
-  Table.remove_breaking_in_bulk(self._scene_runs, indexes_to_remove)
+  -- can't use runs_copy anymore -- could be changed
+  self._scene_runs = Fun.iter(self._scene_runs)
+    :filter(function(run) return not to_remove[run] end)
+    :totable()
 end
 
 --- @param scene integer|string|scene
