@@ -54,10 +54,10 @@ end
 --- @param entity entity
 --- @param destination vector
 --- @return promise, scene
-api.travel_scripted = function(entity, destination)
+api.travel_scripted = function(entity, destination, speed)
   local promise, scene = State.runner:run_task(function()
     local ok = api.travel_persistent(
-      entity, destination, math.max(1, math.ceil((entity.position - destination):abs2() / 3))
+      entity, destination, math.max(1, math.ceil((entity.position - destination):abs2() / 3)), speed
     )
     if ok then return end
 
@@ -77,9 +77,9 @@ end
 --- @param destination vector
 --- @param attempts_n? vector
 --- @return boolean
-api.travel_persistent = function(entity, destination, attempts_n)
+api.travel_persistent = function(entity, destination, attempts_n, speed)
   for _ = 1, attempts_n or 3 do
-    api.travel(entity, destination)
+    api.travel(entity, destination, false, speed)
     if entity.position == destination then return true end
     local d = destination - entity.position
     if State.grids.solids:slow_get(destination, true) and d:abs2() == 1 then
