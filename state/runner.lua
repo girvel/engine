@@ -154,7 +154,8 @@ end
 
 --- @async
 --- @param scene integer|string|scene
-methods.stop = function(self, scene)
+--- @param hard? boolean prevent :on_cancel
+methods.stop = function(self, scene, hard)
   if type(scene) ~= "table" then
     scene = self.scenes[scene]
   end
@@ -182,14 +183,25 @@ methods.stop = function(self, scene)
 
     if scene.on_cancel then
       did_on_cancel_run = true
-      scene:on_cancel()
+      if not hard then
+        scene:on_cancel()
+      end
+    end
+  end
+
+  local postfix = ""
+  if did_on_cancel_run then
+    if hard then
+      postfix = "; prevented :on_cancel"
+    else
+      postfix = "; used :on_cancel"
     end
   end
 
   Log.info("Stopping scene %s; interrupted %s runs%s",
     Table.key_of(self.scenes, scene) or Inspect(scene),
     old_length - new_length,
-    did_on_cancel_run and "; used :on_cancel" or ""
+    postfix
   )
 end
 
