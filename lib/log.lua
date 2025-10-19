@@ -68,7 +68,13 @@ log.log = function(level, trace_shift, fmt, ...)
 
   if log.outfile then
     love.filesystem.append(
-      log.outfile, string.format("[%-6s%s] %s: %s\n", nameupper, os.date(), lineinfo, msg)
+      log.outfile, ("[%-6s%s%s] %s: %s\n"):format(
+        nameupper,
+        os.date("%H:%M:%S"),
+        frame_number,
+        lineinfo,
+        msg
+      )
     )
   end
 
