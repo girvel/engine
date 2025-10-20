@@ -45,10 +45,6 @@ health.damage = function(target, amount, is_critical)
       target:on_death()
     end
 
-    if not target.no_blood_flag then
-      health.add_blood_mark(target.position)
-    end
-
     if target.player_flag then
       State.mode:player_has_died()
       return
@@ -80,8 +76,8 @@ health.damage = function(target, amount, is_critical)
     end
   else
     local half = target:get_max_hp() / 2
-    if not target.no_blood_flag and before > half and target.hp <= half then
-      health.add_blood_mark(target.position)
+    if target.on_half_hp and before > half and target.hp <= half then
+      target:on_half_hp()
     end
   end
 end
@@ -108,8 +104,7 @@ end
 --- @param attack_roll table
 --- @return boolean did_hit true if attack landed
 health.attack = function(source, target, attack_roll, damage_roll)
-  local attack = attack_roll:roll()
-  local is_nat = attack == attack_roll:max()
+  local attack = attack_roll:roll() local is_nat = attack == attack_roll:max()
   local is_nat_miss = attack == attack_roll:min()
   local ac = target.get_armor and target:get_armor() or target.armor or 0
 
@@ -164,39 +159,6 @@ health.floater = function(text, grid_position, color)
     sprite = sprite.text(tostring(text), 16, color),
     life_time = 3,
     layer = "fx_over",
-  }
-end
-
-health.add_blood_mark = function(position)
-  local final_position
-  for d in Iteration.rhombus(2) do
-    local p = d:add_mut(position)
-    if not State.grids.tiles:can_fit(p) then goto continue end
-
-    local on_tile = State.grids.on_tiles[p]
-    if on_tile and on_tile.codename == "blood" then goto continue end
-
-    local solid = State.grids.solids[p]
-    if solid and not solid.transparent_flag then goto continue end
-
-    final_position = p
-    do break end
-
-    ::continue::
-  end
-
-  if not final_position then return end
-
-  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
-
-  return State:add {
-    codename = "blood_mark",
-    boring_flag = true,
-
-    position = final_position,
-    grid_layer = "on_tiles",
-
-    sprite = sprite.image(sprite.utility.select(atlas, math.random(1, 2))),
   }
 end
 
