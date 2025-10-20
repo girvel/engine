@@ -41,7 +41,7 @@ health.damage = function(target, amount, is_critical)
   local before = target.hp
   health.set_hp(target, before - amount)
   if target.hp <= 0 then
-    if target.on_death then
+    if before > 0 and target.on_death then
       target:on_death()
     end
 
