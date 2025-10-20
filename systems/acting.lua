@@ -1,9 +1,10 @@
-local combat = require("engine.state.combat")
 local async = require "engine.tech.async"
 local animated = require "engine.tech.animated"
 
 
---- @class ai
+--- @alias ai ai_strict|table
+
+--- @class ai_strict
 --- @field _control_coroutine? thread
 local sample_methods = {}
 
