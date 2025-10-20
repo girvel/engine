@@ -33,7 +33,7 @@ local preload = function(root)
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
     for _, layer in ipairs(ldtk_level.layerInstances) do
       if layer.__identifier == "positions" then
-        put_positions(layer, result.positions, captures)
+        put_positions(layer, offset, result.positions, captures)
         goto continue
       end
 
@@ -107,10 +107,24 @@ local tile_relative_position = function(instance)
   return Vector.own(instance.px):div_mut(Constants.cell_size):add_mut(Vector.one)
 end
 
+local insert_position = function(collection, rails_name, position)
+  if collection[rails_name] then
+    Error(
+      "Name collision: positions %s and %s both have a rails_name %s",
+      collection[rails_name], position, rails_name
+    )
+  end
+
+  collection[rails_name] = position
+end
+
 --- @param layer table
+--- @param offset vector
 --- @param positions table<string, vector>
 --- @param captures grid<preload_capture>
-put_positions = function(layer, positions, captures)
+put_positions = function(layer, offset, positions, captures)
+  local last_index = {}
+
   for _, instance in ipairs(layer.entityInstances) do
     if instance.__identifier == "position" then
       local position = absolute_position(instance)
@@ -120,14 +134,7 @@ put_positions = function(layer, positions, captures)
         Error("No rails_name for position %s", position)
       end
 
-      if positions[rails_name] then
-        Error(
-          "Name collision: positions %s and %s both have a rails_name %s",
-          positions[rails_name], position, rails_name
-        )
-      end
-
-      positions[rails_name] = position
+      insert_position(positions, rails_name, position)
     elseif instance.__identifier == "entity_capture" then
       local position = relative_position(instance)
 
@@ -143,6 +150,33 @@ put_positions = function(layer, positions, captures)
         rails_name = rails_name,
         layer = this_layer,
       }
+    elseif instance.__identifier:ends_with("_N") then
+      local position = absolute_position(instance)
+      local prefix = instance.__identifier:sub(1, -3)
+
+      local index = (last_index[prefix] or 0) + 1
+      last_index[prefix] = index
+      local rails_name = prefix .. "_" .. index
+
+      insert_position(positions, rails_name, position)
+
+      for _, field in ipairs(instance.fieldInstances) do
+        if field.__identifier:starts_with("_") then
+          if field.__type == "Point" then
+            local subposition = V(field.__value.cx, field.__value.cy)
+              :add_mut(offset)
+              :add_mut(Vector.one)
+
+            insert_position(positions, prefix .. field.__identifier .. "_" .. index, subposition)
+          else
+            Error(
+              'Fields, starting with "_" in entities of layer "positions" are reserved for ' ..
+              'generating positions and should be of type "Point", got type %q in %q instead',
+              field.__type, field.__identifier
+            )
+          end
+        end
+      end
     else
       Error("Unknown position layer entity %q", instance.__identifier)
     end
