@@ -3,6 +3,7 @@ local period = {}
 --- @class state_period
 --- @field _absolute_map composite_map
 --- @field _once_map composite_map
+--- @field _key_map composite_map
 local methods = {}
 period.mt = {__index = methods}
 
@@ -11,6 +12,7 @@ period.new = function()
   return setmetatable({
     _absolute_map = CompositeMap.new("weak"),
     _once_map = CompositeMap.new("weak"),
+    _key_map = CompositeMap.new("weak"),
   }, period.mt)
 end
 
@@ -43,6 +45,19 @@ methods.once = function(self, ...)
     return true
   end
   return false
+end
+
+methods.push_key = function(self, t, key, value)
+  assert(value ~= nil)
+  assert(self._key_map:get(t, key) == nil)
+  self._key_map:set(t[key], t, key)
+  t[key] = value
+end
+
+methods.pop_key = function(self, t, key)
+  assert(self._key_map:get(t, key) ~= nil)
+  t[key] = self._key_map:get(t, key)
+  self._key_map:set(nil, t, key)
 end
 
 Ldump.mark(period, {mt = "const"}, ...)

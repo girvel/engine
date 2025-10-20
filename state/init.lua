@@ -1,3 +1,4 @@
+local async = require("engine.tech.async")
 local level = require("engine.tech.level")
 local combat = require("engine.state.combat")
 local ldtk = require("engine.tech.ldtk")
@@ -156,6 +157,7 @@ end
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
+  async.lag_threshold = .5
   self.is_loaded = false
   Log.info("Loading level %s", path)
   local start_t = love.timer.getTime()
@@ -210,6 +212,7 @@ methods.load_level = function(self, path)
   Log.info("Total time %.2f s", end_t - start_t)
 
   self.is_loaded = true
+  async.lag_threshold = .1
 end
 
 --- @param list entity[]

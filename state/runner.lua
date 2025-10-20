@@ -6,19 +6,22 @@ local runner = {}
 
 --- @alias runner_characters table<string, entity>
 --- @alias runner_positions table<string, vector>
---- @alias runner_scenes table<string|integer, scene|table>
+--- @alias runner_scenes table<string|integer, scene>
 
---- @class scene
+--- @alias scene scene_strict|table
+
+--- @class scene_strict
 --- @field characters? table<string, table>
---- @field start_predicate fun(self: scene|table, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any, ...
---- @field run fun(self: scene|table, ch: runner_characters, ps: runner_positions, ...): any
+--- @field start_predicate fun(self: scene, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any, ...
+--- @field run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
 --- @field enabled? boolean
---- @field boring_flag? true don't log scene beginning and ending
 --- @field mode? "sequential"|"parallel"|"once"
+--- @field boring_flag? true don't log scene beginning and ending
 --- @field save_flag? true don't warn about making a save during this scene
 --- @field in_combat_flag? true allows scene to start in combat
---- @field on_add? fun(self: scene|table, ch: runner_characters, ps: runner_positions) runs when the scene is added
---- @field on_cancel? fun(self: scene|table) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
+--- @field lag_flag? true hides coroutine lag warnings
+--- @field on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
+--- @field on_cancel? fun(self: scene) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
@@ -125,10 +128,12 @@ methods.update = function(self, dt)
   -- State.runner:stop may change this collection
 
   for _, run in ipairs(runs_copy) do
-    local ok, message = pcall(async.resume, run.coroutine)
-    if not ok then
-      Log.trace(run)
-      error(message)
+    if run.base_scene.lag_flag then
+      State.period:push_key(async, "lag_threshold", .5)
+    end
+    async.resume(run.coroutine)
+    if run.base_scene.lag_flag then
+      State.period:pop_key(async, "lag_threshold")
     end
 
     if coroutine.status(run.coroutine) == "dead" then
