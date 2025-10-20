@@ -226,6 +226,7 @@ _table.remove_breaking_in_bulk = function(t, indexes)
   end
 end
 
+--- Uses overridable equality operator
 --- @param t table
 --- @param item any
 --- @return boolean

@@ -281,6 +281,10 @@ methods.position_sequence = function(self, prefix)
     ::continue::
   end
 
+  if #result == 0 then
+    Error("No elements in position sequence %q", prefix)
+  end
+
   if count ~= #result then
     Error("Hole in position sequence %q: %i is missing", prefix, #result + 1)
   end
