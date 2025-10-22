@@ -170,6 +170,7 @@ multiple_methods.play_at = function(self, position, size)
   return Random.item(self):clone():place(position, size):play()
 end
 
+--- @return sound
 multiple_methods.play = function(self)
   return Random.item(self):clone():play()
 end

@@ -3,7 +3,7 @@ local level = require("engine.tech.level")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local tcod = require("engine.tech.tcod")
-local sound= require("engine.tech.sound")
+local sound = require("engine.tech.sound")
 local fighter = require("engine.mech.class.fighter")
 
 
@@ -105,9 +105,8 @@ api.travel = function(entity, destination, uses_dash, speed)
   then return true end
 
   local path = api.build_path(entity.position, destination)
-  if path then
-    return api.follow_path(entity, path, uses_dash, speed)
-  end
+  if not path then return false end
+  return api.follow_path(entity, path, uses_dash, speed)
 end
 
 --- @param start vector
@@ -248,36 +247,58 @@ end
 local prev_fov
 local FADE_DURATION = .5
 
---- @async
-api.fade_out = function()
-  prev_fov = State.player.fov_r
-  for i = prev_fov, 0, -1 do
-    State.player.fov_r = i
-    while not State.period:absolute(FADE_DURATION / prev_fov, api.fade_out) do
-      coroutine.yield()
-    end
+--- @param duration? number
+--- @return promise, scene
+api.fade_out = function(duration)
+  if prev_fov then
+    Error("Can not fade out twice")
   end
+
+  duration = duration or FADE_DURATION
+
+  local promise, scene = State.runner:run_task(function()
+    prev_fov = State.player.fov_r
+    for i = prev_fov, 0, -1 do
+      State.player.fov_r = i
+      while not State.period:absolute(duration / prev_fov, api.fade_in) do
+        coroutine.yield()
+      end
+    end
+  end, "fade_out")
+
+  scene.on_cancel = function()
+    State.player.fov_r = prev_fov
+    prev_fov = nil
+  end
+
+  return promise, scene
 end
 
---- @async
-api.fade_in = function()
-  for i = 0, prev_fov do
-    State.player.fov_r = i
-    while not State.period:absolute(FADE_DURATION / prev_fov, api.fade_in) do
-      coroutine.yield()
-    end
+--- @param duration? number
+--- @return promise, scene
+api.fade_in = function(duration)
+  if not prev_fov then
+    Error("Can not fade in if there was no fade out")
   end
-end
 
-api.fade_move = function(position)
-  local offset = State.perspective.camera_offset + State.player.position * Constants.cell_size * 4
-  State.perspective.is_camera_following = false
-  api.fade_out()
-    level.slow_move(State.player, position)
-    State.perspective.camera_offset = offset - State.player.position * Constants.cell_size * 4
-    async.sleep(2)
-  api.fade_in()
-  State.perspective.is_camera_following = true
+  duration = duration or FADE_DURATION
+
+  local promise, scene = State.runner:run_task(function()
+    for i = 0, prev_fov do
+      State.player.fov_r = i
+      while not State.period:absolute(duration / prev_fov, api.fade_in) do
+        coroutine.yield()
+      end
+    end
+    prev_fov = nil
+  end, "fade_in")
+
+  scene.on_cancel = function()
+    State.player.fov_r = prev_fov
+    prev_fov = nil
+  end
+
+  return promise, scene
 end
 
 --- @param position vector
@@ -403,6 +424,18 @@ api.is_visible = function(target)
   --- @cast position vector
   if not State.grids.solids:can_fit(position) then return false end
   return tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(position))
+end
+
+--- @param path string
+--- @param volume? number
+--- @return promise, scene
+api.play_sound = function(path, volume)
+  return State.runner:run_task(function()
+    local s = sound.multiple(path, volume):play()
+    while s.source:isPlaying() do
+      coroutine.yield()
+    end
+  end, "play " .. path)
 end
 
 Ldump.mark(api, {}, ...)
