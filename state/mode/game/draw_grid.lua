@@ -24,7 +24,7 @@ local draw_grid = function(self, layer, grid, dt)
       if not snapshot:is_visible_unsafe(x, y) then goto continue end
 
       local e = grid:unsafe_get(x, y)
-      if not e then goto continue end
+      if not e or not e.sprite then goto continue end
 
       local is_hidden_by_perspective = (
         not snapshot:is_transparent_unsafe(x, y)

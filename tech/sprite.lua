@@ -37,10 +37,14 @@ end
 --- @return sprite_atlas
 sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   local quad = sprite.utility.get_atlas_quad(index, cell_size, atlas_image:getDimensions())
+  local image_data = cut_out(atlas_image, quad)
+  local main_color, anchors = pull_anchors(image_data)
   return {
     type = "atlas",
     quad = quad,
-    image = love.graphics.newImage(cut_out(atlas_image, quad)),
+    image = love.graphics.newImage(image_data),
+    anchors = anchors,
+    color = main_color,
   }
 end)
 
