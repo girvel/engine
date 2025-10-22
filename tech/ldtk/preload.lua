@@ -154,6 +154,19 @@ put_positions = function(layer, offset, positions, captures)
       local position = absolute_position(instance)
       local prefix = instance.__identifier:sub(1, -3)
 
+      if not last_index[prefix] then
+        local value = 0
+        for name in pairs(positions) do
+          if not name:starts_with(prefix .. "_") then goto continue end
+          local n = tonumber(name:sub(#prefix + 2))
+          if not n then goto continue end
+          value = math.max(value, n)
+
+          ::continue::
+        end
+        last_index[prefix] = value
+      end
+
       local index = (last_index[prefix] or 0) + 1
       last_index[prefix] = index
       local rails_name = prefix .. "_" .. index
