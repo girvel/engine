@@ -55,28 +55,29 @@ local scene_run_mt = {}
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
-    local characters = Table.strict(
-      Fun.pairs(scene.characters or {})
-        :map(function(name, opts)
-          return name, assert(
-            self.entities[name],
-            ("Character %q does not exist in State.runner.entities"):format(name)
-          )
-        end)
-        :tomap(),
-      ("scene %q's character"):format(scene_name)
-    )
-
     if not (scene.enabled
       and (not self.save_lock or self.save_lock == scene or scene.on_cancel)
       and (scene.mode == "parallel" or not self:is_running(scene))
-      and (scene.in_combat_flag or not State.combat or Table.count(characters) == 0)
-      and Fun.pairs(characters):all(function(_, c)
-        return State:exists(c) and not self.locked_entities[c]
-      end))
+      and (scene.in_combat_flag or not State.combat or Table.count(scene.characters) == 0))
     then
       goto continue
     end
+
+    local characters = {}
+    if scene.characters then
+      for name, opts in pairs(scene.characters) do
+        local e = self.entities[name]
+        if not opts.optional and not State:exists(e)
+          or self.locked_entities[e]
+        then
+          goto continue
+        end
+
+        characters[name] = e
+      end
+    end
+
+    characters = Table.strict(characters, ("scene %q's character"):format(scene_name))
 
     local args = {scene:start_predicate(dt, characters, self.positions)}
     if not args[1] then goto continue end
