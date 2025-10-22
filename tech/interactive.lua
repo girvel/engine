@@ -42,7 +42,17 @@ end
 methods.interact = function(self, other)
   local item = require("engine.tech.item")
   Log.debug("%s interacts with %s", Name.code(other), Name.code(self))
-  self.was_interacted_by = other
+
+  local _, scene = State.runner:run_task(function()
+    self.was_interacted_by = other
+    coroutine.yield()
+    self.was_interacted_by = nil
+  end, "set_interacted_by")
+
+  scene.on_cancel = function()
+    self.was_interacted_by = nil
+  end
+
   item.set_cue(self, "highlight", false)
   if self.on_interact then
     self:on_interact(other)
