@@ -58,7 +58,10 @@ methods.update = function(self, dt)
     if not (scene.enabled
       and (not self.save_lock or self.save_lock == scene or scene.on_cancel)
       and (scene.mode == "parallel" or not self:is_running(scene))
-      and (scene.in_combat_flag or not State.combat or Table.count(scene.characters) == 0))
+      and (scene.in_combat_flag
+        or not State.combat
+        or not scene.characters
+        or Table.count(scene.characters) == 0))
     then
       goto continue
     end
