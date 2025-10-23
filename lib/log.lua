@@ -167,6 +167,8 @@ pretty = function(...)
     local x = select(i, ...)
     if type(x) == "table" then
       x = Name.code(x, nil) or inspect(x, {depth = 3, keys_limit = 20})
+    elseif x == nil then
+      x = "nil"
     end
     result[i] = x
   end
