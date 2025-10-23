@@ -10,7 +10,7 @@ local translation = {
     fighting_spirit = "боевой дух",
   },
   bag = {
-    money = "Деньги",
+    money = "Ценности",
   },
 }
 
