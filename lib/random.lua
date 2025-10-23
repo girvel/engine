@@ -54,4 +54,22 @@ random.distribute = function(total_amount, collection_length)
   return result
 end
 
+--- @generic T
+--- @param list T[]
+--- @param collection_length integer
+--- @return T[][]
+random.distribute_items = function(list, collection_length)
+  local result = random.distribute(#list, collection_length)
+  for i, n in ipairs(result) do
+    local l = {}
+    for _ = 1, n do
+      table.insert(l, table.remove(list))
+    end
+
+    --- @diagnostic disable-next-line
+    result[i] = l
+  end
+  return result
+end
+
 return random
