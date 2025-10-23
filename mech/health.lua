@@ -1,4 +1,4 @@
-local sprite = require "engine.tech.sprite"
+local floater = require("engine.tech.floater")
 local item   = require "engine.tech.item"
 
 
@@ -18,7 +18,7 @@ health.heal = function(target, amount)
   end
   health.set_hp(target, value)
   if target.position then
-    State:add(health.floater("+" .. amount, target.position, health.COLOR_HEALING))
+    State:add(floater.new("+" .. amount, target.position, health.COLOR_HEALING))
   end
 end
 
@@ -36,7 +36,7 @@ health.damage = function(target, amount, is_critical)
     repr = repr .. "!"
   end
 
-  State:add(health.floater(repr, target.position, health.COLOR_DAMAGE))
+  State:add(floater.new(repr, target.position, health.COLOR_DAMAGE))
 
   local before = target.hp
   health.set_hp(target, before - amount)
@@ -111,12 +111,12 @@ health.attack = function(source, target, attack_roll, damage_roll)
   Log.info("%s attacks %s; attack roll: %s, armor: %s", source, target, attack, ac)
 
   if is_nat_miss then
-    State:add(health.floater("!", target.position, health.COLOR_DAMAGE))
+    State:add(floater.new("!", target.position, health.COLOR_DAMAGE))
     return false
   end
 
   if attack < ac and not is_nat then
-    State:add(health.floater("-", target.position, health.COLOR_DAMAGE))
+    State:add(floater.new("-", target.position, health.COLOR_DAMAGE))
     return false
   end
 
@@ -144,23 +144,6 @@ end
 --   health.damage(target, damage_roll:roll())
 --   return true
 -- end
-
---- Floating text for damage & such
---- @param text string|number
---- @param grid_position vector
---- @param color vector
-health.floater = function(text, grid_position, color)
-  return {
-    boring_flag = true,
-    codename = "floating_damage",
-    position = grid_position
-      + V(math.random() * .5 + .25, math.random() * .5 + .25),
-    drift = V(0, -.25),
-    sprite = sprite.text(tostring(text), 16, color),
-    life_time = 3,
-    layer = "fx_over",
-  }
-end
 
 Ldump.mark(health, {}, ...)
 return health

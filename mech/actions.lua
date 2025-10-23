@@ -1,12 +1,11 @@
-local xp = require("engine.mech.xp")
+local floater = require("engine.tech.floater")
 local level = require "engine.tech.level"
 local action = require "engine.tech.action"
 local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
-local tcod        = require "engine.tech.tcod"
-local projectile  = require "engine.tech.projectile"
+local tcod        = require "engine.tech.tcod" local projectile  = require "engine.tech.projectile"
 
 
 local actions = {}
@@ -257,7 +256,7 @@ actions.shove = Table.extend({
       local distance = math.ceil(entity:get_modifier("athletics") / 4)
 
       if distance <= 0 or not entity:ability_check("athletics", dc) then
-        State:add(health.floater("-", target.position, health.COLOR_DAMAGE))
+        State:add(floater.new("-", target.position, health.COLOR_DAMAGE))
         return
       end
 
