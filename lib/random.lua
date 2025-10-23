@@ -34,4 +34,24 @@ random.float = function(a, b)
   return math.random() * (b - a) + a
 end
 
+--- @param total_amount integer
+--- @param collection_length integer
+--- @return integer[]
+random.distribute = function(total_amount, collection_length)
+  local splits = {}
+  for _ = 1, collection_length do
+    table.insert(splits, math.random(total_amount))
+  end
+  table.sort(splits)
+
+  local result = {}
+  local prev = 0
+  for _, split in ipairs(splits) do
+    table.insert(result, split - prev)
+    prev = split
+  end
+
+  return result
+end
+
 return random
