@@ -9,6 +9,9 @@ local translation = {
     hit_dice = "перевязать раны",
     fighting_spirit = "боевой дух",
   },
+  bag = {
+    money = "Деньги",
+  },
 }
 
 Ldump.mark(translation, "const", ...)

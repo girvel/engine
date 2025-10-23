@@ -8,6 +8,7 @@ local base = {}
 --- @class base_player: entity_strict
 --- @field fov_r integer
 --- @field ai player_ai
+--- @field bag table<string, integer>
 --- @field hears? dialogue_line
 --- @field speaks? integer
 --- @field notification? string
@@ -30,6 +31,7 @@ base.mixin = function()
     player_flag = true,
     fov_r = 16,
     curtain_color = Vector.transparent,
+    bag = {},
 
     ai = ai.new(),
   })

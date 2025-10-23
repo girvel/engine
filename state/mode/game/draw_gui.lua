@@ -26,7 +26,7 @@ local action_button
 
 -- Render functions
 local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
-  draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
+  draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, use_mouse, draw_curtain
 
 
@@ -85,11 +85,17 @@ draw_sidebar = function(self)
 
     draw_resources()
 
+    if State.combat then
+      ui.br()
+      if not is_compact then ui.br() end
+
+      draw_move_order()
+    end
+
     ui.br()
     if not is_compact then ui.br() end
-
-    if State.combat then
-      draw_move_order()
+    if Table.count(State.player.bag) > 0 then
+      draw_bag()
     end
 
     hint = Kernel._save and "сохранение..." or hint
@@ -400,6 +406,36 @@ draw_move_order = function()
       ui.finish_line()
     end
   tk.finish_block(start)
+end
+
+draw_bag = function()
+  local start = tk.start_block()
+    if not is_compact then
+      ui.start_alignment("center")
+        ui.text("Сумка")
+      ui.finish_alignment()
+      ui.br()
+    end
+
+    --- @type [string, integer][]
+    local sorted, max_length do
+      sorted = {}
+      max_length = 0
+      for k, v in pairs(State.player.bag) do
+        table.insert(sorted, {k, v})
+        max_length = math.max(max_length, k:utf_len())
+      end
+
+      table.sort(sorted, function(a, b)
+        return a[1] < b[1]
+      end)
+    end
+
+    for _, t in ipairs(sorted) do
+      local k, v = unpack(t)
+      ui.text("%s:%s %s", translation.bag[k] or k, " " * (max_length - k:utf_len()), v)
+    end
+  tk.finish_block(start)  -- TODO UI make this stateless?
 end
 
 local H = 200
