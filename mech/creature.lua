@@ -18,6 +18,7 @@ creature.mixin = function()
       hit = sound.multiple("engine/assets/sounds/hit/body", .3),
     },
     transparent_flag = true,
+    moving_flag = true,
   }, methods)
 
   return result

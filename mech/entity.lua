@@ -46,3 +46,4 @@
 --- @field boring_flag true? disable log messages about the entity because it's dull
 --- @field no_sound_flag true? disable movement sounds
 --- @field essential_flag true? can't die, gets incapacitated in combat
+--- @field moving_flag true? not stationary, can move

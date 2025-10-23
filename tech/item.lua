@@ -89,34 +89,59 @@ end
 --- @param ... string | integer
 --- @return boolean
 item.drop = function(parent, ...)
-  local next_position = Iteration.rhombus(5)
-  for i = 1, select("#", ...) do
+  local arg_len = select("#", ...)
+  if arg_len == 0 then return true end
+
+  local present_items = {}
+  local present_slots = {}
+
+  for i = 1, arg_len do
     local slot = select(i, ...)
-
     local this_item = parent.inventory[slot]
-    if not this_item then goto continue end
-
-    local position
-    for d in next_position do
-      local p = d + parent.position
-      if (d == Vector.zero or not State.grids.solids:slow_get(p, true))
-        and not State.grids.items[p]
-      then
-        position = p
-        goto found
-      end
+    if this_item then
+      table.insert(present_items, this_item)
+      table.insert(present_slots, slot)
     end
-    do return false end
-    ::found::
-
-    parent.inventory[slot] = nil
-    this_item.position = position
-    this_item.grid_layer = "items"
-    State:add(this_item)
-
-    ::continue::
   end
-  return true
+
+  local dropped_n = item.drops(parent.position, unpack(present_items))
+  for i = 1, dropped_n do
+    parent.inventory[present_slots[i]] = nil
+  end
+  return dropped_n == #present_items
+end
+
+--- @param position vector
+--- @param ... item
+--- @return integer
+item.drops = function(position, ...)
+  local arg_len = select("#", ...)
+  if arg_len == 0 then return 0 end
+
+  local bfs = State.grids.solids:bfs(position)
+  bfs()
+
+  for i = 1, arg_len do
+    local this_item = select(i, ...)
+
+    do ::redo::
+      local p, e = bfs()
+      if not p then return i - 1 end
+      if e and not e.moving_flag then
+        bfs:discard()
+        goto redo
+      end
+      if State.grids.items[p] then
+        goto redo
+      end
+
+      this_item.position = p
+      this_item.grid_layer = "items"
+      State:add(this_item)
+    end
+  end
+
+  return select("#", ...)
 end
 
 local give_to_hands, give_to_a_hand
@@ -127,8 +152,6 @@ local give_to_hands, give_to_a_hand
 --- @param this_item item item to give
 --- @return boolean success did item make it to the entity's inventory
 item.give = function(entity, this_item)
-  local inv = entity.inventory
-
   local is_free
   local slot = this_item.slot
   if slot == "hands" then

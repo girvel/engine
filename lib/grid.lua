@@ -144,7 +144,7 @@ grid.mt = {
 --- @field _seen grid<true>
 --- @field _next vector[]
 --- @field _last vector?
---- @operator call:vector?
+--- @operator call:vector?,any
 local bfs_methods = {}
 iteration._bfs_mt = {__index = bfs_methods}
 
