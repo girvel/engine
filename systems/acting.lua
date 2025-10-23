@@ -34,6 +34,9 @@ return Tiny.processingSystem {
 
   _active_ais = nil,
   _start_time = nil,
+  _no_aggression_rounds = 0,
+  _was_there_aggression = false,
+  _sub = nil,
 
   onAdd = function(self, entity)
     if entity.ai.init then
@@ -48,6 +51,14 @@ return Tiny.processingSystem {
   end,
 
   preProcess = function(self, entity, dt)
+    if not self._sub then
+      self._sub = State.hostility:subscribe(function()
+        if State.combat then
+          self._was_there_aggression = true
+        end
+      end)
+    end
+
     self._start_time = love.timer.getTime()
     self._active_ais = {}
 
@@ -59,6 +70,8 @@ return Tiny.processingSystem {
         -- in coherent code should always break here on the first iteration
         State.combat:remove(current)
       end
+    else
+      self._no_aggression_rounds = 0
     end
 
     if State.combat and Fun.iter(State.combat.list)
@@ -76,7 +89,6 @@ return Tiny.processingSystem {
       for _, e in ipairs(State.combat.list) do
         e:rest("short")
       end
-
       State.combat = nil
     end
   end,
@@ -139,6 +151,28 @@ return Tiny.processingSystem {
         current:rest("move")
       end
       State.combat:_pass_turn()
+
+      if State.combat.current_i == 1 then
+        if self._was_there_aggression then
+          self._was_there_aggression = false
+          self._no_aggression_rounds = 0
+        else
+          self._no_aggression_rounds = self._no_aggression_rounds + 1
+
+          if self._no_aggression_rounds >= 3 then
+            Log.info(
+              "Combat ends after %s consecutive rounds without aggression",
+              self._no_aggression_rounds
+            )
+
+            for _, e in ipairs(State.combat.list) do
+              e:rest("short")
+            end
+            State.combat = nil
+            return
+          end
+        end
+      end
 
       current = State.combat:get_current()
       Log.info("%s's turn", Name.code(current))
