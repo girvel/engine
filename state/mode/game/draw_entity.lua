@@ -30,7 +30,9 @@ local draw_entity = function(self, entity, dt)
   end
 
   local sprite = entity.sprite
-  if sprite.type == "image" or (sprite.type == "atlas" and (entity.shader or entity.inventory)) then
+  if sprite.type == "image"
+    or (sprite.type == "atlas" and (entity.shader or entity.inventory or entity.layer))
+  then
     tk.draw_entity(entity, x, y, State.perspective.SCALE)
   elseif sprite.type == "atlas" then
     self._sprite_batches[entity.grid_layer]:add(sprite.quad, x, y, 0, State.perspective.SCALE)
