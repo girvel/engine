@@ -31,7 +31,7 @@ base.mixin = function()
     player_flag = true,
     fov_r = 16,
     curtain_color = Vector.transparent,
-    bag = {},
+    bag = {money = 0},
 
     ai = ai.new(),
   })

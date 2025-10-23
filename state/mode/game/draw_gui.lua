@@ -74,29 +74,10 @@ draw_sidebar = function(self)
     SIDEBAR_W, love.graphics.getHeight() - 2 * PADDING_Y
   )
     draw_hp_bar()
-
-    ui.br()
-    if not is_compact then ui.br() end
-
     draw_action_grid(self)
-
-    ui.br()
-    if not is_compact then ui.br() end
-
     draw_resources()
-
-    if State.combat then
-      ui.br()
-      if not is_compact then ui.br() end
-
-      draw_move_order()
-    end
-
-    ui.br()
-    if not is_compact then ui.br() end
-    if Table.count(State.player.bag) > 0 then
-      draw_bag()
-    end
+    draw_move_order()
+    draw_bag()
 
     hint = Kernel._save and "сохранение..." or hint
     if hint then
@@ -166,6 +147,9 @@ draw_hp_bar = function()
 end
 
 draw_action_grid = function(self)
+  ui.br()
+  if not is_compact then ui.br() end
+
   cost = nil
   hint = nil
 
@@ -330,6 +314,9 @@ local PRIMITIVE_RESOURCES = {
 }
 
 draw_resources = function()
+  ui.br()
+  if not is_compact then ui.br() end
+
   local start = tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
@@ -380,6 +367,11 @@ local HOSTILITY_COLOR = {
 }
 
 draw_move_order = function()
+  if not State.combat then return end
+
+  ui.br()
+  if not is_compact then ui.br() end
+
   local start = tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
@@ -409,26 +401,33 @@ draw_move_order = function()
 end
 
 draw_bag = function()
+  --- @type [string, integer][], integer
+  local sorted, max_length do
+    sorted = {}
+    max_length = 0
+    for k, v in pairs(State.player.bag) do
+      if v > 0 then
+        table.insert(sorted, {k, v})
+        max_length = math.max(max_length, k:utf_len())
+      end
+    end
+
+    if #sorted == 0 then return end
+
+    table.sort(sorted, function(a, b)
+      return a[1] < b[1]
+    end)
+  end
+
+  ui.br()
+  if not is_compact then ui.br() end
+
   local start = tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Сумка")
       ui.finish_alignment()
       ui.br()
-    end
-
-    --- @type [string, integer][]
-    local sorted, max_length do
-      sorted = {}
-      max_length = 0
-      for k, v in pairs(State.player.bag) do
-        table.insert(sorted, {k, v})
-        max_length = math.max(max_length, k:utf_len())
-      end
-
-      table.sort(sorted, function(a, b)
-        return a[1] < b[1]
-      end)
     end
 
     for _, t in ipairs(sorted) do
