@@ -106,7 +106,7 @@ d.mt.__mul = function(self, other)
     Fun.iter(self.dice)
       :cycle()
       :take_n(#self.dice * other)
-      :map(function(d) return Table.deep_copy(d) end)
+      :map(function(die) return Table.deep_copy(die) end)
       :totable(),
     self.bonus * other
   )
@@ -138,15 +138,15 @@ end
 --- @return integer
 methods.roll = function(self)
   local rolls = Fun.iter(self.dice)
-    :map(function(d) return d:roll() end)
+    :map(function(die) return die:roll() end)
     :totable()
   local result = Fun.iter(rolls):sum() + self.bonus
 
   Log.debug(
     table.concat(
       Fun.zip(self.dice, rolls)
-        :map(function(d, r)
-          return ("%s (%s)"):format(r, tostring(d))
+        :map(function(die, r)
+          return ("%s (%s)"):format(r, tostring(die))
         end)
         :totable(),
       " + "
@@ -159,7 +159,7 @@ end
 --- @return integer
 methods.max = function(self)
   return Fun.iter(self.dice)
-    :map(function(d) return d.sides_n end)
+    :map(function(die) return die.sides_n end)
     :sum() + self.bonus
 end
 

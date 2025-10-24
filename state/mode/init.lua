@@ -24,13 +24,13 @@ local empty_f = function() end
 --- @class state_mode
 --- @field _mode table
 local methods = {
-  _set_mode = function(self, mode)
-    self._mode = mode
-    self.draw_gui = mode.draw_gui and Ldump.ignore_upvalue_size(function(self, ...)
-      return mode:draw_gui(...)
+  _set_mode = function(self, mode_value)
+    self._mode = mode_value
+    self.draw_gui = mode_value.draw_gui and Ldump.ignore_upvalue_size(function(_, ...)
+      return mode_value:draw_gui(...)
     end) or empty_f
-    self.draw_entity = mode.draw_entity and Ldump.ignore_upvalue_size(function(self, ...)
-      return mode:draw_entity(...)
+    self.draw_entity = mode_value.draw_entity and Ldump.ignore_upvalue_size(function(_, ...)
+      return mode_value:draw_entity(...)
     end) or empty_f
   end,
 

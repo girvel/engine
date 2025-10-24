@@ -5,7 +5,9 @@ local actions = require("engine.mech.actions")
 
 local wandering = {}
 
---- @class wandering_ai: ai
+--- @alias wandering_ai wandering_ai_strict|table
+
+--- @class wandering_ai_strict: ai_strict
 --- @field targeting ai_targeting
 --- @field _frequency_k number
 --- @field _target? entity
@@ -18,6 +20,7 @@ local DEFAULT_TARGETING = {
   scan_period = .5,
   scan_range = 10,
   range = 20,
+  support_range = 0,
 }
 
 --- @param targeting? ai_targeting_optional

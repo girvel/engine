@@ -6,7 +6,7 @@ build_love_shader = function(palette_path, palette_real_colors_n)
     love.filesystem.read("engine/tech/shaders/water.frag"),
     palette_real_colors_n,
     palette_real_colors_n
-  ), nil)
+  ), nil)  --- @diagnostic disable-line
 
   do
     local palette = {}

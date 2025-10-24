@@ -8,7 +8,9 @@ local actions   = require("engine.mech.actions")
 
 local combat_ai = {}
 
---- @class combat_ai: ai
+--- @alias combat_ai combat_ai_strict|table
+
+--- @class combat_ai_strict: ai_strict
 --- @field targeting ai_targeting
 --- @field _hostility_subscription function
 local methods = {}

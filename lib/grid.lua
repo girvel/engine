@@ -139,7 +139,9 @@ grid.mt = {
   end,
 }
 
---- @class iteration_bfs
+--- @alias iteration_bfs _iteration_bfs|fun():vector?,any
+
+--- @class _iteration_bfs
 --- @field _base grid<any>
 --- @field _seen grid<true>
 --- @field _next vector[]

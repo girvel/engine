@@ -33,7 +33,8 @@ end
 line_profiler.report = function()
   if not start_line or not stop_line then return "" end
 
-  local source_code = love.filesystem.read(target_file:sub(2)):split("\n", true)
+  local source_code = love.filesystem.read(target_file:sub(2))  --[[@as string]]
+  local lines = source_code:split("\n", true)
 
   local sum = 0
   for i, value in pairs(time_spent) do
@@ -46,7 +47,7 @@ line_profiler.report = function()
   for i = start_line + 1, stop_line - 1 do
     local value = time_spent[i] or 0
     report = report .. ("%i\t%.2f s\t%.2f%%\t%s\n"):format(
-      i, value, value / sum * 100, source_code[i]
+      i, value, value / sum * 100, lines[i]
     )
   end
 

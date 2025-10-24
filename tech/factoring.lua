@@ -8,7 +8,6 @@ local factoring = {}
 --- @return {[string | integer]: function}
 factoring.from_atlas = function(atlas_path, cell_size, codenames, mixin)
   local result = {ATLAS_IMAGE = love.graphics.newImage(atlas_path)}
-  local w, h = result.ATLAS_IMAGE:getDimensions()
   for i, codename in ipairs(codenames) do
     if not codename then goto continue end
     local factory = function()

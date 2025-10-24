@@ -12,7 +12,8 @@ bad_trip.new = function(duration)
     duration = duration,
     now = 0,
     love_shader = love.graphics.newShader(
-      love.filesystem.read("engine/tech/shaders/bad_trip.frag"), nil
+      love.filesystem.read("engine/tech/shaders/bad_trip.frag"),
+      nil  --- @diagnostic disable-line
     ),
   }, bad_trip.mt)
 

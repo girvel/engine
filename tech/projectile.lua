@@ -1,4 +1,3 @@
-local sprite = require("engine.tech.sprite")
 local item   = require("engine.tech.item")
 
 

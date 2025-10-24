@@ -7,7 +7,8 @@ local build_love_shader = function(tint, intensity, brightness, contrast_midpoin
   assert(#tint == 3)
 
   local result = love.graphics.newShader(
-    love.filesystem.read("engine/tech/shaders/winter.frag"), nil
+    love.filesystem.read("engine/tech/shaders/winter.frag"),
+    nil  --- @diagnostic disable-line
   )
   result:send("tint", tint)
   result:send("intensity", intensity)
