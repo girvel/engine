@@ -350,13 +350,9 @@ api.autosave = function(name)
   local _, scene = State.runner:run_task(function()
     name = name or "autosave"
     Log.debug("Planned autosave %q", name)
-    while State.runner.locked_entities[State.player] do
+    while State.runner.locked_entities[State.player] or State.combat do
       coroutine.yield()
     end
-    -- assert(
-    --   not State.runner.locked_entities[State.player],
-    --   "Autosave when the player is locked in a cutscene"
-    -- )
     Log.info("Autosave %q", name)
     Kernel:plan_save(name)
 
