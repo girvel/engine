@@ -90,9 +90,10 @@ cli.stat = function(args)
 
     print()
     print("# Git")
-    print("DOT commits:    " .. dot_commits)
-    print("Engine commits: " .. engine_commits)
-    print("Tags:           " .. tags)
+    print("Commits: " .. dot_commits + engine_commits)
+    print("DOT:     " .. dot_commits)
+    print("Engine:  " .. engine_commits)
+    print("Tags:    " .. tags)
   end
 
   do
