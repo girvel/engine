@@ -7,6 +7,19 @@ local sound = require("engine.tech.sound")
 local fighter = require("engine.mech.class.fighter")
 
 
+--- @param x entity|vector
+--- @return vector
+local to_vector = function(x)
+  if getmetatable(x) ~= Vector.mt then
+    if not x.position then
+      Error("Entity %s has no position", x)
+    end
+    return x.position
+  end  --- @cast x vector
+  return x
+end
+
+
 --- API for asynchronous scripting, both AI and rails
 local api = {}
 
@@ -52,9 +65,11 @@ api.fast_travel = function(entity, intermediate_point, destination)
 end
 
 --- @param entity entity
---- @param destination vector
+--- @param destination vector|entity
 --- @return promise, scene
 api.travel_scripted = function(entity, destination, speed)
+  destination = to_vector(destination)
+
   local promise, scene = State.runner:run_task(function()
     local ok = api.travel_persistent(
       entity, destination, math.max(1, math.ceil((entity.position - destination):abs2() / 3)), speed
@@ -436,6 +451,15 @@ api.play_sound = function(path, volume)
       coroutine.yield()
     end
   end, "play " .. path)
+end
+
+--- @param a entity|vector
+--- @param b entity|vector
+--- @return number
+api.distance = function(a, b)
+  a = to_vector(a)
+  b = to_vector(b)
+  return (a - b):abs2()
 end
 
 Ldump.mark(api, {}, ...)
