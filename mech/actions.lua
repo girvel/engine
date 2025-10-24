@@ -284,6 +284,8 @@ base_attack = function(entity, slot)
   WHOOSH:play_at(entity.position)
 
   entity:animate(slot .. "_attack"):next(function()
+    if not State:exists(target) then return end
+
     State.hostility:register(entity, target)
 
     if not health.attack(
@@ -353,6 +355,8 @@ actions.bow_attack = function(target)
       entity.inventory.hand = arrow
 
       entity:animate("bow_attack"):next(function()
+        if not State:exists(target) then return end
+
         local attack_roll = entity:get_ranged_attack_roll()
         local damage_roll = entity:get_ranged_damage_roll()
 
