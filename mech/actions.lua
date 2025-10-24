@@ -252,7 +252,7 @@ actions.shove = Table.extend({
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
       State.hostility:register(entity, target)
-      local dc = (D(20) + target:get_modifier("acrobatics")):roll()
+      local dc = target:get_roll("acrobatics"):roll()
       local distance = math.ceil(entity:get_modifier("athletics") / 4)
 
       if distance <= 0 or not entity:ability_check("athletics", dc) then

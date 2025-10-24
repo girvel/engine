@@ -154,6 +154,7 @@ end
 
 --- @param self entity
 --- @param ability ability|skill
+--- @return number
 methods.get_modifier = function(self, ability)
   if abilities.set[ability] then
     return abilities.get_modifier(self:modify(
@@ -172,6 +173,13 @@ methods.get_modifier = function(self, ability)
     self:get_modifier(abilities.skill_bases[ability]),
     ability
   )
+end
+
+--- @param self entity
+--- @param ability ability|skill
+--- @return d
+methods.get_roll = function(self, ability)
+  return D(20) + self:get_modifier(ability) + xp.get_proficiency_bonus(self.level or 1)
 end
 
 local SUCCESS = sound.multiple("engine/assets/sounds/check_succeeded")
