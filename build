@@ -44,6 +44,9 @@ local parse_cli = function()
     "Display more output"
   )
 
+  parser:command("issues")
+    :description("List issues")
+
   return parser:parse()
 end
 
@@ -175,6 +178,12 @@ cli.exe = function(args)
   run("rm .build/%s.love", versioned_name)
 
   log.info("Build finished.")
+end
+
+cli.issues = function(args)
+  for _, source in ipairs {".", "engine", "engine/lib/moonspeak", "engine/lib/ldump"} do
+    run("cd %s; gh issue list --state all --json number,title,body,comments -L 999 | jq 'map({number, title, body, comments: (.comments | map(.body))})' | cat", source)
+  end
 end
 
 local args = parse_cli()
