@@ -47,16 +47,26 @@ methods.once = function(self, ...)
   return false
 end
 
+local PSEUDO_NIL = {}
+
 methods.push_key = function(self, t, key, value)
-  assert(value ~= nil)
+  local saved_value
+  if t[key] == nil then
+    saved_value = PSEUDO_NIL
+  else
+    saved_value = t[key]
+  end
+
   assert(self._key_map:get(t, key) == nil)
-  self._key_map:set(t[key], t, key)
+  self._key_map:set(saved_value, t, key)
   t[key] = value
 end
 
 methods.pop_key = function(self, t, key)
-  assert(self._key_map:get(t, key) ~= nil)
   t[key] = self._key_map:get(t, key)
+  if t[key] == PSEUDO_NIL then
+    t[key] = nil
+  end
   self._key_map:set(nil, t, key)
 end
 
