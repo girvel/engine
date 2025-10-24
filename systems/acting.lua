@@ -66,7 +66,7 @@ return Tiny.processingSystem {
     if State.combat then
       while true do
         local current = State.combat:get_current()
-        if State:exists(current) then break end
+        if not current or State:exists(current) then break end
         -- in coherent code should always break here on the first iteration
         State.combat:remove(current)
       end

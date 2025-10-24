@@ -24,9 +24,10 @@ end
 methods.remove = function(self, element)
   local i = Table.index_of(self.list, element)
   if not i then return end
-  if i <= self.current_i then
+  if i < self.current_i then
     self.current_i = self.current_i - 1
   end
+  self.current_i = Math.loopmod(self.current_i, #self.list)
   table.remove(self.list, i)
 end
 

@@ -94,6 +94,7 @@ methods.remove = function(self, entity, silently)
   return entity
 end
 
+--- @return boolean
 methods.exists = function(self, entity)
   return self._entities[entity]
 end
