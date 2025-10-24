@@ -72,44 +72,12 @@ end
 --- @param system T
 --- @return T
 safety.for_system = function(system)
-  --- @cast system table
-  local update = system.update
-  system.update = function(...)
-    return safety.call(update, ...)
-  end
-
-  local process = system.process
-  if process then
-    system.process = function(...)
-      return safety.call(process, ...)
-    end
-  end
-
-  local preProcess = system.preProcess
-  if preProcess then
-    system.preProcess = function(...)
-      return safety.call(preProcess, ...)
-    end
-  end
-
-  local postProcess = system.postProcess
-  if postProcess then
-    system.postProcess = function(...)
-      return safety.call(postProcess, ...)
-    end
-  end
-
-  local onAdd = system.onAdd
-  if onAdd then
-    system.onAdd = function(...)
-      return safety.call(onAdd, ...)
-    end
-  end
-
-  local onRemove = system.onRemove
-  if onRemove then
-    system.onRemove = function(...)
-      return safety.call(onRemove, ...)
+  for _, key in ipairs {"update", "process", "preProcess", "postProcess", "onAdd", "onRemove"} do
+    local inner = system[key]
+    if inner then
+      system[key] = Ldump.ignore_upvalue_size(function(...)
+        return safety.call(inner, ...)
+      end)
     end
   end
 
