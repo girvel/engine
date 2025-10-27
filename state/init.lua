@@ -248,7 +248,7 @@ methods.start_combat = function(self, list)
       Log.info("Joining the combat: %s", repr)
       Table.concat(State.combat.list, list)
     else
-      Log.info("Combat starts: %s", repr)
+      Log.info("--- Combat starts: %s ---", repr)
       State.combat = combat.new(list)
     end
   end, "start_combat")

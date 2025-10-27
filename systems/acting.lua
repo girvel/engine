@@ -80,8 +80,8 @@ return Tiny.processingSystem {
       end)
     then
       Log.info(
-        "Combat ends as only %s are left standing",
-         table.concat(Fun.iter(State.combat.list)
+        "--- Combat ends as only %s are left standing ---",
+        table.concat(Fun.iter(State.combat.list)
           :map(Name.code)
           :totable(), ", ")
       )
@@ -161,7 +161,7 @@ return Tiny.processingSystem {
 
           if self._no_aggression_rounds >= 3 then
             Log.info(
-              "Combat ends after %s consecutive rounds without aggression",
+              "--- Combat ends after %s consecutive rounds without aggression ---",
               self._no_aggression_rounds
             )
 
@@ -175,7 +175,7 @@ return Tiny.processingSystem {
       end
 
       current = State.combat:get_current()
-      Log.info("%s's turn", Name.code(current))
+      Log.info("--- %s's turn ---", Name.code(current))
       State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
 
       self:_update_conditions(entity, 6)
