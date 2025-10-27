@@ -346,20 +346,25 @@ api.autosave = function(name)
     Log.warn("Autosave collision for %q", name or "<unnamed autosave>")
     return
   end
+  name = name or "autosave"
 
   local _, scene = State.runner:run_task(function()
-    name = name or "autosave"
     Log.debug("Planned autosave %q", name)
+
     while State.runner.locked_entities[State.player] or State.combat do
       coroutine.yield()
     end
-    Log.info("Autosave %q", name)
-    Kernel:plan_save(name)
 
-    coroutine.yield()
+    if State.player.hp > 0 then
+      Log.info("Autosave %q", name)
+      Kernel:plan_save(name)
+
+      coroutine.yield()
+      api.notification("Игра сохранена")
+    else
+      Log.info("No autosave %q, player is dead", name)
+    end
     State.runner.save_lock = false
-
-    api.notification("Игра сохранена")
   end, "autosave_" .. (name or "anon"))
 
   scene.on_cancel = function()
