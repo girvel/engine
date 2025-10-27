@@ -4,7 +4,7 @@ local audio = {}
 --- @field _playlist sound[]
 --- @field _playlist_paused boolean
 --- @field _paused_delay number
---- @field _current sound
+--- @field _current sound?
 local methods = {}
 local mt = {__index = methods}
 
@@ -92,7 +92,9 @@ methods.set_paused = function(self, value)
 end
 
 methods.reset = function(self)
-  self._current.source:pause()
+  if self._current then
+    self._current.source:pause()
+  end
 end
 
 Ldump.mark(audio, {}, ...)
