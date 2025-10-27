@@ -39,7 +39,7 @@ end
 --- @return integer[]
 random.distribute = function(total_amount, collection_length)
   local splits = {}
-  for _ = 1, collection_length do
+  for _ = 1, collection_length - 1 do
     table.insert(splits, math.random(total_amount))
   end
   table.sort(splits)
@@ -50,6 +50,7 @@ random.distribute = function(total_amount, collection_length)
     table.insert(result, split - prev)
     prev = split
   end
+  table.insert(result, total_amount - prev)
 
   return result
 end
