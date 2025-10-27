@@ -358,14 +358,14 @@ api.autosave = function(name)
 
     coroutine.yield()
     State.runner.save_lock = false
+
+    api.notification("Игра сохранена")
   end, "autosave_" .. (name or "anon"))
 
   scene.on_cancel = function()
     State.runner.save_lock = false
   end
   State.runner.save_lock = scene
-
-  api.notification("Игра сохранена")
 end
 
 --- @param entity entity
