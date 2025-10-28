@@ -158,6 +158,7 @@ return Tiny.processingSystem {
       current:rest("move")
     end
     State.combat:_pass_turn()
+    self._move_start_t = love.timer.getTime()
 
     if State.combat.current_i == 1 then
       if self._was_there_aggression then
