@@ -84,12 +84,10 @@ return Tiny.processingSystem {
             :totable(), ", ")
         )
 
-        for _, e in ipairs(State.combat.list) do
-          e:rest("short")
-        end
-        State.combat = nil
+        self:_finish_combat()
       else
         local is_timeout_reached = current ~= State.player
+          and self._move_start_t
           and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
 
         if is_timeout_reached then
@@ -174,11 +172,7 @@ return Tiny.processingSystem {
             self._no_aggression_rounds
           )
 
-          for _, e in ipairs(State.combat.list) do
-            e:rest("short")
-          end
-          State.combat = nil
-          return
+          self:_finish_combat()
         end
       end
     end
@@ -187,6 +181,14 @@ return Tiny.processingSystem {
     current = State.combat:get_current()
     Log.info("--- %s's turn ---", Name.code(current))
     State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
+  end,
+
+  _finish_combat = function(self)
+    for _, e in ipairs(State.combat.list) do
+      e:rest("short")
+    end
+    State.combat = nil
+    self._move_start_t = nil
   end,
 
   _process_outside_combat = function(self, entity, dt)
