@@ -6,13 +6,13 @@ local runner = {}
 
 --- @alias runner_characters table<string, entity>
 --- @alias runner_positions table<string, vector>
---- @alias runner_scenes table<string|integer, scene>
+--- @alias runner_scenes table<string, scene>
 
 --- @alias scene scene_strict|table
 
 --- @class scene_strict
 --- @field characters? table<string, table>
---- @field start_predicate fun(self: scene, dt: integer, ch: runner_characters, ps: runner_positions): boolean|any, ...
+--- @field start_predicate fun(self: scene, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
 --- @field run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
 --- @field enabled? boolean
 --- @field mode? "sequential"|"parallel"|"once"
@@ -151,7 +151,7 @@ methods.update = function(self, dt)
     :totable()
 end
 
---- @param scene integer|string|scene
+--- @param scene string|scene
 methods.is_running = function(self, scene)
   if type(scene) ~= "table" then
     scene = self.scenes[scene]
@@ -236,7 +236,7 @@ methods.add = function(self, scenes)
   Log.info("Added %s scenes%s", Table.count(scenes), on_adds_repr)
 end
 
---- @param scene integer|string|scene
+--- @param scene string|scene
 methods.remove = function(self, scene)
   local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
   if not key then return end
@@ -264,6 +264,15 @@ methods.run_task = function(self, f, name)
   }
   self.scenes[key] = scene
   return end_promise, scene
+end
+
+--- @param f fun(scene, characters)
+--- @param name? string
+--- @return promise, scene
+methods.run_task_sync = function(self, f, name)
+  local promise, scene = self:run_task(f, name)
+  scene.on_cancel = f
+  return promise, scene
 end
 
 methods.handle_loading = function(self)

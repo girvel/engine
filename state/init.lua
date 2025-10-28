@@ -224,7 +224,7 @@ methods.start_combat = function(self, list)
 
   if #list == 0 then return end
 
-  self.runner:run_task(function()
+  self.runner:run_task_sync(function()
     list = Fun.iter(list)
       :filter(function(e) return not self:in_combat(e) and self:exists(e) end)
       :totable()
