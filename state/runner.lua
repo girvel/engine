@@ -162,11 +162,15 @@ methods.is_running = function(self, scene)
 end
 
 --- @async
---- @param scene integer|string|scene
+--- @param scene string|scene
 --- @param hard? boolean prevent :on_cancel
 methods.stop = function(self, scene, hard)
+  local key
   if type(scene) ~= "table" then
+    key = scene
     scene = self.scenes[scene]
+  else
+    key = Table.key_of(self.scenes, scene) or Inspect(scene)
   end
 
   local old_length = #self._scene_runs
@@ -207,11 +211,7 @@ methods.stop = function(self, scene, hard)
     end
   end
 
-  Log.info("Stopping scene %s; interrupted %s runs%s",
-    Table.key_of(self.scenes, scene) or Inspect(scene),
-    old_length - new_length,
-    postfix
-  )
+  Log.info( "Stopping scene %s; interrupted %s runs%s", key, old_length - new_length, postfix)
 end
 
 --- @param scenes runner_scenes
