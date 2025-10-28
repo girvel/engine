@@ -27,8 +27,8 @@ methods.remove = function(self, element)
   if i < self.current_i then
     self.current_i = self.current_i - 1
   end
-  self.current_i = Math.loopmod(self.current_i, #self.list)
   table.remove(self.list, i)
+  self.current_i = Math.loopmod(self.current_i, #self.list)
 end
 
 methods._pass_turn = function(self)
