@@ -331,18 +331,37 @@ end
 ui.image = function(image)
   local frame = Table.last(model.frame)
   local is_linear = Table.last(model.is_linear)
+  local alignment = Table.last(model.alignment)
 
   image = get_image(image)
-  love.graphics.draw(image, frame.x, frame.y, 0, SCALE)
+
+  local dx = 0
+  local dy = 0
+  if alignment.x == "center" then
+    dx = (frame.w - image:getWidth() * SCALE) / 2
+  elseif alignment.x == "right" then
+    dx = frame.w - image:getWidth() * SCALE
+  end
+  if alignment.y == "center" then
+    dy = (frame.h - image:getHeight() * SCALE) / 2
+  elseif alignment.y == "bottom" then
+    dy = frame.h - image:getHeight() * SCALE
+  end
+
+  love.graphics.draw(image, frame.x + dx, frame.y + dy, 0, SCALE)
   if is_linear then
-    frame.x = frame.x + image:getWidth() * SCALE
-    model.line_last_h[#model.line_last_h] = math.max(
-      Table.last(model.line_last_h),
-      image:getHeight() * SCALE
-    )
+    if alignment.x == "left" then
+      frame.x = frame.x + image:getWidth() * SCALE
+      model.line_last_h[#model.line_last_h] = math.max(
+        Table.last(model.line_last_h),
+        image:getHeight() * SCALE
+      )
+    end
   else
-    frame.y = frame.y + image:getHeight() * SCALE
-    frame.h = frame.h - image:getHeight() * SCALE
+    if alignment.y == "top" then
+      frame.y = frame.y + image:getHeight() * SCALE
+      frame.h = frame.h - image:getHeight() * SCALE
+    end
   end
 end
 

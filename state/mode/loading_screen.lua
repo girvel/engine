@@ -1,3 +1,4 @@
+local animated = require("engine.tech.animated")
 local async = require("engine.tech.async")
 local ui = require("engine.tech.ui")
 
@@ -23,17 +24,14 @@ end
 
 local INDICATOR_LENGTH = 20
 
+local bar_animation = animated.mixin("engine/assets/sprites/gui/loading_bar", "no_atlas").animation.pack.second
+
 methods.draw_gui = function(self)
-  local status_bar do
-    local progress = math.floor((async.resume(self._loading_coroutine) or 1) * INDICATOR_LENGTH)
-    local done = ">" * progress
-    local remaining = "-" * (INDICATOR_LENGTH - progress)
-    status_bar = "[" .. done .. remaining .. "]"
-  end
+  local progress = math.max(1, math.ceil((async.resume(self._loading_coroutine) or 1) * #bar_animation))
 
   ui.start_alignment("center")
   ui.start_frame(nil, love.graphics.getHeight() * 4 / 5)
-    ui.text(status_bar)
+    ui.image(bar_animation[progress].image)
   ui.finish_frame()
   ui.finish_alignment()
 
