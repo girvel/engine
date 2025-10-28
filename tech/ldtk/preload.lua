@@ -10,7 +10,7 @@
 --- @class preload_entity
 --- @field position vector
 --- @field identifier string
---- @field rails_name? string
+--- @field runner_name? string
 --- @field args? string
 
 local put_positions, put_entities, put_tiles
@@ -54,7 +54,7 @@ local preload = function(root)
       local missed_captures = Fun.pairs(captures._inner_array)
         :map(function(i, capture)
           return ("%s %s@%s"):format(
-            capture.rails_name, capture.layer, V(captures:_get_outer_index(i))
+            capture.runner_name, capture.layer, V(captures:_get_outer_index(i))
           )
         end)
         :totable()
@@ -71,7 +71,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 --- @class preload_capture
---- @field rails_name string
+--- @field runner_name string
 --- @field layer string
 
 local fields = function(instance, ...)
@@ -107,15 +107,15 @@ local tile_relative_position = function(instance)
   return Vector.own(instance.px):div_mut(Constants.cell_size):add_mut(Vector.one)
 end
 
-local insert_position = function(collection, rails_name, position)
-  if collection[rails_name] then
+local insert_position = function(collection, runner_name, position)
+  if collection[runner_name] then
     Error(
-      "Name collision: positions %s and %s both have a rails_name %s",
-      collection[rails_name], position, rails_name
+      "Name collision: positions %s and %s both have a runner_name %s",
+      collection[runner_name], position, runner_name
     )
   end
 
-  collection[rails_name] = position
+  collection[runner_name] = position
 end
 
 --- @param layer table
@@ -129,25 +129,25 @@ put_positions = function(layer, offset, positions, captures)
     if instance.__identifier == "position" then
       local position = absolute_position(instance)
 
-      local rails_name = fields(instance, "rails_name")
-      if rails_name == nil or rails_name == "" then
-        Error("No rails_name for position %s", position)
+      local runner_name = fields(instance, "runner_name")
+      if runner_name == nil or runner_name == "" then
+        Error("No runner_name for position %s", position)
       end
 
-      insert_position(positions, rails_name, position)
+      insert_position(positions, runner_name, position)
     elseif instance.__identifier == "entity_capture" then
       local position = relative_position(instance)
 
-      local rails_name, this_layer = fields(instance, "rails_name", "layer")
-      if rails_name == nil or rails_name == "" then
-        Error("No rails_name for entity_capture @local:%s", position)
+      local runner_name, this_layer = fields(instance, "runner_name", "layer")
+      if runner_name == nil or runner_name == "" then
+        Error("No runner_name for entity_capture @local:%s", position)
       end
       if this_layer == nil or this_layer == "" then
         Error("No layer for entity_capture @local:%s", position)
       end
 
       captures[position] = {
-        rails_name = rails_name,
+        runner_name = runner_name,
         layer = this_layer,
       }
     elseif instance.__identifier:ends_with("_N") then
@@ -169,9 +169,9 @@ put_positions = function(layer, offset, positions, captures)
 
       local index = (last_index[prefix] or 0) + 1
       last_index[prefix] = index
-      local rails_name = prefix .. "_" .. index
+      local runner_name = prefix .. "_" .. index
 
-      insert_position(positions, rails_name, position)
+      insert_position(positions, runner_name, position)
 
       for _, field in ipairs(instance.fieldInstances) do
         if field.__identifier:starts_with("_") then
@@ -202,11 +202,11 @@ end
 local use_captures = function(captures, entity, layer)
   local capture = captures[entity.position]
   if capture and capture.layer == layer then
-    if entity.rails_name then
-      Error("Attempt to capture an entity as %q, when it already has rails_name %s",
-        capture.rails_name, entity.rails_name)
+    if entity.runner_name then
+      Error("Attempt to capture an entity as %q, when it already has runner_name %s",
+        capture.runner_name, entity.runner_name)
     end
-    entity.rails_name = capture.rails_name
+    entity.runner_name = capture.runner_name
     captures[entity.position] = nil
   end
 end
@@ -234,7 +234,7 @@ put_entities = function(layer, offset, captures, entities)
       identifier = instance.__identifier,
     }
 
-    entity.rails_name, entity.args = fields(instance, "rails_name", "args")
+    entity.runner_name, entity.args = fields(instance, "runner_name", "args")
 
     use_captures(captures, entity, layer_name)
     entity.position:add_mut(offset)

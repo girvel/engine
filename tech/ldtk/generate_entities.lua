@@ -53,12 +53,12 @@ local generate_entities = function(palette, preload_entities)
 
       local entity = factory(entry.args and Common.eval(entry.args))
 
-      if entry.rails_name then
+      if entry.runner_name then
         if not entity then
           Error("Entity capture at %s@%s attempted, but factory returned no entity",
             layer, entry.position)
         else
-          result.runner_entities[entry.rails_name] = entity
+          result.runner_entities[entry.runner_name] = entity
         end
       end
 
