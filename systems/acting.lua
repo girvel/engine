@@ -62,34 +62,43 @@ return Tiny.processingSystem {
     self._start_time = love.timer.getTime()
     self._active_ais = {}
 
-    -- a safety measure
     if State.combat then
+      -- a safety measure
+      local current
       while true do
-        local current = State.combat:get_current()
+        current = State.combat:get_current()
         if not current or State:exists(current) then break end
         -- in coherent code should always break here on the first iteration
         State.combat:remove(current)
       end
+
+      if Fun.iter(State.combat.list)
+        :all(function(a) return Fun.iter(State.combat.list)
+          :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
+        end)
+      then
+        Log.info(
+          "--- Combat ends as only %s are left standing ---",
+          table.concat(Fun.iter(State.combat.list)
+            :map(Name.code)
+            :totable(), ", ")
+        )
+
+        for _, e in ipairs(State.combat.list) do
+          e:rest("short")
+        end
+        State.combat = nil
+      else
+        local is_timeout_reached = current ~= State.player
+          and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
+
+        if is_timeout_reached then
+          Log.warn("%s's combat move timed out", Name.code(current))
+          self:_pass_turn()
+        end
+      end
     else
       self._no_aggression_rounds = 0
-    end
-
-    if State.combat and Fun.iter(State.combat.list)
-      :all(function(a) return Fun.iter(State.combat.list)
-        :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
-      end)
-    then
-      Log.info(
-        "--- Combat ends as only %s are left standing ---",
-        table.concat(Fun.iter(State.combat.list)
-          :map(Name.code)
-          :totable(), ", ")
-      )
-
-      for _, e in ipairs(State.combat.list) do
-        e:rest("short")
-      end
-      State.combat = nil
     end
   end,
 
@@ -138,48 +147,46 @@ return Tiny.processingSystem {
 
     async.resume(ai._control_coroutine, ai, entity)
 
-    local is_timeout_reached = current ~= State.player
-      and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
-
-    if is_timeout_reached then
-      Log.warn("%s's combat move timed out", Name.code(current))
+    if coroutine.status(ai._control_coroutine) == "dead" then
+      self:_pass_turn()
     end
+  end,
 
-    if is_timeout_reached or coroutine.status(ai._control_coroutine) == "dead" then
-      ai._control_coroutine = nil
-      if current.rest then
-        current:rest("move")
-      end
-      State.combat:_pass_turn()
+  _pass_turn = function(self)
+    local current = State.combat:get_current()
 
-      if State.combat.current_i == 1 then
-        if self._was_there_aggression then
-          self._was_there_aggression = false
-          self._no_aggression_rounds = 0
-        else
-          self._no_aggression_rounds = self._no_aggression_rounds + 1
+    current.ai._control_coroutine = nil
+    if current.rest then
+      current:rest("move")
+    end
+    State.combat:_pass_turn()
 
-          if self._no_aggression_rounds >= 3 then
-            Log.info(
-              "--- Combat ends after %s consecutive rounds without aggression ---",
-              self._no_aggression_rounds
-            )
+    if State.combat.current_i == 1 then
+      if self._was_there_aggression then
+        self._was_there_aggression = false
+        self._no_aggression_rounds = 0
+      else
+        self._no_aggression_rounds = self._no_aggression_rounds + 1
 
-            for _, e in ipairs(State.combat.list) do
-              e:rest("short")
-            end
-            State.combat = nil
-            return
+        if self._no_aggression_rounds >= 3 then
+          Log.info(
+            "--- Combat ends after %s consecutive rounds without aggression ---",
+            self._no_aggression_rounds
+          )
+
+          for _, e in ipairs(State.combat.list) do
+            e:rest("short")
           end
+          State.combat = nil
+          return
         end
       end
-
-      current = State.combat:get_current()
-      Log.info("--- %s's turn ---", Name.code(current))
-      State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
-
-      self:_update_conditions(entity, 6)
     end
+    self:_update_conditions(current, 6)
+
+    current = State.combat:get_current()
+    Log.info("--- %s's turn ---", Name.code(current))
+    State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
   end,
 
   _process_outside_combat = function(self, entity, dt)
