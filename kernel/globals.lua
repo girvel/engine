@@ -1,5 +1,7 @@
 Log = require("engine.lib.log")
+local KB = 1024
 Ldump = require("engine.lib.ldump")
+Ldump.upvalue_warning_threshold = 10 * KB
 
 Constants = require("engine.tech.constants")
 
