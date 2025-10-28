@@ -23,14 +23,6 @@ end
 --- API for asynchronous scripting, both AI and rails
 local api = {}
 
---- @async
---- @param seconds number
-api.wait = function(seconds)
-  if not State.args.fast_scenes then
-    async.sleep(seconds)
-  end
-end
-
 --- @param entity entity
 --- @param position vector
 --- @param suppress_warning? boolean

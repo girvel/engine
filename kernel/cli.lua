@@ -39,11 +39,6 @@ cli.parse = function(args)
     "-r --resolution"
   ):args("?")
 
-  parser:flag(
-    "-F --fast-scenes",
-    "Removes delays in scripts, sets high key rate for skipping lines"
-  )
-
   args[-2] = nil
   args[-1] = nil
 

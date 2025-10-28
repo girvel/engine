@@ -28,7 +28,9 @@ return function(args)
     async.lag_threshold = 2
   end
 
-  if not args.debug then
+  if args.debug then
+    Kernel:set_key_rate("space", 15)
+  else
     Lp = {
       start = function() end,
       stop = function() end,
@@ -40,10 +42,6 @@ return function(args)
     love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false})
   else
     love.window.updateMode(0, 0, {fullscreen = true})
-  end
-
-  if args.fast_scenes then
-    Kernel:set_key_rate("space", 15)
   end
 
   State = state.new(systems, args)
