@@ -36,26 +36,6 @@ tk.preserve_line_of_fire = function(entity, target, vision_map)
 
     if vision_map:is_visible_unsafe(unpack(target.position)) then
       best_p = p
-      if State.debug then
-        Log.trace("found %s", best_p)
-        for i in pairs(State.debug_overlay.points) do
-          State.debug_overlay.points[i] = nil
-        end
-        local i = 0
-        for dx = -10, 10 do
-          for dy = -10, 10 do
-            i = i + 1
-            if vision_map:is_visible_unsafe(p.x + dx, p.y + dy) then
-              State.debug_overlay.points[i] = {
-                position = p + V(dx, dy),
-                color = (not vision_map:is_transparent_unsafe(p.x + dx, p.y + dy))
-                  and Vector.hex("ff0000") or Vector.white,
-                view = "grid",
-              }
-            end
-          end
-        end
-      end
       break
     end
     vision_map:free()

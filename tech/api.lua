@@ -105,7 +105,6 @@ end
 --- @param speed? number
 --- @return boolean
 api.travel = function(entity, destination, uses_dash, speed)
-  Log.trace("travel %s %s -> %s", Name.code(entity), entity.position, destination)
   if entity.position == destination or (
     State.grids.solids:slow_get(destination, true)
     and (entity.position - destination):abs2() == 1)
