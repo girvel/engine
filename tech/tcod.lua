@@ -73,9 +73,9 @@ tcod.observer_mt.__newindex = function(self, index, value)
   self._grid[index] = value
   local x, y = unpack(index)
 
-  for _, map in ipairs(self._maps) do
+  for map in pairs(self._maps) do
     tcod._c.TCOD_map_set_properties(
-      map, x - 1, y - 1,
+      map._map, x - 1, y - 1,
       not value or not not value.transparent_flag, not value
     )
   end

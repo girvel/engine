@@ -211,7 +211,11 @@ return Tiny.processingSystem {
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
     end
 
-    async.resume(ai._control_coroutine, ai, entity, dt)
+    local ok, msg = pcall(async.resume, ai._control_coroutine, ai, entity, dt)
+    if not ok then
+      Log.trace(msg)
+      Log.trace(entity)
+    end
 
     if coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil
