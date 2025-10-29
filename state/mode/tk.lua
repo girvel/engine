@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 local item = require("engine.tech.item")
@@ -113,9 +114,6 @@ tk.finish_block = function(start)
   ui.offset(0, h)
 end
 
--- TODO tk color constants
-local DIMMED = Vector.hex("2a3e34")
-
 tk.choose_save = function(show_new_save)
   local options, dates do
     options = {}
@@ -147,7 +145,7 @@ tk.choose_save = function(show_new_save)
 
   ui.start_frame()
   ui.start_alignment("right")
-  love.graphics.setColor(DIMMED)
+  love.graphics.setColor(colors.white_dim)
     for i, option in ipairs(options) do
       if show_new_save and i == 1 then
         ui.br()

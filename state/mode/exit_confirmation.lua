@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local tk = require("engine.state.mode.tk")
 local ui = require("engine.tech.ui")
 
@@ -24,9 +25,6 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local WHITE = Vector.hex("ffffff")
-local RED = Vector.hex("99152c")
-
 methods.draw_gui = function(self)
   local W = 470
   local H = 160
@@ -42,10 +40,10 @@ methods.draw_gui = function(self)
     ui.br()
 
     if self._prev.has_saved == false then
-      love.graphics.setColor(RED)
+      love.graphics.setColor(colors.red)
       ui.text("Игра не сохранена")
       ui.br()
-      love.graphics.setColor(WHITE)
+      love.graphics.setColor(Vector.white)
     end
 
     local n = ui.choice({

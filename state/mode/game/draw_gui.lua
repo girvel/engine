@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local animated = require("engine.tech.animated")
 local sound = require("engine.tech.sound")
 local base_player = require("engine.state.player.base")
@@ -297,13 +298,10 @@ local DEFAULT_ICON = "'"
 
 local COLORS = {
   actions = Vector.hex("79ad9c"),
-  bonus_actions = Vector.hex("c3e06c"),
+  bonus_actions = colors.green_high,
   reactions = Vector.hex("fcea9b"),
   movement = Vector.hex("429858"),
 }
-
-local WHITE = Vector.hex("ffffff")
-local HIGHLIGHTED = Vector.hex("e7573e")
 
 local PRIMITIVE_RESOURCES = {
   "movement",
@@ -335,19 +333,19 @@ draw_resources = function()
         local icon = ICONS[r] or DEFAULT_ICON
         local highlighted_n = cost and cost[r]
         if highlighted_n then
-          love.graphics.setColor(HIGHLIGHTED)
+          love.graphics.setColor(colors.red_high)
             ui.text(icon * highlighted_n)
-          love.graphics.setColor(COLORS[r] or WHITE)
+          love.graphics.setColor(COLORS[r] or colors.white)
             ui.text(icon * math.max(0, amount - highlighted_n))
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(colors.white)
         else
-          love.graphics.setColor(COLORS[r] or WHITE)
+          love.graphics.setColor(COLORS[r] or colors.white)
             if amount <= 12 then
               ui.text(icon * amount)
             else
               ui.text("x" .. amount)
             end
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(colors.white)
         end
       ui.finish_line()
       ui.finish_frame()
@@ -356,13 +354,13 @@ draw_resources = function()
 
       ::continue::
     end
+    love.graphics.setColor(Vector.white)
   tk.finish_block(start)
 end
 
-local BORDERS = Vector.hex("191919")
 local HOSTILITY_COLOR = {
-  enemy = Vector.hex("99152c"),
-  ally = Vector.hex("5d863f"),
+  enemy = colors.red,
+  ally = colors.green_dim,
 }
 
 draw_move_order = function()
@@ -384,7 +382,7 @@ draw_move_order = function()
         if State.combat.current_i == i then
           ui.text("x ")
         else
-          love.graphics.setColor(BORDERS)
+          love.graphics.setColor(colors.white_dim)
           ui.text("- ")
         end
 
@@ -463,8 +461,8 @@ end
 
 local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
 
-local FAILURE = Vector.hex("e7573e")
-local SUCCESS = Vector.hex("c3e06c")
+local FAILURE = colors.red_high
+local SUCCESS = colors.green_high
 
 draw_line = function(line)
   local text = line.text

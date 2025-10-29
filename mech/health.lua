@@ -1,11 +1,12 @@
+local colors = require("engine.tech.colors")
 local floater = require("engine.tech.floater")
 local item   = require "engine.tech.item"
 
 
 local health = {}
 
-health.COLOR_DAMAGE = Vector.hex("e7573e")
-health.COLOR_HEALING = Vector.hex("c3e06c")
+health.COLOR_DAMAGE = colors.red_high
+health.COLOR_HEALING = colors.green_high
 
 --- Restores `amount` of `target`'s health with FX
 --- @param target entity

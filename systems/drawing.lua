@@ -1,7 +1,6 @@
 local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
-
-local BG = Vector.hex("191919")
+local colors = require("engine.tech.colors")
 
 return Tiny.sortedProcessingSystem {
   codename = "drawing",
@@ -27,7 +26,7 @@ return Tiny.sortedProcessingSystem {
       end
     end
 
-    love.graphics.clear(BG)
+    love.graphics.clear(colors.black)
   end,
 
   process = function(_, entity, dt)

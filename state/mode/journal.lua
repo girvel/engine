@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local ui = require("engine.tech.ui")
 local tk = require("engine.state.mode.tk")
 
@@ -25,10 +26,6 @@ methods.draw_entity = function(self, ...)
   end
 end
 
-local DIMMED = Vector.hex("2a3e34")
-local HIGHLIGHTED = Vector.hex("cfa867")
-local WHITE = Vector.hex("ffffff")
-
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
     State.quests:new_content_is_read()
@@ -44,15 +41,15 @@ methods.draw_gui = function(self, dt)
 
       ui.start_font(36)
         ui.start_line()
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(colors.white_dim)
           ui.text("# ")
 
           if quest.status == "new" or quest.status == "active" then
-            love.graphics.setColor(WHITE)
+            love.graphics.setColor(colors.white)
             ui.text(quest.name)
           else
             ui.text(quest.name)
-            love.graphics.setColor(WHITE)
+            love.graphics.setColor(colors.white)
           end
         ui.finish_line()
       ui.finish_font()
@@ -62,13 +59,13 @@ methods.draw_gui = function(self, dt)
         local prefix
         local needs_color_reset = true
         if objective.status == "done" then
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(colors.white_dim)
           prefix = "+ "
         elseif objective.status == "failed" then
-          love.graphics.setColor(DIMMED)
+          love.graphics.setColor(colors.white_dim)
           prefix = "x "
         elseif objective.status == "new" then
-          love.graphics.setColor(HIGHLIGHTED)
+          love.graphics.setColor(colors.golden)
           prefix = "- "
         else
           prefix = "- "
@@ -78,7 +75,7 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. objective.text)
 
         if needs_color_reset then
-          love.graphics.setColor(WHITE)
+          love.graphics.setColor(colors.white)
         end
 
       end
@@ -87,6 +84,7 @@ methods.draw_gui = function(self, dt)
 
       ::continue::
     end
+    love.graphics.setColor(Vector.white)
   tk.finish_window()
 end
 
