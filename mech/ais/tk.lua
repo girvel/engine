@@ -16,7 +16,7 @@ tk.find_target = function(entity, r, vision_map)
       and State.hostility:get(entity, e) == "enemy"
       and e.hp and e.hp > 0
       and vision_map:is_visible_unsafe(unpack(e.position))
-      and (not e.can_act or e:can_act())
+      and (not State.runner.locked_entities[e])
     then
       return e
     end

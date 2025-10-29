@@ -105,10 +105,6 @@ methods.observe = function(self, entity, dt)
     end
   end
 
-  if self._vision_map == nil then
-    Log.trace(Inspect(self))
-    Log.trace(Inspect(entity))
-  end
   local target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
   if target then
     State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
