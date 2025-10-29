@@ -1,3 +1,4 @@
+local tcod = require("engine.tech.tcod")
 local sound    = require "engine.tech.sound"
 
 
@@ -7,6 +8,7 @@ local ai = {}
 --- @field finish_turn boolean?
 --- @field _next_actions action[]
 --- @field _action_promises promise[]
+--- @field _vision_map tcod_map
 local methods = {}
 ai.mt = {__index = methods}
 
@@ -17,6 +19,14 @@ ai.new = function()
     _next_actions = {},
     _action_promises = {},
   }, ai.mt)
+end
+
+methods.init = function(self, entity)
+  self._vision_map = tcod.map(State.grids.solids)
+end
+
+methods.deinit = function(self, entity)
+  self._vision_map:free()
 end
 
 local YOUR_TURN = sound.multiple("engine/assets/sounds/your_move", .2)
@@ -44,6 +54,8 @@ end
 --- @param entity player
 --- @param dt number
 methods.observe = function(self, entity, dt)
+  self._vision_map:refresh_fov(entity.position, entity.fov_r)
+
   if not entity:can_act() then
     for _, p in ipairs(self._action_promises) do
       p:resolve(false)

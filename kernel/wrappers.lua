@@ -9,7 +9,7 @@ Ldump.serializer = setmetatable({
     end
 
     if type(x) == "userdata"
-      and x.typeOf
+      and pcall(function() return x.typeOf end)
       and x:typeOf("ImageData")
     then
       --- @cast x love.ImageData

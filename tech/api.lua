@@ -116,6 +116,10 @@ api.travel = function(entity, destination, uses_dash, speed)
   return api.follow_path(entity, path, uses_dash, speed)
 end
 
+local vision_map = Memoize(function()
+  return tcod.map(State.grids.solids)
+end)
+
 --- @param start vector
 --- @param destination vector
 --- @return vector[]?
@@ -136,7 +140,7 @@ api.build_path = function(start, destination)
   for _, d in ipairs(possible_destinations) do
     local p = destination + d
     if State.grids.solids:can_fit(p) then
-      path = tcod.snapshot(State.grids.solids):find_path(start, destination + d)
+      path = vision_map():find_path(start, destination + d)
       if #path > 0 then
         return path
       end
@@ -428,10 +432,13 @@ end
 --- @param target vector|entity
 --- @return boolean
 api.is_visible = function(target)
+  local player_vision = State.player.ai._vision_map
+  if not player_vision then return false end
+
   local position = getmetatable(target) == Vector.mt and target or assert(target.position)
   --- @cast position vector
   if not State.grids.solids:can_fit(position) then return false end
-  return tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(position))
+  return player_vision:is_visible_unsafe(unpack(position))
 end
 
 --- @param path string

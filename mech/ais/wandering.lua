@@ -1,3 +1,4 @@
+local tcod = require("engine.tech.tcod")
 local tk = require("engine.mech.ais.tk")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
@@ -12,6 +13,7 @@ local wandering = {}
 --- @field _frequency_k number
 --- @field _target? entity
 --- @field _hostility_sub function
+--- @field _vision_map tcod_map
 local methods = {}
 wandering.mt = {__index = methods}
 
@@ -43,11 +45,13 @@ methods.init = function(self, entity)
       ai._control_coroutine = nil
     end
   end)
+  self._vision_map = tcod.map(State.grids.solids)
 end
 
 --- @param entity entity
 methods.deinit = function(self, entity)
   State.hostility:unsubscribe(self._hostility_sub)
+  self._vision_map:free()
 end
 
 --- @param entity entity
@@ -56,7 +60,7 @@ methods.observe = function(self, entity, dt)
   if (not self._target or (self._target.position - entity.position):abs2() > self.targeting.range)
     and State.period:absolute(self.targeting.scan_period, self, "target_scan")
   then
-    self._target = tk.find_target(entity, self.targeting.scan_range)
+    self._target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
   end
 end
 

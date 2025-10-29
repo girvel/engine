@@ -334,10 +334,13 @@ actions.bow_attack = function(target)
         and State.hostility:get(entity, target) ~= "ally")
       then return false end
 
-      local snapshot = tcod.copy(State.grids.solids)
-      snapshot:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
-      local result = snapshot:is_visible_unsafe(unpack(target.position))
-      snapshot:free()
+      local result do
+        local vision_map = tcod.map(State.grids.solids)
+        vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
+        result = vision_map:is_visible_unsafe(unpack(target.position))
+        vision_map:free()
+      end
+
       return result
     end,
 

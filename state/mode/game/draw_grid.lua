@@ -1,6 +1,3 @@
-local tcod  = require("engine.tech.tcod")
-
-
 --- @param self state_mode_game
 --- @param grid grid<entity>
 --- @param dt number
@@ -12,7 +9,8 @@ local draw_grid = function(self, layer, grid, dt)
     return
   end
 
-  local snapshot = tcod.snapshot(State.grids.solids)
+  local vision_map = State.player.ai._vision_map
+  if not vision_map then return end
 
   local sprite_batch = self._sprite_batches[layer]
   if sprite_batch then
@@ -21,13 +19,13 @@ local draw_grid = function(self, layer, grid, dt)
 
   for x = State.perspective.vision_start.x, State.perspective.vision_end.x do
     for y = State.perspective.vision_start.y, State.perspective.vision_end.y do
-      if not snapshot:is_visible_unsafe(x, y) then goto continue end
+      if not vision_map:is_visible_unsafe(x, y) then goto continue end
 
       local e = grid:unsafe_get(x, y)
       if not e or not e.sprite then goto continue end
 
       local is_hidden_by_perspective = (
-        not snapshot:is_transparent_unsafe(x, y)
+        not vision_map:is_transparent_unsafe(x, y)
         and e.perspective_flag
         and e.position.y > State.player.position.y
       )

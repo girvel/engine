@@ -1,6 +1,3 @@
-local tcod = require("engine.tech.tcod")
-
-
 local perspective = {}
 
 local smooth_camera_offset
@@ -66,8 +63,6 @@ methods.update = function(self, dt)
     )
     self.vision_end = Vector.use(Math.median, Vector.one, self.vision_end, State.level.grid_size)
   end
-
-  tcod.snapshot(State.grids.solids):refresh_fov(State.player.position, State.player.fov_r)
 end
 
 local SPRING_STIFFNESS = 100

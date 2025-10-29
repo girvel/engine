@@ -6,6 +6,8 @@
 --- Distributed under the MIT/X11 License. See COPYING.md for more details.
 ---
 
+--- @diagnostic disable
+
 local exports = {}
 local methods = {}
 

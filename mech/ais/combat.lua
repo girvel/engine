@@ -13,6 +13,7 @@ local combat_ai = {}
 --- @class combat_ai_strict: ai_strict
 --- @field targeting ai_targeting
 --- @field _hostility_subscription function
+--- @field _vision_map tcod_map
 local methods = {}
 combat_ai.mt = {__index = methods}
 
@@ -48,18 +49,21 @@ methods.init = function(self, entity)
       end
     end
   end)
+
+  self._vision_map = tcod.map(State.grids.solids)
 end
 
 --- @param entity entity
 methods.deinit = function(self, entity)
   State.hostility:unsubscribe(self._hostility_subscription)
+  self._vision_map:free()
 end
 
 --- @param entity entity
 methods.control = function(self, entity)
   if not State.combat or State.runner.locked_entities[State.player] then return end
 
-  local target = tk.find_target(entity, self.targeting.range)
+  local target = tk.find_target(entity, self.targeting.range, self._vision_map)
   if not target then
     State.combat:remove(entity)
     return
@@ -67,7 +71,7 @@ methods.control = function(self, entity)
 
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
-    tk.preserve_line_of_fire(entity, target)
+    tk.preserve_line_of_fire(entity, target, self._vision_map)
     local bow_attack = actions.bow_attack(target)
     while bow_attack:act(entity) do
       async.sleep(.66)
@@ -101,18 +105,8 @@ methods.observe = function(self, entity, dt)
     end
   end
 
-  local target = tk.find_target(entity, self.targeting.scan_range)
-
-  local condition = not not target
-  if target == State.player then
-    condition = (
-      not State.runner.locked_entities[State.player]
-      and tcod.snapshot(State.grids.solids):is_visible_unsafe(unpack(entity.position))
-      and (State.player.position - entity.position):abs2() <= self.targeting.scan_range
-    )
-  end
-
-  if condition then
+  local target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+  if target then
     State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
     State:start_combat({target, entity})
   end

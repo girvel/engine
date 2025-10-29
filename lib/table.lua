@@ -213,16 +213,22 @@ end
 
 --- @param t any[]
 --- @param i integer
-_table.remove_breaking = function(t, i)
+_table.remove_breaking_at = function(t, i)
   t[i] = t[#t]
   t[#t] = nil
+end
+
+--- @param t any[]
+--- @param item any
+_table.remove_breaking = function(t, item)
+  Table.remove_breaking_at(t, assert(Table.index_of(t, item)))
 end
 
 --- @param t any[]
 --- @param indexes integer[]
 _table.remove_breaking_in_bulk = function(t, indexes)
   for i = #indexes, 1, -1 do
-    _table.remove_breaking(t, indexes[i])
+    _table.remove_breaking_at(t, indexes[i])
   end
 end
 

@@ -19,6 +19,8 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+--- @diagnostic disable
+
 local function deep_update(t1, t2)
    for k, v in pairs(t2) do
       if type(v) == "table" then
