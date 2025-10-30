@@ -55,6 +55,8 @@ require("engine.lib.string")
 
 Table = require("engine.lib.table")
 
+Timer = require("engine.lib.timer")
+
 Tiny = require("engine.lib.tiny")
 Ldump.mark_module("engine.lib.tiny", {
   systemTableKey = {},
