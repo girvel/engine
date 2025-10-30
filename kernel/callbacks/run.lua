@@ -2,12 +2,12 @@ local saves = require "engine.kernel.saves"
 
 
 return function()
-	love.load(love.arg.parseGameArguments(arg), arg)
+  love.load(love.arg.parseGameArguments(arg), arg)
 
-	love.timer.step()
-	local dt = 0
+  love.timer.step()
+  local dt = 0
   local KEY_REPETITION_DELAY = .3
-	return function()
+  return function()
     if Kernel._load then
       local t = love.timer.getTime()
         State = saves.read(Kernel._load)  --[[@as state]]
@@ -33,7 +33,7 @@ return function()
       love.handlers[name](a,b,c,d,e,f)
     end
 
-		dt = love.timer.step()
+    dt = love.timer.step()
     Kernel.time = Kernel.time + dt
     Kernel.frame_n = Kernel.frame_n + 1
 
@@ -45,7 +45,7 @@ return function()
       end
     end
 
-		love.update(dt)
+    love.update(dt)
 
     love.graphics.origin()
     love.graphics.clear(love.graphics.getBackgroundColor())
