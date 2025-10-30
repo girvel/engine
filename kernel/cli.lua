@@ -68,7 +68,7 @@ cli.parse = function(args)
   end
 
   result.mobdebug = is_mobdebug_attached
-  result.checkpoint = result.checkpoint[1]
+  result.checkpoint = result.checkpoint and result.checkpoint[1]
 
   return result
 end
