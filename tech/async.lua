@@ -35,5 +35,29 @@ async.sleep = function(seconds)
   end
 end
 
-Ldump.mark(async, {}, ...)
+--- @class async_sometimes
+--- @field counter integer
+--- @field last_t number
+local sometimes_methods = {}
+async.sometimes_mt = {__index = sometimes_methods}
+
+async.sometimes = function()
+  return setmetatable({
+    counter = 0,
+    last_t = love.timer.getTime(),
+  }, async.sometimes_mt)
+end
+
+sometimes_methods.yield = function(self, ...)
+  self.counter = self.counter + 1
+  if self.counter % 100 ~= 0 then return end
+
+  local now = love.timer.getTime()
+  if now - self.last_t >= Constants.yield_period then
+    self.last_t = now
+    coroutine.yield(...)
+  end
+end
+
+Ldump.mark(async, {sometimes_mt = {}}, ...)
 return async

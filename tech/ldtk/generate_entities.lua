@@ -88,7 +88,7 @@ local generate_entities = function(palette, preload_entities)
     ::continue::
   end
 
-  Log.info("Generated entities in %.2f s", love.timer.getTime() - start_t)
+  Log.info("%.2f s | Generated entities", love.timer.getTime() - start_t)
   return result
 end
 

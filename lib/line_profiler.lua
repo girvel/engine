@@ -14,6 +14,7 @@ line_profiler.start = function()
   local info = debug.getinfo(2, "Sl")
   target_file = info.source
   start_line = info.currentline
+  Log.trace("%s %s", target_file, start_line)
   debug.sethook(function(_, new_line_i)
     if debug.getinfo(2, "S").source ~= target_file then return end
     local now = line_profiler.time_function()
@@ -25,6 +26,7 @@ end
 
 --- @return nil
 line_profiler.stop = function()
+  Log.trace("%s", stop_line)
   stop_line = debug.getinfo(2, "l").currentline
   debug.sethook()
 end

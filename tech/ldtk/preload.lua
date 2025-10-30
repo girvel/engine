@@ -62,7 +62,7 @@ local preload = function(root)
     end
   end
 
-  Log.info("Preloaded the level in %.2f", love.timer.getTime() - start_t)
+  Log.info("%.2f s | Preloaded the level", love.timer.getTime() - start_t)
   return result
 end
 

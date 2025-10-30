@@ -208,16 +208,18 @@ methods.load_level = function(self, path)
   self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
 
   coroutine.yield("add", 1)
-  local end_t = love.timer.getTime()
-  Log.info("Added %s entities in %.2f s", #load_data.entities, end_t - read_t)
-  Log.info("Total time %.2f s", end_t - start_t)
+  local add_t = love.timer.getTime()
+  Log.info("%.2f s | Added %s entities", add_t - read_t, #load_data.entities)
 
   -- NEXT! initial save during :init
-  -- NEXT! use (stage, N) instead of (N) for progress yields
   -- NEXT! yield progress
   -- NEXT! log, time, count total time
   -- NEXT! | for log formatting
   self.rails:init(self.args.checkpoint)
+
+  local end_t = love.timer.getTime()
+  Log.info("%.2f s | Initialized rails", end_t - read_t)
+  Log.info("%.2f s | Loaded the level", end_t - start_t)
 
   self.is_loaded = true
   async.lag_threshold = .1
