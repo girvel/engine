@@ -25,6 +25,10 @@ cli.parse = function(args)
     "-S --disable-scenes"
   ):args("+"):default({})
 
+  parser:option(
+    "-c --checkpoint"
+  ):args("?")
+
   parser:flag(
     "-p --profiler",
     "Run the game with profiler"
@@ -64,6 +68,7 @@ cli.parse = function(args)
   end
 
   result.mobdebug = is_mobdebug_attached
+  result.checkpoint = result.checkpoint[1]
 
   return result
 end

@@ -175,7 +175,6 @@ methods.load_level = function(self, path)
 
   Table.extend(self.runner.entities, load_data.runner_entities)
   Table.extend(self.runner.positions, load_data.runner_positions)
-  self.runner:add(load_data.runner_scenes)
 
   self.grids = Fun.iter(level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
@@ -212,6 +211,11 @@ methods.load_level = function(self, path)
   local end_t = love.timer.getTime()
   Log.info("Added %s entities in %.2f s", #load_data.entities, end_t - read_t)
   Log.info("Total time %.2f s", end_t - start_t)
+
+  -- NEXT! yield progress
+  -- NEXT! log, time, count total time
+  -- NEXT! | for log formatting
+  self.rails:init(self.args.checkpoint)
 
   self.is_loaded = true
   async.lag_threshold = .1

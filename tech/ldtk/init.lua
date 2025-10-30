@@ -16,7 +16,6 @@ local ldtk = {}
 --- @field ldtk_path string
 --- @field palette palette
 --- @field rails rails
---- @field scenes runner_scenes
 
 --- General information about the level
 --- @class level_info
@@ -29,7 +28,6 @@ local ldtk = {}
 --- @field rails rails
 --- @field runner_entities table<string, entity>
 --- @field runner_positions table<string, vector>
---- @field runner_scenes runner_scenes
 
 --- Read LDtk level file
 --- @async
@@ -52,7 +50,6 @@ ldtk.load = function(path)
     rails = definition.rails,
     runner_entities = generation_data.runner_entities,
     runner_positions = preload_data.positions,
-    runner_scenes = definition.scenes,
   }
 end
 
