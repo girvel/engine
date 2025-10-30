@@ -338,9 +338,10 @@ end
 --- @param name? string
 api.autosave = function(name)
   if State.runner.save_lock then
-    Log.warn("Autosave collision for %q", name or "<unnamed autosave>")
+    -- Autosave collision is intended behaviour; it just means that they are joined into one
     return
   end
+
   name = name or "autosave"
 
   local _, scene = State.runner:run_task(function()

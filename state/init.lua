@@ -213,8 +213,6 @@ methods.load_level = function(self, path)
 
   -- NEXT! initial save during :init
   -- NEXT! yield progress
-  -- NEXT! log, time, count total time
-  -- NEXT! | for log formatting
   self.rails:init(self.args.checkpoint)
 
   local end_t = love.timer.getTime()
