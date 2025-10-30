@@ -46,7 +46,7 @@ local build_love_shader = function(tint, intensity, brightness, brightness_insid
       end
     love.graphics.setColor(Vector.white)
     love.graphics.setCanvas()
-    ignore = love.graphics.newImage(canvas:newImageData())
+    ignore = canvas
   end
   result:send("ignore", ignore)
   result:send("ignore_size", {ignore:getDimensions()})
