@@ -12,6 +12,7 @@ local combat_ai = {}
 
 --- @class combat_ai_strict: ai_strict
 --- @field targeting ai_targeting
+--- @field target entity?
 --- @field _hostility_subscription function
 --- @field _vision_map tcod_map
 local methods = {}
@@ -61,18 +62,23 @@ end
 
 --- @param entity entity
 methods.control = function(self, entity)
-  if not State.combat or State.runner.locked_entities[State.player] then return end
-
-  local target = tk.find_target(entity, self.targeting.range, self._vision_map)
-  if not target then
-    State.combat:remove(entity)
+  if not State.combat or State.runner.locked_entities[State.player] then
+    self.target = nil
     return
+  end
+
+  if not State:exists(self.target) or api.distance(entity, self.target) > self.targeting.range then
+    self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+    if not self.target then
+      State.combat:remove(entity)
+      return
+    end
   end
 
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
-    tk.preserve_line_of_fire(entity, target, self._vision_map)
-    local bow_attack = actions.bow_attack(target)
+    tk.preserve_line_of_fire(entity, self.target, self._vision_map)
+    local bow_attack = actions.bow_attack(self.target)
     while bow_attack:act(entity) do
       async.sleep(.66)
     end
@@ -81,8 +87,8 @@ methods.control = function(self, entity)
       api.heal(entity)
     end
 
-    api.travel(entity, target.position, true)
-    api.attack(entity, target)
+    api.travel(entity, self.target.position, true)
+    api.attack(entity, self.target)
   end
 end
 
@@ -105,10 +111,10 @@ methods.observe = function(self, entity, dt)
     end
   end
 
-  local target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
-  if target then
+  local new_target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+  if new_target then
     State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
-    State:start_combat({target, entity})
+    State:start_combat({new_target, entity})
   end
 end
 
