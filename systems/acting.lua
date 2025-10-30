@@ -37,6 +37,7 @@ return Tiny.processingSystem {
   _no_aggression_rounds = 0,
   _was_there_aggression = false,
   _sub = nil,
+  _was_there_combat = false,
 
   onAdd = function(self, entity)
     if entity.ai.init then
@@ -62,41 +63,43 @@ return Tiny.processingSystem {
     self._start_time = love.timer.getTime()
     self._active_ais = {}
 
-    if State.combat then
-      -- a safety measure
-      local current
-      while true do
-        current = State.combat:get_current()
-        if not current or State:exists(current) then break end
-        -- in coherent code should always break here on the first iteration
-        State.combat:remove(current)
-      end
-
-      if Fun.iter(State.combat.list)
-        :all(function(a) return Fun.iter(State.combat.list)
-          :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
-        end)
-      then
-        Log.info(
-          "--- Combat ends as only %s are left standing ---",
-          table.concat(Fun.iter(State.combat.list)
-            :map(Name.code)
-            :totable(), ", ")
-        )
-
-        self:_finish_combat()
-      else
-        local is_timeout_reached = current ~= State.player
-          and self._move_start_t
-          and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
-
-        if is_timeout_reached then
-          Log.warn("%s's combat move timed out", Name.code(current))
-          self:_pass_turn()
-        end
-      end
-    else
+    if not State.combat then
       self._no_aggression_rounds = 0
+      return
+    end
+
+    -- a safety measure
+    local current
+    while true do
+      current = State.combat:get_current()
+      if not current or State:exists(current) then break end
+      -- in coherent code should always break here on the first iteration
+      State.combat:remove(current)
+    end
+
+    if Fun.iter(State.combat.list)
+      :all(function(a) return Fun.iter(State.combat.list)
+        :all(function(b) return a == b or State.hostility:get(a, b) ~= "enemy" end)
+      end)
+    then
+      Log.info(
+        "--- Combat ends as only %s are left standing ---",
+        table.concat(Fun.iter(State.combat.list)
+          :map(Name.code)
+          :totable(), ", ")
+      )
+
+      self:_finish_combat()
+      return
+    end
+
+    local is_timeout_reached = current ~= State.player
+      and self._move_start_t
+      and love.timer.getTime() - self._move_start_t > MOVE_TIMEOUT
+
+    if is_timeout_reached then
+      Log.warn("%s's combat move timed out", Name.code(current))
+      self:_pass_turn()
     end
   end,
 
@@ -118,6 +121,7 @@ return Tiny.processingSystem {
   postProcess = function(self, dt)
     State.stats.active_ais = self._active_ais
     State.stats.ai_frame_time = love.timer.getTime() - self._start_time
+    self._was_there_combat = not not State.combat
   end,
 
   _move_start_t = nil,
@@ -136,9 +140,10 @@ return Tiny.processingSystem {
     if not ai.control then
       self:_update_conditions(entity, 6)
       State.combat:_pass_turn()
+      return
     end
 
-    if not ai._control_coroutine then
+    if not ai._control_coroutine or not self._was_there_combat then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
       self._move_start_t = love.timer.getTime()
     end
@@ -174,6 +179,7 @@ return Tiny.processingSystem {
           )
 
           self:_finish_combat()
+          return
         end
       end
     end
@@ -187,6 +193,7 @@ return Tiny.processingSystem {
   _finish_combat = function(self)
     for _, e in ipairs(State.combat.list) do
       e:rest("short")
+      e.ai._control_coroutine = nil
     end
     State.combat = nil
     self._move_start_t = nil
@@ -207,15 +214,11 @@ return Tiny.processingSystem {
       return
     end
 
-    if not ai._control_coroutine then
+    if not ai._control_coroutine or self._was_there_combat then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
     end
 
-    local ok, msg = pcall(async.resume, ai._control_coroutine, ai, entity, dt)
-    if not ok then
-      Log.trace(msg)
-      Log.trace(entity)
-    end
+    async.resume(ai._control_coroutine, ai, entity, dt)
 
     if coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil
