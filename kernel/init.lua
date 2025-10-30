@@ -5,8 +5,8 @@ local init = {}
 --- @field _load? string
 --- @field _specific_key_rates table<love.KeyConstant, number>
 --- @field _delays table<love.KeyConstant, number>
---- @field _total_frames integer
---- @field _total_time number
+--- @field frame_n integer
+--- @field time number
 local methods = {}
 local mt = {__index = methods}
 
@@ -15,8 +15,8 @@ init.new = function()
   return setmetatable({
     _specific_key_rates = {},
     _delays = {},
-    _total_frames = 0,
-    _total_time = 0,
+    frame_n = 0,
+    time = 0,
   }, mt)
 end
 
@@ -51,10 +51,10 @@ methods.report = function(self)
 
   local line_report = Lp.report()
   if #line_report > 0 then
-    Log.info(line_report)
+    Log.info("Line profile:\n%s", line_report)
   end
 
-  Log.info("Average FPS is %.2f", self._total_frames / self._total_time)
+  Log.info("Average FPS is %.2f", self.frame_n / self.time)
   Log.info("Saved log to %s%s", love.filesystem.getRealDirectory(Log.outfile), Log.outfile)
   Log.report()
 end

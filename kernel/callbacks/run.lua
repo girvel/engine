@@ -16,7 +16,7 @@ return function()
         end
         Kernel._load = nil
         State.runner:handle_loading()
-      Kernel._total_time = math.max(Kernel._total_time - (love.timer.getTime() - t))
+      Kernel.time = math.max(Kernel.time - (love.timer.getTime() - t))
     end
 
     love.event.pump()
@@ -34,8 +34,8 @@ return function()
     end
 
 		dt = love.timer.step()
-    Kernel._total_time = Kernel._total_time + dt
-    Kernel._total_frames = Kernel._total_frames + 1
+    Kernel.time = Kernel.time + dt
+    Kernel.frame_n = Kernel.frame_n + 1
 
     for k, v in pairs(Kernel._delays) do
       Kernel._delays[k] = math.max(0, v - dt)
@@ -55,14 +55,14 @@ return function()
     do
       local t = love.timer.getTime()
         love.graphics.present()
-      Kernel._total_time = math.max(0, Kernel._total_time - (love.timer.getTime() - t))
+      Kernel.time = math.max(0, Kernel.time - (love.timer.getTime() - t))
     end
 
     if Kernel._save then
       local t = love.timer.getTime()
         saves.write(State, Kernel._save)
         Kernel._save = nil
-      Kernel._total_time = math.max(0, Kernel._total_time - (love.timer.getTime() - t))
+      Kernel.time = math.max(0, Kernel.time - (love.timer.getTime() - t))
     end
   end
 end
