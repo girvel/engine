@@ -22,16 +22,30 @@ loading_screen.new = function(loading_coroutine, next_state)
   }, mt)
 end
 
-local INDICATOR_LENGTH = 20
+local STAGES = {
+  json = {start = 0, finish = .4},
+  preload = {start = .4, finish = .5},
+  generate = {start = .5, finish = .8},
+  add = {start = .8, finish = 1},
+}
 
 local bar_animation = animated.mixin("engine/assets/sprites/gui/loading_bar", "no_atlas").animation.pack.second
 
 methods.draw_gui = function(self)
-  local progress = math.max(1, math.ceil((async.resume(self._loading_coroutine) or 1) * #bar_animation))
+  local frame do
+    local stage_id, value = async.resume(self._loading_coroutine)
+    if stage_id then
+      local stage = STAGES[stage_id]
+      value = stage.start + (stage.finish - stage.start) * value
+    else
+      value = 1
+    end
+    frame = math.max(1, math.ceil(value * #bar_animation))
+  end
 
   ui.start_alignment("center")
   ui.start_frame(nil, love.graphics.getHeight() * 4 / 5)
-    ui.image(bar_animation[progress].image)
+    ui.image(bar_animation[frame].image)
   ui.finish_frame()
   ui.finish_alignment()
 

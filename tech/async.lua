@@ -4,15 +4,16 @@ async.lag_threshold = .1
 
 --- @param coroutine_ thread
 --- @param ... any
---- @return any
+--- @return any ...
 async.resume = function(coroutine_, ...)
   local t = love.timer.getTime()
-  local success, result = coroutine.resume(coroutine_, ...)
+  local result = {coroutine.resume(coroutine_, ...)}
   t = love.timer.getTime() - t
   if t > async.lag_threshold then
     Log.warn("Coroutine lags (%.2f s)\n%s", t, debug.traceback())
   end
 
+  local success = table.remove(result, 1)
   if not success then
     local message = ("Coroutine error: %s\ncoroutine %s"):format(result, debug.traceback(coroutine_))
     if State.debug then
@@ -22,7 +23,7 @@ async.resume = function(coroutine_, ...)
     end
   end
 
-  return result
+  return unpack(result)
 end
 
 --- @async

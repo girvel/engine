@@ -200,18 +200,20 @@ methods.load_level = function(self, path)
     -- if e.on_load then e:on_load() end
 
     if i % 500 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
-      coroutine.yield(.8 + .2 * (i / #load_data.entities))
+      coroutine.yield("add", i / #load_data.entities)
       last_yield_t = love.timer.getTime()
     end
   end
 
   self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
 
-  coroutine.yield(1)
+  coroutine.yield("add", 1)
   local end_t = love.timer.getTime()
   Log.info("Added %s entities in %.2f s", #load_data.entities, end_t - read_t)
   Log.info("Total time %.2f s", end_t - start_t)
 
+  -- NEXT! initial save during :init
+  -- NEXT! use (stage, N) instead of (N) for progress yields
   -- NEXT! yield progress
   -- NEXT! log, time, count total time
   -- NEXT! | for log formatting

@@ -36,9 +36,9 @@ local ldtk = {}
 ldtk.load = function(path)
   local definition = love.filesystem.load(path .. "/init.lua")() --[[@as level_definition]]
   local json = read_json(definition.ldtk_path)
-  coroutine.yield(.4)
+  coroutine.yield("json", 1)
   local preload_data = preload(json)
-  coroutine.yield(.5)
+  coroutine.yield("preload", 1)
   local generation_data = generate_entities(definition.palette, preload_data.entities)
 
   return {
