@@ -53,6 +53,7 @@ end
 --- | '"activation"'
 --- | '"hp"'
 --- | '"outgoing_damage"'
+--- | '"saving_throw"'
 
 --- @param self entity
 --- @param modname creature_modification
@@ -198,6 +199,26 @@ methods.ability_check = function(self, to_check, dc)
   )
 
   local success = result >= dc
+
+  local sounds = success and SUCCESS or FAILURE
+  sounds:play_at(self.position)
+
+  return success
+end
+
+--- @param self entity
+--- @param to_check ability
+--- @param dc integer difficulty class
+--- @return boolean
+methods.saving_throw = function(self, to_check, dc)
+  local roll = self:modify("saving_throw", D(20) + self:get_modifier(to_check), to_check)
+  local result = roll:roll()
+  local success = result >= dc
+
+  Log.debug(
+    "%s %s / %s %s | Saving throw for %s",
+    to_check:utf_upper(), result, dc, success and "" or "", self
+  )
 
   local sounds = success and SUCCESS or FAILURE
   sounds:play_at(self.position)
