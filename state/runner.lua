@@ -10,8 +10,12 @@ local runner = {}
 
 --- @alias scene scene_strict|table
 
+--- @class character_options
+--- @field dynamic? boolean Does not trigger error if the character is missing (nil)
+--- @field optional? boolean Allows the scene to run without this character
+
 --- @class scene_strict
---- @field characters? table<string, table>
+--- @field characters? table<string, character_options>
 --- @field start_predicate fun(self: scene, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
 --- @field run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
 --- @field enabled? boolean
@@ -69,7 +73,13 @@ methods.update = function(self, dt)
     local characters = {}
     if scene.characters then
       for name, opts in pairs(scene.characters) do
-        local e = self.entities[name]
+        local e
+        if opts.dynamic then
+          e = rawget(self.entities, name)
+        else
+          e = self.entities[name]
+        end
+
         if not opts.optional and not State:exists(e)
           or self.locked_entities[e]
         then
