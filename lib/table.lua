@@ -311,11 +311,8 @@ end
 _table.strict = function(t, item_name)
   return setmetatable(t, {
     __index = function(self, index)
-      return assert(
-        rawget(self, index),
-        ("There's no %s %q"):format(item_name or "item", index)
-      )
-    end
+      Error("There's no %s %q", item_name or "item", index)
+    end,
   })
 end
 
