@@ -55,8 +55,10 @@ methods.update = function(self, dt)
   do
     local total_scale = self.SCALE * Constants.cell_size
     self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
-    self.vision_end = self.vision_start
-      + (V(love.graphics.getDimensions()) / total_scale):map(math.ceil)
+    self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
+      :div_mut(total_scale)
+      :map(math.ceil)
+      :add_mut(self.vision_end)
 
     self.vision_start = Vector.use(
       Math.median, Vector.one, self.vision_start, State.level.grid_size

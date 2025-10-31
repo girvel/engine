@@ -432,13 +432,20 @@ end
 --- @param target vector|entity
 --- @return boolean
 api.is_visible = function(target)
+  target = to_vector(target)
+
+  if not (
+    State.perspective.vision_start <= target
+    and target <= State.perspective.vision_end
+  ) then
+    return false
+  end
+
   local player_vision = State.player.ai._vision_map
   if not player_vision then return false end
 
-  local position = getmetatable(target) == Vector.mt and target or assert(target.position)
-  --- @cast position vector
-  if not State.grids.solids:can_fit(position) then return false end
-  return player_vision:is_visible_unsafe(unpack(position))
+  if not State.grids.solids:can_fit(target) then return false end
+  return player_vision:is_visible_unsafe(unpack(target))
 end
 
 --- @param path string
