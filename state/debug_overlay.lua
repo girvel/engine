@@ -4,7 +4,7 @@ local ui = require("engine.tech.ui")
 local debug_overlay = {}
 
 --- @class state_debug
---- @field points table<string, overlay_point>
+--- @field points table<any, overlay_point>
 --- @field _show_points boolean
 --- @field _show_fps boolean
 --- @field _show_ai boolean
@@ -59,7 +59,7 @@ draw_points = function(points)
     end
     local x, y = unpack(v)
     love.graphics.circle("fill", x, y, 3)
-    love.graphics.print(k, x, y)
+    love.graphics.print(tostring(k), x, y)
     love.graphics.setColor(Vector.white)
   end
   ui.finish_font()
