@@ -175,6 +175,8 @@ iteration._bfs_mt.__call = function(self)
     end
   end
 
+  if #self._next == 0 then return end
+
   self._last = table.remove(self._next, 1)
   return self._last, self._base[self._last]
 end
