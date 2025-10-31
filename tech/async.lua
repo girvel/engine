@@ -13,9 +13,9 @@ async.resume = function(coroutine_, ...)
     Log.warn("Coroutine lags (%.2f s)\n%s", t, debug.traceback())
   end
 
-  local success = table.remove(result, 1)
-  if not success then
-    local message = ("Coroutine error: %s\ncoroutine %s"):format(result, debug.traceback(coroutine_))
+  local ok = table.remove(result, 1)
+  if not ok then
+    local message = ("Coroutine error: %s\ncoroutine %s"):format(result[1], debug.traceback(coroutine_))
     if State.debug then
       error(message)
     else
