@@ -1,8 +1,19 @@
 local vector = require("engine.lib.vector")
 local iteration = require("engine.lib.iteration")
 
+
 --- indexing starts from 1
 local grid = {}
+
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Initialization
+----------------------------------------------------------------------------------------------------
+
+--- @class grid<T>: { [vector]: T }
+--- @field size vector
+--- @field _inner_array any[]
+local methods = {}
 
 --- @param size vector
 --- @param factory? fun(): any
@@ -34,10 +45,10 @@ grid.from_matrix = function(matrix, size)
   return result
 end
 
---- @class grid<T>: { [vector]: T }
---- @field size vector
---- @field _inner_array any[]
-local methods = {}
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Methods
+----------------------------------------------------------------------------------------------------
 
 --- @param self grid
 --- @param v vector
@@ -77,6 +88,57 @@ end
 
 --- @generic T
 --- @param self grid<T>
+--- @param start vector
+--- @param max_radius? integer
+--- @return vector?
+methods.find_free_position = function(self, start, max_radius)
+  return self:find_free_positions(start, max_radius)() or nil
+end
+
+--- @param x integer
+--- @param y integer
+--- @return integer
+methods._get_inner_index = function(self, x, y)
+  return x + (y - 1) * self.size[1]
+end
+
+--- @param i integer
+--- @return integer, integer
+methods._get_outer_index = function(self, i)
+  return Math.loopmod(i, self.size.x), math.floor((i - 1) / self.size.x) + 1
+end
+
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Metatable
+----------------------------------------------------------------------------------------------------
+
+grid.mt = {
+  __index = function(self, v)
+    local method = methods[v]
+    if method then return method end
+
+    if getmetatable(v) ~= vector.mt then
+      Error("Attempt to index grid with %s which is neither vector nor a method name", v)
+    end
+
+    assert(self:can_fit(v), ("%s does not fit in grid border %s"):format(v, self.size))
+    return self._inner_array[self:_get_inner_index(unpack(v))]
+  end,
+
+  __newindex = function(self, v, value)
+    assert(self:can_fit(v), tostring(v) .. " does not fit into grid size " .. tostring(self.size))
+    self._inner_array[self:_get_inner_index(unpack(v))] = value
+  end,
+}
+
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Iteration
+----------------------------------------------------------------------------------------------------
+
+--- @generic T
+--- @param self grid<T>
 --- @return any
 methods.iter = function(self)
   return Fun.iter(pairs(self._inner_array))
@@ -98,46 +160,32 @@ methods.find_free_positions = function(self, start, max_radius)
   end)
 end
 
---- @generic T
---- @param self grid<T>
---- @param start vector
---- @param max_radius? integer
---- @return vector?
-methods.find_free_position = function(self, start, max_radius)
-  return self:find_free_positions(start, max_radius)() or nil
-end
+methods.rect = function(self, x1, x2, y1, y2)
+  x1 = math.max(x1, 1)
+  x2 = math.min(x2, self.size.x)
+  y1 = math.max(y1, 1)
+  y2 = math.min(y2, self.size.y)
+  local x = x1
+  local y = y1
 
---- @param x integer
---- @param y integer
---- @return integer
-methods._get_inner_index = function(self, x, y)
-  return x + (y - 1) * self.size[1]
-end
+  return function()
+    local r1 = x
+    local r2 = y
+    local r3 = self:unsafe_get(x, y)
 
---- @param i integer
---- @return integer, integer
-methods._get_outer_index = function(self, i)
-  return Math.loopmod(i, self.size.x), math.floor((i - 1) / self.size.x) + 1
-end
-
-grid.mt = {
-  __index = function(self, v)
-    local method = methods[v]
-    if method then return method end
-
-    if getmetatable(v) ~= vector.mt then
-      Error("Attempt to index grid with %s which is neither vector nor a method name", v)
+    x = x + 1
+    if x > x2 then
+      x = x1
+      y = y + 1
     end
 
-    assert(self:can_fit(v), ("%s does not fit in grid border %s"):format(v, self.size))
-    return self._inner_array[self:_get_inner_index(unpack(v))]
-  end,
+    if y > y2 then
+      return
+    end
 
-  __newindex = function(self, v, value)
-    assert(self:can_fit(v), tostring(v) .. " does not fit into grid size " .. tostring(self.size))
-    self._inner_array[self:_get_inner_index(unpack(v))] = value
-  end,
-}
+    return r1, r2, r3
+  end
+end
 
 --- @alias iteration_bfs _iteration_bfs|fun():vector?,any
 
