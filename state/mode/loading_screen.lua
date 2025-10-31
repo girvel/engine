@@ -23,11 +23,11 @@ loading_screen.new = function(loading_coroutine, next_state)
 end
 
 local STAGES = {
-  json = {start = 0, finish = .2},
-  preload = {start = .2, finish = .25},
-  generate = {start = .25, finish = .4},
-  add = {start = .4, finish = .5},
-  rails_init = {start = .5, finish = 1},
+  json = {start = 0, finish = .4},
+  preload = {start = .4, finish = .5},
+  generate = {start = .5, finish = .8},
+  add = {start = .8, finish = .95},
+  rails_init = {start = .95, finish = 1},
 }
 
 local bar_animation = animated.mixin("engine/assets/sprites/gui/loading_bar", "no_atlas").animation.pack.second

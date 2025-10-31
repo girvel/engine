@@ -211,7 +211,6 @@ methods.load_level = function(self, path)
   local add_t = love.timer.getTime()
   Log.info("%.2f s | Added %s entities", add_t - read_t, #load_data.entities)
 
-  -- NEXT! initial save during :init
   self.rails:init(self.args.checkpoint)
 
   local end_t = love.timer.getTime()
