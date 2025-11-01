@@ -25,7 +25,7 @@ local runner = {}
 --- @field in_combat_flag? true allows scene to start in combat
 --- @field lag_flag? true hides coroutine lag warnings
 --- @field on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
---- @field on_cancel? fun(self: scene) runs when the scene run is cancelled (either through runner:stop, runner:remove or loading a save)
+--- @field on_cancel? fun(self: scene) runs when the scene run is cancelled (either through runner:stop or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
@@ -171,7 +171,6 @@ methods.is_running = function(self, scene)
     :any(function(r) return r.base_scene == scene end)
 end
 
---- @async
 --- @param scene string|scene
 --- @param hard? boolean prevent :on_cancel
 methods.stop = function(self, scene, hard)
@@ -193,35 +192,38 @@ methods.stop = function(self, scene, hard)
 
   local did_on_cancel_run = false
   if new_length ~= old_length then
-    coroutine.yield()
-    for character, _ in pairs(scene.characters or {}) do
-      self.locked_entities[self.entities[character]] = nil
-    end
-
-    if scene.characters and scene.characters.player then
-      State.perspective.target_override = nil
-      State.perspective.is_camera_following = true
-      State.player.curtain_color = Vector.transparent
-    end
-
-    if scene.on_cancel then
-      did_on_cancel_run = true
-      if not hard then
-        scene:on_cancel()
+    self:run_task_sync(function()
+      for character, _ in pairs(scene.characters or {}) do
+        self.locked_entities[self.entities[character]] = nil
       end
-    end
-  end
 
-  local postfix = ""
-  if did_on_cancel_run then
-    if hard then
-      postfix = "; prevented :on_cancel"
-    else
-      postfix = "; used :on_cancel"
-    end
-  end
+      if scene.characters and scene.characters.player then
+        State.perspective.target_override = nil
+        State.perspective.is_camera_following = true
+        State.player.curtain_color = Vector.transparent
+      end
 
-  Log.info( "Stopping scene %s; interrupted %s runs%s", key, old_length - new_length, postfix)
+      if scene.on_cancel then
+        did_on_cancel_run = true
+        if not hard then
+          scene:on_cancel()
+        end
+      end
+
+      local postfix = ""
+      if did_on_cancel_run then
+        if hard then
+          postfix = "; prevented :on_cancel"
+        else
+          postfix = "; used :on_cancel"
+        end
+      end
+
+      Log.info("Stopping scene %s; interrupted %s runs%s", key, old_length - new_length, postfix)
+    end)
+  else
+    Log.info("Stopping scene %s; no runs found", key)
+  end
 end
 
 --- @param scenes runner_scenes
@@ -252,7 +254,6 @@ methods.remove = function(self, scene)
   if not key then return end
   self.scenes[key] = nil
   Log.info("Removed scene %s", key)
-  self:stop(scene)  -- yields => goes last
 end
 
 --- @param f fun(scene, characters)
