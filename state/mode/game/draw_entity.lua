@@ -40,7 +40,7 @@ local draw_entity = function(self, entity, dt)
     love.graphics.setFont(sprite.font)
     love.graphics.print({sprite.color, sprite.text}, x, y)
   else
-    assert(false)
+    Error("Unknown sprite type %q", sprite.type)
   end
 
   if entity.shader then
