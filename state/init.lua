@@ -205,7 +205,7 @@ methods.load_level = function(self, path)
     end
   end
 
-  self.perspective.camera_offset = V(self.perspective:center_camera(unpack(self.player.position)))
+  self.perspective:immediate_center()
 
   coroutine.yield("add", 1)
   local add_t = love.timer.getTime()

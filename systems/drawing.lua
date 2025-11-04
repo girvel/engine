@@ -15,7 +15,7 @@ return Tiny.sortedProcessingSystem {
 
   preProcess = function(_, dt)
     if State.is_loaded then
-      State.perspective:update(dt)
+      State.perspective:_update(dt)
     end
 
     local shader = State.shader
