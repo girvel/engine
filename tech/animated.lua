@@ -48,15 +48,15 @@ end
 
 --- @param path string
 --- @param position vector
---- @param is_over? boolean whether to display in fx_over or fv_under layer
-animated.fx = function(path, position, is_over)
+--- @param layer? layer
+animated.fx = function(path, position, layer)
   local result = animated.mixin(path, "no_atlas")
 
   local _, _, head = path:find("/?([^/]+)$")
   result.codename = head and (head .. "_fx") or "unnamed_fx"
   result.boring_flag = true
   result.position = position
-  result.layer = is_over and "fx_over" or "fx_under"
+  result.layer = layer or "fx_under"
 
   result:animate():next(function() State:remove(result) end)
 
