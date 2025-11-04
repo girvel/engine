@@ -20,7 +20,7 @@ humanoid.cues = {
 }
 
 local blood_mark = function()
-  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
+  local atlas = love.image.newImageData("engine/assets/sprites/standalone/blood_mark.png")
   return {
     codename = "blood_mark",
     boring_flag = true,
