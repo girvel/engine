@@ -21,35 +21,17 @@ local levels, count, pretty
 --- @param ... any
 --- @return string
 log.format = function(fmt, ...)
-  if type(fmt) == "string" then
-    return fmt:format(pretty(...))
-  else
-    if not select("#", ...) == 0 then
-      Error(
-        "Log.format's first argument should be of type string to use formatting args; got %s",
-        type(fmt)
-      )
-    end
-    return tostring(pretty(fmt))
-  end
+  return fmt:format(pretty(...))
 end
 
---- @generic T
---- @param level log_level
---- @param trace_shift integer
---- @param fmt any
---- @param ... T
---- @return T
-log.log = function(level, trace_shift, fmt, ...)
+local _log = function(level, trace_shift, message)
   if count[level] then
     count[level] = count[level] + 1
   end
 
   if levels[level].index < levels[log.level].index then
-    return ...
+    return
   end
-
-  local msg = log.format(fmt, ...)
 
   local info = debug.getinfo(2 + trace_shift, "Sl")
   local lineinfo = info.short_src .. ":" .. info.currentline
@@ -63,7 +45,7 @@ log.log = function(level, trace_shift, fmt, ...)
     frame_number,
     log.usecolor and "\27[0m" or "",
     lineinfo,
-    msg
+    message
   ))
 
   if log.outfile then
@@ -73,11 +55,32 @@ log.log = function(level, trace_shift, fmt, ...)
         os.date("%H:%M:%S"),
         frame_number,
         lineinfo,
-        msg
+        message
       )
     )
   end
+end
 
+--- @generic T
+--- @param level log_level
+--- @param trace_shift integer
+--- @param fmt any
+--- @param ... T
+--- @return T
+log.log = function(level, trace_shift, fmt, ...)
+  _log(level, trace_shift, log.format(fmt, ...))
+  return ...
+end
+
+--- @generic T
+--- @param ... T
+--- @return T ...
+log.traces = function(...)
+  local to_log = {pretty(...)}
+  for i, v in ipairs(to_log) do
+    to_log[i] = tostring(v)
+  end
+  _log("trace", 0, table.concat(to_log, " "))
   return ...
 end
 
