@@ -41,14 +41,33 @@ end
 local smooth_camera_offset
 
 methods._update = function(self, dt)
-  if not State.player then return end
+  if self.is_camera_following then
+    local prev_offset = self.camera_offset
 
-  if self.is_camera_following and State.is_loaded then
-    local next_offset = smooth_camera_offset:next(
-      self.target_override or State.player, self.camera_offset, dt
-    )
-    self.is_moving = next_offset ~= self.camera_offset
-    self.camera_offset = next_offset
+    if dt >= .05 then
+      self:immediate_center()
+    else
+      local target = self.target_override or State.player
+      local px, py = unpack(self.camera_offset)
+      local tx, ty = unpack(target.position)
+
+      if target == State.player
+        and State.player:can_act()
+        and State.player.resources.movement > 0
+      then
+        tx = tx
+          + math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
+          - math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
+
+        ty = ty
+          + math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
+          - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
+      end
+
+      self.camera_offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
+    end
+
+    self.is_moving = prev_offset ~= self.camera_offset
   else
     self.is_moving = false
   end
@@ -84,32 +103,11 @@ local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 smooth_camera_offset = {
   vx = 0,
   vy = 0,
-  next = function(self, target, prev, dt)
-    prev = prev:map(function(v) return v ~= v and 0 or v end)
-    local prev_x, prev_y = unpack(prev)
-
-    if dt >= .05 then  -- spring-based camera overshoots on low FPS
-      return V(State.perspective:_center(unpack(target.position)))
-    end
-
-    local tx, ty = unpack(target.position)
-    if target == State.player
-      and State.player:can_act()
-      and State.player.resources.movement > 0
-    then
-      tx = tx
-        + math.min(1, (Kernel._delays.d or 0) * Kernel:get_key_rate("d"))
-        - math.min(1, (Kernel._delays.a or 0) * Kernel:get_key_rate("a"))
-
-      ty = ty
-        + math.min(1, (Kernel._delays.s or 0) * Kernel:get_key_rate("s"))
-        - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
-    end
-
+  next = function(self, tx, ty, px, py, dt)
     local dest_x, dest_y = State.perspective:_center(tx, ty)
 
-    local dx = dest_x - prev_x
-    local dy = dest_y - prev_y
+    local dx = dest_x - px
+    local dy = dest_y - py
 
     local ax = SPRING_STIFFNESS * dx - DAMPING_K * self.vx
     local ay = SPRING_STIFFNESS * dy - DAMPING_K * self.vy
@@ -117,11 +115,9 @@ smooth_camera_offset = {
     self.vx = self.vx + ax * dt
     self.vy = self.vy + ay * dt
 
-    local result = V(
-      math.floor(prev_x + self.vx * dt),
-      math.floor(prev_y + self.vy * dt)
-    )
-    return result
+    return
+      math.floor(px + self.vx * dt),
+      math.floor(py + self.vy * dt)
   end,
 }
 
