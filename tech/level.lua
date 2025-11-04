@@ -12,7 +12,7 @@ level.grid_layers = {
   "shadows",
 }
 
---- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"shadows"
+--- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"weather"|"shadows"
 level.layers = {
   "tiles",
   "on_tiles",
