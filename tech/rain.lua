@@ -1,5 +1,7 @@
 local animated = require("engine.tech.animated")
 local api = require("engine.tech.api")
+
+
 local rain = {}
 
 --- @alias rain rain_strict|table
@@ -78,7 +80,12 @@ ai_methods.observe = function(self, entity, dt)
 
   while State.period:absolute(life_time / entity.rain_density / cells_n, self, "emit_rain") do
     local target = Vector.use(Random.float, start, finish)
-    local target_cell = target / Constants.cell_size
+    local target_cell = (target / Constants.cell_size):map(math.floor)
+
+    if State.grids.shadows:slow_get(target_cell, true) then goto continue end
+
+    local e = State.grids.solids[target_cell]
+    if e and not e.transparent_flag or State.rails:is_indoors(target_cell) then goto continue end
 
     table.insert(self._particles, {
       position = target - DIRECTION * d,
@@ -86,6 +93,8 @@ ai_methods.observe = function(self, entity, dt)
       life_time = life_time,
       is_visible = api.is_visible(target_cell),
     })
+
+    ::continue::
   end
 
   love.graphics.setCanvas(entity.sprite.image)
