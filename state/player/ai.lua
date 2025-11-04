@@ -54,8 +54,6 @@ end
 --- @param entity player
 --- @param dt number
 methods.observe = function(self, entity, dt)
-  self._vision_map:refresh_fov(entity.position, entity.fov_r)
-
   if not entity:can_act() then
     for _, p in ipairs(self._action_promises) do
       p:resolve(false)

@@ -41,6 +41,8 @@ end
 local smooth_camera_offset
 
 methods._update = function(self, dt)
+  State.player.ai._vision_map:refresh_fov(State.player.position, State.player.fov_r)
+
   if self.is_camera_following then
     local prev_offset = self.camera_offset
 
