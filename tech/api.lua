@@ -432,7 +432,7 @@ end
 --- @param target vector|entity
 --- @return boolean
 api.is_visible = function(target)
-  target = to_vector(target)
+  target = to_vector(target):map(math.floor)
 
   if not (
     State.perspective.vision_start <= target
