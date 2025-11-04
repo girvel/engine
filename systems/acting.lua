@@ -113,7 +113,7 @@ return Tiny.processingSystem {
 
     if State.combat then
       self:_process_inside_combat(entity, dt)
-    elseif (entity.position - State.player.position):abs2() <= AI_RANGE then
+    elseif not entity.position or (entity.position - State.player.position):abs2() <= AI_RANGE then
       self:_process_outside_combat(entity, dt)
     end
   end,

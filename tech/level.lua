@@ -22,6 +22,7 @@ level.layers = {
   "solids",
   "fx_over",
   "on_solids",
+  "weather",
   "shadows",
 }
 
