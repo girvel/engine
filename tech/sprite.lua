@@ -15,7 +15,7 @@ local pull_anchors, cut_out
 
 --- @param base string|love.ImageData
 --- @return sprite_image
-sprite.image = function(base)
+sprite.image = Memoize(function(base)
   if type(base) == "string" then
     base = love.image.newImageData(base)
   end
@@ -27,7 +27,7 @@ sprite.image = function(base)
     image = love.graphics.newImage(base),
     color = main_color or Vector.white,
   }
-end
+end)
 
 --- @class sprite_atlas NOTICE shared pointer, do not mutate
 --- @field type "atlas"
