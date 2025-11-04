@@ -79,8 +79,8 @@ methods._update = function(self, dt)
     self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
-      :map(math.ceil)
-      :add_mut(self.vision_end)
+      :map_mut(math.ceil)
+      :add_mut(self.vision_start)
 
     self.vision_start = Vector.use(
       Math.median, Vector.one, self.vision_start, State.level.grid_size
