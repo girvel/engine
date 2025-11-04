@@ -41,7 +41,7 @@ methods.draw_gui = function(self)
     else
       value = 1
     end
-    frame = math.max(1, math.ceil(value * #bar_animation))
+    frame = Math.median(1, math.ceil(value * #bar_animation), #bar_animation)
   end
 
   ui.start_alignment("center")
