@@ -49,6 +49,15 @@ end
 --- @param path string
 --- @param position vector
 --- @param layer? layer
+--- @return entity
+animated.add_fx = function(path, position, layer)
+  return State:add(animated.fx(path, position, layer))
+end
+
+--- @param path string
+--- @param position vector
+--- @param layer? layer
+--- @return entity
 animated.fx = function(path, position, layer)
   local result = animated.mixin(path, "no_atlas")
 
