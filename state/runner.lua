@@ -19,7 +19,7 @@ local runner = {}
 --- @field start_predicate fun(self: scene, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
 --- @field run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
 --- @field enabled? boolean
---- @field mode? "sequential"|"parallel"|"once"
+--- @field mode? "sequential"|"parallel"|"once"|"disable"
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field save_flag? true don't warn about making a save during this scene
 --- @field in_combat_flag? true allows scene to start in combat
@@ -33,7 +33,6 @@ local runner = {}
 --- @field base_scene scene
 
 --- @class scene_cancellation
---- @field f fun(self: scene, ch: runner_characters, ps: runner_positions)
 --- @field name string
 --- @field base_scene scene
 
@@ -92,6 +91,22 @@ local select_characters = function(self, scene, scene_name)
   return ok, Table.strict(characters, ("scene %q's character"):format(scene_name))
 end
 
+--- @param self state_runner
+--- @param scene scene
+--- @param key string
+--- @param ch runner_characters
+local finish = function(self, scene, key, ch)
+  for _, character in pairs(ch) do
+    self.locked_entities[character] = nil
+  end
+
+  if Table.key_of(ch, State.player) then
+    State.perspective.target_override = nil
+    State.perspective.is_camera_following = true
+    State.player.curtain_color = Vector.transparent
+  end
+end
+
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
@@ -106,14 +121,14 @@ methods.update = function(self, dt)
       goto continue
     end
 
-    local ok, characters = select_characters(self, scene, scene_name)
+    local ok, ch = select_characters(self, scene, scene_name)
     if not ok then goto continue end
 
-    local args = {scene:start_predicate(dt, characters, self.positions)}
+    local args = {scene:start_predicate(dt, ch, self.positions)}
     if not args[1] then goto continue end
 
     -- outside coroutine to avoid two scenes with the same character starting in the same frame
-    for _, character in pairs(characters) do
+    for _, character in pairs(ch) do
       self.locked_entities[character] = true
     end
 
@@ -121,25 +136,16 @@ methods.update = function(self, dt)
       coroutine = coroutine.create(function()
         if not scene.mode or scene.mode == "once" then
           State.runner:remove(scene)
+        elseif scene.mode == "disable" then
+          scene.enabled = nil
         end
 
         if not scene.boring_flag then
           Log.info("Scene %q starts", scene_name)
         end
 
-        safety.call(scene.run, scene, characters, self.positions, unpack(args))
-
-        -- NEXT do these things on any cancellation, loading or manual
-        -- NEXT scene_cancellation should not contain the f field
-        for _, character in pairs(characters) do
-          self.locked_entities[character] = nil
-        end
-
-        if Table.key_of(characters, State.player) then
-          State.perspective.target_override = nil
-          State.perspective.is_camera_following = true
-          State.player.curtain_color = Vector.transparent
-        end
+        safety.call(scene.run, scene, ch, self.positions, unpack(args))
+        finish(self, scene, scene_name, ch)
 
         if not scene.boring_flag then
           Log.info("Scene %q ends", scene_name)
@@ -208,15 +214,8 @@ methods.stop = function(self, scene, hard)
   local did_on_cancel_run = false
   if new_length ~= old_length then
     self:run_task_sync(function()
-      for character, _ in pairs(scene.characters or {}) do
-        self.locked_entities[self.entities[character]] = nil
-      end
-
-      if scene.characters and scene.characters.player then
-        State.perspective.target_override = nil
-        State.perspective.is_camera_following = true
-        State.player.curtain_color = Vector.transparent
-      end
+      local _, ch = select_characters(self, scene, key)
+      finish(self, scene, key, ch)
 
       if scene.on_cancel then
         did_on_cancel_run = true
@@ -306,8 +305,9 @@ methods.handle_loading = function(self)
   -- NOTICE: is done only when the whole state is deserialized
 
   for _, c in ipairs(self._loading_cancellations) do
-    local _, characters = select_characters(self, c.base_scene, c.name)
-    c.f(c.base_scene, characters, self.positions)
+    local _, ch = select_characters(self, c.base_scene, c.name)
+    c.base_scene:on_cancel(ch, self.positions)
+    finish(self, c.base_scene, c.name, ch)
   end
 
   if #self._loading_cancellations > 0 then
