@@ -25,10 +25,15 @@ local runner = {}
 --- @field in_combat_flag? true allows scene to start in combat
 --- @field lag_flag? true hides coroutine lag warnings
 --- @field on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
---- @field on_cancel? fun(self: scene) runs when the scene run is cancelled (either through runner:stop or loading a save)
+--- @field on_cancel? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene run is cancelled (either through runner:stop or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
+--- @field name string
+--- @field base_scene scene
+
+--- @class scene_cancellation
+--- @field f fun(self: scene, ch: runner_characters, ps: runner_positions)
 --- @field name string
 --- @field base_scene scene
 
@@ -39,8 +44,9 @@ local runner = {}
 --- @field locked_entities table<entity, true>
 --- @field save_lock scene?
 --- @field _scene_runs scene_run[]
+--- @field _loading_cancellations? scene_cancellation[]
 local methods = {}
-local mt = {__index = methods}
+runner.mt = {__index = methods}
 
 
 --- @return state_runner
@@ -51,10 +57,40 @@ runner.new = function()
     entities = Table.strict({}, "runner entity"),
     _scene_runs = {},
     locked_entities = {},
-  }, mt)
+  }, runner.mt)
 end
 
 local scene_run_mt = {}
+
+--- @param self state_runner
+--- @param scene scene
+--- @param scene_name string
+--- @return boolean, runner_characters
+local select_characters = function(self, scene, scene_name)
+  local ok = true
+  local characters = {}
+
+  if scene.characters then
+    for name, opts in pairs(scene.characters) do
+      local e
+      if opts.dynamic then
+        e = rawget(self.entities, name)
+      else
+        e = self.entities[name]
+      end
+
+      if not opts.optional and not State:exists(e)
+        or self.locked_entities[e]
+      then
+        ok = false
+      end
+
+      characters[name] = e
+    end
+  end
+
+  return ok, Table.strict(characters, ("scene %q's character"):format(scene_name))
+end
 
 --- @param dt number
 methods.update = function(self, dt)
@@ -70,27 +106,8 @@ methods.update = function(self, dt)
       goto continue
     end
 
-    local characters = {}
-    if scene.characters then
-      for name, opts in pairs(scene.characters) do
-        local e
-        if opts.dynamic then
-          e = rawget(self.entities, name)
-        else
-          e = self.entities[name]
-        end
-
-        if not opts.optional and not State:exists(e)
-          or self.locked_entities[e]
-        then
-          goto continue
-        end
-
-        characters[name] = e
-      end
-    end
-
-    characters = Table.strict(characters, ("scene %q's character"):format(scene_name))
+    local ok, characters = select_characters(self, scene, scene_name)
+    if not ok then goto continue end
 
     local args = {scene:start_predicate(dt, characters, self.positions)}
     if not args[1] then goto continue end
@@ -102,7 +119,7 @@ methods.update = function(self, dt)
 
     table.insert(self._scene_runs, setmetatable({
       coroutine = coroutine.create(function()
-        if not scene.mode then
+        if not scene.mode or scene.mode == "once" then
           scene.enabled = nil
         end
 
@@ -124,10 +141,6 @@ methods.update = function(self, dt)
 
         if not scene.boring_flag then
           Log.info("Scene %q ends", scene_name)
-        end
-
-        if scene.mode == "once" then
-          self:remove(scene)
         end
       end),
       base_scene = scene,
@@ -206,7 +219,8 @@ methods.stop = function(self, scene, hard)
       if scene.on_cancel then
         did_on_cancel_run = true
         if not hard then
-          scene:on_cancel()
+          local _, characters = select_characters(self, scene, key)
+          scene:on_cancel(characters, State.runner.positions)
         end
       end
 
@@ -287,12 +301,22 @@ methods.run_task_sync = function(self, f, name)
 end
 
 methods.handle_loading = function(self)
-  for name, scene in pairs(self.scenes) do
-    if scene.on_cancel then
-      scene:on_cancel()
-      Log.debug("Scene %s safely cancelled in save", name)
-    end
+  -- NOTICE: is done only when the whole state is deserialized
+
+  for _, c in ipairs(self._loading_cancellations) do
+    local _, characters = select_characters(self, c.base_scene, c.name)
+    c.f(c.base_scene, characters, self.positions)
   end
+
+  if #self._loading_cancellations > 0 then
+    Log.info(
+      "Scenes canceled on save:%s",
+      Fun.iter(self._loading_cancellations)
+        :reduce(function(acc, c) return acc .. "\n  " .. c.name end, "")
+    )
+  end
+
+  self._loading_cancellations = nil
 end
 
 --- @param prefix string
@@ -321,12 +345,43 @@ methods.position_sequence = function(self, prefix)
   return result
 end
 
-scene_run_mt.__serialize = function(self)
-  if not self.base_scene.save_flag and not self.base_scene.on_cancel then
-    Log.warn("Scene %s cancelled in save with no :on_cancel defined", self.name)
+--- @param self state_runner
+runner.mt.__serialize = function(self)
+  local scenes = self.scenes
+  local positions = self.positions
+  local entities = self.entities
+
+  local cancellations = {}
+  for _, run in ipairs(self._scene_runs) do
+    local on_cancel = run.base_scene.on_cancel
+    if on_cancel then
+      table.insert(cancellations, {
+        f = on_cancel,
+        base_scene = run.base_scene,
+        name = run.name,
+      })
+    elseif not run.base_scene.save_flag then
+      Log.warn("Scene %s cancelled in save with no :on_cancel defined", run.name)
+    end
   end
+
+  return function()
+    local result = setmetatable({
+      scenes = scenes,
+      positions = positions,
+      entities = entities,
+      _scene_runs = {},
+      _loading_cancellations = cancellations,
+      locked_entities = {},
+    }, runner.mt)
+
+    return result
+  end
+end
+
+scene_run_mt.__serialize = function(self)
   return "nil"
 end
 
-Ldump.mark(runner, {}, ...)
+Ldump.mark(runner, {mt = {}}, ...)
 return runner
