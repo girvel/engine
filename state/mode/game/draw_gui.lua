@@ -35,6 +35,14 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
 
+  do
+    local resolution = V(love.graphics.getDimensions())
+    local canvas_resolution = V(self._temp_canvas:getDimensions())
+    if resolution ~= canvas_resolution then
+      self._temp_canvas = love.graphics.newCanvas(unpack(resolution))
+    end
+  end
+
   draw_curtain()
   draw_sidebar(self)
   draw_dialogue()
