@@ -120,7 +120,7 @@ methods.update = function(self, dt)
     table.insert(self._scene_runs, setmetatable({
       coroutine = coroutine.create(function()
         if not scene.mode or scene.mode == "once" then
-          scene.enabled = nil
+          State.runner:remove(scene)
         end
 
         if not scene.boring_flag then
@@ -129,6 +129,8 @@ methods.update = function(self, dt)
 
         safety.call(scene.run, scene, characters, self.positions, unpack(args))
 
+        -- NEXT do these things on any cancellation, loading or manual
+        -- NEXT scene_cancellation should not contain the f field
         for _, character in pairs(characters) do
           self.locked_entities[character] = nil
         end
@@ -279,12 +281,12 @@ methods.run_task = function(self, f, name)
   local end_promise = Promise.new()
   local scene = {
     boring_flag = true,
+    mode = "once",
     enabled = true,
     start_predicate = function() return true end,
     run = function(self_scene)
       f(self_scene)
       end_promise:resolve()
-      self.scenes[key] = nil  -- not in the beginning: sometimes scene should handle on_cancel
     end,
   }
   self.scenes[key] = scene
