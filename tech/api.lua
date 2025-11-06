@@ -25,7 +25,7 @@ local api = {}
 
 --- @param crowd entity[]
 --- @param destination vector
---- @param rotate_towards vector
+--- @param rotate_towards? vector
 --- @return promise, scene[]
 api.travel_crowd = function(crowd, destination, rotate_towards)
   local promises = {}
@@ -35,7 +35,9 @@ api.travel_crowd = function(crowd, destination, rotate_towards)
     if State:exists(e) then
       local p, s = State.runner:run_task(function()
         api.travel_persistent(e, destination, 2)
-        api.rotate(e, rotate_towards)
+        if rotate_towards then
+          api.rotate(e, rotate_towards)
+        end
       end)
       table.insert(promises, p)
       table.insert(scenes, s)
