@@ -23,6 +23,28 @@ end
 --- API for asynchronous scripting, both AI and rails
 local api = {}
 
+--- @param crowd entity[]
+--- @param destination vector
+--- @param rotate_towards vector
+--- @return promise, scene[]
+api.travel_crowd = function(crowd, destination, rotate_towards)
+  local promises = {}
+  local scenes = {}
+
+  for _, e in ipairs(crowd) do
+    if State:exists(e) then
+      local p, s = State.runner:run_task(function()
+        api.travel_persistent(e, destination, 2)
+        api.rotate(e, rotate_towards)
+      end)
+      table.insert(promises, p)
+      table.insert(scenes, s)
+    end
+  end
+
+  return Promise.all(unpack(promises)), scenes
+end
+
 --- @param entity entity
 --- @param position vector
 --- @param suppress_warning? boolean
@@ -33,7 +55,6 @@ api.assert_position = function(entity, position, suppress_warning, is_strict)
   local free_position = not is_strict
     and State.grids.solids:find_free_position(position)
     or position
-  level.unsafe_move(entity, free_position)
 
   if not suppress_warning then
     Log.warn(
@@ -41,6 +62,8 @@ api.assert_position = function(entity, position, suppress_warning, is_strict)
       entity, entity.position, position, free_position
     )
   end
+
+  level.unsafe_move(entity, free_position)
 end
 
 --- @param entity entity
