@@ -81,9 +81,10 @@ methods.animate = function(self, animation_name, assertive, looped)
   local animation = self.animation
   animation_name = animation_name or animation.next
 
-  if animation._end_promise then
-    animation._end_promise:resolve()
+  local promise = animation._end_promise
+  if promise then
     animation._end_promise = nil
+    promise:resolve()
   end
   self:animation_set_paused(false)
 
