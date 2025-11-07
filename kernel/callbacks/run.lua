@@ -7,6 +7,8 @@ return function()
   love.timer.step()
   local dt = 0
   local KEY_REPETITION_DELAY = .3
+
+  Kernel.start_time = love.timer.getTime()
   return function()
     if Kernel._load then
       local t = love.timer.getTime()
@@ -16,7 +18,7 @@ return function()
         end
         Kernel._load = nil
         State.runner:handle_loading()
-      Kernel.time = math.max(Kernel.time - (love.timer.getTime() - t))
+      Kernel.cpu_time = math.max(Kernel.cpu_time - (love.timer.getTime() - t))
     end
 
     love.event.pump()
@@ -34,7 +36,7 @@ return function()
     end
 
     dt = love.timer.step()
-    Kernel.time = Kernel.time + dt
+    Kernel.cpu_time = Kernel.cpu_time + dt
     Kernel.frame_n = Kernel.frame_n + 1
 
     for k, v in pairs(Kernel._delays) do
@@ -55,14 +57,14 @@ return function()
     do
       local t = love.timer.getTime()
         love.graphics.present()
-      Kernel.time = math.max(0, Kernel.time - (love.timer.getTime() - t))
+      Kernel.cpu_time = math.max(0, Kernel.cpu_time - (love.timer.getTime() - t))
     end
 
     if Kernel._save then
       local t = love.timer.getTime()
         saves.write(State, Kernel._save)
         Kernel._save = nil
-      Kernel.time = math.max(0, Kernel.time - (love.timer.getTime() - t))
+      Kernel.cpu_time = math.max(0, Kernel.cpu_time - (love.timer.getTime() - t))
     end
   end
 end

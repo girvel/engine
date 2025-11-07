@@ -6,7 +6,8 @@ local init = {}
 --- @field _specific_key_rates table<love.KeyConstant, number>
 --- @field _delays table<love.KeyConstant, number>
 --- @field frame_n integer
---- @field time number
+--- @field cpu_time number
+--- @field start_time number
 local methods = {}
 local mt = {__index = methods}
 
@@ -16,7 +17,8 @@ init.new = function()
     _specific_key_rates = {},
     _delays = {},
     frame_n = 0,
-    time = 0,
+    cpu_time = 0,
+    start_time = 0,
   }, mt)
 end
 
@@ -54,7 +56,7 @@ methods.report = function(self)
     Log.info("Line profile:\n%s", line_report)
   end
 
-  Log.info("Average FPS is %.2f", self.frame_n / self.time)
+  Log.info("Play time %s s, average FPS is %.2f", math.floor(love.timer.getTime() - self.start_time), self.frame_n / self.cpu_time)
   Log.info("Saved log to %s%s", love.filesystem.getRealDirectory(Log.outfile), Log.outfile)
   Log.report()
 end
