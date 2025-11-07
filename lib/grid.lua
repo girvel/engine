@@ -160,7 +160,23 @@ methods.find_free_positions = function(self, start, max_radius)
   end)
 end
 
-methods.rect = function(self, x1, x2, y1, y2)
+--- @generic T
+--- @param self grid<T>
+--- @param start vector
+--- @param finish vector
+--- @return fun(): integer, integer, T?
+methods.rectv = function(self, start, finish)
+  return self:rect(start.x, start.y, finish.x, finish.y)
+end
+
+--- @generic T
+--- @param self grid<T>
+--- @param x1 integer
+--- @param y1 integer
+--- @param x2 integer
+--- @param y2 integer
+--- @return fun(): integer, integer, T?
+methods.rect = function(self, x1, y1, x2, y2)
   x1 = math.max(x1, 1)
   x2 = math.min(x2, self.size.x)
   y1 = math.max(y1, 1)

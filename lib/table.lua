@@ -316,8 +316,9 @@ _table.strict = function(t, item_name)
   })
 end
 
---- @param t table
---- @return any[]
+--- @generic T
+--- @param t table<T, any>
+--- @return T[]
 _table.keys = function(t)
   local result = {}
   for k in pairs(t) do
