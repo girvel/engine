@@ -125,7 +125,8 @@ methods.update = function(self, dt)
     if not ok then goto continue end
 
     local args = {scene:start_predicate(dt, ch, self.positions)}
-    if not args[1] then goto continue end
+    local ok = table.remove(args, 1)
+    if not ok then goto continue end
 
     -- outside coroutine to avoid two scenes with the same character starting in the same frame
     for _, character in pairs(ch) do
