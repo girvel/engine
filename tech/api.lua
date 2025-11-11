@@ -23,6 +23,14 @@ end
 --- API for asynchronous scripting, both AI and rails
 local api = {}
 
+--- @param secs number
+--- @return promise, scene
+api.delay = function(secs)
+  return State.runner:run_task(function()
+    async.sleep(secs)
+  end, "api_delay")
+end
+
 --- @param crowd entity[]
 --- @param destination vector
 --- @param rotate_towards? vector
