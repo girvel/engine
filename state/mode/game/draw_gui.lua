@@ -94,7 +94,6 @@ draw_sidebar = function(self)
       ui.finish_alignment()
     end
   ui.finish_frame()
-
 end
 
 action_button = function(action, hotkey)

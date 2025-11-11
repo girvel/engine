@@ -112,7 +112,7 @@ methods.observe = function(self, entity, dt)
   end
 
   local new_target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
-  if new_target then
+  if new_target and not State:in_combat(new_target) then
     State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
     State:start_combat({new_target, entity})
   end

@@ -96,11 +96,13 @@ api.travel_scripted = function(entity, destination, speed)
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
   end, "travel_scripted_" .. Name.code(entity, "anon"))
+
   scene.on_cancel = function()
     local p = assert(State.grids.solids:find_free_position(destination))
     level.unsafe_move(entity, p)
     promise:resolve()
   end
+
   return promise, scene
 end
 

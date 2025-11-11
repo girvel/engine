@@ -44,6 +44,12 @@ local build_love_shader = function(tint, intensity, brightness, brightness_insid
 
         love.graphics.rectangle("fill", start.x, start.y, size.x, size.y)
       end
+
+      local no_winter_shader = State.runner:position_sequence("no_winter_shader")
+      for _, p in ipairs(no_winter_shader) do
+        local x, y = unpack(p * K)
+        love.graphics.rectangle("fill", x, y, K, K)
+      end
     love.graphics.setColor(Vector.white)
     love.graphics.setCanvas()
     ignore = canvas
