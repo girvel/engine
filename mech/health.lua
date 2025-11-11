@@ -39,48 +39,7 @@ health.damage = function(target, amount, is_critical)
 
   State:add(floater.new(repr, target.position, health.COLOR_DAMAGE))
 
-  local before = target.hp
-  health.set_hp(target, before - amount)
-  if target.hp <= 0 then
-    if before > 0 and target.on_death then
-      target:on_death()
-    end
-
-    if target.player_flag then
-      State.mode:player_has_died()
-      return
-    end
-
-    if target.essential_flag then
-      target:animation_freeze("lying")
-      if State:in_combat(target) then
-        State.combat:remove(target)
-      end
-
-      return
-    end
-
-    if target.inventory then
-      local to_drop = {}
-      for _, slot in ipairs(item.DROPPING_SLOTS) do
-        local this_item = target.inventory[slot]
-        if this_item and not this_item.no_drop_flag then
-          table.insert(to_drop, slot)
-        end
-      end
-      item.drop(target, unpack(to_drop))
-    end
-
-    State:remove(target)
-    if not target.boring_flag then
-      Log.info(Name.code(target) .. " is killed")
-    end
-  else
-    local half = target:get_max_hp() / 2
-    if target.on_half_hp and before > half and target.hp <= half then
-      target:on_half_hp()
-    end
-  end
+  health.set_hp(target, target.hp - amount)
 end
 
 --- Set HP, update blood cue, handle modifiers
@@ -92,10 +51,52 @@ health.set_hp = function(target, value)
     value = target:modify("hp", value)
   end
 
+  local before = target.hp
   target.hp = value
 
   if target.get_max_hp then
     item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
+  end
+
+  if target.hp > 0 then
+    local half = target:get_max_hp() / 2
+    if target.on_half_hp and before and before > half and target.hp <= half then
+      target:on_half_hp()
+    end
+    return
+  end
+
+  if (before or before > 0) and target.on_death then
+    target:on_death()
+  end
+
+  if target.player_flag then
+    State.mode:player_has_died()
+    return
+  end
+
+  if target.essential_flag then
+    target:animation_freeze("lying")
+    if State:in_combat(target) then
+      State.combat:remove(target)
+    end
+    return
+  end
+
+  if target.inventory then
+    local to_drop = {}
+    for _, slot in ipairs(item.DROPPING_SLOTS) do
+      local this_item = target.inventory[slot]
+      if this_item and not this_item.no_drop_flag then
+        table.insert(to_drop, slot)
+      end
+    end
+    item.drop(target, unpack(to_drop))
+  end
+
+  State:remove(target)
+  if not target.boring_flag then
+    Log.info(Name.code(target) .. " is killed")
   end
 end
 
