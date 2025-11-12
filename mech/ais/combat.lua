@@ -75,6 +75,7 @@ methods.control = function(self, entity)
     end
   end
 
+  api.heal(entity)
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
     tk.preserve_line_of_fire(entity, self.target, self._vision_map)
@@ -83,10 +84,6 @@ methods.control = function(self, entity)
       async.sleep(.66)
     end
   else
-    if entity.hp <= entity:get_max_hp() / 2 then
-      api.heal(entity)
-    end
-
     api.travel(entity, self.target.position, true)
     api.attack(entity, self.target)
   end

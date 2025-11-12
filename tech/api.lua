@@ -1,3 +1,4 @@
+local cleric = require("engine.mech.class.cleric")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
 local async = require("engine.tech.async")
@@ -240,8 +241,23 @@ end
 
 --- @param entity entity
 api.heal = function(entity)
-  if fighter.second_wind:act(entity) then
+  if entity.hp <= entity:get_max_hp() / 2 and fighter.second_wind:act(entity) then
     async.sleep(.2)
+  end
+
+  if cleric.healing_word_base:is_available(entity) then
+    Log.traces(1)
+    for v in Iteration.rhombus(cleric.healing_word_base.radius) do
+      local p = v:add_mut(entity.position)
+      local e = State.grids.solids:slow_get(p)
+      if e and e.hp and e.hp < e:get_max_hp() and State.hostility:get(entity, e) == "ally" then
+        Log.traces(2)
+        if not cleric.healing_word(e):act(entity)
+          or not cleric.healing_word_base:is_available(entity)
+        then break end
+        async.sleep(.2)
+      end
+    end
   end
 end
 
