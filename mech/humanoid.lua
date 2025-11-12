@@ -30,12 +30,20 @@ end
 
 humanoid.add_blood_mark = mark(blood_mark)
 
+humanoid.add_body = function(self)
+  local e = humanoid.add_blood_mark(self)
+  if e then
+    e.body_flag = true
+  end
+  return e
+end
+
 humanoid.mixin = function()
   local result = animated.mixin("engine/assets/sprites/animations/humanoid")
   result.transparent_flag = true
   result.cues = humanoid.cues
-  result.on_death = humanoid.add_blood_mark
   result.on_half_hp = humanoid.add_blood_mark
+  result.on_death = humanoid.add_body
   return result
 end
 

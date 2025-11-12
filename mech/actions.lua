@@ -358,7 +358,11 @@ actions.bow_attack = function(target)
       entity.inventory.hand = arrow
 
       entity:animate("bow_attack"):next(function()
-        if not State:exists(target) then return end
+        if not State:exists(target) then
+          State:remove(entity.inventory.hand)
+          entity.inventory.hand = nil
+          return
+        end
 
         local attack_roll = entity:get_ranged_attack_roll()
         local damage_roll = entity:get_ranged_damage_roll()

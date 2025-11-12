@@ -1,5 +1,5 @@
+local raise_dead = require("engine.mech.spells.raise_dead")
 local healing_word = require("engine.mech.spells.healing_word")
-local cleric = require("engine.mech.class.cleric")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
 local async = require("engine.tech.async")
@@ -244,6 +244,29 @@ end
 api.heal = function(entity)
   if entity.hp <= entity:get_max_hp() / 2 and fighter.second_wind:act(entity) then
     async.sleep(.2)
+  end
+
+  do
+    if raise_dead.base:is_available(entity) then
+      Log.trace("Raise dead is available to %s", entity)
+      for v in Iteration.rhombus(20) do
+        local p = v:add_mut(entity.position)
+        local target = State.grids.marks:slow_get(p)
+        local spell = raise_dead.new(target)
+        if entity.codename:find("priest") and target then
+          Log.traces(Inspect(target))
+        end
+        if spell:is_available(entity) then
+          if not spell:act(entity) then break end
+          async.sleep(.2)
+          if not raise_dead.base:is_available(entity) then
+            break
+          end
+        end
+      end
+    elseif entity.codename:find("priest") then
+      Log.trace("Raise dead is unavailable to %s;\n%s\n%s", entity, Inspect(entity.resources), Inspect(raise_dead.base))
+    end
   end
 
   for spell_level = 2, 1, -1 do
