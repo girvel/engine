@@ -59,6 +59,7 @@ end
 --- @field dice die[]
 --- @field bonus integer
 --- @operator add(d): d
+--- @operator add(integer): d
 --- @operator sub(integer): d
 --- @operator mul(integer): d
 local methods = {}
