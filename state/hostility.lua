@@ -22,9 +22,9 @@ end
 
 --- @param a entity
 --- @param b entity
---- @return hostility # nil by default, "ally" if a == b
+--- @return hostility # nil by default, "ally" if a.faction == b.faction
 methods.get = function(self, a, b)
-  if a == b then return "ally" end
+  if a.faction == b.faction then return "ally" end
   if not a.faction or not b.faction then
     return nil
   end
