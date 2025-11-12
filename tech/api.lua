@@ -246,19 +246,24 @@ api.heal = function(entity)
     async.sleep(.2)
   end
 
-  if healing_word.base:is_available(entity) then
-    Log.traces(1)
-    for v in Iteration.rhombus(healing_word.base.radius) do
+  for spell_level = 2, 1, -1 do
+    local base = healing_word.base(spell_level)
+    if not base:is_available(entity) then goto continue end
+
+    Log.trace("healing_word_%s is available for %s", spell_level, entity)
+    for v in Iteration.rhombus(base.radius) do
       local p = v:add_mut(entity.position)
-      local e = State.grids.solids:slow_get(p)
-      if e and e.hp and e.hp < e:get_max_hp() and State.hostility:get(entity, e) == "ally" then
-        Log.traces(2)
-        if not healing_word.new(e):act(entity)
-          or not healing_word.base:is_available(entity)
+      local target = State.grids.solids:slow_get(p)
+      if target and target.hp and target.hp < target:get_max_hp() and State.hostility:get(entity, target) == "ally" then
+        Log.trace("Cast healing_word_%s on %s", spell_level, target)
+        if not healing_word.new(spell_level, target):act(entity)
+          or not base:is_available(entity)
         then break end
         async.sleep(.2)
       end
     end
+
+    ::continue::
   end
 end
 
