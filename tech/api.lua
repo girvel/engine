@@ -1,3 +1,4 @@
+local healing_word = require("engine.mech.spells.healing_word")
 local cleric = require("engine.mech.class.cleric")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
@@ -245,15 +246,15 @@ api.heal = function(entity)
     async.sleep(.2)
   end
 
-  if cleric.healing_word_base:is_available(entity) then
+  if healing_word.base:is_available(entity) then
     Log.traces(1)
-    for v in Iteration.rhombus(cleric.healing_word_base.radius) do
+    for v in Iteration.rhombus(healing_word.base.radius) do
       local p = v:add_mut(entity.position)
       local e = State.grids.solids:slow_get(p)
       if e and e.hp and e.hp < e:get_max_hp() and State.hostility:get(entity, e) == "ally" then
         Log.traces(2)
-        if not cleric.healing_word(e):act(entity)
-          or not cleric.healing_word_base:is_available(entity)
+        if not healing_word.new(e):act(entity)
+          or not healing_word.base:is_available(entity)
         then break end
         async.sleep(.2)
       end

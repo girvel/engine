@@ -5,8 +5,8 @@ local action = {}
 
 --- @class action
 --- @field cost? table<string, number>
---- @field _is_available? fun(action, table): boolean
---- @field _act? fun(action, table): boolean
+--- @field _is_available? fun(self: action, entity: entity): boolean
+--- @field _act? fun(self: action, entity: entity): boolean
 action.base = {
   is_available = function(self, entity)
     if self.cost

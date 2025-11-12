@@ -35,43 +35,4 @@ cleric.spell_slots = {
   end,
 }
 
-cleric.healing_word_base = Table.extend({
-  name = "Лечащее слово",
-  codename = "healing_word",
-
-  cost = {
-    bonus_actions = 1,
-    spell_slots_1 = 1,
-  },
-
-  range = 40,
-}, action.base)
-
---- @param target entity
-cleric.healing_word = function(target)
-  return Table.extend({}, cleric.healing_word_base, {
-    _is_available = function(self, entity)
-      if not (target
-        and target.hp
-        and target.hp < target:get_max_hp())
-      then return false end
-
-      local result do
-        local vision_map = tcod.map(State.grids.solids)
-        vision_map:refresh_fov(entity.position, cleric.healing_word_base.range)
-        result = vision_map:is_visible_unsafe(unpack(target.position))
-        vision_map:free()
-      end
-
-      return result
-    end,
-
-    --- @param entity entity
-    _act = function(self, entity)
-      health.heal(target, (D(4) + entity:get_modifier("wis")):roll())
-      return true
-    end,
-  })
-end
-
 return cleric
