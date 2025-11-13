@@ -68,15 +68,13 @@ methods.control = function(self, entity)
     return
   end
 
-  local no_target_at_all = not State:exists(self.target)
+  if not State:exists(self.target)
     or api.distance(entity, self.target) > self.targeting.range
-
-  if no_target_at_all
     or api.travel_distance(entity, self.target) > self.targeting.sane_travel_distance
   then
     self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
     if not self.target then
-      if no_target_at_all then
+      if not tk.sees_enemies(entity, self.targeting.scan_range, self._vision_map) then
         State.combat:remove(entity)
       end
       return
