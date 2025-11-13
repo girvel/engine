@@ -50,4 +50,41 @@ describe("Grid library", function()
       assert.are_equal(nil, this_grid:find_free_position(v(3, 3), 2))
     end)
   end)
+
+  -- describe("grid.rhombus", function()
+  --   it("works", function()
+  --     local m = grid.from_matrix({
+  --       {0, 0, 0, 0},
+  --       {0, 0, 0, 0},
+  --       {0, 0, 0, 0},
+  --       {0, 0, 0, 0},
+  --     }, v(4, 4))
+
+  --     local expected_order = {
+  --       v(3, 3),
+  --       v(3, 2),
+  --       v(4, 3),
+  --       v(3, 4),
+  --       v(2, 3),
+  --       v(3, 1),
+  --       v(4, 2),
+  --       v(4, 4),
+  --       v(2, 4),
+  --       v(1, 3),
+  --       v(2, 2),
+  --       v(4, 1),
+  --       v(1, 4),
+  --       v(1, 2),
+  --       v(2, 1),
+  --       v(1, 1),
+  --     }
+
+  --     local counter = 1
+  --     for p, _ in m:rhombus(4, v(3, 3)) do
+  --       print(counter)
+  --       assert.are_equal(expected_order[counter], p)
+  --       counter = counter + 1
+  --     end
+  --   end)
+  -- end)
 end)

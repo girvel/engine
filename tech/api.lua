@@ -486,8 +486,8 @@ end
 --- @return number
 api.travel_distance = function(entity, target)
   target = api.to_vector(target)
-
   if (entity.position - target):abs2() == 1 then return 1 end
+
   local path = api.build_path(entity.position, target)
   if not path then return math.huge end
   if (Table.last(path) - target):abs2() > 1 then return math.huge end

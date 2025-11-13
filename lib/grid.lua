@@ -33,7 +33,7 @@ grid.new = function(size, factory)
 end
 
 --- @param matrix any[][]
---- @param size vector
+--- @param size vector provided, because there could be nils in the base matrix
 --- @return grid
 grid.from_matrix = function(matrix, size)
   local result = grid.new(size)
@@ -119,7 +119,7 @@ grid.mt = {
     if method then return method end
 
     if getmetatable(v) ~= vector.mt then
-      Error("Attempt to index grid with %s which is neither vector nor a method name", v)
+      error(("Attempt to index grid with `%s` which is neither vector nor a method name"):format(v))
     end
 
     assert(self:can_fit(v), ("%s does not fit in grid border %s"):format(v, self.size))
@@ -187,7 +187,6 @@ methods.rect = function(self, x1, y1, x2, y2)
   return function()
     local r1 = x
     local r2 = y
-    local r3 = self:unsafe_get(x, y)
 
     x = x + 1
     if x > x2 then
@@ -199,7 +198,7 @@ methods.rect = function(self, x1, y1, x2, y2)
       return
     end
 
-    return r1, r2, r3
+    return r1, r2, self:unsafe_get(r1, r2)
   end
 end
 
