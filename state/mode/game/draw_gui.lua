@@ -570,7 +570,7 @@ draw_notification = function()
     postfix = "   "
   end
 
-  ui.start_frame(nil, 10, -State.perspective.sidebar_w)
+  ui.start_frame(nil, 10)
   ui.start_font(32)
   ui.start_alignment("center")
     ui.text(prefix .. text .. postfix)
