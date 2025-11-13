@@ -39,6 +39,9 @@ local draw_entity = function(self, entity, dt)
   elseif sprite.type == "text" then
     love.graphics.setFont(sprite.font)
     love.graphics.print({sprite.color, sprite.text}, x, y)
+  elseif sprite.type == "rendered" then
+    local drawable = sprite:render(entity, dt)
+    love.graphics.draw(drawable, x, y, 0, State.perspective.SCALE)
   else
     Error("Unknown sprite type %q", sprite.type)
   end

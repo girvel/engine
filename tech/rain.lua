@@ -6,16 +6,14 @@ local rain = {}
 
 --- @alias rain rain_strict|table
 --- @class rain_strict: entity_strict
---- @field ai rain_ai
+--- @field _rain_state rain_state
 --- @field rain_density number
 --- @field rain_speed number
 
---- @alias rain_ai rain_ai_strict|table
---- @class rain_ai_strict: ai_strict
+--- @class rain_state
 --- @field _particles particle[]
 --- @field _player_position vector
-local ai_methods = {}
-rain.ai_mt = {__index = ai_methods}
+--- @field _canvas love.Canvas
 
 --- @class particle
 --- @field position vector in pixels (before scaling)
@@ -33,19 +31,17 @@ rain.new = function(density, speed)
     position = Vector.one,
     layer = "weather",
     sprite = {
-      type = "image",
-      image = love.graphics.newCanvas(unpack(State.level.grid_size * Constants.cell_size)),
-      anchors = {},
-      color = Vector.white,
+      type = "rendered",
+      render = rain.render,
     },
 
     rain_density = density,
     rain_speed = speed,
-
-    ai = setmetatable({
+    _rain_state = {
       _particles = {},
       _player_position = nil,
-    }, rain.ai_mt),
+      _canvas = love.graphics.newCanvas(unpack(State.level.grid_size * Constants.cell_size)),
+    },
   }
 end
 
@@ -53,8 +49,13 @@ local BUFFER_K = 2
 local DIRECTION = V(1, 1):normalized_mut()
 local IMAGE = love.graphics.newImage("assets/sprites/standalone/rain_particle.png")
 
+--- @param self sprite_rendered
 --- @param entity rain
-ai_methods.observe = function(self, entity, dt)
+--- @param dt number
+--- @return love.Canvas
+rain.render = function(self, entity, dt)
+  local state = entity._rain_state
+
   local start, finish do
     local original_start = State.perspective.vision_start * Constants.cell_size
     local original_finish = (State.perspective.vision_end + Vector.one) * Constants.cell_size
@@ -74,8 +75,8 @@ ai_methods.observe = function(self, entity, dt)
   local velocity = DIRECTION * entity.rain_speed * Constants.cell_size
 
   local did_vision_change do
-    did_vision_change = self._player_position ~= State.player.position
-    self._player_position = State.player.position
+    did_vision_change = state._player_position ~= State.player.position
+    state._player_position = State.player.position
   end
 
   while State.period:absolute(life_time / entity.rain_density / cells_n, self, "emit_rain") do
@@ -87,7 +88,7 @@ ai_methods.observe = function(self, entity, dt)
     local e = State.grids.solids[target_cell]
     if e and not e.transparent_flag or State.rails:is_indoors(target_cell) then goto continue end
 
-    table.insert(self._particles, {
+    table.insert(state._particles, {
       position = target - DIRECTION * d,
       target_cell = target_cell,
       life_time = life_time,
@@ -97,10 +98,10 @@ ai_methods.observe = function(self, entity, dt)
     ::continue::
   end
 
-  love.graphics.setCanvas(entity.sprite.image)
+  love.graphics.setCanvas(state._canvas)
     love.graphics.clear(Vector.transparent)
 
-    for _, p in ipairs(self._particles) do
+    for _, p in ipairs(state._particles) do
       p.position = p.position + velocity * dt
       p.life_time = p.life_time - dt
       if did_vision_change then
@@ -111,17 +112,18 @@ ai_methods.observe = function(self, entity, dt)
       end
     end
 
-    for i = #self._particles, 1, -1 do
-      local p = self._particles[i]
+    for i = #state._particles, 1, -1 do
+      local p = state._particles[i]
       if p.life_time <= 0 then
-        Table.remove_breaking_at(self._particles, i)
+        Table.remove_breaking_at(state._particles, i)
         if p.is_visible then
           animated.add_fx("assets/sprites/animations/rain_impact", p.position / Constants.cell_size, "weather")
         end
       end
     end
   love.graphics.setCanvas()
+  return state._canvas
 end
 
-Ldump.mark(rain, {mt = "const"}, ...)
+Ldump.mark(rain, {render = {}}, ...)
 return rain

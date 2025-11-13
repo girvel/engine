@@ -5,7 +5,11 @@ local sprite = {utility = {}}
 
 local pull_anchors, cut_out
 
---- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid
+--- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid | sprite_rendered
+
+--- @class sprite_rendered
+--- @field type "rendered"
+--- @field render fun(self: sprite_rendered, entity: entity, dt: number): love.Drawable
 
 --- @class sprite_image
 --- @field type "image"
