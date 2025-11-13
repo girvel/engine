@@ -24,7 +24,7 @@ local DEFAULT_TARGETING = {
   scan_range = 10,
   support_range = 15,
   range = 20,
-  sane_travel_distance = 30,  -- 2.5 turns
+  sane_traveling_distance = 30,  -- 2.5 turns
 }
 
 --- @param targeting? ai_targeting_optional
@@ -70,7 +70,7 @@ methods.control = function(self, entity)
 
   if not State:exists(self.target)
     or api.distance(entity, self.target) > self.targeting.range
-    or api.travel_distance(entity, self.target) > self.targeting.sane_travel_distance
+    or api.traveling_distance(entity, self.target) > self.targeting.sane_traveling_distance
   then
     self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
     if not self.target then
@@ -82,15 +82,18 @@ methods.control = function(self, entity)
   end
 
   tk.heal(entity)
+
+  local speed = #State.combat.list > 8 and 9 or 7
+
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
-    tk.preserve_line_of_fire(entity, self.target, self._vision_map)
+    tk.preserve_line_of_fire(entity, self.target, self._vision_map, speed)
     local bow_attack = actions.bow_attack(self.target)
     while bow_attack:act(entity) do
       async.sleep(.66)
     end
   else
-    api.travel(entity, self.target.position, true)
+    api.travel(entity, self.target.position, true, speed)
     api.attack(entity, self.target)
   end
 end

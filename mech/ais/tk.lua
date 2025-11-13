@@ -12,7 +12,7 @@ local tk = {}
 --- @param r number
 --- @param vision_map tcod_map
 --- @return entity?
-tk.find_target = function(entity, r, vision_map, sane_travel_distance)
+tk.find_target = function(entity, r, vision_map, sane_traveling_distance)
   vision_map:refresh_fov(entity.position, r)
   local bfs = State.grids.solids:bfs(entity.position)
   bfs()
@@ -25,7 +25,7 @@ tk.find_target = function(entity, r, vision_map, sane_travel_distance)
       and e.hp and e.hp > 0
       and vision_map:is_visible_unsafe(unpack(e.position))
       and (not State.runner.locked_entities[e])
-      and api.travel_distance(entity, e) < (sane_travel_distance or 100)
+      and api.traveling_distance(entity, e) < (sane_traveling_distance or 100)
     then
       return e
     end
@@ -38,7 +38,7 @@ end
 --- @param r number
 --- @param vision_map tcod_map
 --- @return boolean
-tk.sees_enemies = function(entity, r, vision_map, sane_travel_distance)
+tk.sees_enemies = function(entity, r, vision_map, sane_traveling_distance)
   vision_map:refresh_fov(entity.position, r)
   for d in Iteration.rhombus(r) do
     local e = State.grids.solids:slow_get(entity.position + d)
@@ -57,7 +57,7 @@ end
 --- @param entity entity
 --- @param target entity
 --- @param vision_map tcod_map
-tk.preserve_line_of_fire = function(entity, target, vision_map)
+tk.preserve_line_of_fire = function(entity, target, vision_map, speed)
   local best_p
   for d in Iteration.rhombus(entity.resources.movement) do
     local p = entity.position + d
@@ -75,9 +75,9 @@ tk.preserve_line_of_fire = function(entity, target, vision_map)
   end
 
   if best_p then
-    api.travel(entity, best_p, true)
+    api.travel(entity, best_p, true, speed)
   else
-    api.travel(entity, target.position, true)
+    api.travel(entity, target.position, true, speed)
   end
 end
 
@@ -130,14 +130,14 @@ end
 --- @field scan_range number radius in which to search for target
 --- @field support_range number radius in which to support members of the faction in combat
 --- @field range number radius in which to continue targeting a single entity
---- @field sane_travel_distance number max travel distance to follow a target
+--- @field sane_traveling_distance number max travel distance to follow a target
 
 --- @class ai_targeting_optional
 --- @field scan_period? number time period determining target search frequency
 --- @field scan_range? number radius in which to search for target
 --- @field support_range? number radius in which to support members of the faction in combat
 --- @field range? number radius in which to continue targeting a single entity
---- @field sane_travel_distance? number max travel distance to follow a target
+--- @field sane_traveling_distance? number max travel distance to follow a target
 
 Ldump.mark(tk, {}, ...)
 return tk

@@ -143,11 +143,6 @@ end
 --- @param speed? number
 --- @return boolean
 api.travel = function(entity, destination, uses_dash, speed)
-  if entity.position == destination or (
-    State.grids.solids:slow_get(destination, true)
-    and (entity.position - destination):abs2() == 1)
-  then return true end
-
   local path = api.build_path(entity.position, destination)
   if not path then return false end
   return api.follow_path(entity, path, uses_dash, speed)
@@ -163,7 +158,7 @@ end)
 api.build_path = function(start, destination)
   destination = api.to_vector(destination)
 
-  local possible_destinations = {unpack(Vector.extended_directions)}
+  local possible_destinations = {unpack(Vector.directions)}
   table.sort(possible_destinations, function(a, b)
     local abs_a = a:abs2()
     local abs_b = b:abs2()
@@ -178,6 +173,7 @@ api.build_path = function(start, destination)
   local path
   for _, d in ipairs(possible_destinations) do
     local p = destination + d
+    if p == start then return {} end
     if State.grids.solids:can_fit(p) then
       path = vision_map():find_path(start, destination + d)
       if #path > 0 then
@@ -195,6 +191,9 @@ end
 --- @return boolean
 api.follow_path = function(entity, path, uses_dash, speed)
   speed = speed or entity.speed or 5
+  if uses_dash and #path > 6 then
+    speed = speed * 1.5
+  end
 
   for _, position in ipairs(path) do
     if entity.resources.movement <= 0 and not (uses_dash and actions.dash:act(entity)) then
@@ -484,7 +483,7 @@ end
 --- @param entity entity
 --- @param target entity|vector
 --- @return number
-api.travel_distance = function(entity, target)
+api.traveling_distance = function(entity, target)
   target = api.to_vector(target)
   if (entity.position - target):abs2() == 1 then return 1 end
 
