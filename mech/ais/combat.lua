@@ -24,6 +24,7 @@ local DEFAULT_TARGETING = {
   scan_range = 10,
   support_range = 15,
   range = 20,
+  sane_travel_distance = 30,  -- 2.5 turns
 }
 
 --- @param targeting? ai_targeting_optional
@@ -67,10 +68,17 @@ methods.control = function(self, entity)
     return
   end
 
-  if not State:exists(self.target) or api.distance(entity, self.target) > self.targeting.range then
+  local no_target_at_all = not State:exists(self.target)
+    or api.distance(entity, self.target) > self.targeting.range
+
+  if no_target_at_all
+    or api.travel_distance(entity, self.target) > self.targeting.sane_travel_distance
+  then
     self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
     if not self.target then
-      State.combat:remove(entity)
+      if no_target_at_all then
+        State.combat:remove(entity)
+      end
       return
     end
   end

@@ -7,9 +7,12 @@ local sound = require("engine.tech.sound")
 local fighter = require("engine.mech.class.fighter")
 
 
+--- API for asynchronous scripting, both AI and rails
+local api = {}
+
 --- @param x entity|vector
 --- @return vector
-local to_vector = function(x)
+api.to_vector = function(x)
   if getmetatable(x) ~= Vector.mt then
     if not x.position then
       Error("Entity %s has no position", x)
@@ -19,9 +22,6 @@ local to_vector = function(x)
   return x
 end
 
-
---- API for asynchronous scripting, both AI and rails
-local api = {}
 
 --- @param secs number
 --- @return promise, scene
@@ -96,7 +96,7 @@ end
 --- @param destination vector|entity
 --- @return promise, scene
 api.travel_scripted = function(entity, destination, speed)
-  destination = to_vector(destination)
+  destination = api.to_vector(destination)
 
   local promise, scene = State.runner:run_task(function()
     local ok = api.travel_persistent(
@@ -158,9 +158,11 @@ local vision_map = Memoize(function()
 end)
 
 --- @param start vector
---- @param destination vector
+--- @param destination vector|entity
 --- @return vector[]?
 api.build_path = function(start, destination)
+  destination = api.to_vector(destination)
+
   local possible_destinations = {unpack(Vector.extended_directions)}
   table.sort(possible_destinations, function(a, b)
     local abs_a = a:abs2()
@@ -463,7 +465,7 @@ end
 --- @param target vector|entity
 --- @return boolean
 api.is_visible = function(target)
-  target = to_vector(target):map(math.floor)
+  target = api.to_vector(target):map(math.floor)
 
   if not (
     State.perspective.vision_start <= target
@@ -477,6 +479,17 @@ api.is_visible = function(target)
 
   if not State.grids.solids:can_fit(target) then return false end
   return player_vision:is_visible_unsafe(unpack(target))
+end
+
+--- @param entity entity
+--- @param target entity|vector
+--- @return number
+api.travel_distance = function(entity, target)
+  target = api.to_vector(target)
+  local path = api.build_path(entity.position, target)
+  if not path then return math.huge end
+  if (Table.last(path) - target):abs2() > 1 then return math.huge end
+  return #path
 end
 
 --- @param path string
@@ -495,8 +508,8 @@ end
 --- @param b entity|vector
 --- @return number
 api.distance = function(a, b)
-  a = to_vector(a)
-  b = to_vector(b)
+  a = api.to_vector(a)
+  b = api.to_vector(b)
   return (a - b):abs2()
 end
 
