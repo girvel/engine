@@ -37,7 +37,6 @@ return Tiny.processingSystem {
   _no_aggression_rounds = 0,
   _was_there_aggression = false,
   _sub = nil,
-  _was_there_combat = false,
 
   onAdd = function(self, entity)
     if entity.ai.init then
@@ -74,7 +73,7 @@ return Tiny.processingSystem {
       current = State.combat:get_current()
       if not current or State:exists(current) then break end
       -- in coherent code should always break here on the first iteration
-      State.combat:remove(current)
+      State:remove_from_combat(current)
     end
 
     if Fun.iter(State.combat.list)
@@ -121,7 +120,6 @@ return Tiny.processingSystem {
   postProcess = function(self, dt)
     State.stats.active_ais = self._active_ais
     State.stats.ai_frame_time = love.timer.getTime() - self._start_time
-    self._was_there_combat = not not State.combat
   end,
 
   _move_start_t = nil,
@@ -143,7 +141,7 @@ return Tiny.processingSystem {
       return
     end
 
-    if not ai._control_coroutine or not self._was_there_combat then
+    if not ai._control_coroutine then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
       self._move_start_t = love.timer.getTime()
     end
@@ -214,7 +212,7 @@ return Tiny.processingSystem {
       return
     end
 
-    if not ai._control_coroutine or self._was_there_combat then
+    if not ai._control_coroutine then
       ai._control_coroutine = Common.nil_serialized(coroutine.create(ai.control))
     end
 

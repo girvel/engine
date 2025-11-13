@@ -126,7 +126,7 @@ methods.flush = function(self)
     end
 
     if self.combat then
-      self.combat:remove(entity)
+      self:remove_from_combat(entity)
     end
   end
   self._entities_to_remove = {}
@@ -257,6 +257,16 @@ methods.start_combat = function(self, list)
       State.combat = combat.new(list)
     end
   end, "start_combat")
+end
+
+--- @param entity entity
+methods.remove_from_combat = function(self, entity)
+  assert(self.combat)
+
+  State.combat:remove(entity)
+  if entity.ai then
+    entity.ai._control_coroutine = nil
+  end
 end
 
 --- @param entity entity

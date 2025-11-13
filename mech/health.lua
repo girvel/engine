@@ -78,7 +78,7 @@ health.set_hp = function(target, value)
   if target.essential_flag then
     target:animation_freeze("lying")
     if State:in_combat(target) then
-      State.combat:remove(target)
+      State:remove_from_combat(target)
     end
     return
   end

@@ -75,7 +75,7 @@ methods.control = function(self, entity)
     self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
     if not self.target then
       if not tk.sees_enemies(entity, self.targeting.scan_range, self._vision_map) then
-        State.combat:remove(entity)
+        State:remove_from_combat(entity)
       end
       return
     end
