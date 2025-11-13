@@ -1,3 +1,5 @@
+local api = require("engine.tech.api")
+local animated = require("engine.tech.animated")
 local health = require("engine.mech.health")
 local tcod = require("engine.tech.tcod")
 local action = require("engine.tech.action")
@@ -55,7 +57,12 @@ methods._is_available = function(self, entity)
 end
 
 methods._act = function(self, entity)
-  health.heal(self.target, (D(4) * self.level + entity:get_modifier("wis")):roll())
+  api.rotate(entity, self.target)
+  entity:animate("gesture"):next(function()
+    health.heal(self.target, (D(4) * self.level + entity:get_modifier("wis")):roll())
+    animated.add_fx("engine/assets/sprites/animations/second_wind", self.target.position)
+  end)
+  animated.add_fx("engine/assets/sprites/animations/healing_word_spell", entity.position)
   return true
 end
 

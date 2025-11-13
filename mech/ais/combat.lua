@@ -75,7 +75,7 @@ methods.control = function(self, entity)
     end
   end
 
-  api.heal(entity)
+  tk.heal(entity)
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
     tk.preserve_line_of_fire(entity, self.target, self._vision_map)

@@ -1,3 +1,7 @@
+local healing_word = require("engine.mech.spells.healing_word")
+local raise_dead = require("engine.mech.spells.raise_dead")
+local fighter = require("engine.mech.class.fighter")
+local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
 local api = require("engine.tech.api")
 
@@ -49,6 +53,57 @@ tk.preserve_line_of_fire = function(entity, target, vision_map)
     api.travel(entity, target.position, true)
   end
 end
+
+--- @async
+--- @param entity entity
+tk.heal = function(entity)
+  if entity.hp <= entity:get_max_hp() / 2 and fighter.second_wind:act(entity) then
+    async.sleep(.2)
+  end
+
+  do
+    if raise_dead.base:is_available(entity) then
+      Log.trace("Raise dead is available to %s", entity)
+      for v in Iteration.rhombus(20) do
+        local p = v:add_mut(entity.position)
+        local target = State.grids.marks:slow_get(p)
+        local spell = raise_dead.new(target)
+        if entity.codename:find("priest") and target then
+          Log.traces(Inspect(target))
+        end
+        if spell:is_available(entity) then
+          if not spell:act(entity) then break end
+          entity.animation._end_promise:wait()
+          if not raise_dead.base:is_available(entity) then
+            break
+          end
+        end
+      end
+    elseif entity.codename:find("priest") then
+      Log.trace("Raise dead is unavailable to %s;\n%s\n%s", entity, Inspect(entity.resources), Inspect(raise_dead.base))
+    end
+  end
+
+  for spell_level = 2, 1, -1 do
+    local base = healing_word.base(spell_level)
+    if not base:is_available(entity) then goto continue end
+
+    Log.trace("healing_word_%s is available for %s", spell_level, entity)
+    for v in Iteration.rhombus(base.radius) do
+      local p = v:add_mut(entity.position)
+      local target = State.grids.solids:slow_get(p)
+      if target and target.hp and target.hp < target:get_max_hp() and State.hostility:get(entity, target) == "ally" then
+        Log.trace("Cast healing_word_%s on %s", spell_level, target)
+        if not healing_word.new(spell_level, target):act(entity) then break end
+        entity.animation._end_promise:wait()
+        if not base:is_available(entity) then break end
+      end
+    end
+
+    ::continue::
+  end
+end
+
 
 --- @class ai_targeting
 --- @field scan_period number time period determining target search frequency
