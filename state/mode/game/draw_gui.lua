@@ -583,6 +583,7 @@ end
 
 draw_suggestion = function()
   if State.runner.locked_entities[State.player] then return end
+  if not actions.interact:is_available(State.player) then return end
   local target = interactive.get_for(State.player)  --[[@as item]]
   if not target then return end
 
