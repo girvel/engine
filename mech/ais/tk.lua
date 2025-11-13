@@ -1,5 +1,5 @@
 local healing_word = require("engine.mech.spells.healing_word")
-local raise_dead = require("engine.mech.spells.raise_dead")
+local animate_dead = require("engine.mech.spells.animate_dead")
 local fighter = require("engine.mech.class.fighter")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
@@ -62,25 +62,25 @@ tk.heal = function(entity)
   end
 
   do
-    if raise_dead.base:is_available(entity) then
+    if animate_dead.base:is_available(entity) then
       Log.trace("Raise dead is available to %s", entity)
       for v in Iteration.rhombus(20) do
         local p = v:add_mut(entity.position)
         local target = State.grids.marks:slow_get(p)
-        local spell = raise_dead.new(target)
+        local spell = animate_dead.new(target)
         if entity.codename:find("priest") and target then
           Log.traces(Inspect(target))
         end
         if spell:is_available(entity) then
           if not spell:act(entity) then break end
           entity.animation._end_promise:wait()
-          if not raise_dead.base:is_available(entity) then
+          if not animate_dead.base:is_available(entity) then
             break
           end
         end
       end
     elseif entity.codename:find("priest") then
-      Log.trace("Raise dead is unavailable to %s;\n%s\n%s", entity, Inspect(entity.resources), Inspect(raise_dead.base))
+      Log.trace("Raise dead is unavailable to %s;\n%s\n%s", entity, Inspect(entity.resources), Inspect(animate_dead.base))
     end
   end
 
