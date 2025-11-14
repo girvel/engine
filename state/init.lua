@@ -33,27 +33,30 @@ local state = {}
 --- @field _entities table<entity, true>
 --- @field _entities_to_add entity[]
 --- @field _entities_to_remove [entity, boolean][]
+--- @field _travel_map tcod_map
 local methods = {}
 state.mt = {__index = methods}
+
+--- @param self state
+local replace_modules = function(self)
+  self.mode = require("engine.state.mode").new()
+  self.runner = require("engine.state.runner").new()
+  self.perspective = require("engine.state.perspective").new()
+  self.quests = require("engine.state.quests").new()
+  self.hostility = require("engine.state.hostility").new()
+  self.audio = require("engine.state.audio").new()
+  self.debug_overlay = require("engine.state.debug_overlay").new(self.debug)
+  self.period = require("engine.state.period").new()
+  self.uid = require("engine.state.uid").new()
+  self.stats = require("engine.state.stats").new()
+end
 
 --- @param systems table[]
 --- @return state
 state.new = function(systems, args)
-  return setmetatable({
-    mode = require("engine.state.mode").new(),
-    runner = require("engine.state.runner").new(),
-    perspective = require("engine.state.perspective").new(),
-    quests = require("engine.state.quests").new(),
-    hostility = require("engine.state.hostility").new(),
-    audio = require("engine.state.audio").new(),
-    debug_overlay = require("engine.state.debug_overlay").new(args.debug),
-    period = require("engine.state.period").new(),
-    uid = require("engine.state.uid").new(),
-    stats = require("engine.state.stats").new(),
+  local result = setmetatable({
     debug = args.debug,
-
     args = args,
-
     is_loaded = false,
 
     _world = Tiny.world(unpack(systems)),
@@ -61,6 +64,9 @@ state.new = function(systems, args)
     _entities_to_add = {},
     _entities_to_remove = {},
   }, state.mt)
+
+  replace_modules(result)
+  return result
 end
 
 --- Schedules entity to be added
@@ -150,10 +156,10 @@ methods.reset = function(self)
   Log.info("State:reset()")
   local to_remove = Table.shallow_copy(self._entities)
   for e, _ in pairs(to_remove) do
-    State:remove(e, true)
+    self:remove(e, true)
   end
-
-  self.audio:reset()
+  self:flush()
+  replace_modules(self)
 end
 
 --- @async
@@ -184,6 +190,7 @@ methods.load_level = function(self, path)
     self.grids.solids,
     "Missing \"solids\" grid_layer; required for FOV and pathing to work"
   ))
+  self._travel_map = tcod.map(self.grids.solids)
 
   for layer, grid in pairs(self.grids) do
     State:add({

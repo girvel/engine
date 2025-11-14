@@ -148,10 +148,6 @@ api.travel = function(entity, destination, uses_dash, speed)
   return api.follow_path(entity, path, uses_dash, speed)
 end
 
-local vision_map = Memoize(function()
-  return tcod.map(State.grids.solids)
-end)
-
 --- @param start vector
 --- @param destination vector|entity
 --- @return vector[]?
@@ -175,7 +171,7 @@ api.build_path = function(start, destination)
     local p = destination + d
     if p == start then return {} end
     if State.grids.solids:can_fit(p) then
-      path = vision_map():find_path(start, destination + d)
+      path = State._travel_map:find_path(start, destination + d)
       if #path > 0 then
         return path
       end
