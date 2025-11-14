@@ -26,7 +26,6 @@ local rain = {}
 --- @return rain
 rain.new = function(density, speed)
   return {
-    non_positional_ai_flag = true,
     codename = "rain_emitter",
     position = Vector.one,
     layer = "weather",
