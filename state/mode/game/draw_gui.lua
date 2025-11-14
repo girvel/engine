@@ -384,7 +384,7 @@ draw_move_order = function()
       ui.br()
     end
 
-    for i, e in ipairs(State.combat.list) do
+    local draw_item = function(i, e)
       ui.start_line()
         if State.combat.current_i == i then
           ui.text("x ")
@@ -400,6 +400,26 @@ draw_move_order = function()
           ui.text(Name.game(e))
         love.graphics.setColor(Vector.white)
       ui.finish_line()
+    end
+
+    local list = State.combat.list
+    if #list <= 8 then
+      for i, e in ipairs(list) do
+        draw_item(i, e)
+      end
+    else
+      local pivot = math.ceil(#list / 2)
+
+      local frame = ui.get_frame()
+      ui.start_frame(frame.w / 2)
+        for i = pivot + 1, #list do
+          draw_item(i, list[i])
+        end
+      ui.finish_frame()
+
+      for i = 1, pivot do
+        draw_item(i, list[i])
+      end
     end
   tk.finish_block(start)
 end
