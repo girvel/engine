@@ -12,9 +12,10 @@ return function(factory, grid_layer)
       local p = d:add_mut(self.position)
       if not State.grids.tiles:can_fit(p) then goto continue end
 
-      if State.grids[grid_layer][p]
-        or State.grids.solids[p]
-      then goto continue end
+      if State.grids[grid_layer][p] then goto continue end
+
+      local solid = State.grids.solids[p]
+      if solid and solid ~= self and not solid.transparent_flag then goto continue end
 
       final_position = p
       do break end
