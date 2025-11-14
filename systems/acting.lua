@@ -148,7 +148,7 @@ return Tiny.processingSystem {
 
     async.resume(ai._control_coroutine, ai, entity)
 
-    if coroutine.status(ai._control_coroutine) == "dead" then
+    if not ai._control_coroutine or coroutine.status(ai._control_coroutine) == "dead" then
       self:_pass_turn()
     end
   end,
@@ -218,7 +218,7 @@ return Tiny.processingSystem {
 
     async.resume(ai._control_coroutine, ai, entity, dt)
 
-    if coroutine.status(ai._control_coroutine) == "dead" then
+    if not ai._control_coroutine or coroutine.status(ai._control_coroutine) == "dead" then
       ai._control_coroutine = nil
       if entity.rest then
         entity:rest("move")
