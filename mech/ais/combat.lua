@@ -23,11 +23,11 @@ local DEFAULT_TARGETING = {
   scan_period = .5,
   scan_range = 10,
   support_range = 15,
-  range = 20,
+  follow_range = 20,
   sane_traveling_distance = 30,  -- 2.5 turns
 }
 
---- @param targeting? ai_targeting_optional
+--- @param targeting? table
 --- @return combat_ai
 combat_ai.new = function(targeting)
   return setmetatable({
@@ -69,7 +69,7 @@ methods.control = function(self, entity)
   end
 
   if not State:exists(self.target)
-    or api.distance(entity, self.target) > self.targeting.range
+    or api.distance(entity, self.target) > self.targeting.follow_range
     or api.traveling_distance(entity, self.target) > self.targeting.sane_traveling_distance
   then
     self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)

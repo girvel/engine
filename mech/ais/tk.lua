@@ -128,16 +128,9 @@ end
 --- @class ai_targeting
 --- @field scan_period number time period determining target search frequency
 --- @field scan_range number radius in which to search for target
+--- @field follow_range number radius in which to continue targeting a single entity
+--- @field sane_traveling_distance number max travel distance to select/follow a target
 --- @field support_range number radius in which to support members of the faction in combat
---- @field range number radius in which to continue targeting a single entity
---- @field sane_traveling_distance number max travel distance to follow a target
-
---- @class ai_targeting_optional
---- @field scan_period? number time period determining target search frequency
---- @field scan_range? number radius in which to search for target
---- @field support_range? number radius in which to support members of the faction in combat
---- @field range? number radius in which to continue targeting a single entity
---- @field sane_traveling_distance? number max travel distance to follow a target
 
 Ldump.mark(tk, {}, ...)
 return tk

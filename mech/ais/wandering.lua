@@ -21,7 +21,7 @@ wandering.mt = {__index = methods}
 local DEFAULT_TARGETING = {
   scan_period = .5,
   scan_range = 10,
-  range = 20,
+  follow_range = 20,
   support_range = 0,
 }
 
@@ -57,7 +57,7 @@ end
 --- @param entity entity
 --- @param dt number
 methods.observe = function(self, entity, dt)
-  if (not self._target or (self._target.position - entity.position):abs2() > self.targeting.range)
+  if (not self._target or (self._target.position - entity.position):abs2() > self.targeting.follow_range)
     and State.period:absolute(self.targeting.scan_period, self, "target_scan")
   then
     self._target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
