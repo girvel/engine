@@ -136,8 +136,7 @@ return Tiny.processingSystem {
     if entity ~= current then return end
 
     if not ai.control then
-      self:_update_conditions(entity, 6)
-      State.combat:_pass_turn()
+      self:_pass_turn()
       return
     end
 
@@ -148,7 +147,9 @@ return Tiny.processingSystem {
 
     async.resume(ai._control_coroutine, ai, entity)
 
-    if not ai._control_coroutine or coroutine.status(ai._control_coroutine) == "dead" then
+    if (not ai._control_coroutine or coroutine.status(ai._control_coroutine) == "dead")
+      and State.combat:get_current() == entity
+    then
       self:_pass_turn()
     end
   end,
