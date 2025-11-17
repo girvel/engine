@@ -412,7 +412,9 @@ actions.interact = Table.extend({
 
   _act = function(self, entity)
     entity:animate("interact"):next(function()
-      assert(interactive.get_for(entity)):interact(entity)
+      local target = interactive.get_for(entity)
+      if not target then return end
+      target:interact(entity)
     end)
     return true
   end,
