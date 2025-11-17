@@ -233,7 +233,7 @@ map_methods.find_path = function(self, origin, destination)
 end
 
 ----------------------------------------------------------------------------------------------------
--- [SECTION] C backend
+-- [SECTION] Serialization
 ----------------------------------------------------------------------------------------------------
 
 -- Serialization order is important. tcod_map is deserialized partially (when deserialized by
@@ -261,6 +261,7 @@ tcod.observer_mt.__serialize = function(self)
 
   return function()
     local result = tcod.observer(grid)
+    result._maps = maps  --- @diagnostic disable-line:inject-field
     for map in pairs(maps) do
       map._parent = result
       map._map = tcod._c.TCOD_map_new(unpack(grid.size))
