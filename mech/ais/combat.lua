@@ -61,6 +61,34 @@ methods.deinit = function(self, entity)
   self._vision_map:free()
 end
 
+local get_speed = function() return #State.combat.list > 8 and 9 or 7 end
+
+--- @param entity entity
+methods._target_search = function(self, entity)
+  if State:exists(self.target)
+    and api.distance(entity, self.target) <= self.targeting.follow_range
+    and api.traveling_distance(entity, self.target) >= self.targeting.sane_traveling_distance
+  then return end
+
+  self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+  if self.target then return end
+
+  for _, e in ipairs(State.combat.list) do
+    if State.hostility:get(entity, e) == "ally"
+      and e.ai and e.ai.target
+    then
+      if not api.travel(entity, e.position, true, get_speed()) then break end
+
+      self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+      if self.target then return end
+    end
+  end
+
+  if not tk.sees_enemies(entity, self.targeting.scan_range, self._vision_map) then
+    State:remove_from_combat(entity)
+  end
+end
+
 --- @param entity entity
 methods.control = function(self, entity)
   if not State.combat or State.runner.locked_entities[State.player] then
@@ -68,32 +96,19 @@ methods.control = function(self, entity)
     return
   end
 
-  if not State:exists(self.target)
-    or api.distance(entity, self.target) > self.targeting.follow_range
-    or api.traveling_distance(entity, self.target) > self.targeting.sane_traveling_distance
-  then
-    self.target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
-    if not self.target then
-      if not tk.sees_enemies(entity, self.targeting.scan_range, self._vision_map) then
-        State:remove_from_combat(entity)
-      end
-      return
-    end
-  end
-
   tk.heal(entity)
-
-  local speed = #State.combat.list > 8 and 9 or 7
+  self:_target_search(entity)
+  if not self.target then return end
 
   local bow = entity.inventory.offhand
   if bow and bow.tags.ranged then
-    tk.preserve_line_of_fire(entity, self.target, self._vision_map, speed)
+    tk.preserve_line_of_fire(entity, self.target, self._vision_map, get_speed())
     local bow_attack = actions.bow_attack(self.target)
     while bow_attack:act(entity) do
       async.sleep(.66)
     end
   else
-    api.travel(entity, self.target.position, true, speed)
+    api.travel(entity, self.target.position, true, get_speed())
     api.attack(entity, self.target)
   end
 end
