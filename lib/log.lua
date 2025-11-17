@@ -80,7 +80,61 @@ log.traces = function(...)
   for i, v in ipairs(to_log) do
     to_log[i] = tostring(v)
   end
-  _log("trace", 0, table.concat(to_log, " "))
+  _log("trace", 1, table.concat(to_log, " "))
+  return ...
+end
+
+--- @param line string
+--- @return string
+local extract_expr = function(line)
+  local a, b = line:find(".tracel(", 1, true)
+  if not a then return line end
+
+  local depth = 1
+  local expr = ""
+  for i = b + 1, #line do
+    local char = line:sub(i, i)
+    if char == ")" then
+      depth = depth - 1
+      if depth == 0 then return expr end
+    elseif char == "(" then
+      depth = depth + 1
+    end
+
+    expr = expr .. char
+  end
+
+  return expr
+end
+
+--- @generic T
+--- @param ... T
+--- @return T
+log.tracel = function(...)
+  local repr do
+    local to_log = {pretty(...)}
+    for i, v in ipairs(to_log) do
+      to_log[i] = tostring(v)
+    end
+    repr = table.concat(to_log, " ")
+  end
+
+  local info = debug.getinfo(2)
+  if love.filesystem.getInfo(info.short_src) then
+    local source = love.filesystem.read(info.short_src)
+    if source then
+      local lines = source:split("\n", true)
+      local expr = extract_expr(lines[info.currentline])
+      if select("#", ...) == 1 then
+        log.log("trace", 1, "%s: %s", expr, repr)
+      else
+        log.log("trace", 1, "(%s): (%s)", expr, repr)
+      end
+      return ...
+    end
+  end
+
+  _log("trace", 1, repr)
   return ...
 end
 
@@ -89,7 +143,7 @@ end
 --- @param ... T
 --- @return T
 log.trace = function(fmt, ...)
-  return log.log("trace", 0, fmt, ...)
+  return log.log("trace", 1, fmt, ...)
 end
 
 --- @generic T
@@ -97,7 +151,7 @@ end
 --- @param ... T
 --- @return T
 log.debug = function(fmt, ...)
-  return log.log("debug", 0, fmt, ...)
+  return log.log("debug", 1, fmt, ...)
 end
 
 --- @generic T
@@ -105,7 +159,7 @@ end
 --- @param ... T
 --- @return T
 log.info = function(fmt, ...)
-  return log.log("info", 0, fmt, ...)
+  return log.log("info", 1, fmt, ...)
 end
 
 --- @generic T
@@ -113,7 +167,7 @@ end
 --- @param ... T
 --- @return T
 log.warn = function(fmt, ...)
-  return log.log("warn", 0, fmt, ...)
+  return log.log("warn", 1, fmt, ...)
 end
 
 --- @generic T
@@ -121,7 +175,7 @@ end
 --- @param ... T
 --- @return T
 log.error = function(fmt, ...)
-  return log.log("error", 0, fmt, ...)
+  return log.log("error", 1, fmt, ...)
 end
 
 --- @generic T
@@ -129,7 +183,7 @@ end
 --- @param ... T
 --- @return T
 log.fatal = function(fmt, ...)
-  return log.log("fatal", 0, fmt, ...)
+  return log.log("fatal", 1, fmt, ...)
 end
 
 log.report = function()
