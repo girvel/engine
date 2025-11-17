@@ -381,7 +381,7 @@ actions.bow_attack = function(target)
         projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()
           -- SOUND hit?
           if d:abs2() == 1 then
-            attack_roll = attack_roll:extended({advantage = "disadvantage"})
+            attack_roll = attack_roll:set("disadvantage")
           end
           health.attack(
             entity,

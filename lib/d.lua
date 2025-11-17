@@ -169,17 +169,22 @@ methods.min = function(self)
   return #self.dice + self.bonus
 end
 
---- @param modification die
---- @return d
-methods.extended = function(self, modification)
-  return d.new(
-    Fun.iter(self.dice)
-      :map(function(x)
-        return Table.extend(Table.deep_copy(x), modification)
-      end)
-      :totable(),
-    self.bonus
-  )
+--- @generic T
+--- @param self T
+--- @param value die_advantage
+--- @return T
+methods.set = function(self, value)
+  --- @cast self d
+  for _, die in ipairs(self.dice) do
+    if value == "advantage" and die.advantage == "disadvantage"
+      or value == "disadvantage" and die.advantage == "advantage"
+    then
+      die.advantage = "none"
+    else
+      die.advantage = value
+    end
+  end
+  return self
 end
 
 --- @generic T: d
