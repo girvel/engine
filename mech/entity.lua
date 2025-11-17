@@ -49,3 +49,4 @@
 --- @field moving_flag true? not stationary, can move
 --- @field non_positional_ai_flag true? AI would still be enabled even if the player is far away
 --- @field body_flag true? is true for entities representing resurrectable bodies
+--- @field blind_sight_flag true? doesn't need FOV for searching targets
