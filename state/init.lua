@@ -103,7 +103,7 @@ end
 --- @param entity entity?
 --- @return boolean
 methods.exists = function(self, entity)
-  return self._entities[entity]
+  return not not self._entities[entity]
 end
 
 --- Removes & adds scheduled entities
