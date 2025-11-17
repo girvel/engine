@@ -201,13 +201,19 @@ methods.stop = function(self, scene, hard)
     key = scene
     scene = self.scenes[scene]
   else
-    key = Table.key_of(self.scenes, scene) or Inspect(scene)
+    key = Table.key_of(self.scenes, scene)
   end
 
   local old_length = #self._scene_runs
 
   self._scene_runs = Fun.iter(self._scene_runs)
-    :filter(function(r) return r.base_scene ~= scene end)
+    :filter(function(r)
+      if r.base_scene ~= scene then
+        return true
+      end
+      key = key or r.name
+      return false
+    end)
     :totable()
 
   local new_length = #self._scene_runs
@@ -235,7 +241,7 @@ methods.stop = function(self, scene, hard)
         end
       end
 
-      Log.info("Stopping scene %s; interrupted %s runs%s", key, old_length - new_length, postfix)
+      Log.info("Stopping scene %s; interrupted %s runs%s", key or Inspect(scene), old_length - new_length, postfix)
     end)
   else
     Log.info("Stopping scene %s; no runs found", key)
