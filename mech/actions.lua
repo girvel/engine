@@ -20,9 +20,7 @@ actions.move = Memoize(function(direction)
   return Table.extend({
     codename = "move_" .. (Vector.name_from_direction(direction) or tostring(direction)),
 
-    cost = {
-      movement = 1,
-    },
+    cost = {},
 
     _is_available = function(_, entity)
       return direction:abs2() == 1
@@ -33,6 +31,10 @@ actions.move = Memoize(function(direction)
         entity:rotate(direction)
       elseif entity.direction then
         entity.direction = direction
+      end
+
+      if entity.resources.movement <= 0 then
+        return false
       end
 
       local next_position = entity.position + direction
@@ -71,6 +73,10 @@ actions.move = Memoize(function(direction)
         level.switch_places(entity, obstacle)
       else
         result = level.unsafe_move(entity, next_position)
+      end
+
+      if result then
+        entity.resources.movement = entity.resources.movement - 1
       end
 
       if result and entity.animate then
