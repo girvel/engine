@@ -1,35 +1,41 @@
 local safety = require "engine.tech.safety"
 
 
-local result = {
+local systems = {
   -- love.keypressed
-  require("engine.systems.ui_keypressed"),
-  require("engine.systems.debug_exit"),
+  {path = "engine/systems/ui_keypressed.lua"},
+  {path = "engine/systems/debug_exit.lua"},
 
   -- love.mousemoved
-  require("engine.systems.ui_mousemoved"),
+  {path = "engine/systems/ui_mousemoved.lua"},
 
   -- love.mousepressed
-  require("engine.systems.ui_mousepressed"),
+  {path = "engine/systems/ui_mousepressed.lua"},
 
   -- love.mousereleased
-  require("engine.systems.ui_mousereleased"),
+  {path = "engine/systems/ui_mousereleased.lua"},
 
   -- love.update
-  require("engine.systems.genesis"),
-  safety.live_system(require("engine.systems.update_sound")),
-  safety.live_system(require("engine.systems.update_runner")),  -- together with acting
-  safety.live_system(require("engine.systems.acting")),
-  safety.live_system(require("engine.systems.animation")),
-  require("engine.systems.ui_update"),
-  safety.live_system(require("engine.systems.drifting")),     -- small
-  safety.live_system(require("engine.systems.timed_death")),  -- small
-  safety.live_system(require("engine.systems.running")),      -- small
+  {path = "engine/systems/genesis.lua"},
+  {path = "engine/systems/update_sound.lua", live = true},
+  {path = "engine/systems/update_runner.lua", live = true},  -- together with acting
+  {path = "engine/systems/acting.lua", live = true},
+  {path = "engine/systems/animation.lua", live = true},
+  {path = "engine/systems/ui_update.lua"},
+  {path = "engine/systems/drifting.lua", live = true},
+  {path = "engine/systems/timed_death.lua", live = true},
+  {path = "engine/systems/running.lua", live = true},
 
   -- love.draw
-  require("engine.systems.drawing"),
+  {path = "engine/systems/drawing.lua"},
 }
 
-Fun.iter(result):each(safety.for_system)
-
-return result
+return Fun.iter(systems)
+  :map(function(e)
+    local system = assert(love.filesystem.load(e.path))()
+    if e.live then
+      system = safety.live_system(system)
+    end
+    return safety.for_system(system)
+  end)
+  :totable()

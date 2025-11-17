@@ -64,7 +64,7 @@ Ldump.mark_module("engine.lib.tiny", {
 Tiny.worldMetaTable.__serialize = function(self)
   local entities = self.entities
   return function()
-    local systems = require("engine.systems")
+    local systems = assert(love.filesystem.load("engine/systems/init.lua"))()
     for _, system in ipairs(systems) do
       system.world = nil
     end

@@ -1,6 +1,4 @@
-local saves = require("engine.kernel.saves")
 local state = require("engine.state")
-local systems = require("engine.systems")
 local safety = require "engine.tech.safety"
 local cli = require "engine.kernel.cli"
 local async = require "engine.tech.async"
@@ -44,7 +42,7 @@ return function(args)
     love.window.updateMode(0, 0, {fullscreen = true})
   end
 
-  State = state.new(systems, args)
+  State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))(), args)
   assert = safety.assert
   Error = safety.error
 
