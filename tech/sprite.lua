@@ -3,7 +3,7 @@ local ffi = require("ffi")
 
 local sprite = {utility = {}}
 
-local pull_anchors, cut_out
+local transform_colors, cut_out
 
 --- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid | sprite_rendered
 
@@ -18,13 +18,16 @@ local pull_anchors, cut_out
 --- @field color vector
 
 --- @param base string|love.ImageData
+--- @param color vector?
 --- @return sprite_image
-sprite.image = Memoize(function(base)
+sprite.image = Memoize(function(base, color)
   if type(base) == "string" then
     base = love.image.newImageData(base)
+  else
+    base = base:clone()  --[[@as love.ImageData]]
   end
 
-  local main_color, anchors = pull_anchors(base)
+  local main_color, anchors = transform_colors(base, color)
   return {
     type = "image",
     anchors = anchors or {},
@@ -42,7 +45,7 @@ end)
 sprite.from_atlas = Memoize(function(index, cell_size, atlas_image)
   local quad = sprite.utility.get_atlas_quad(index, cell_size, atlas_image:getDimensions())
   local image_data = cut_out(atlas_image, quad)
-  local main_color, anchors = pull_anchors(image_data)
+  local main_color, anchors = transform_colors(image_data)
   return {
     type = "atlas",
     quad = quad,
@@ -163,7 +166,9 @@ ffi.cdef [[
 ]]
 
 --- @param base love.ImageData
-pull_anchors = function(base)
+--- @param target_color vector?
+transform_colors = function(base, target_color)
+  target_color = target_color and target_color:copy():mul_mut(255):map_mut(math.ceil)
   local w, h = base:getDimensions()
   local pixels = ffi.cast("Color*", base:getFFIPointer())
 
@@ -192,15 +197,31 @@ pull_anchors = function(base)
 
       if anchor_name then
         result[anchor_name] = V(x, y)
-        pixels[i].r = main_color.r
-        pixels[i].g = main_color.g
-        pixels[i].b = main_color.b
-        pixels[i].a = main_color.a
+        if target_color then
+          color.r = target_color.r
+          color.g = target_color.g
+          color.b = target_color.b
+          color.a = target_color.a
+        else
+          color.r = main_color.r
+          color.g = main_color.g
+          color.b = main_color.b
+          color.a = main_color.a
+        end
+      elseif target_color and color.a > 0 then
+        color.r = target_color.r
+        color.g = target_color.g
+        color.b = target_color.b
+        color.a = target_color.a
       end
     end
   end
 
-  return V(main_color.r, main_color.g, main_color.b):div_mut(255), result
+  if target_color then
+    return V(target_color.r, target_color.g, target_color.b):div_mut(255), result
+  else
+    return V(main_color.r, main_color.g, main_color.b):div_mut(255), result
+  end
 end
 
 Ldump.mark(sprite, {}, ...)

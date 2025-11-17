@@ -20,13 +20,14 @@ local methods = {}
 
 local load_pack
 
---- @alias atlas_n integer|nil|"no_atlas"
+--- @alias atlas_n integer|"directional"|"no_atlas"
 
 --- @param path string
---- @param atlas_n atlas_n if nil, interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
+--- @param atlas_n? atlas_n if nil or "directional", interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
+--- @param color? vector
 --- @return table
-animated.mixin = function(path, atlas_n)
-  local pack = load_pack(path, atlas_n)
+animated.mixin = function(path, atlas_n, color)
+  local pack = load_pack(path, atlas_n or "directional", color)
   return Table.extend({
     animation = {
       pack = pack,
@@ -174,8 +175,10 @@ methods.animation_freeze = function(self, animation_name)
 end
 
 --- @param folder_path string
+--- @param is_atlas boolean
+--- @param color vector?
 --- @return animation_pack[]
-local load_pack_raw = Memoize(function(folder_path, is_atlas)
+local load_pack_raw = Memoize(function(folder_path, is_atlas, color)
   local info = love.filesystem.getInfo(folder_path)
 
   if not info then
@@ -235,13 +238,13 @@ local load_pack_raw = Memoize(function(folder_path, is_atlas)
         local pack = result[i]
         pack[animation_name] = pack[animation_name] or {}
         pack[animation_name][frame_i] = sprite.image(
-          sprite.utility.select(data, i)
+          sprite.utility.select(data, i), color
         )
       end
     else
       local pack = result[1]
       pack[animation_name] = pack[animation_name] or {}
-      pack[animation_name][frame_i] = sprite.image(data)
+      pack[animation_name][frame_i] = sprite.image(data, color)
     end
 
     ::continue::
@@ -250,9 +253,12 @@ local load_pack_raw = Memoize(function(folder_path, is_atlas)
   return result
 end)
 
-load_pack = function(path, atlas_n)
-  local base_pack = load_pack_raw(path, atlas_n ~= "no_atlas")
-  if atlas_n then
+--- @param path string
+--- @param atlas_n atlas_n if nil, interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
+--- @param color? vector
+load_pack = function(path, atlas_n, color)
+  local base_pack = load_pack_raw(path, atlas_n ~= "no_atlas", color)
+  if atlas_n ~= "directional" then
     if atlas_n == "no_atlas" then atlas_n = 1 end
     return base_pack[atlas_n]
   end

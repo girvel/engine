@@ -32,7 +32,6 @@ item.mixin = function(animation_path)
       State:add(self)
     end),
     {
-      inventory = {},
       tags = {},
       direction = Vector.right,  -- needed to initially animate into idle_right instead of idle
     }
