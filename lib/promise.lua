@@ -14,24 +14,33 @@ promise.new = function()
   }, promise.mt)
 end
 
+--- NOTICE Modifies promises
 --- @param ... promise
 --- @return promise
 promise.all = function(...)
   local result = promise.new()
   local count = select("#", ...)
+  local waiting_for_n = 0
+
   for i = 1, count do
     local item = select(i, ...)  --[[@as promise]]
-    if i ~= count or getmetatable(item) == promise.mt then
+    if (i ~= count or getmetatable(item) == promise.mt)
+      and not item.is_resolved
+    then
+      waiting_for_n = waiting_for_n + 1
       item:next(function()
-        count = count - 1
-        if count == 0 then
+        waiting_for_n = waiting_for_n - 1
+        if waiting_for_n == 0 then
           result:resolve()
         end
       end)
-    else
-      count = count - 1
     end
   end
+
+  if waiting_for_n == 0 then
+    result:resolve()
+  end
+
   return result
 end
 
