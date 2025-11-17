@@ -397,7 +397,7 @@ draw_move_order = function()
         local color = hostility and HOSTILITY_COLOR[hostility] or Vector.white
 
         love.graphics.setColor(color)
-          ui.text(Name.game(e))
+          ui.text(Name.game(e):utf_capitalize())
         love.graphics.setColor(Vector.white)
       ui.finish_line()
     end
