@@ -72,6 +72,19 @@ animated.fx = function(path, position, layer)
   return result
 end
 
+local set_current = function(self, animation_name)
+  local animation = self.animation
+  local dirname = self.direction and Vector.name_from_direction(self.direction)
+
+  if dirname then
+    animation.current = animation_name .. "_" .. dirname
+  end
+
+  if not dirname or not animation.pack[animation.current] then
+    animation.current = animation_name
+  end
+end
+
 --- @param self entity
 --- @param animation_name? string|animation_name
 --- @param assertive? boolean whether to assert that animation exists
@@ -88,12 +101,7 @@ methods.animate = function(self, animation_name, assertive, looped)
   end
   self:animation_set_paused(false)
 
-  local dirname = self.direction and Vector.name_from_direction(self.direction)
-  if dirname then
-    animation.current = animation_name .. "_" .. dirname
-  else
-    animation.current = animation_name
-  end
+  set_current(self, animation_name)
 
   if animation.pack[animation.current] then
     if looped then
@@ -104,11 +112,7 @@ methods.animate = function(self, animation_name, assertive, looped)
       Error("Missing %s for entity %s", animation_name, self)
     end
 
-    if dirname then
-      animation.current = animation.next .. "_" .. dirname
-    else
-      animation.current = animation.next
-    end
+    set_current(self, animation.next)
   end
 
   animation.frame = 1
