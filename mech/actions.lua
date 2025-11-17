@@ -35,20 +35,23 @@ actions.move = Memoize(function(direction)
         entity.direction = direction
       end
 
-      if State.grids[entity.grid_layer]:slow_get(entity.position + direction, true) then
+      local next_position = entity.position + direction
+      local home_grid = State.grids[entity.grid_layer]
+      if not home_grid:can_fit(next_position) then return false end
+
+      local obstacle = home_grid[next_position]
+      if obstacle and State.hostility:get(obstacle, entity) ~= "ally" then
         return false
       end
 
       if entity.grid_layer ~= "solids" then
-        local solid = State.grids.solids:slow_get(entity.position + direction)
+        local solid = State.grids.solids:slow_get(next_position)
         if solid and not solid.transparent_flag then return false end
       end
 
-      if (not entity.modify or entity:modify("opportunity_attack_trigger", true))
-        and entity.grid_layer == "solids"
-      then
+      if not entity.modify or entity:modify("opportunity_attack_trigger", true) then
         Fun.iter(Vector.directions)
-          :map(function(d) return State.grids.solids:slow_get(entity.position + d), d end)
+          :map(function(d) return home_grid:slow_get(entity.position + d), d end)
           :filter(function(e)
             return e
               and e.resources
@@ -62,7 +65,14 @@ actions.move = Memoize(function(direction)
           end)
       end
 
-      local result = level.unsafe_move(entity, entity.position + direction)
+      local result
+      if obstacle then
+        result = true
+        level.switch_places(entity, obstacle)
+      else
+        result = level.unsafe_move(entity, next_position)
+      end
+
       if result and entity.animate then
         entity:animate("move")
       end

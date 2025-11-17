@@ -31,10 +31,10 @@ level.layers = {
 --- Forcefully move entity to a new position
 --- @param entity grid_positioned
 --- @param position vector
---- @return nil
+--- @return boolean
 level.unsafe_move = function(entity, position)
   assert(entity.position, "Can not move an entity without the current position")
-  if entity.position == position then return end
+  if entity.position == position then return false end
 
   local grid = State.grids[entity.grid_layer]
   if grid[position] then
@@ -55,6 +55,16 @@ level.slow_move = function(entity, position)
   if not grid:can_fit(position) or grid[position] then return false end
   level.unsafe_move(entity, position)
   return true
+end
+
+--- @param entity entity
+--- @param target entity
+level.switch_places = function(entity, target)
+  State.grids[entity.grid_layer][entity.position] = target
+  State.grids[target.grid_layer][target.position] = entity
+
+  entity.position, target.position = target.position, entity.position
+  entity.grid_layer, target.grid_layer = target.grid_layer, entity.grid_layer
 end
 
 --- Forcefully change entity's grid_layer
