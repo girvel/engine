@@ -13,6 +13,7 @@ local combat_ai = {}
 --- @class combat_ai_strict: ai_strict
 --- @field targeting ai_targeting
 --- @field target entity?
+--- @field starts_no_fights boolean
 --- @field _hostility_subscription function
 --- @field _vision_map tcod_map
 local methods = {}
@@ -28,10 +29,12 @@ local DEFAULT_TARGETING = {
 }
 
 --- @param targeting? table
+--- @param starts_no_fights? boolean
 --- @return combat_ai
-combat_ai.new = function(targeting)
+combat_ai.new = function(targeting, starts_no_fights)
   return setmetatable({
     targeting = Table.defaults(targeting, DEFAULT_TARGETING),
+    starts_no_fights = starts_no_fights,
   }, combat_ai.mt)
 end
 
@@ -119,9 +122,7 @@ methods.observe = function(self, entity, dt)
   if State.runner.locked_entities[State.player] or entity.hp <= 0 then return end
   if not Random.chance(dt / self.targeting.scan_period) then return end
 
-  if State.combat then
-    if Table.contains(State.combat.list, entity) then return end
-
+  if State.combat and not State:in_combat(entity) then
     for _, e in ipairs(State.combat.list) do
       if State.hostility:get(entity, e) == "ally"
         and (entity.position - e.position):abs2() <= self.targeting.support_range
@@ -132,10 +133,12 @@ methods.observe = function(self, entity, dt)
     end
   end
 
-  local new_target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
-  if new_target and not State:in_combat(new_target) then
-    State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
-    State:start_combat({new_target, entity})
+  if not self.starts_no_fights then
+    local new_target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
+    if new_target and not State:in_combat(new_target) then
+      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+      State:start_combat({new_target, entity})
+    end
   end
 end
 
