@@ -41,9 +41,9 @@ end
 
 --- @param entity entity
 --- @param path string
---- @param atlas_n atlas_n
+--- @param atlas_n? atlas_n
 animated.change_pack = function(entity, path, atlas_n)
-  entity.animation.pack = load_pack(path, atlas_n)
+  entity.animation.pack = load_pack(path, atlas_n or "directional")
   entity:animate()
 end
 
