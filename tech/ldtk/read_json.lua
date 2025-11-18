@@ -20,7 +20,7 @@ local read_json = function(path)
     coroutine.yield("json", 0)
     local result = love.thread.getChannel('json'):pop()
     if result then
-      Log.info("t=%.2f s | Read & parsed JSON %q", love.timer.getTime() - start_t, path)
+      Log.info("%.2f s | Read & parsed JSON %q", love.timer.getTime() - start_t, path)
       return result
     end
   end
