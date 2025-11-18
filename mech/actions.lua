@@ -117,7 +117,7 @@ actions.dash = Table.extend({
     movement = -6,
   },
 
-  sounds = sound.multiple("engine/assets/sounds/dash", .5),
+  sounds = sound.multiple("engine/assets/sounds/dash", .2),
 
   _is_available = function()
     return not not State.combat
