@@ -42,7 +42,9 @@ actions.move = Memoize(function(direction)
       if not home_grid:can_fit(next_position) then return false end
 
       local obstacle = home_grid[next_position]
-      if obstacle and State.hostility:get(obstacle, entity) ~= "ally" then
+      if obstacle and (
+        State.hostility:get(obstacle, entity) ~= "ally" or obstacle == State.player
+      ) then
         return false
       end
 
