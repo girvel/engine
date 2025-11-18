@@ -43,7 +43,13 @@ end
 --- @param fmt any
 --- @param ... any
 safety.error = function(fmt, ...)
-  local message = Log.format(fmt, ...)
+  local message
+  if fmt == nil and select("#", ...) == 0 then
+    message = ""
+  else
+    message = Log.format(fmt, ...)
+  end
+
   if State.debug then
     error(message, 1)
   else
