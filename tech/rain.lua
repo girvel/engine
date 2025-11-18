@@ -64,7 +64,7 @@ local IMAGE = love.graphics.newImage("assets/sprites/standalone/rain_particle.pn
 rain.render = function(self, entity, dt)
   local state = entity._rain_state
 
-  if entity.rain_density >= 1/2 then
+  if entity.rain_density >= 1 then
     if state._sound ~= sounds.heavy then
       if state._sound then state._sound:stop() end
       state._sound = sounds.heavy
