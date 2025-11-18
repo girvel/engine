@@ -76,7 +76,7 @@ end
 
 --- @enum (key) sound_size
 sound.sizes = {
-  small = {1, 10},
+  small = {3, 10},
   medium = {7, 20},
   large = {15, 30},
 }
