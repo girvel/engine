@@ -24,10 +24,10 @@ end
 --- @param b entity
 --- @return hostility # nil by default, "ally" if a.faction == b.faction
 methods.get = function(self, a, b)
-  if a.faction == b.faction then return "ally" end
   if not a.faction or not b.faction then
     return nil
   end
+  if a.faction == b.faction then return "ally" end
   return self._are_hostile[a.faction .. "_to_" .. b.faction]
 end
 
