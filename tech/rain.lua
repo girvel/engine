@@ -1,3 +1,4 @@
+local sound = require("engine.tech.sound")
 local animated = require("engine.tech.animated")
 local api = require("engine.tech.api")
 
@@ -14,12 +15,19 @@ local rain = {}
 --- @field _particles particle[]
 --- @field _player_position vector
 --- @field _canvas love.Canvas
+--- @field _sound sound
+--- @field _touched_ground boolean
 
 --- @class particle
 --- @field position vector in pixels (before scaling)
 --- @field target_cell vector
 --- @field life_time number
 --- @field is_visible boolean
+
+local sounds = {
+  light = sound.new("engine/assets/sounds/rain_light.mp3", .6),
+  heavy = sound.new("engine/assets/sounds/rain_heavy.mp3", .2),
+}
 
 --- @param density number
 --- @param speed number
@@ -40,6 +48,7 @@ rain.new = function(density, speed)
       _particles = {},
       _player_position = nil,
       _canvas = love.graphics.newCanvas(unpack(State.level.grid_size * Constants.cell_size)),
+      _touched_ground = false,
     },
   }
 end
@@ -54,6 +63,22 @@ local IMAGE = love.graphics.newImage("assets/sprites/standalone/rain_particle.pn
 --- @return love.Canvas
 rain.render = function(self, entity, dt)
   local state = entity._rain_state
+
+  if entity.rain_density >= 1/2 then
+    if state._sound ~= sounds.heavy then
+      if state._sound then state._sound:stop() end
+      state._sound = sounds.heavy
+    end
+  else
+    if state._sound ~= sounds.light then
+      if state._sound then state._sound:stop() end
+      state._sound = sounds.light
+    end
+  end
+
+  if state._touched_ground and not state._sound.source:isPlaying() then
+    state._sound:play()
+  end
 
   local start, finish do
     local original_start = State.perspective.vision_start * Constants.cell_size
@@ -115,6 +140,7 @@ rain.render = function(self, entity, dt)
       local p = state._particles[i]
       if p.life_time <= 0 then
         Table.remove_breaking_at(state._particles, i)
+        state._touched_ground = true
         if p.is_visible then
           animated.add_fx("assets/sprites/animations/rain_impact", p.position / Constants.cell_size, "weather")
         end
