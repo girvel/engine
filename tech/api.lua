@@ -22,6 +22,19 @@ api.to_vector = function(x)
   return x
 end
 
+local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
+local HIT = sound.multiple("engine/assets/sounds/hit/body", .3)
+
+--- @param entity entity
+--- @param type "hand"|"offhand"
+--- @return promise, scene
+api.emulate_attack = function(entity, type)
+  return State.runner:run_task(function()
+    WHOOSH:play_at(entity.position)
+    entity:animate(type .. "_attack"):wait()
+    HIT:play_at(entity.position + entity.direction)
+  end, "emulate_attack_" .. Name.code(entity))
+end
 
 --- @param secs number
 --- @return promise, scene
