@@ -69,7 +69,6 @@ tk.preserve_line_of_fire = function(entity, target, vision_map, speed)
       best_p = p
       break
     end
-    vision_map:free()
 
     ::continue::
   end

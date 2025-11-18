@@ -46,6 +46,7 @@ return Tiny.processingSystem {
 
   onRemove = function(self, entity)
     if entity.ai.deinit then
+      Log.trace("Deinitializing AI for %s", entity)
       entity.ai:deinit(entity)
     end
   end,
