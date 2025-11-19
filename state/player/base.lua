@@ -34,6 +34,7 @@ base.mixin = function()
     bag = {money = 0},
 
     ai = ai.new(),
+    immovable_flag = true,
   })
 
   return result

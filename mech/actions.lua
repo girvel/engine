@@ -43,7 +43,7 @@ actions.move = Memoize(function(direction)
 
       local obstacle = home_grid[next_position]
       if obstacle and (
-        State.hostility:get(obstacle, entity) ~= "ally" or obstacle == State.player
+        State.hostility:get(obstacle, entity) ~= "ally" or obstacle.immovable_flag
       ) then
         return false
       end
