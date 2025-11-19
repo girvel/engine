@@ -1,3 +1,4 @@
+-- TODO not really used, not really functional, should probably be redone
 local audio = {}
 
 --- @class state_audio

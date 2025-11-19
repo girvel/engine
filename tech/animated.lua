@@ -68,7 +68,10 @@ animated.fx = function(path, position, layer)
   result.position = position
   result.layer = layer or "fx_under"
 
-  result:animate():next(function() State:remove(result) end)
+  result:animate():next(function()
+    result:animation_set_paused(true)
+    State:remove(result)
+  end)
 
   return result
 end
