@@ -60,8 +60,6 @@ local VENDOR_LIBS = {
   "profile",
 }
 
-local FALLEN_TOTAL = 12482
-
 local cli = {}
 
 cli.stat = function(args)
@@ -140,7 +138,7 @@ cli.exe = function(args)
       name = "game"
       log.error(msg)
     end
-    love = nil
+    love = nil  --- @diagnostic disable-line
   end
 
   local version_suffix = read_run("git tag --points-at")

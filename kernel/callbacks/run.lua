@@ -42,7 +42,7 @@ return function()
     for k, v in pairs(Kernel._delays) do
       Kernel._delays[k] = math.max(0, v - dt)
       if Kernel._delays[k] == 0 then
-        love.keypressed(nil, k)
+        love.keypressed(nil, k, true)
         Kernel._delays[k] = 1 / Kernel:get_key_rate(k)
       end
     end

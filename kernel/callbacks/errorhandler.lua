@@ -11,7 +11,7 @@ return function(msg)
   return function()
     love.event.pump()
 
-    for e,a,b,c in love.event.poll() do
+    for e,a,_b,_c in love.event.poll() do
       if e == "quit" then
         return 1
       elseif e == "keypressed" and a == "return" then
