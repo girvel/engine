@@ -137,7 +137,7 @@ tk.choose_save = function(show_new_save)
 
     table.sort(options, function(a, b) return dates[a] > dates[b] end)
     if show_new_save then
-      table.insert(options, 1, "<новое сохранение>")
+      table.insert(options, 1, "<Новое сохранение>")
     end
   end
 
