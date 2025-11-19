@@ -5,6 +5,7 @@ local kernel = {}
 --- @field _load? string
 --- @field _specific_key_rates table<love.KeyConstant, number>
 --- @field _delays table<love.KeyConstant, number>
+--- @field _is_active boolean
 --- @field frame_n integer
 --- @field cpu_time number
 --- @field start_time number
@@ -19,6 +20,7 @@ kernel.new = function()
     frame_n = 0,
     cpu_time = 0,
     start_time = 0,
+    _is_active = false,
   }, mt)
 end
 
