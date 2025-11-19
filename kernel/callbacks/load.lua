@@ -37,10 +37,11 @@ return function(args)
   end
 
   if args.resolution then
-    love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false})
+    love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false, minheight = 200, minwidth = 200})
   else
-    love.window.updateMode(0, 0, {fullscreen = true})
+    love.window.updateMode(0, 0, {fullscreen = true, minheight = 200, minwidth = 200})
   end
+  Log.tracel(love.window.getMode())
 
   State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))(), args)
   assert = safety.assert
