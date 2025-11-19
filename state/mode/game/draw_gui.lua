@@ -461,16 +461,18 @@ draw_bag = function()
   tk.finish_block(start)  -- TODO UI make this stateless?
 end
 
-local H = 200
-local BOTTOM_GAP = 50 + 40  -- (padding)
 local draw_line, draw_options
 
 draw_dialogue = function()
   local line = State.player.hears
   if not line then return end
 
+  local H = is_compact and 110 or 200
+  local BOTTOM_GAP = (is_compact and 0 or 50) + 40  -- (padding)
+  local FONT_SIZE = is_compact and 26 or 32
+
   tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
-  ui.start_font(32)
+  ui.start_font(FONT_SIZE)
     if line.type == "plain_line" then
       draw_line(line)
     elseif line.type == "options" then

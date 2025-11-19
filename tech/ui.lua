@@ -111,23 +111,27 @@ ui.start_frame = function(x, y, w, h)
     h = prev.h + h
   end
 
-  table.insert(model.frame, {
+  local frame = {
     x = prev.x + x,
     y = prev.y + y,
     w = w,
     h = h,
-  })
+  }
+
+  table.insert(model.frame, frame)
+  -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
 --- @param push_y? boolean
 ui.finish_frame = function(push_y)
   local pop = table.remove(model.frame)
+  local frame = Table.last(model.frame)
   if push_y then
-    local this = Table.last(model.frame)
     local next_y = pop.y + pop.h
-    this.h = this.h - (next_y - this.y)
-    this.y = next_y
+    frame.h = frame.h - (next_y - frame.y)
+    frame.y = next_y
   end
+  -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
 --- @param x? "left"|"center"|"right"
