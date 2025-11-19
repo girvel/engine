@@ -21,6 +21,9 @@ return function()
       Kernel.cpu_time = math.max(Kernel.cpu_time - (love.timer.getTime() - t))
     end
 
+    Kernel._is_active = love.window.isVisible()
+      and love.window.hasFocus()
+
     love.event.pump()
     for name, a,b,c,d,e,f in love.event.poll() do
       if name == "quit" then
@@ -49,8 +52,10 @@ return function()
 
     love.update(dt)
 
-    love.graphics.origin()
-    love.graphics.clear(love.graphics.getBackgroundColor())
+    if Kernel._is_active then
+      love.graphics.origin()
+      love.graphics.clear(love.graphics.getBackgroundColor())
+    end
 
     love.draw(dt)
 

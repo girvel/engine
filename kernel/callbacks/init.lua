@@ -8,7 +8,9 @@ for callback_name, _ in pairs(
   end, {})
 ) do
   love[callback_name] = function(...)
-    State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
+    if Kernel._is_active then
+      State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
+    end
   end
 end
 

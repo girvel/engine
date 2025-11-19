@@ -1,4 +1,4 @@
-local init = {}
+local kernel = {}
 
 --- @class kernel middleware between fallen engine and LOVE
 --- @field _save? string
@@ -12,7 +12,7 @@ local methods = {}
 local mt = {__index = methods}
 
 --- @return kernel
-init.new = function()
+kernel.new = function()
   return setmetatable({
     _specific_key_rates = {},
     _delays = {},
@@ -61,4 +61,4 @@ methods.report = function(self)
   Log.report()
 end
 
-return init
+return kernel
