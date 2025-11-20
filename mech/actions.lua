@@ -96,11 +96,7 @@ actions.move = Memoize(function(direction)
           )
 
         if sounds then
-          if entity == State.player then
-            sounds:play()
-          else
-            sounds:play_at(entity.position)
-          end
+          sounds:play_at(entity.position)
           last_walk_sound_t[entity] = love.timer.getTime()
         end
       end
