@@ -58,19 +58,18 @@ sound.multiple = Memoize(function(dir_path, volume)
   return result
 end)
 
---- @param dir_path string
+--- @param path string
 --- @param volume? number
 --- @param size? sound_size
-sound.source = function(dir_path, volume, size)
-  local soundpack = sound.multiple(dir_path, volume)
+sound.source = function(path, volume, size)
   return {
-    ai = {
-      _last_sound = nil,
-      observe = function(self, entity, dt)
-        if self._last_sound and self._last_sound.source:isPlaying() then return end
-        self._last_sound = soundpack:play_at(entity.position, size)
-      end,
-    }
+    sound_source = sound.new(path, volume):clone(),
+    on_add = function(self)
+      self.sound_source:place(self.position, size):set_looping(true):play()
+    end,
+    on_remove = function(self)
+      self.sound_source:stop()
+    end,
   }
 end
 
