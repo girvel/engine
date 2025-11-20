@@ -12,7 +12,7 @@ level.grid_layers = {
   "shadows",
 }
 
---- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"weather"|"shadows"
+--- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"weather"|"shadows"|"fx_over_shadows"
 level.layers = {
   "tiles",
   "on_tiles",
@@ -24,6 +24,7 @@ level.layers = {
   "on_solids",
   "weather",
   "shadows",
+  "fx_over_shadows",
 }
 
 --- @alias grid_positioned {position: vector, grid_layer: string}

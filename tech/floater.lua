@@ -14,9 +14,9 @@ floater.new = function(text, grid_position, color)
     position = grid_position
       + V(math.random() * .5 + .25, math.random() * .5 + .25),
     drift = V(0, -.25),
-    sprite = sprite.text(tostring(text), 16, color),
+    sprite = sprite.text(tostring(text), 20, color),
     life_time = 3,
-    layer = "fx_over",
+    layer = "fx_over_shadows",
   }
 end
 
