@@ -18,6 +18,8 @@ ai.new = function()
     finish_turn = nil,
     _next_actions = {},
     _action_promises = {},
+
+    target = true,  -- a little hack for ally combat AI to follow the player when hesitant
   }, ai.mt)
 end
 
