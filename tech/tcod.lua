@@ -140,17 +140,19 @@ tcod.map = function(grid)
   return result
 end
 
-map_methods.free = function(self)
-  tcod._c.TCOD_map_delete(self._map)
-  self._map = nil
-  self._parent._maps[self] = nil
-end
-
 --- @param self tcod_map
 local assert_is_not_freed = function(self)
   if self._map == nil then
     Error("Attempt to use tcod.map after free")
   end
+end
+
+map_methods.free = function(self)
+  assert_is_not_freed(self)
+
+  tcod._c.TCOD_map_delete(self._map)
+  self._map = nil
+  self._parent._maps[self] = nil
 end
 
 map_methods.update_transparency = function(self)
