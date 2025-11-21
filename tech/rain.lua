@@ -62,6 +62,7 @@ local IMAGE = love.graphics.newImage("assets/sprites/standalone/rain_particle.pn
 --- @param dt number
 --- @return love.Canvas
 rain.render = function(self, entity, dt)
+  dt = math.min(1, dt)
   local state = entity._rain_state
 
   if entity.rain_density >= 1 then
