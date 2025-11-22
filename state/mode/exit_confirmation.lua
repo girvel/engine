@@ -19,11 +19,7 @@ exit_confirmation.new = function(prev)
   }, mt)
 end
 
-methods.draw_entity = function(self, ...)
-  if self._prev.draw_entity then
-    self._prev:draw_entity(...)
-  end
-end
+tk.delegate(methods, "draw_entity", "preprocess")
 
 methods.draw_gui = function(self)
   local W = 470

@@ -29,19 +29,13 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, use_mouse, draw_curtain
 
-
 --- @param self state_mode_game
 --- @param dt number
 draw_gui = function(self, dt)
-  is_compact = love.graphics.getHeight() < 900
+  love.graphics.setCanvas()
+  love.graphics.draw(self._main_canvas)
 
-  do
-    local resolution = V(love.graphics.getDimensions())
-    local canvas_resolution = V(self._temp_canvas:getDimensions())
-    if resolution ~= canvas_resolution then
-      self._temp_canvas = love.graphics.newCanvas(unpack(resolution))
-    end
-  end
+  is_compact = love.graphics.getHeight() < 900
 
   draw_curtain()
   draw_sidebar(self)

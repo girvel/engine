@@ -25,7 +25,7 @@ debug_overlay.new = function(is_debug)
     _show_ai = false,
     _show_scenes = is_debug,
     _show_rails = is_debug,
-    _show_console = is_debug,
+    _show_console = false,
   }, mt)
 end
 

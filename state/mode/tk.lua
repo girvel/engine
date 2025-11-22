@@ -6,6 +6,19 @@ local item = require("engine.tech.item")
 
 local tk = {}
 
+--- @param methods table
+--- @param ... string
+tk.delegate = function(methods, ...)
+  for i = 1, select("#", ...) do
+    local f_name = select(i, ...)
+    methods[f_name] = function(self, ...)
+      if self._prev[f_name] then
+        return self._prev[f_name](...)
+      end
+    end
+  end
+end
+
 local PADDING = 40
 local MAX_READABLE_W = 800
 

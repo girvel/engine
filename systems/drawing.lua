@@ -2,6 +2,7 @@ local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
 local colors = require("engine.tech.colors")
 
+
 return Tiny.sortedProcessingSystem {
   codename = "drawing",
   base_callback = "draw",
@@ -27,6 +28,8 @@ return Tiny.sortedProcessingSystem {
     end
 
     love.graphics.clear(colors.black)
+
+    State.mode:preprocess()
   end,
 
   process = function(_, entity, dt)
