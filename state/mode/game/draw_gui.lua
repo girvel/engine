@@ -1,4 +1,3 @@
-local memory = require("engine.tech.shaders.memory")
 local colors = require("engine.tech.colors")
 local animated = require("engine.tech.animated")
 local sound = require("engine.tech.sound")
@@ -33,16 +32,6 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 --- @param self state_mode_game
 --- @param dt number
 draw_gui = function(self, dt)
-  love.graphics.setCanvas(State.player.memory)
-  love.graphics.draw(self._main_canvas, unpack(-State.perspective.camera_offset))
-
-  love.graphics.setCanvas()
-  local shader = love.graphics.getShader()
-  love.graphics.setShader(memory.love_shader)
-    love.graphics.draw(State.player.memory, unpack(State.perspective.camera_offset))
-  love.graphics.setShader(shader)
-  love.graphics.draw(self._main_canvas)
-
   is_compact = love.graphics.getHeight() < 900
 
   draw_curtain()

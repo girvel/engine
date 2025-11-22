@@ -19,17 +19,9 @@ return Tiny.sortedProcessingSystem {
       State.perspective:_update(dt)
     end
 
-    local shader = State.shader
-    if shader then
-      love.graphics.setShader(shader.love_shader)
-      if shader.update then
-        shader:update(dt)
-      end
-    end
-
     love.graphics.clear(colors.black)
 
-    State.mode:preprocess()
+    State.mode:preprocess(dt)
   end,
 
   process = function(_, entity, dt)
@@ -37,9 +29,7 @@ return Tiny.sortedProcessingSystem {
   end,
 
   postProcess = function(_, dt)
-    if State.shader then
-      love.graphics.setShader()
-    end
+    State.mode:postprocess(dt)
     ui.start()
     State.mode:draw_gui(dt)
     State.debug_overlay:draw(dt)

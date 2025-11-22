@@ -19,7 +19,7 @@ load_menu.new = function(prev)
   }, mt)
 end
 
-tk.delegate(methods, "draw_entity", "preprocess")
+tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
   tk.start_window("center", "center", "read_max", "max")

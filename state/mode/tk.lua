@@ -13,7 +13,7 @@ tk.delegate = function(methods, ...)
     local f_name = select(i, ...)
     methods[f_name] = function(self, ...)
       if self._prev[f_name] then
-        return self._prev[f_name](...)
+        return self._prev[f_name](self._prev, ...)
       end
     end
   end

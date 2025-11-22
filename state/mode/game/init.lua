@@ -13,6 +13,7 @@ local methods = {
   draw_gui = require("engine.state.mode.game.draw_gui"),
   draw_grid = require("engine.state.mode.game.draw_grid"),
   preprocess = require("engine.state.mode.game.preprocess"),
+  postprocess = require("engine.state.mode.game.postprocess"),
 }
 
 local mt = {__index = methods}

@@ -1,6 +1,3 @@
-local colors = require("engine.tech.colors")
-
-
 --- @param self state_mode_game
 --- @param dt number
 local preprocess = function(self, dt)
@@ -22,6 +19,14 @@ local preprocess = function(self, dt)
 
   love.graphics.setCanvas(self._main_canvas)
   love.graphics.clear(0, 0, 0, 0)
+
+  local shader = State.shader
+  if shader then
+    love.graphics.setShader(shader.love_shader)
+    if shader.update then
+      shader:update(dt)
+    end
+  end
 end
 
 return preprocess

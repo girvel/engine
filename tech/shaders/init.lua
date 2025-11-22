@@ -17,6 +17,7 @@ local get_stdlib = Memoize(function()
 end)
 
 --- @param path string
+--- @return love.Shader
 shaders.build = function(path)
   local result = love.graphics.newShader(
     get_stdlib() .. love.filesystem.read(path),

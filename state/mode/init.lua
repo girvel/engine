@@ -29,17 +29,11 @@ mode.mt = {__index = methods}
 methods._set_mode = function(self, mode_value)
   self._mode = mode_value
 
-  self.draw_gui = mode_value.draw_gui and Ldump.ignore_upvalue_size(function(_, ...)
-    return mode_value:draw_gui(...)
-  end) or empty_f
-
-  self.draw_entity = mode_value.draw_entity and Ldump.ignore_upvalue_size(function(_, ...)
-    return mode_value:draw_entity(...)
-  end) or empty_f
-
-  self.preprocess = mode_value.preprocess and Ldump.ignore_upvalue_size(function(_, ...)
-    return mode_value:preprocess(...)
-  end) or empty_f
+  for _, id in ipairs {"draw_gui", "draw_entity", "preprocess", "postprocess"} do
+    self[id] = mode_value[id] and Ldump.ignore_upvalue_size(function(_, ...)
+      return mode_value[id](mode_value, ...)
+    end) or empty_f
+  end
 end
 
 methods.draw_gui = function(self, dt)
@@ -51,6 +45,10 @@ methods.draw_entity = function(self, entity, dt)
 end
 
 methods.preprocess = function(self, entity, dt)
+  Error("No State.mode._mode is set")
+end
+
+methods.postprocess = function(self, entity, dt)
   Error("No State.mode._mode is set")
 end
 
