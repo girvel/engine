@@ -123,6 +123,7 @@ rain.render = function(self, entity, dt)
     ::continue::
   end
 
+  local canvas = love.graphics.getCanvas()
   love.graphics.setCanvas(state._canvas)
     love.graphics.clear(Vector.transparent)
 
@@ -147,7 +148,7 @@ rain.render = function(self, entity, dt)
         end
       end
     end
-  love.graphics.setCanvas()
+  love.graphics.setCanvas(canvas)
   return state._canvas
 end
 

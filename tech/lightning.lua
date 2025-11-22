@@ -40,12 +40,13 @@ end
 lightning.render = function(self, entity, dt)
   local state = entity._lightning_state
 
+  local canvas = love.graphics.getCanvas()
   love.graphics.setCanvas(state.canvas)
     love.graphics.clear()
     love.graphics.setColor(colors.white)
       love.graphics.line(state.from.x, state.from.y, state.to.x, state.to.y)
     love.graphics.setColor(Vector.white)
-  love.graphics.setCanvas()
+  love.graphics.setCanvas(canvas)
 
   return state.canvas
 end

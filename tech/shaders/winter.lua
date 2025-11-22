@@ -27,6 +27,7 @@ local build_love_shader = function(tint, intensity, brightness, brightness_insid
 
   local ignore do
     local canvas = love.graphics.newCanvas(unpack(State.level.grid_size * K))
+    local prev_canvas = love.graphics.getCanvas()
     love.graphics.setCanvas(canvas)
     love.graphics.setColor(Vector.red)
       love.graphics.clear(0, 0, 0)
@@ -51,7 +52,7 @@ local build_love_shader = function(tint, intensity, brightness, brightness_insid
         love.graphics.rectangle("fill", x, y, K, K)
       end
     love.graphics.setColor(Vector.white)
-    love.graphics.setCanvas()
+    love.graphics.setCanvas(prev_canvas)
     ignore = canvas
   end
   result:send("ignore", ignore)

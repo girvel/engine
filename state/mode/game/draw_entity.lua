@@ -15,7 +15,9 @@ local draw_entity = function(self, entity, dt)
   x = dx + x * k
   y = dy + y * k
 
+  local canvas
   if entity.shader then
+    canvas = love.graphics.getCanvas()
     love.graphics.setShader(entity.shader.love_shader)
     love.graphics.setCanvas(self._temp_canvas)
     -- OPT isn't it too expensive to draw the image the size of the screen?
@@ -47,7 +49,7 @@ local draw_entity = function(self, entity, dt)
   end
 
   if entity.shader then
-    love.graphics.setCanvas()
+    love.graphics.setCanvas(canvas)
     --- @diagnostic disable-next-line
     love.graphics.setShader(State.shader and State.shader.love_shader)
     love.graphics.draw(self._temp_canvas)

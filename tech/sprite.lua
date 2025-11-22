@@ -124,9 +124,10 @@ end
 
 local image_to_canvas = Memoize(function(image)
   local result = love.graphics.newCanvas(image:getDimensions())
+  local canvas = love.graphics.getCanvas()
   love.graphics.setCanvas(result)
   love.graphics.draw(image)
-  love.graphics.setCanvas()
+  love.graphics.setCanvas(canvas)
   return result
 end)
 
