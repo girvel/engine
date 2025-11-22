@@ -582,8 +582,12 @@ end
 
 --- @param ... integer mouse button number (love-compatible)
 ui.mousedown = function(...)
+  local frame = Table.last(model.frame)
+  if not get_mouse_over(frame.w, frame.h) then return false end
+
   for i = 1, select("#", ...) do
     if Table.contains(model.mouse.button_pressed, select(i, ...)) then
+      Log.tracel(model.mouse, frame)
       return true
     end
   end
