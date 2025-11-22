@@ -667,26 +667,51 @@ use_mouse = function(self)
 
       if rmb and not solid or lmb and interaction_target then
         local path = api.build_path(State.player.position, position)
-        if path and #path > 0 and #path <= PATH_MAX_LENGTH then
+        if path and #path <= PATH_MAX_LENGTH then
           animated.add_fx("engine/assets/sprites/animations/mouse_travel", position)
           set_mouse_task(function()
-            api.follow_path(State.player, path, false, 8)
-            if interaction_target then
+            local ok = api.follow_path(State.player, path, false, 8)
+            api.rotate(State.player, position)
+            if ok and interaction_target then
               actions.interact:act(State.player)
             end
           end)
         end
       end
 
+      local is_a_potential_target
+      if not solid then
+        is_a_potential_target = false
+      else
+        local player_hostility = State.hostility:get(State.player, solid)
+        is_a_potential_target = (
+          player_hostility == "enemy"
+          or player_hostility == nil and State.hostility:get(solid, State.player) == "enemy"
+        )
+      end
       local bow_attack = actions.bow_attack(solid)
 
-      if bow_attack:is_available(State.player)
-        and (State.hostility:get(State.player, solid) == "enemy"
-          or State.hostility:get(solid, State.player) == "enemy")
-      then
+      if bow_attack:is_available(State.player) and is_a_potential_target then
         ui.cursor("target_active")
         if rmb then
           State.player.ai:plan_action(bow_attack)
+        end
+      end
+
+      local hand = State.player.inventory.hand
+      if hand and hand.damage_roll and is_a_potential_target then
+        ui.cursor("target_active")
+        if rmb and actions.hand_attack:enough_resources(State.player) then
+          local path = api.build_path(State.player.position, position)
+          if path and #path <= PATH_MAX_LENGTH then
+            set_mouse_task(function()
+              local ok = api.follow_path(State.player, path, false, 8)
+              api.rotate(State.player, position)
+              if ok then
+                actions.hand_attack:act(State.player)
+              end
+            end)
+          end
         end
       end
     end

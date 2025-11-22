@@ -8,10 +8,13 @@ local action = {}
 --- @field _is_available? fun(self: action, entity: entity): boolean
 --- @field _act? fun(self: action, entity: entity): boolean
 action.base = {
+  enough_resources = function(self, entity)
+    return not self.cost
+      or Fun.iter(self.cost):all(function(k, v) return (entity.resources[k] or 0) >= v end)
+  end,
+
   is_available = function(self, entity)
-    if self.cost
-      and Fun.iter(self.cost):any(function(k, v) return (entity.resources[k] or 0) < v end)
-    then
+    if not self:enough_resources(entity) then
       return false
     end
 
