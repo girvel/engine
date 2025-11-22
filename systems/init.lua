@@ -3,36 +3,39 @@ local safety = require "engine.tech.safety"
 
 local systems = {
   -- love.keypressed
-  {path = "engine/systems/ui_keypressed.lua"},
-  {path = "engine/systems/debug_exit.lua"},
+  {codename = "ui_keypressed"},
+  {codename = "debug_exit"},
+
+  -- love.textinput
+  {codename = "ui_textinput"},
 
   -- love.mousemoved
-  {path = "engine/systems/ui_mousemoved.lua"},
+  {codename = "ui_mousemoved"},
 
   -- love.mousepressed
-  {path = "engine/systems/ui_mousepressed.lua"},
+  {codename = "ui_mousepressed"},
 
   -- love.mousereleased
-  {path = "engine/systems/ui_mousereleased.lua"},
+  {codename = "ui_mousereleased"},
 
   -- love.update
-  {path = "engine/systems/genesis.lua"},
-  {path = "engine/systems/update_sound.lua", live = true},
-  {path = "engine/systems/update_runner.lua", live = true},  -- together with acting
-  {path = "engine/systems/acting.lua", live = true},
-  {path = "engine/systems/animation.lua", live = true},
-  {path = "engine/systems/ui_update.lua"},
-  {path = "engine/systems/drifting.lua", live = true},
-  {path = "engine/systems/timed_death.lua", live = true},
-  {path = "engine/systems/running.lua", live = true},
+  {codename = "genesis"},
+  {codename = "update_sound", live = true},
+  {codename = "update_runner", live = true},  -- together with acting
+  {codename = "acting", live = true},
+  {codename = "animation", live = true},
+  {codename = "ui_update"},
+  {codename = "drifting", live = true},
+  {codename = "timed_death", live = true},
+  {codename = "running", live = true},
 
   -- love.draw
-  {path = "engine/systems/drawing.lua"},
+  {codename = "drawing"},
 }
 
 return Fun.iter(systems)
   :map(function(e)
-    local system = assert(love.filesystem.load(e.path))()
+    local system = assert(love.filesystem.load("engine/systems/" .. e.codename .. ".lua"))()
     if e.live then
       system = safety.live_system(system)
     end

@@ -1,4 +1,6 @@
 local sprite = require "engine.tech.sprite"
+
+
 --- Immediate mode UI module
 local ui = {}
 
@@ -16,6 +18,7 @@ local model = {
   },
   keyboard = {
     pressed = {},
+    input = "",
   },
 
  -- accumulated state --
@@ -85,6 +88,7 @@ ui.finish = function()
   model.mouse.button_pressed = {}
   model.mouse.button_released = {}
   model.keyboard.pressed = {}
+  model.keyboard.input = ""
   love.mouse.setCursor(CURSORS[model.cursor])
 end
 
@@ -500,6 +504,25 @@ ui.offset = function(x, y)
   frame.h = frame.h - (y or 0)
 end
 
+--- @class ui_string_ref
+--- @field value string
+
+-- TODO consider suppressing ui.keyboard? or maybe on higher level?
+--- @param content ui_string_ref
+ui.field = function(content)
+  model.selection.max_i = model.selection.max_i + 1
+
+  if model.selection.i == model.selection.max_i then
+    content.value = content.value .. model.keyboard.input
+    if Table.contains(model.keyboard.pressed, "backspace") then
+      content.value = content.value:utf_sub(1, -2)
+    end
+    ui.text("> " .. content.value)
+  else
+    ui.text(". " .. content.value)
+  end
+end
+
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)
@@ -603,10 +626,14 @@ ui.handle_keypress = function(key)
     model.selection.i = Math.loopmod(model.selection.i + 1, model.selection.max_i)
   elseif key == "return" then
     model.selection.is_pressed = true
-  else
-    -- TODO remove everything besides this
-    table.insert(model.keyboard.pressed, key)
   end
+
+  -- TODO remove everything besides this
+  table.insert(model.keyboard.pressed, key)
+end
+
+ui.handle_textinput = function(text)
+  model.keyboard.input = model.keyboard.input .. text
 end
 
 ui.handle_mousemove = function(x, y)
