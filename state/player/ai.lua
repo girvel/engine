@@ -75,6 +75,7 @@ end
 --- @param action action
 --- @return promise?
 methods.plan_action = function(self, action)
+  -- TODO maybe not needed, we've got State.runner now?
   local promise = Promise.new()
   table.insert(self._next_actions, action)
   table.insert(self._action_promises, promise)

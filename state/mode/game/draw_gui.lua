@@ -18,11 +18,10 @@ local api         = require("engine.tech.api")
 --   internal state -> game mode fields
 
 -- Internal state
-local cost, hint, movement_path, movement_last_t, is_compact
-movement_last_t = 0
+local cost, hint, mouse_task, is_compact
 
 -- Utility functions
-local action_button
+local action_button, set_mouse_task
 
 -- Render functions
 local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
@@ -172,8 +171,7 @@ draw_action_grid = function(self)
     d = Vector.right,
   } do
     if ui.keyboard(key) then
-      movement_path = nil
-      movement_last_t = love.timer.getTime()
+      set_mouse_task()
       State.player.ai:plan_action(actions.move(direction))
     end
   end
@@ -524,7 +522,7 @@ draw_line = function(line)
   ui.finish_frame()
   ui.text(text)
 
-  if ui.keyboard("space") or ui.mousedown(1) then
+  if ui.keyboard("space") or ui.mousedown_anywhere(1) then
     State.player.hears = nil
     SKIP_SOUNDS:play()
   end
@@ -617,37 +615,19 @@ draw_suggestion = function()
   ui.finish_frame()
 end
 
-local movement_interact = nil
+--- @param task? fun(scene: any, characters: any)
+set_mouse_task = function(task)
+  State.runner:stop(mouse_task, false, true)
+  if task then
+    _, mouse_task = State.runner:run_task(task)
+  end
+end
+
 local PATH_MAX_LENGTH = 50
 
 use_mouse = function(self)
-  if movement_path then
-    if love.timer.getTime() - movement_last_t >= 1/8 then
-      movement_last_t = love.timer.getTime()
-
-      if #movement_path > 0 then
-        local next = table.remove(movement_path, 1)
-        State.player.ai:plan_action(actions.move(next - State.player.position)):next(function(ok)
-          if not ok then
-            movement_path = nil
-          end
-        end)
-      else
-        if movement_interact then
-          local target = interactive.get_at(movement_interact)
-          if target then
-            api.rotate(State.player, target)
-            State.player.ai:plan_action(actions.interact)
-          end
-          movement_interact = nil
-        end
-        movement_path = nil
-      end
-    end
-
-    if ui.mousedown(1) then
-      movement_path = nil
-    end
+  if ui.mousedown(1) then
+    set_mouse_task()
   end
 
   if not State.player:can_act() then return end
@@ -685,44 +665,28 @@ use_mouse = function(self)
         ui.cursor("hand")
       end
 
-      local offhand = State.player.inventory.offhand
-      if (lmb and interaction_target) or (rmb and not solid) then
-        local is_target_solid = interaction_target
-          and Table.contains({"solids", "on_solids"}, interaction_target.grid_layer)
-
-        if interaction_target and (
-          (State.player.position - position):abs2() == 1 and is_target_solid
-          or State.player.position == position and not is_target_solid
-        ) then
-          movement_path = {}
-          movement_interact = position
-        else
-          local path = api.build_path(State.player.position, position)
-
-          if path and #path > 0 and #path <= PATH_MAX_LENGTH then
-            if State.player.position ~= position then
-              movement_path = path
-              movement_last_t = love.timer.getTime()
-              State:add(animated.fx("engine/assets/sprites/animations/mouse_travel", position))
-            end  -- interact should still work even if no movement is needed
-            if lmb then
-              movement_interact = interaction_target and position or nil
+      if rmb and not solid or lmb and interaction_target then
+        local path = api.build_path(State.player.position, position)
+        if path and #path > 0 and #path <= PATH_MAX_LENGTH then
+          animated.add_fx("engine/assets/sprites/animations/mouse_travel", position)
+          set_mouse_task(function()
+            api.follow_path(State.player, path, false, 8)
+            if interaction_target then
+              actions.interact:act(State.player)
             end
-          end
+          end)
         end
       end
 
-      if solid and offhand and offhand.tags.ranged then
-        local action = actions.bow_attack(solid)
+      local bow_attack = actions.bow_attack(solid)
 
-        if action:is_available(State.player)
-          and (State.hostility:get(State.player, solid) == "enemy"
-            or State.hostility:get(solid, State.player) == "enemy")
-        then
-          ui.cursor("target_active")
-          if rmb then
-            State.player.ai:plan_action(action)
-          end
+      if bow_attack:is_available(State.player)
+        and (State.hostility:get(State.player, solid) == "enemy"
+          or State.hostility:get(solid, State.player) == "enemy")
+      then
+        ui.cursor("target_active")
+        if rmb then
+          State.player.ai:plan_action(bow_attack)
         end
       end
     end

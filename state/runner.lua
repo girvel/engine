@@ -195,7 +195,8 @@ end
 
 --- @param scene string|scene
 --- @param hard? boolean prevent :on_cancel
-methods.stop = function(self, scene, hard)
+--- @param silent? boolean
+methods.stop = function(self, scene, hard, silent)
   local key
   if type(scene) ~= "table" then
     key = scene
@@ -241,10 +242,14 @@ methods.stop = function(self, scene, hard)
         end
       end
 
-      Log.info("Stopping scene %s; interrupted %s runs%s", key or Inspect(scene), old_length - new_length, postfix)
+      if not silent then
+        Log.info("Stopping scene %s; interrupted %s runs%s", key or Inspect(scene), old_length - new_length, postfix)
+      end
     end)
   else
-    Log.info("Stopping scene %s; no runs found", key)
+    if not silent then
+      Log.info("Stopping scene %s; no runs found", key)
+    end
   end
 end
 
