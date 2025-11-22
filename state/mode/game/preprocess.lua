@@ -21,7 +21,7 @@ local preprocess = function(self, dt)
   end
 
   love.graphics.setCanvas(self._main_canvas)
-  love.graphics.clear(colors.black)
+  love.graphics.clear(0, 0, 0, 0)
 end
 
 return preprocess

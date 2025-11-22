@@ -13,6 +13,7 @@ local base = {}
 --- @field speaks? integer
 --- @field notification? string
 --- @field curtain_color vector
+--- @field memory love.Canvas
 
 --- @alias dialogue_line plain_dialogue_line | dialogue_options
 
@@ -35,6 +36,12 @@ base.mixin = function()
 
     ai = ai.new(),
     immovable_flag = true,
+
+    on_add = function(self)
+      self.memory = love.graphics.newCanvas(unpack(
+        State.level.grid_size * Constants.cell_size * State.perspective.SCALE
+      ))
+    end,
   })
 
   return result
