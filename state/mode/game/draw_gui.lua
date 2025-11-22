@@ -62,7 +62,7 @@ draw_sidebar = function(self)
     return
   end
 
-  State.perspective.sidebar_w = SIDEBAR_W - PADDING_LX - PADDING_RX  -- TODO why -?
+  State.perspective.sidebar_w = SIDEBAR_W + PADDING_LX + PADDING_RX
 
   ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING_LX - PADDING_RX)
     ui.tile(gui.window_bg)
@@ -652,7 +652,7 @@ use_mouse = function(self)
 
   if not State.player:can_act() then return end
 
-  ui.start_frame(nil, nil, -State.perspective.sidebar_w)
+  ui.start_frame(nil, nil, love.graphics.getWidth() - State.perspective.sidebar_w)
     ui.cursor(self.input_mode == "target" and "target_inactive" or nil)
 
     local position = V(love.mouse.getPosition())

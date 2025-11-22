@@ -12,7 +12,7 @@ local perspective = {}
 --- @field camera_offset vector (internally set) offset in pixels relative to the grid start
 --- @field vision_start vector (internally set)
 --- @field vision_end vector (internally set)
---- @field sidebar_w integer
+--- @field sidebar_w integer sidebar width in screen pixels
 --- @field SCALE integer
 local methods = {}
 perspective.mt = {__index = methods}
@@ -97,7 +97,7 @@ end
 methods._center = function(self, x, y)
   local k = Constants.cell_size * self.SCALE
   return
-    math.floor(love.graphics.getWidth() / 2 - self.sidebar_w - x * k),
+    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - x * k),
     math.floor(love.graphics.getHeight() / 2 - y * k)
 end
 
