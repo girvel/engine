@@ -15,7 +15,7 @@ end
 
 local run = function(command, ...)
   command = command:format(...)
-  print(command)
+  log.debug(command)
   local exit_code = os.execute(command)
   if exit_code ~= 0 then
     log.fatal("Command exited with code %s", exit_code)
@@ -35,8 +35,8 @@ local parse_cli = function()
     :description("Build a binary executable to distribute")
 
   exe:option(
-    "-l --love-path",
-    "Full path of the love executable; defaults to $(which love.exe); should have love dlls nearby"
+    "-I --include",
+    "Path to a folder, containing love.exe, love dlls and rcedit-x64.exe"
   )
 
   exe:option(
@@ -108,14 +108,14 @@ end
 cli.exe = function(args)
   log.info("Starting the build")
 
-  local love_path
-  if args.love_path then
-    love_path = args.love_path
+  local include
+  if args.include then
+    include = args.include
   else
-    love_path = read_run("dirname $(which love.exe)")
+    include = read_run("dirname $(which love.exe)")
 
     do
-      local f = io.open(love_path)
+      local f = io.open(include)
       if not f then
         log.fatal("No --love-path provided, unable to find love.exe in PATH")
         os.exit(1)
@@ -123,7 +123,7 @@ cli.exe = function(args)
       f:close()
     end
 
-    log.info("Found love.exe at %s", love_path)
+    log.info("Found love.exe at %s", include)
   end
 
   local name do
@@ -165,10 +165,12 @@ cli.exe = function(args)
   run("cd .build; zip -9 -r %s_linux.zip %s_linux", versioned_name, versioned_name)
 
   -- pack win64
-  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", love_path, versioned_name, name)
+  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", include, versioned_name, name)
+  run("convert engine/assets/sprites/icon.png +clone -sample 256x256 +clone -sample 48x48 +clone -sample 32x32 -colorspace sRGB .build/dot.ico")
+  run("wine '%s/rcedit-x64.exe' .build/%s.exe --set-icon .build/dot.ico", include, versioned_name)
   run("mkdir -p .build/%s_win64", versioned_name)
   run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
-  run("cp '%s'/*.dll .build/%s_win64/", love_path, versioned_name)
+  run("cp '%s'/*.dll .build/%s_win64/", include, versioned_name)
   run("cp engine/lib/*.dll .build/%s_win64/", versioned_name)
   run("cd .build; zip -9 -r %s_win64.zip %s_win64", versioned_name, versioned_name)
 
