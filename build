@@ -145,7 +145,6 @@ cli.exe = function(args)
   if #version_suffix > 0 then
     log.info("Detected git tag", version_suffix)
     version_suffix = "_" .. version_suffix
-    -- strips \n
   end
   local versioned_name = name .. version_suffix
 
@@ -167,7 +166,7 @@ cli.exe = function(args)
   -- pack win64
   run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", include, versioned_name, name)
   run("convert engine/assets/sprites/icon.png +clone -sample 256x256 +clone -sample 48x48 +clone -sample 32x32 -colorspace sRGB .build/dot.ico")
-  run("wine '%s/rcedit-x64.exe' .build/%s.exe --set-icon .build/dot.ico", include, versioned_name)
+  run("wine '%s/rcedit-x64.exe' .build/%s.exe --set-icon .build/dot.ico", include, name)
   run("mkdir -p .build/%s_win64", versioned_name)
   run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
   run("cp '%s'/*.dll .build/%s_win64/", include, versioned_name)
