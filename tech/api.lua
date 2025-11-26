@@ -306,6 +306,7 @@ api.fade_out = function(duration)
   end
 
   duration = duration or FADE_DURATION
+  State.player.is_memory_enabled = false
 
   local promise, scene = State.runner:run_task(function()
     prev_fov = State.player.fov_r
@@ -318,6 +319,7 @@ api.fade_out = function(duration)
   end, "fade_out")
 
   scene.on_cancel = function()
+    State.player.is_memory_enabled = true
     State.player.fov_r = prev_fov
     prev_fov = nil
   end
@@ -342,9 +344,11 @@ api.fade_in = function(duration)
       end
     end
     prev_fov = nil
+    State.player.is_memory_enabled = true
   end, "fade_in")
 
   scene.on_cancel = function()
+    State.player.is_memory_enabled = true
     State.player.fov_r = prev_fov
     prev_fov = nil
   end
