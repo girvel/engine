@@ -171,6 +171,7 @@ ffi.cdef [[
 transform_colors = function(base, target_color)
   target_color = target_color and target_color:copy():mul_mut(255):map_mut(math.ceil)
   local w, h = base:getDimensions()
+  if w > 128 then return Vector.white, {} end
   local pixels = ffi.cast("Color*", base:getFFIPointer())
 
   local main_color
