@@ -506,16 +506,16 @@ api.traveling_distance = function(entity, target)
   return #path
 end
 
---- @param path string
+--- @param dirpath string
 --- @param volume? number
 --- @return promise, scene
-api.play_sound = function(path, volume)
+api.play_sound = function(dirpath, volume)
   return State.runner:run_task(function()
-    local s = sound.multiple(path, volume):play()
+    local s = sound.multiple(dirpath, volume):play()
     while s.source:isPlaying() do
       coroutine.yield()
     end
-  end, "play " .. path)
+  end, "play " .. dirpath)
 end
 
 --- @param a entity|vector
