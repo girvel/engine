@@ -216,7 +216,7 @@ item.cues = {
   end,
 }
 
---- @return boolean, string?
+--- @return boolean, item_slot?
 give_to_hands = function(entity, this_item)
   local inv = entity.inventory
   local hand = inv.hand

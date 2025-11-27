@@ -2,7 +2,6 @@ local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
-local tcod = require("engine.tech.tcod")
 local sound = require("engine.tech.sound")
 local fighter = require("engine.mech.class.fighter")
 
