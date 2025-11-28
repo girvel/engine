@@ -281,5 +281,5 @@ methods.in_combat = function(self, entity)
   return State.combat and Table.contains(State.combat.list, entity)
 end
 
-Ldump.mark(state, {}, ...)
+Ldump.mark(state, {mt = "const"}, ...)
 return state

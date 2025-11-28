@@ -142,5 +142,5 @@ methods.observe = function(self, entity, dt)
   end
 end
 
-Ldump.mark(combat_ai, {}, ...)
+Ldump.mark(combat_ai, {mt = {}}, ...)
 return combat_ai
