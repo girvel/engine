@@ -14,6 +14,7 @@ local STATES = {
   load_menu = require("engine.state.mode.load_menu"),
   death = require("engine.state.mode.death"),
   exit_confirmation = require("engine.state.mode.exit_confirmation"),
+  ending = require("engine.state.mode.ending"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -105,9 +106,13 @@ methods.player_has_died = function(self)
 end
 
 methods.to_start_screen = function(self)
-  assert(self._mode.type == "death")
+  assert(self._mode.type == "death" or self._mode.type == "ending")
   self:_set_mode(STATES.start_menu.new())
   State:reset()
+end
+
+methods.ending = function(self, is_good)
+  self:_set_mode(STATES.ending.new(is_good))
 end
 
 --- @return boolean ok false if already in confirmation menu
