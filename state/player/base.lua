@@ -16,6 +16,7 @@ local base = {}
 --- @field memory love.Canvas
 --- @field is_memory_enabled boolean
 --- @field is_blind boolean
+--- @field is_deaf boolean
 
 --- @alias dialogue_line plain_dialogue_line | dialogue_options
 
@@ -41,6 +42,7 @@ base.mixin = function()
 
     is_memory_enabled = true,
     is_blind = false,
+    is_deaf = false,
     on_add = function(self)
       self.memory = love.graphics.newCanvas(unpack(
         State.level.grid_size * Constants.cell_size * State.perspective.SCALE

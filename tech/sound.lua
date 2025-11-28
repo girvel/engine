@@ -114,7 +114,7 @@ end
 --- @return T
 methods.play = function(self)
   --- @cast self sound
-  self.source:play()
+  if not State.player or not State.player.is_deaf then self.source:play() end
   return self
 end
 
