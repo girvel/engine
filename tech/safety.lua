@@ -35,7 +35,7 @@ safety.assert = function(condition, message)
     return condition
   end
 
-  Log.error(message)
+  Log.error("Assert failed: %s", message)
   return condition
 end
 
