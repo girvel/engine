@@ -297,7 +297,7 @@ _table.do_folder = function(path)
     if love.filesystem.getInfo(full_path, "directory") then
       result[name] = _table.do_folder(full_path)
     elseif name:ends_with(".lua") then
-      result[name] = love.filesystem.load(full_path)()
+      result[name:sub(1, -5)] = love.filesystem.load(full_path)()
     end
   end
   return result
