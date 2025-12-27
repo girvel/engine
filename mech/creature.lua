@@ -4,6 +4,7 @@ local abilities = require "engine.mech.abilities"
 local sound     = require "engine.tech.sound"
 local creature = {}
 
+
 --- @class _creature_methods
 local methods = {}
 

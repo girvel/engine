@@ -201,9 +201,6 @@ draw_keyboard_action_grid = function(self)
       end
     end
     ui.offset(4)
-
-    action_button(fighter.hit_dice, "h")
-    ui.offset(4)
   ui.finish_line()
   ui.offset(0, 4)
 
@@ -221,6 +218,9 @@ draw_keyboard_action_grid = function(self)
     ui.offset(4)
 
     action_button(actions.interact, "e")
+    ui.offset(4)
+
+    action_button(fighter.hit_dice, "h")
     ui.offset(4)
   ui.finish_line()
   ui.offset(0, 4)
