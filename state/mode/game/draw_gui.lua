@@ -201,6 +201,18 @@ draw_keyboard_action_grid = function(self)
       end
     end
     ui.offset(4)
+
+    do
+      -- TODO active/inactive icons
+      local button = ui.key_button(gui.creator, "c")
+      if button.is_clicked then
+        State.mode:open_creator()
+      end
+      if button.is_mouse_over then
+        hint = "персонаж"
+      end
+    end
+    ui.offset(4)
   ui.finish_line()
   ui.offset(0, 4)
 

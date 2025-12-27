@@ -28,7 +28,9 @@ local gui_elements = {
 
   journal = nth(17),
   escape_menu = nth(18),
+  creator = nth(19),
   journal_inactive = nth(25),
+  creator_inactive = nth(27),
 
   escape = nth(21),
   escape_inactive = nth(29),

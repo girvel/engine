@@ -15,6 +15,7 @@ local STATES = {
   death = require("engine.state.mode.death"),
   exit_confirmation = require("engine.state.mode.exit_confirmation"),
   ending = require("engine.state.mode.ending"),
+  creator = require("engine.state.mode.creator"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -30,6 +31,7 @@ mode.mt = {__index = methods}
 methods._set_mode = function(self, mode_value)
   self._mode = mode_value
 
+  -- TODO don't like this reassignment stuff
   for _, id in ipairs {"draw_gui", "draw_entity", "preprocess", "postprocess"} do
     self[id] = mode_value[id] and Ldump.ignore_upvalue_size(function(_, ...)
       return mode_value[id](mode_value, ...)
@@ -77,6 +79,12 @@ end
 methods.open_journal = function(self)
   Log.info("Opening journal")
   self:_set_mode(STATES.journal.new(self._mode --[[@as state_mode_game]]))
+  OPEN_JOURNAL:play()
+end
+
+methods.open_creator = function(self)
+  Log.info("Opening creator")
+  self:_set_mode(STATES.creator.new(self._mode --[[@as state_mode_game]]))
   OPEN_JOURNAL:play()
 end
 
