@@ -9,6 +9,7 @@ local creator = {}
 --- @field type "creator"
 --- @field _prev state_mode_game
 --- @field model table
+--- @field pane_i integer
 local methods = {}
 creator.mt = {__index = methods}
 
@@ -57,10 +58,13 @@ creator.new = function(prev)
       bonus_plus2 = ABILITIES[1],
       feat = FEATS[1],
     },
+    pane_i = 0,
   }, creator.mt)
 end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
+
+local draw_base_pane
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("n") then
@@ -68,78 +72,116 @@ methods.draw_gui = function(self, dt)
   end
 
   tk.start_window("center", "center", 700, 620)
-  ui.start_font(24)
     ui.h1("Персонаж")
-
-    ui.text("  [0] > [1] > [2]")
-    ui.br()
-
-    ui.start_line()
-    ui.start_font(30)
-      ui.selector()
-      love.graphics.setColor(colors.white_dim)
-        ui.text("## ")
-      love.graphics.setColor(Vector.white)
-      ui.text("Раса:  ")
-      ui.switch(RACES, self.model, "race")
-    ui.finish_font()
-    ui.finish_line()
-    ui.br()
-
-    ui.start_line()
-      ui.selector()
-      ui.text("Навык:  ")
-      ui.switch(SKILLS, self.model, "skill_1")
-    ui.finish_line()
-
-    ui.start_line()
-      ui.selector()
-      ui.text("Навык:  ")
-      local skills = Table.shallow_copy(SKILLS)
-      Table.remove(skills, self.model.skill_1)
-      ui.switch(skills, self.model, "skill_2")
-    ui.finish_line()
-
-    if self.model.race == RACES[1] then
-      ui.text("  +1 ко всем характеристикам")
-    else
-      if self.model.race == RACES[3] then
-        ui.start_line()
-          ui.selector()
-          ui.text("+2:  ")
-          ui.switch(ABILITIES, self.model, "bonus_plus2")
-        ui.finish_line()
-      else
-        ui.start_line()
-          ui.selector()
-          ui.text("+1:  ")
-          ui.switch(ABILITIES, self.model, "bonus_plus1_1")
-        ui.finish_line()
-
-        ui.start_line()
-          ui.selector()
-          ui.text("+1:  ")
-          local remaining_abilities = Table.shallow_copy(ABILITIES)
-          Table.remove(remaining_abilities, self.model.bonus_plus1_1)
-          ui.switch(remaining_abilities, self.model, "bonus_plus1_2")
-        ui.finish_line()
-      end
-
-      ui.br()
+    ui.start_font(24)
       ui.start_line()
-        ui.selector()
-        ui.text("Черта:  ")
-        ui.switch(FEATS, self.model, "feat")
+        if ui.selector() then
+          if ui.keyboard("left") then
+            self.pane_i = (self.pane_i - 1) % 3
+          end
+
+          if ui.keyboard("right") then
+            self.pane_i = (self.pane_i + 1) % 3
+          end
+        end
+
+        ui.text("Уровень: ")
+        for i = 0, 2 do
+          if i > 0 then
+            ui.text(">")
+          end
+          if i == self.pane_i then
+            ui.text(" [%s] ", i)
+          else
+            if ui.text_button(" [%s] ", i).is_clicked then
+              self.pane_i = i
+            end
+          end
+        end
       ui.finish_line()
       ui.br()
-      ui.text("    %s", FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+      ui.br()
+
+      if self.pane_i == 0 then
+        draw_base_pane(self, dt)
+      end
+      -- NEXT analyze script, find out used abilities
+      -- NEXT switch to journal and back
+      -- NEXT switching skills causes padding to change
+      -- NEXT on panes 1+ select a class
+      -- NEXT delegate pane to the class
+      -- NEXT active/inactive
+      -- NEXT select the first unset pane by default
+      -- NEXT really highlight the updated creator
+      -- NEXT highlight the updated journal
+      -- NEXT task for never: setting to disable annoying highlights
+    ui.finish_font()
+  tk.finish_window()
+end
+
+--- @param self state_mode_creator
+--- @param dt number
+draw_base_pane = function(self, dt)
+  ui.start_line()
+  ui.start_font(30)
+    ui.selector()
+    love.graphics.setColor(colors.white_dim)
+      ui.text("## ")
+    love.graphics.setColor(Vector.white)
+    ui.text("Раса: ")
+    ui.switch(RACES, self.model, "race")
+  ui.finish_font()
+  ui.finish_line()
+  ui.br()
+
+  ui.start_line()
+    ui.selector()
+    ui.text("Навык: ")
+    ui.switch(SKILLS, self.model, "skill_1")
+  ui.finish_line()
+
+  ui.start_line()
+    ui.selector()
+    ui.text("Навык: ")
+    local skills = Table.shallow_copy(SKILLS)
+    Table.remove(skills, self.model.skill_1)
+    ui.switch(skills, self.model, "skill_2")
+  ui.finish_line()
+
+  if self.model.race == RACES[1] then
+    ui.text("  +1 ко всем характеристикам")
+  else
+    if self.model.race == RACES[3] then
+      ui.start_line()
+        ui.selector()
+        ui.text("+2: ")
+        ui.switch(ABILITIES, self.model, "bonus_plus2")
+      ui.finish_line()
+    else
+      ui.start_line()
+        ui.selector()
+        ui.text("+1: ")
+        ui.switch(ABILITIES, self.model, "bonus_plus1_1")
+      ui.finish_line()
+
+      ui.start_line()
+        ui.selector()
+        ui.text("+1: ")
+        local remaining_abilities = Table.shallow_copy(ABILITIES)
+        Table.remove(remaining_abilities, self.model.bonus_plus1_1)
+        ui.switch(remaining_abilities, self.model, "bonus_plus1_2")
+      ui.finish_line()
     end
 
-    -- NEXT analyze script, find out used abilities
-    -- NEXT switch to journal and back
-    -- NEXT switching panes
-  ui.finish_font()
-  tk.finish_window()
+    ui.br()
+    ui.start_line()
+      ui.selector()
+      ui.text("Черта: ")
+      ui.switch(FEATS, self.model, "feat")
+    ui.finish_line()
+    ui.br()
+    ui.text("    %s", FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+  end
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)

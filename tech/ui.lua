@@ -56,7 +56,7 @@ local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 local SCALE = 4  -- TODO extract scale here
 local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
 
-local get_font, get_batch, get_mouse_over, button
+local get_font, get_batch, get_mouse_over, button, format
 
 
 ----------------------------------------------------------------------------------------------------
@@ -218,10 +218,7 @@ end
 
 --- @param text any
 ui.text = function(text, ...)
-  text = tostring(text)
-  if select("#", ...) > 0 then
-    text = text:format(...)
-  end
+  text = format(text, ...)
 
   local frame = Table.last(model.frame)
   local font = Table.last(model.font)
@@ -527,6 +524,7 @@ ui.field = function(content)
   end
 end
 
+--- @return boolean is_selected
 ui.selector = function()
   model.selection.max_i = model.selection.max_i + 1
   if model.selection.i == model.selection.max_i then
@@ -534,6 +532,7 @@ ui.selector = function()
   else
     ui.text("  ")
   end
+  return model.selection.i == model.selection.max_i
 end
 
 --- @param values string[]
@@ -543,9 +542,12 @@ local max_length = Memoize(function(values)
     :max()
 end)
 
---- @param text string
+--- @param text any
+--- @param ... any
 --- @return ui_button_out
-ui.text_button = function(text)
+ui.text_button = function(text, ...)
+  -- TODO bug overlap when next to each other
+  text = format(text, ...)
   local font = Table.last(model.font)
   local prev_color = {love.graphics.getColor()}
 
@@ -553,7 +555,7 @@ ui.text_button = function(text)
   if result.is_mouse_over then
     ui.cursor("hand")
   else
-    love.graphics.setColor(colors.white_dim)
+    love.graphics.setColor(colors.blue_high)
   end
   ui.text(text)
   if not result.is_mouse_over then
@@ -800,6 +802,17 @@ button = function(w, h)
   end
 
   return result
+end
+
+--- @param fmt any
+--- @param ... any
+--- @return string
+format = function(fmt, ...)
+  fmt = tostring(fmt)
+  if select("#", ...) > 0 then
+    fmt = fmt:format(...)
+  end
+  return fmt
 end
 
 ----------------------------------------------------------------------------------------------------
