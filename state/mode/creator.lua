@@ -32,7 +32,7 @@ local FEAT_CODENAMES = {
 }
 
 local FEATS = Fun.iter(FEAT_CODENAMES)
-  :map(function(feat) return assert(translation.feats[feat]) end)
+  :map(function(feat) return assert(translation.feats[feat]):utf_capitalize() end)
   :totable()
 
 local FEAT_DESCRIPTIONS = {
@@ -121,7 +121,6 @@ methods.draw_gui = function(self, dt)
       end
 
       -- NEXT finish the fighter class
-      -- NEXT extract idioms
 
       -- NEXT active/inactive
       -- NEXT change icon
@@ -335,13 +334,27 @@ local FS_DESCRIPTIONS = {
   "+1 к классу брони при наличии шлема/доспеха",
 }
 
+local start_icon_header = function(image)
+  ui.start_line()
+  ui.selector()
+  ui.image(image, 2)
+  ui.start_font(28)
+end
+
+local finish_icon_header = function()
+  ui.finish_font()
+  ui.finish_line()
+  ui.br()
+end
+
 local description = function(fmt, ...)
   ui.start_frame(ui.get_font():getWidth("w") * 4)
     ui.text(fmt, ...)
     local y = ui.get_frame().y
   ui.finish_frame()
   ui.get_frame().y = y
-  ui.br()
+
+  ui.br(); ui.br(); ui.br()
 end
 
 draw_fighter_pane = function(self, dt, total_level, class_level)
@@ -360,6 +373,7 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
   else
     hp_bonus = 6
   end
+
   ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
   ui.br()
   ui.br()
@@ -369,38 +383,16 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
       class_data.fighting_style = FIGHTING_STYLES[1]
     end
 
-    ui.start_line()
-      ui.selector()
-      ui.image(gui_elements.fighting_styles, 2)
-
-      ui.start_font(28)
-      ui.start_frame(nil, nil, nil, gui_elements.second_wind:getHeight() * 2)
-      ui.start_line()
-        ui.text(" Боевой стиль: ")
-        ui.switch(FIGHTING_STYLES, class_data, "fighting_style")
-      ui.finish_line()
-      ui.finish_frame()
-      ui.finish_font()
-    ui.finish_line()
-    ui.br()
+    start_icon_header(gui_elements.fighting_styles)
+      ui.text(" Боевой стиль: ")
+      ui.switch(FIGHTING_STYLES, class_data, "fighting_style")
+    finish_icon_header()
 
     description(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
-    ui.br()
-    ui.br()
 
-    ui.start_line()
-      ui.text("  ")
-      ui.image(gui_elements.second_wind, 2)
-
-      ui.start_font(28)
-      ui.start_alignment("left", "bottom")
-      ui.start_frame(nil, nil, nil, gui_elements.second_wind:getHeight() * 2)
-        ui.text(" Второе дыхание")
-      ui.finish_frame()
-      ui.finish_alignment()
-      ui.finish_font()
-    ui.finish_line()
-    ui.br()
+    start_icon_header(gui_elements.second_wind)
+      ui.text(" Второе дыхание")
+    finish_icon_header()
 
     local roll = fighter.second_wind:get_roll(self.model.total_level)
     description(
