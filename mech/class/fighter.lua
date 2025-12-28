@@ -60,8 +60,12 @@ fighter.second_wind = Table.extend({
   _act = function(self, entity)
     State:add(animated.fx("engine/assets/sprites/animations/second_wind", entity.position))
     self.sounds:play_at(entity.position)
-    health.heal(entity, (D(10) + entity.level):roll())
+    health.heal(entity, self:get_roll(entity.level):roll())
     return true
+  end,
+
+  get_roll = function(self, level)
+    return D(10) + level
   end,
 }, action.base)
 

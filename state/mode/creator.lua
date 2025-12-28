@@ -1,3 +1,4 @@
+local gui_elements = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 local xp = require("engine.mech.xp")
 local translation = require("engine.tech.translation")
@@ -62,6 +63,7 @@ creator.new = function(prev)
       bonus_plus2 = ABILITIES[1],
       feat = FEATS[1],
       classes = {},
+      total_level = 3,
     },
     pane_i = 0,
   }, creator.mt)
@@ -87,16 +89,16 @@ methods.draw_gui = function(self, dt)
       ui.start_line()
         if ui.selector() then
           if ui.keyboard("left") then
-            self.pane_i = (self.pane_i - 1) % 3
+            self.pane_i = (self.pane_i - 1) % (self.model.total_level + 1)
           end
 
           if ui.keyboard("right") then
-            self.pane_i = (self.pane_i + 1) % 3
+            self.pane_i = (self.pane_i + 1) % (self.model.total_level + 1)
           end
         end
 
         ui.text("Уровень: ")
-        for i = 0, 2 do
+        for i = 0, self.model.total_level do
           if i > 0 then
             ui.text(">")
           end
@@ -117,14 +119,19 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT delegate pane to the class
+      -- NEXT switches in the class pane
+      -- NEXT finish the fighter class
+      -- NEXT extract idioms
+
       -- NEXT active/inactive
+      -- NEXT change icon
       -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
       -- NEXT when warlock: kind of recognize the Nea
-      -- NEXT change icon
+      -- NEXT distribute abilities randomly?
+
     ui.finish_font()
   tk.finish_window()
 end
@@ -189,7 +196,7 @@ draw_base_pane = function(self, dt)
         right_button = false
       end
 
-      ui.text("+ %d = %02d  (%s%d)", bonus, score, modifier > 0 and "+" or "", modifier)
+      ui.text("+ %d = %02d  (%+d)", bonus, score, modifier)
 
       if left_button then
         self.model.points = self.model.points + (
@@ -278,6 +285,8 @@ local CLASSES = Fun.iter(CLASSES_DATA)
   :map(function(cls) return assert(translation.classes[cls.codename]):utf_capitalize() end)
   :totable()
 
+local draw_fighter_pane
+
 --- @param self state_mode_creator
 --- @param dt number
 draw_pane = function(self, dt)
@@ -300,11 +309,51 @@ draw_pane = function(self, dt)
       ui.text("## ")
     love.graphics.setColor(Vector.white)
     ui.text("Класс: ")
-    ui.switch(CLASSES, self_classes, self.pane_i)
+    ui.switch(CLASSES, self_classes, self.pane_i)  -- NEXT hide switch buttons if # == 1
     ui.text("(уровень %s)", class_level)
   ui.finish_font()
   ui.finish_line()
   ui.br()
+
+  local class_i = Table.index_of(CLASSES, self_classes[self.pane_i])
+  if class_i == 1 then
+    draw_fighter_pane(self, dt, self.pane_i, class_level)
+  end
+end
+
+draw_fighter_pane = function(self, dt, total_level, class_level)
+  local con_mod = abilities.get_modifier(self.model.abilities.con)
+  local hp_bonus
+  if total_level == 1 then
+    -- NEXT implement this
+    -- NEXT figure out how many skills & where
+    hp_bonus = 10
+  else
+    hp_bonus = 6
+  end
+  ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
+  ui.br()
+
+  if class_level == 1 then
+    ui.start_line()
+      ui.text("  ")
+      ui.image(gui_elements.second_wind, 2)
+
+      ui.start_font(28)
+      ui.start_alignment("left", "bottom")
+      ui.start_frame(nil, nil, nil, gui_elements.second_wind:getHeight() * 2)
+        ui.text(" Второе дыхание")
+      ui.finish_frame()
+      ui.finish_alignment()
+      ui.finish_font()
+    ui.finish_line()
+    ui.br()
+
+    ui.start_frame(ui.get_font():getWidth("w") * 4)
+      local roll = fighter.second_wind:get_roll(self.model.total_level)
+      ui.text("Бонусным действием раз за бой восстанавливает %d-%d здоровья", roll:min(), roll:max())
+    ui.finish_frame(true)
+  end
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)
