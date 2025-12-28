@@ -571,17 +571,28 @@ ui.switch = function(possible_values, container, key)
   local value = container[key]
 
   local left_button = ui.text_button(" < ")
-  ui.text(tostring(value):cjust(max_length(possible_values), " "))
-  local right_button = ui.text_button(" > ")
+
+  local length = max_length(possible_values)
+  ui.start_frame()  -- font slightly breaks monospacing
+    ui.text(tostring(value):cjust(length, " "))
+  ui.finish_frame()
+
+  local right_button = ui.text_button(" " * (length + 1) .. " > ")
 
   local is_selected = model.selection.i == model.selection.max_i
   local index = Table.index_of(possible_values, value) or 1
+
+  local offset
   if left_button.is_clicked or is_selected and ui.keyboard("left") then
-    container[key] = possible_values[Math.loopmod(index + 1, #possible_values)]
+    offset = 1
   end
 
   if right_button.is_clicked or is_selected and ui.keyboard("right") then
-    container[key] = possible_values[Math.loopmod(index - 1, #possible_values)]
+    offset = -1
+  end
+
+  if offset then
+    container[key] = possible_values[Math.loopmod(index + offset, #possible_values)]
   end
 end
 
