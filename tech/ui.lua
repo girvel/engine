@@ -523,6 +523,34 @@ ui.field = function(content)
   end
 end
 
+ui.selector = function()
+  model.selection.max_i = model.selection.max_i + 1
+  if model.selection.i == model.selection.max_i then
+    ui.text("> ")
+  else
+    ui.text("  ")
+  end
+end
+
+--- @param possible_values string[]
+--- @param container table
+--- @param key any
+ui.switch = function(possible_values, container, key)
+  local value = container[key]
+  ui.text("< %s >", value)
+
+  if model.selection.i == model.selection.max_i then
+    local index = Table.index_of(possible_values, value) or 1
+    if ui.keyboard("left") then
+      container[key] = possible_values[Math.loopmod(index + 1, #possible_values)]
+    end
+
+    if ui.keyboard("right") then
+      container[key] = possible_values[Math.loopmod(index - 1, #possible_values)]
+    end
+  end
+end
+
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)
