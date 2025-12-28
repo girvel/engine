@@ -1,3 +1,4 @@
+local xp = require("engine.mech.xp")
 local translation = require("engine.tech.translation")
 local abilities = require("engine.mech.abilities")
 local colors = require("engine.tech.colors")
@@ -19,7 +20,7 @@ local SKILLS = Fun.iter(abilities.skill_bases)
   :map(function(skill) return assert(translation.skills[skill]):utf_capitalize() end)
   :totable()
 
-local ABILITIES = Fun.iter(abilities.set)
+local ABILITIES = Fun.iter(abilities.list)
   :map(function(ability) return assert(translation.abilities[ability]):utf_capitalize() end)
   :totable()
 
@@ -112,7 +113,7 @@ methods.draw_gui = function(self, dt)
         draw_base_pane(self, dt)
       end
 
-      -- NEXT change abilities
+      -- NEXT ability bonus
       -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
       -- NEXT active/inactive
@@ -142,7 +143,7 @@ draw_base_pane = function(self, dt)
   ui.text("  " .. header)
   ui.text("  " .. "-" * header:utf_len())
 
-  for codename in pairs(abilities.set) do
+  for _, codename in ipairs(abilities.list) do
     ui.start_line()
       local name = translation.abilities[codename]
       local raw_score = self.model.abilities[codename]
@@ -150,18 +151,50 @@ draw_base_pane = function(self, dt)
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
-      ui.selector()
+      local is_selected = ui.selector()
       ui.text("%s ", name:ljust(column1_length):utf_capitalize())
-      ui.text_button(" < ")
+
+      local left_button
+      if raw_score > 8 then
+        left_button = ui.text_button(" < ").is_clicked
+          or is_selected and ui.keyboard("left")
+      else
+        ui.text("   ")
+        left_button = false
+      end
+
       ui.text("%02d", raw_score)
-      ui.text_button(" > ")
+
+      local right_button
+      if raw_score < 15
+        and xp.point_buy[raw_score + 1] - xp.point_buy[raw_score] <= self.model.points
+      then
+        right_button = ui.text_button(" > ").is_clicked
+          or is_selected and ui.keyboard("right")
+      else
+        ui.text("   ")
+        right_button = false
+      end
+
       ui.text("+ %d = %02d  (%d)", bonus, score, modifier)
+
+      if left_button then
+        self.model.points = self.model.points + (
+          xp.point_buy[raw_score] - xp.point_buy[raw_score - 1]
+        )
+        self.model.abilities[codename] = raw_score - 1
+      elseif right_button then
+        self.model.points = self.model.points - (
+          xp.point_buy[raw_score + 1] - xp.point_buy[raw_score]
+        )
+        self.model.abilities[codename] = raw_score + 1
+      end
     ui.finish_line()
   end
 
   ui.start_line()
     ui.text("  %s    ", ("Очки:"):ljust(column1_length))
-    ui.text("%02d", self.model.points)
+    ui.text("%02d", self.model.points)  -- NEXT color red on > 0
   ui.finish_line()
 
   ui.br()

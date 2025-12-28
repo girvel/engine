@@ -14,10 +14,8 @@ abilities.new = function(str, dex, con, int, wis, cha)
   }
 end
 
-abilities.set = Table.set {
-  "str", "dex", "con",
-  "int", "wis", "cha",
-} --[[@as table<ability, true>]]
+abilities.list = {"str", "dex", "con", "int", "wis", "cha"}
+abilities.set = Table.set(abilities.list) --[[@as table<ability, true>]]
 
 --- @enum (key) skill
 abilities.skill_bases = {
