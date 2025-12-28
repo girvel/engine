@@ -11,22 +11,34 @@ local creator = {}
 local methods = {}
 creator.mt = {__index = methods}
 
-local POSSIBLE_SKILLS = {
+-- NEXT connect
+local SKILLS = {
   "Выживание",
   "Внимание",
   "Атлетика",
 }
 
-local POSSIBLE_RACES = {
+local RACES = {
   "Разносторонний человек",
   "Альтернативный человек",
   "Необычное происхождение",
 }
 
-local POSSIBLE_ABILITIES = {
+local ABILITIES = {
   "Сила",
   "Ловкость",
   "Телосложение",
+}
+
+-- NEXT more feats
+local FEATS = {
+  "Неистовый атакующий",
+  "Мастер двуручного оружия",
+}
+
+local FEAT_DESCRIPTIONS = {
+  "Атаки наносят больше урона",
+  "Шанс попадания двуручным оружием меньше на 25%, урон выше на 10",
 }
 
 --- @param prev state_mode_game
@@ -36,12 +48,13 @@ creator.new = function(prev)
     type = "creator",
     _prev = prev,
     model = {
-      race = POSSIBLE_RACES[1],
-      skill_1 = POSSIBLE_SKILLS[1],
-      skill_2 = POSSIBLE_SKILLS[2],
-      bonus_plus1_1 = POSSIBLE_ABILITIES[1],
-      bonus_plus1_2 = POSSIBLE_ABILITIES[2],
-      bonus_plus2 = POSSIBLE_ABILITIES[1],
+      race = RACES[1],
+      skill_1 = SKILLS[1],
+      skill_2 = SKILLS[2],
+      bonus_plus1_1 = ABILITIES[1],
+      bonus_plus1_2 = ABILITIES[2],
+      bonus_plus2 = ABILITIES[1],
+      feat = FEATS[1],
     },
   }, creator.mt)
 end
@@ -53,7 +66,7 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
-  tk.start_window("center", "center", 400, 600)
+  tk.start_window("center", "center", 500, 700)
   ui.start_font(24)
     ui.h1("Персонаж")
 
@@ -62,55 +75,57 @@ methods.draw_gui = function(self, dt)
 
     ui.start_line()
       ui.selector()
-      ui.text("## ")
-      ui.switch(POSSIBLE_RACES, self.model, "race")
+      ui.text("## Раса:  ")
+      ui.switch(RACES, self.model, "race")
     ui.finish_line()
     ui.br()
 
     ui.start_line()
       ui.selector()
       ui.text("Навык:  ")
-      ui.switch(POSSIBLE_SKILLS, self.model, "skill_1")
+      ui.switch(SKILLS, self.model, "skill_1")
     ui.finish_line()
 
     ui.start_line()
       ui.selector()
       ui.text("Навык:  ")
-      local skills = Table.shallow_copy(POSSIBLE_SKILLS)
+      local skills = Table.shallow_copy(SKILLS)
       Table.remove(skills, self.model.skill_1)
       ui.switch(skills, self.model, "skill_2")
     ui.finish_line()
 
-    if self.model.race == POSSIBLE_RACES[1] then
+    if self.model.race == RACES[1] then
       ui.text("  +1 ко всем характеристикам")
     else
-      if self.model.race == POSSIBLE_RACES[3] then
+      if self.model.race == RACES[3] then
         ui.start_line()
           ui.selector()
           ui.text("+2:  ")
-          ui.switch(POSSIBLE_ABILITIES, self.model, "bonus_plus2")
+          ui.switch(ABILITIES, self.model, "bonus_plus2")
         ui.finish_line()
       else
         ui.start_line()
           ui.selector()
           ui.text("+1:  ")
-          ui.switch(POSSIBLE_ABILITIES, self.model, "bonus_plus1_1")
+          ui.switch(ABILITIES, self.model, "bonus_plus1_1")
         ui.finish_line()
 
         ui.start_line()
           ui.selector()
           ui.text("+1:  ")
-          local remaining_abilities = Table.shallow_copy(POSSIBLE_ABILITIES)
+          local remaining_abilities = Table.shallow_copy(ABILITIES)
           Table.remove(remaining_abilities, self.model.bonus_plus1_1)
           ui.switch(remaining_abilities, self.model, "bonus_plus1_2")
         ui.finish_line()
       end
 
+      ui.br()
       ui.start_line()
         ui.selector()
-        ui.text("Черта: < Чёрт >")
-        -- NEXT
+        ui.text("Черта:  ")
+        ui.switch(FEATS, self.model, "feat")
       ui.finish_line()
+      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
     end
 
     -- NEXT analyze script, find out used abilities

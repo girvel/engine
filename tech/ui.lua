@@ -217,7 +217,10 @@ end
 
 --- @param text any
 ui.text = function(text, ...)
-  text = tostring(text):format(...)
+  text = tostring(text)
+  if select("#", ...) > 0 then
+    text = text:format(...)
+  end
 
   local frame = Table.last(model.frame)
   local font = Table.last(model.font)
