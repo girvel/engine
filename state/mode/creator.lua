@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local tk = require("engine.state.mode.tk")
 local ui = require("engine.tech.ui")
 
@@ -66,17 +67,22 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
-  tk.start_window("center", "center", 500, 700)
+  tk.start_window("center", "center", 700, 700)
   ui.start_font(24)
     ui.h1("Персонаж")
 
-    ui.text("[0] > [1] > [2]")
+    ui.text("  [0] > [1] > [2]")
     ui.br()
 
     ui.start_line()
+    ui.start_font(30)
       ui.selector()
-      ui.text("## Раса:  ")
+      love.graphics.setColor(colors.white_dim)
+        ui.text("## ")
+      love.graphics.setColor(Vector.white)
+      ui.text("Раса:  ")
       ui.switch(RACES, self.model, "race")
+    ui.finish_font()
     ui.finish_line()
     ui.br()
 
@@ -131,7 +137,7 @@ methods.draw_gui = function(self, dt)
     -- NEXT analyze script, find out used abilities
     -- NEXT handle mouse
     -- NEXT align switch
-    -- NEXT fancier subheader
+    -- NEXT switch to journal and back
   ui.finish_font()
   tk.finish_window()
 end
