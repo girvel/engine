@@ -134,5 +134,10 @@ fighter.fighting_styles.defence = {
   end,
 }
 
+fighter.fighting_styles_list = {
+  fighter.fighting_styles.two_weapon_fighting,
+  fighter.fighting_styles.defence,
+}
+
 Ldump.mark(fighter, "const", ...)
 return fighter

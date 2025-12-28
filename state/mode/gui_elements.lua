@@ -48,6 +48,8 @@ local gui_elements = {
   fighting_spirit_inactive = nth(43),
   great_weapon_master_inactive = nth(44),
 
+  fighting_styles = nth(49),
+
   window_bg = "engine/assets/sprites/gui/window_bg.png",
   hp_bg = "engine/assets/sprites/gui/hp_bg.png",
   hp_bar = "engine/assets/sprites/gui/hp_bar.png",

@@ -63,6 +63,7 @@ creator.new = function(prev)
       bonus_plus2 = ABILITIES[1],
       feat = FEATS[1],
       classes = {},
+      class_data = Fun.range(3):map(function() return {} end):totable(),
       total_level = 3,
     },
     pane_i = 0,
@@ -119,18 +120,19 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT switches in the class pane
       -- NEXT finish the fighter class
       -- NEXT extract idioms
 
       -- NEXT active/inactive
       -- NEXT change icon
+      -- NEXT submit
       -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
       -- NEXT when warlock: kind of recognize the Nea
       -- NEXT distribute abilities randomly?
+      -- NEXT more fighting styles
 
     ui.finish_font()
   tk.finish_window()
@@ -314,6 +316,7 @@ draw_pane = function(self, dt)
   ui.finish_font()
   ui.finish_line()
   ui.br()
+  ui.br()
 
   local class_i = Table.index_of(CLASSES, self_classes[self.pane_i])
   if class_i == 1 then
@@ -321,7 +324,33 @@ draw_pane = function(self, dt)
   end
 end
 
+local FIGHTING_STYLES = Fun.iter(fighter.fighting_styles_list)
+  :map(function(style)
+    return assert(translation.fighting_styles[style.codename]):utf_capitalize()
+  end)
+  :totable()
+
+local FS_DESCRIPTIONS = {
+  "Удар оружием во второй руке наносит больше урона",
+  "+1 к классу брони при наличии шлема/доспеха",
+}
+
+local description = function(fmt, ...)
+  ui.start_frame(ui.get_font():getWidth("w") * 4)
+    ui.text(fmt, ...)
+    local y = ui.get_frame().y
+  ui.finish_frame()
+  ui.get_frame().y = y
+  ui.br()
+end
+
 draw_fighter_pane = function(self, dt, total_level, class_level)
+  local codename = "fighter_" .. class_level
+  if self.model.class_data[total_level].type ~= codename then
+    self.model.class_data[total_level] = {type = codename}
+  end
+  local class_data = self.model.class_data[total_level]
+
   local con_mod = abilities.get_modifier(self.model.abilities.con)
   local hp_bonus
   if total_level == 1 then
@@ -333,8 +362,32 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
   end
   ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
   ui.br()
+  ui.br()
 
   if class_level == 1 then
+    if not class_data.fighting_style then
+      class_data.fighting_style = FIGHTING_STYLES[1]
+    end
+
+    ui.start_line()
+      ui.selector()
+      ui.image(gui_elements.fighting_styles, 2)
+
+      ui.start_font(28)
+      ui.start_frame(nil, nil, nil, gui_elements.second_wind:getHeight() * 2)
+      ui.start_line()
+        ui.text(" Боевой стиль: ")
+        ui.switch(FIGHTING_STYLES, class_data, "fighting_style")
+      ui.finish_line()
+      ui.finish_frame()
+      ui.finish_font()
+    ui.finish_line()
+    ui.br()
+
+    description(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
+    ui.br()
+    ui.br()
+
     ui.start_line()
       ui.text("  ")
       ui.image(gui_elements.second_wind, 2)
@@ -349,10 +402,11 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
     ui.finish_line()
     ui.br()
 
-    ui.start_frame(ui.get_font():getWidth("w") * 4)
-      local roll = fighter.second_wind:get_roll(self.model.total_level)
-      ui.text("Бонусным действием раз за бой восстанавливает %d-%d здоровья", roll:min(), roll:max())
-    ui.finish_frame(true)
+    local roll = fighter.second_wind:get_roll(self.model.total_level)
+    description(
+      "Бонусным действием раз за бой восстанавливает %d-%d здоровья",
+      roll:min(), roll:max()
+    )
   end
 end
 

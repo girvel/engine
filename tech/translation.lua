@@ -61,6 +61,11 @@ local translation = {
   classes = {
     fighter = "воин",
   },
+
+  fighting_styles = {
+    two_weapon_fighting = "Бой двумя оружиями",
+    defence = "Защита",
+  },
 }
 
 Ldump.mark(translation, "const", ...)
