@@ -50,6 +50,8 @@ creator.new = function(prev)
     type = "creator",
     _prev = prev,
     model = {
+      abilities = abilities.new(8, 8, 8, 8, 8, 8),
+      points = 27,
       race = RACES[1],
       skill_1 = SKILLS[1],
       skill_2 = SKILLS[2],
@@ -105,12 +107,12 @@ methods.draw_gui = function(self, dt)
         end
       ui.finish_line()
       ui.br()
-      ui.br()
 
       if self.pane_i == 0 then
         draw_base_pane(self, dt)
       end
 
+      -- NEXT change abilities
       -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
       -- NEXT active/inactive
@@ -118,7 +120,6 @@ methods.draw_gui = function(self, dt)
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
-      -- NEXT table of abilities
       -- NEXT change icon
     ui.finish_font()
   tk.finish_window()
@@ -127,6 +128,44 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_base_pane = function(self, dt)
+  local column1_length = Fun.iter(ABILITIES)
+    :map(function(name) return name:utf_len() end)
+    :max()
+
+  local column2_length = 16
+
+  local header = ("%s   %s МОДИФИКАТОР"):format(
+    ("ХАР-КА"):ljust(column1_length, " "),
+    ("ЗНАЧЕНИЕ"):ljust(column2_length, " ")
+  )
+
+  ui.text("  " .. header)
+  ui.text("  " .. "-" * header:utf_len())
+
+  for codename in pairs(abilities.set) do
+    ui.start_line()
+      local name = translation.abilities[codename]
+      local raw_score = self.model.abilities[codename]
+      local bonus = 0
+      local score = raw_score + bonus
+      local modifier = abilities.get_modifier(score)
+
+      ui.selector()
+      ui.text("%s ", name:ljust(column1_length):utf_capitalize())
+      ui.text_button(" < ")
+      ui.text("%02d", raw_score)
+      ui.text_button(" > ")
+      ui.text("+ %d = %02d  (%d)", bonus, score, modifier)
+    ui.finish_line()
+  end
+
+  ui.start_line()
+    ui.text("  %s    ", ("Очки:"):ljust(column1_length))
+    ui.text("%02d", self.model.points)
+  ui.finish_line()
+
+  ui.br()
+
   ui.start_line()
   ui.start_font(30)
     ui.selector()

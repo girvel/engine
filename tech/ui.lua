@@ -248,7 +248,7 @@ ui.text = function(text, ...)
 
     if alignment.y == "top" then
       if is_linear then
-        frame.x = frame.x + font:getWidth(text)
+        frame.x = frame.x + font:getWidth("w") * text:utf_len()
         model.line_last_h[#model.line_last_h] = math.max(
           Table.last(model.line_last_h),
           font:getHeight() * LINE_K
@@ -574,11 +574,8 @@ ui.switch = function(possible_values, container, key, ...)
   possible_values = Table.removed(possible_values, ...)
 
   local left_button = ui.text_button(" < ")
-  ui.start_frame()  -- font slightly breaks monospacing
-    ui.text(tostring(value):cjust(length, " "))
-  ui.finish_frame()
-
-  local right_button = ui.text_button(" " * (length + 1) .. " > ")
+  ui.text(tostring(value):cjust(length, " "))
+  local right_button = ui.text_button(" > ")
 
   local is_selected = model.selection.i == model.selection.max_i
   local index = Table.index_of(possible_values, value) or 1

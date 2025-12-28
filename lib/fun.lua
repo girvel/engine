@@ -9,6 +9,7 @@
 --- @diagnostic disable
 
 local exports = {}
+--- @class fun_iter
 local methods = {}
 
 -- compatibility with Lua 5.1/5.2
@@ -130,6 +131,7 @@ local rawiter = function(obj, param, state)
           obj, type(obj)))
 end
 
+--- @return fun_iter
 local iter = function(obj, param, state)
     return wrap(rawiter(obj, param, state))
 end

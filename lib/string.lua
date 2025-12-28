@@ -100,43 +100,20 @@ end
 
 --- @param str string
 --- @param int integer
---- @param padstr string
+--- @param padstr? string
 --- @return string
 string.ljust = function(str, int, padstr)
-  local len = utf8.len(str)
-
-  if int > len then
-    local num = padstr and math.floor((int - len) / #padstr) or int - len
-    str = str .. (padstr or " ") * num
-    len = #str
-    if len < int then str = str .. padstr:sub(1, int - len) end
-  end
-
-  return str
+  padstr = padstr or " "
+  assert(padstr:utf_len() == 1, "TODO")
+  return str .. padstr * (int - str:utf_len())
 end
 
 --- @param str string
 --- @param int integer
---- @param padstr string
---- @return string
-string.rjust = function(str, int, padstr)
-  local len = #str
-
-  if int > len then
-    local num = padstr and math.floor((int - len) / #padstr) or int - len
-    str = ((padstr or " ") * num) .. str
-    len = #str
-    if len < int then str = padstr:sub(1, int - len) .. str end
-  end
-
-  return str
-end
-
---- @param str string
---- @param int integer
---- @param padstr string
+--- @param padstr? string
 --- @return string
 string.cjust = function(str, int, padstr)
+  padstr = padstr or " "
   assert(padstr:utf_len() == 1, "TODO")
   local total_pad = int - str:utf_len()
   return (padstr * math.floor(total_pad / 2)) .. str .. (padstr * math.ceil(total_pad / 2))
