@@ -136,7 +136,6 @@ methods.draw_gui = function(self, dt)
 
     -- NEXT analyze script, find out used abilities
     -- NEXT handle mouse
-    -- NEXT align switch
     -- NEXT switch to journal and back
   ui.finish_font()
   tk.finish_window()

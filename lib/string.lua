@@ -133,6 +133,16 @@ string.rjust = function(str, int, padstr)
 end
 
 --- @param str string
+--- @param int integer
+--- @param padstr string
+--- @return string
+string.cjust = function(str, int, padstr)
+  assert(padstr:utf_len() == 1, "TODO")
+  local total_pad = int - str:utf_len()
+  return (padstr * math.floor(total_pad / 2)) .. str .. (padstr * math.ceil(total_pad / 2))
+end
+
+--- @param str string
 --- @return string
 string.lstrip = function(str)
   return select(1, str:gsub("^%s+", ""))

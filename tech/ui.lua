@@ -535,12 +535,19 @@ ui.selector = function()
   end
 end
 
+--- @param values string[]
+local max_length = Memoize(function(values)
+  return Fun.iter(values)
+    :map(function(v) return v:utf_len() end)
+    :max()
+end)
+
 --- @param possible_values string[]
 --- @param container table
 --- @param key any
 ui.switch = function(possible_values, container, key)
   local value = container[key]
-  ui.text("< %s >", value)
+  ui.text("< %s >", tostring(value):cjust(max_length(possible_values), " "))
 
   if model.selection.i == model.selection.max_i then
     local index = Table.index_of(possible_values, value) or 1
