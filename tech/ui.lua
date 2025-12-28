@@ -543,36 +543,34 @@ local max_length = Memoize(function(values)
     :max()
 end)
 
+--- @param text string
+--- @return ui_button_out
+ui.text_button = function(text)
+  local font = Table.last(model.font)
+  local prev_color = {love.graphics.getColor()}
+
+  local result = button(font:getWidth("w") * text:utf_len(), font:getHeight())
+  if result.is_mouse_over then
+    ui.cursor("hand")
+  else
+    love.graphics.setColor(colors.white_dim)
+  end
+  ui.text(text)
+  if not result.is_mouse_over then
+    love.graphics.setColor(prev_color)
+  end
+  return result
+end
+
 --- @param possible_values string[]
 --- @param container table
 --- @param key any
 ui.switch = function(possible_values, container, key)
-  local font = Table.last(model.font)
   local value = container[key]
 
-  local prev_color = {love.graphics.getColor()}
-
-  local left_button = button(font:getWidth("w") * 3, font:getHeight())
-  if left_button.is_mouse_over then
-    ui.cursor("hand")
-  else
-    love.graphics.setColor(colors.white_dim)
-  end
-  ui.text(" < ")
-
-  love.graphics.setColor(prev_color)
+  local left_button = ui.text_button(" < ")
   ui.text(tostring(value):cjust(max_length(possible_values), " "))
-
-  -- NEXT ui.text_button
-  local right_button = button(font:getWidth("w") * 3, font:getHeight())
-  if right_button.is_mouse_over then
-    ui.cursor("hand")
-  else
-    love.graphics.setColor(colors.white_dim)
-  end
-  ui.text(" > ")
-
-  love.graphics.setColor(prev_color)
+  local right_button = ui.text_button(" > ")
 
   local is_selected = model.selection.i == model.selection.max_i
   local index = Table.index_of(possible_values, value) or 1

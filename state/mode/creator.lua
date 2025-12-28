@@ -67,7 +67,7 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
-  tk.start_window("center", "center", 700, 700)
+  tk.start_window("center", "center", 700, 620)
   ui.start_font(24)
     ui.h1("Персонаж")
 
