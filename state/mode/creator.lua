@@ -111,7 +111,6 @@ methods.draw_gui = function(self, dt)
         draw_base_pane(self, dt)
       end
 
-      -- NEXT switching skills causes padding to change
       -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
       -- NEXT active/inactive
@@ -143,15 +142,13 @@ draw_base_pane = function(self, dt)
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, self.model, "skill_1")
+    ui.switch(SKILLS, self.model, "skill_1", self.model.skill_2)
   ui.finish_line()
 
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    local skills = Table.shallow_copy(SKILLS)
-    Table.remove(skills, self.model.skill_1)
-    ui.switch(skills, self.model, "skill_2")
+    ui.switch(SKILLS, self.model, "skill_2", self.model.skill_1)
   ui.finish_line()
 
   if self.model.race == RACES[1] then
@@ -167,15 +164,13 @@ draw_base_pane = function(self, dt)
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus1_1")
+        ui.switch(ABILITIES, self.model, "bonus_plus1_1", self.model.bonus_plus1_2)
       ui.finish_line()
 
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        local remaining_abilities = Table.shallow_copy(ABILITIES)
-        Table.remove(remaining_abilities, self.model.bonus_plus1_1)
-        ui.switch(remaining_abilities, self.model, "bonus_plus1_2")
+        ui.switch(ABILITIES, self.model, "bonus_plus1_2", self.model.bonus_plus1_1)
       ui.finish_line()
     end
 

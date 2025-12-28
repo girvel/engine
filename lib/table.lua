@@ -202,6 +202,17 @@ _table.remove = function(t, item)
   return t
 end
 
+--- @param t table
+--- @param ... any
+--- @return table
+_table.removed = function(t, ...)
+  local result = Table.shallow_copy(t)
+  for i = 1, select("#", ...) do
+    Table.remove(result, select(i, ...))
+  end
+  return result
+end
+
 --- Uses pairs
 _table.remove_pair = function(t, item)
   for k, v in pairs(t) do

@@ -567,12 +567,13 @@ end
 --- @param possible_values string[]
 --- @param container table
 --- @param key any
-ui.switch = function(possible_values, container, key)
+--- @param ... string exceptions
+ui.switch = function(possible_values, container, key, ...)
   local value = container[key]
+  local length = max_length(possible_values)
+  possible_values = Table.removed(possible_values, ...)
 
   local left_button = ui.text_button(" < ")
-
-  local length = max_length(possible_values)
   ui.start_frame()  -- font slightly breaks monospacing
     ui.text(tostring(value):cjust(length, " "))
   ui.finish_frame()
