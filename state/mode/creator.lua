@@ -1,3 +1,5 @@
+local translation = require("engine.tech.translation")
+local abilities = require("engine.mech.abilities")
 local colors = require("engine.tech.colors")
 local tk = require("engine.state.mode.tk")
 local ui = require("engine.tech.ui")
@@ -13,34 +15,32 @@ local creator = {}
 local methods = {}
 creator.mt = {__index = methods}
 
--- NEXT connect
-local SKILLS = {
-  "Выживание",
-  "Внимание",
-  "Атлетика",
+local SKILLS = Fun.iter(abilities.skill_bases)
+  :map(function(skill) return assert(translation.skills[skill]):utf_capitalize() end)
+  :totable()
+
+local ABILITIES = Fun.iter(abilities.set)
+  :map(function(ability) return assert(translation.abilities[ability]):utf_capitalize() end)
+  :totable()
+
+local FEAT_CODENAMES = {
+  "savage_attacker",
+  "great_weapon_master",
+}
+
+local FEATS = Fun.iter(FEAT_CODENAMES)
+  :map(function(feat) return assert(translation.feats[feat]) end)
+  :totable()
+
+local FEAT_DESCRIPTIONS = {
+  "Атаки наносят больше урона",
+  "Шанс попадания двуручным оружием меньше на 25%, урон выше на 10",
 }
 
 local RACES = {
   "Разносторонний человек",
   "Альтернативный человек",
   "Необычное происхождение",
-}
-
-local ABILITIES = {
-  "Сила",
-  "Ловкость",
-  "Телосложение",
-}
-
--- NEXT more feats
-local FEATS = {
-  "Неистовый атакующий",
-  "Мастер двуручного оружия",
-}
-
-local FEAT_DESCRIPTIONS = {
-  "Атаки наносят больше урона",
-  "Шанс попадания двуручным оружием меньше на 25%, урон выше на 10",
 }
 
 --- @param prev state_mode_game
@@ -105,7 +105,6 @@ methods.draw_gui = function(self, dt)
       if self.pane_i == 0 then
         draw_base_pane(self, dt)
       end
-      -- NEXT analyze script, find out used abilities
       -- NEXT switch to journal and back
       -- NEXT switching skills causes padding to change
       -- NEXT on panes 1+ select a class
@@ -115,6 +114,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
+      -- NEXT table of abilities
     ui.finish_font()
   tk.finish_window()
 end
