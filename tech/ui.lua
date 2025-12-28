@@ -688,7 +688,7 @@ ui.cursor = function(cursor_type)
 end
 
 ui.get_frame = function()
-  return Table.shallow_copy(Table.last(model.frame))
+  return Table.last(model.frame)
 end
 
 ui.get_font = function()

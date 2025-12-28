@@ -120,8 +120,6 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT finish the fighter class
-
       -- NEXT active/inactive
       -- NEXT change icon
       -- NEXT submit
@@ -273,8 +271,10 @@ draw_base_pane = function(self, dt)
       ui.text("Черта: ")
       ui.switch(FEATS, self.model, "feat")
     ui.finish_line()
-    ui.br()
-    ui.text("    %s", FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+
+    ui.start_frame(ui.get_font():getWidth("w") * 4)
+      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+    ui.finish_frame()
   end
 end
 
@@ -297,24 +297,25 @@ draw_pane = function(self, dt)
   end
 
   local class_level = 0
-  for i = self.pane_i, 1, -1 do
+  for i = self.pane_i, 1, -1 do  -- NEXT initialize in the start, scrolling backwards breaks stuff
     if self_classes[i] == self_classes[self.pane_i] then
       class_level = class_level + 1
     end
   end
 
-  ui.start_line()
-  ui.start_font(30)
-    ui.selector()
-    love.graphics.setColor(colors.white_dim)
-      ui.text("## ")
-    love.graphics.setColor(Vector.white)
-    ui.text("Класс: ")
-    ui.switch(CLASSES, self_classes, self.pane_i)  -- NEXT hide switch buttons if # == 1
-    ui.text("(уровень %s)", class_level)
-  ui.finish_font()
-  ui.finish_line()
   ui.br()
+
+  ui.start_line()
+    ui.selector()
+    ui.start_font(36)
+      love.graphics.setColor(colors.white_dim)
+        ui.text("## ")
+      love.graphics.setColor(Vector.white)
+      ui.text("Класс: ")
+      ui.switch(CLASSES, self_classes, self.pane_i)  -- NEXT hide switch buttons if # == 1
+      ui.text("(уровень %s)", class_level)
+    ui.finish_font()
+  ui.finish_line()
   ui.br()
 
   local class_i = Table.index_of(CLASSES, self_classes[self.pane_i])
@@ -334,27 +335,30 @@ local FS_DESCRIPTIONS = {
   "+1 к классу брони при наличии шлема/доспеха",
 }
 
+local SAMURAI_SKILLS = Fun.iter {"performance", "history", "insight"}
+  :map(function(codename) return assert(translation.skills[codename]):utf_capitalize() end)
+  :totable()
+
 local start_icon_header = function(image)
   ui.start_line()
   ui.selector()
   ui.image(image, 2)
-  ui.start_font(28)
+  ui.start_font(32)
+  ui.text(" ")
 end
 
 local finish_icon_header = function()
   ui.finish_font()
   ui.finish_line()
-  ui.br()
 end
 
 local description = function(fmt, ...)
-  ui.start_frame(ui.get_font():getWidth("w") * 4)
+  ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
     ui.text(fmt, ...)
     local y = ui.get_frame().y
   ui.finish_frame()
   ui.get_frame().y = y
-
-  ui.br(); ui.br(); ui.br()
+  ui.br()
 end
 
 draw_fighter_pane = function(self, dt, total_level, class_level)
@@ -376,7 +380,6 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
 
   ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
   ui.br()
-  ui.br()
 
   if class_level == 1 then
     if not class_data.fighting_style then
@@ -384,21 +387,45 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
     end
 
     start_icon_header(gui_elements.fighting_styles)
-      ui.text(" Боевой стиль: ")
+      ui.text("Боевой стиль:")
       ui.switch(FIGHTING_STYLES, class_data, "fighting_style")
     finish_icon_header()
 
     description(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
 
     start_icon_header(gui_elements.second_wind)
-      ui.text(" Второе дыхание")
+      ui.text("Способность: Второе дыхание")
     finish_icon_header()
 
     local roll = fighter.second_wind:get_roll(self.model.total_level)
     description(
-      "Бонусным действием раз за бой восстанавливает %d-%d здоровья",
+      "Раз за бой бонусным действием восстанавливает %d-%d здоровья",
       roll:min(), roll:max()
     )
+  elseif class_level == 2 then
+    start_icon_header(gui_elements.action_surge)
+      ui.text("Способность: Всплеск действий")
+    finish_icon_header()
+    description("Раз за бой даёт одно дополнительное действие")
+  elseif class_level == 3 then
+    if not class_data.skill then
+      class_data.skill = SAMURAI_SKILLS[1]
+    end
+
+    start_icon_header(gui_elements.fighting_spirit)
+      ui.text("Способность: Боевой дух")
+    finish_icon_header()
+    description(
+      "Три раза за игру бонусным действием даёт 5 ед. временного здоровья; атаки в этот ход " ..
+      "попадают чаще."
+    )
+
+    ui.start_line()
+      ui.selector()
+      ui.text("Навык:")
+      ui.switch(SAMURAI_SKILLS, class_data, "skill")
+      -- NEXT how to detect skill collisions?
+    ui.finish_line()
   end
 end
 
