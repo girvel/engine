@@ -28,6 +28,12 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
+  if ui.keyboard("n") then
+    State.quests:new_content_is_read()
+    State.mode:close_menu()
+    State.mode:open_creator()
+  end
+
   tk.start_window("center", "center", "read_max", "max")
     ui.h1("Журнал")
 

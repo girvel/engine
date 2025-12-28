@@ -71,6 +71,11 @@ methods.draw_gui = function(self, dt)
     State.mode:close_menu()
   end
 
+  if ui.keyboard("j") then
+    State.mode:close_menu()
+    State.mode:open_journal()
+  end
+
   tk.start_window("center", "center", 700, 620)
     ui.h1("Персонаж")
     ui.start_font(24)
@@ -105,7 +110,7 @@ methods.draw_gui = function(self, dt)
       if self.pane_i == 0 then
         draw_base_pane(self, dt)
       end
-      -- NEXT switch to journal and back
+
       -- NEXT switching skills causes padding to change
       -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
@@ -115,6 +120,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
       -- NEXT table of abilities
+      -- NEXT change icon
     ui.finish_font()
   tk.finish_window()
 end
