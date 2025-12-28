@@ -1,3 +1,4 @@
+local fighter = require("engine.mech.class.fighter")
 local xp = require("engine.mech.xp")
 local translation = require("engine.tech.translation")
 local abilities = require("engine.mech.abilities")
@@ -60,6 +61,7 @@ creator.new = function(prev)
       bonus_plus1_2 = ABILITIES[2],
       bonus_plus2 = ABILITIES[1],
       feat = FEATS[1],
+      classes = {},
     },
     pane_i = 0,
   }, creator.mt)
@@ -67,7 +69,7 @@ end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
-local draw_base_pane
+local draw_base_pane, draw_pane
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("n") then
@@ -111,15 +113,17 @@ methods.draw_gui = function(self, dt)
 
       if self.pane_i == 0 then
         draw_base_pane(self, dt)
+      else
+        draw_pane(self, dt)
       end
 
-      -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
       -- NEXT active/inactive
       -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
+      -- NEXT when warlock: kind of recognize the Nea
       -- NEXT change icon
     ui.finish_font()
   tk.finish_window()
@@ -264,6 +268,43 @@ draw_base_pane = function(self, dt)
     ui.br()
     ui.text("    %s", FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
   end
+end
+
+local CLASSES_DATA = {
+  fighter,
+}
+
+local CLASSES = Fun.iter(CLASSES_DATA)
+  :map(function(cls) return assert(translation.classes[cls.codename]):utf_capitalize() end)
+  :totable()
+
+--- @param self state_mode_creator
+--- @param dt number
+draw_pane = function(self, dt)
+  local self_classes = self.model.classes
+  if not self_classes[self.pane_i] then
+    self_classes[self.pane_i] = self_classes[self.pane_i - 1] or CLASSES[1]
+  end
+
+  local class_level = 0
+  for i = self.pane_i, 1, -1 do
+    if self_classes[i] == self_classes[self.pane_i] then
+      class_level = class_level + 1
+    end
+  end
+
+  ui.start_line()
+  ui.start_font(30)
+    ui.selector()
+    love.graphics.setColor(colors.white_dim)
+      ui.text("## ")
+    love.graphics.setColor(Vector.white)
+    ui.text("Класс: ")
+    ui.switch(CLASSES, self_classes, self.pane_i)
+    ui.text("(уровень %s)", class_level)
+  ui.finish_font()
+  ui.finish_line()
+  ui.br()
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)

@@ -7,6 +7,7 @@ local animated = require("engine.tech.animated")
 
 local fighter = {}
 
+fighter.codename = "fighter"
 fighter.hit_dice = class.hit_dice(10)
 
 fighter.action_surge = Table.extend({

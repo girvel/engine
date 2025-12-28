@@ -54,8 +54,12 @@ local translation = {
   },
 
   feats = {
-    savage_attacker = "Неистовый атакующий",
-    great_weapon_master = "Мастер двуручного оружия",
+    savage_attacker = "неистовый атакующий",
+    great_weapon_master = "мастер двуручного оружия",
+  },
+
+  classes = {
+    fighter = "воин",
   },
 }
 
