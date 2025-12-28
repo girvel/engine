@@ -204,7 +204,7 @@ draw_keyboard_action_grid = function(self)
 
     do
       -- TODO active/inactive icons
-      local button = ui.key_button(gui.creator, "c")
+      local button = ui.key_button(gui.creator, "n")
       if button.is_clicked then
         State.mode:open_creator()
       end

@@ -20,6 +20,7 @@ creature.mixin = function()
     },
     transparent_flag = true,
     moving_flag = true,
+    xp = 0,
   }, methods)
 
   return result
