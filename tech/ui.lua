@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local sprite = require "engine.tech.sprite"
 
 
@@ -546,18 +547,41 @@ end)
 --- @param container table
 --- @param key any
 ui.switch = function(possible_values, container, key)
+  local font = Table.last(model.font)
   local value = container[key]
-  ui.text("< %s >", tostring(value):cjust(max_length(possible_values), " "))
 
-  if model.selection.i == model.selection.max_i then
-    local index = Table.index_of(possible_values, value) or 1
-    if ui.keyboard("left") then
-      container[key] = possible_values[Math.loopmod(index + 1, #possible_values)]
-    end
+  local prev_color = {love.graphics.getColor()}
 
-    if ui.keyboard("right") then
-      container[key] = possible_values[Math.loopmod(index - 1, #possible_values)]
-    end
+  local left_button = button(font:getWidth("w") * 3, font:getHeight())
+  if left_button.is_mouse_over then
+    ui.cursor("hand")
+  else
+    love.graphics.setColor(colors.white_dim)
+  end
+  ui.text(" < ")
+
+  love.graphics.setColor(prev_color)
+  ui.text(tostring(value):cjust(max_length(possible_values), " "))
+
+  -- NEXT ui.text_button
+  local right_button = button(font:getWidth("w") * 3, font:getHeight())
+  if right_button.is_mouse_over then
+    ui.cursor("hand")
+  else
+    love.graphics.setColor(colors.white_dim)
+  end
+  ui.text(" > ")
+
+  love.graphics.setColor(prev_color)
+
+  local is_selected = model.selection.i == model.selection.max_i
+  local index = Table.index_of(possible_values, value) or 1
+  if left_button.is_clicked or is_selected and ui.keyboard("left") then
+    container[key] = possible_values[Math.loopmod(index + 1, #possible_values)]
+  end
+
+  if right_button.is_clicked or is_selected and ui.keyboard("right") then
+    container[key] = possible_values[Math.loopmod(index - 1, #possible_values)]
   end
 end
 

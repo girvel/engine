@@ -131,12 +131,13 @@ methods.draw_gui = function(self, dt)
         ui.text("Черта:  ")
         ui.switch(FEATS, self.model, "feat")
       ui.finish_line()
-      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+      ui.br()
+      ui.text("    %s", FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
     end
 
     -- NEXT analyze script, find out used abilities
-    -- NEXT handle mouse
     -- NEXT switch to journal and back
+    -- NEXT switching panes
   ui.finish_font()
   tk.finish_window()
 end
