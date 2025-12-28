@@ -113,7 +113,6 @@ methods.draw_gui = function(self, dt)
         draw_base_pane(self, dt)
       end
 
-      -- NEXT ability bonus
       -- NEXT on panes 1+ select a class
       -- NEXT delegate pane to the class
       -- NEXT active/inactive
@@ -147,7 +146,17 @@ draw_base_pane = function(self, dt)
     ui.start_line()
       local name = translation.abilities[codename]
       local raw_score = self.model.abilities[codename]
-      local bonus = 0
+      local bonus
+      if self.model.race == RACES[1] then
+        bonus = 1
+      elseif self.model.race == RACES[2] then
+        bonus = self.model.bonus_plus1_1 == name
+          or self.model.bonus_plus1_2 == name
+          and 1 or 0
+      else
+        bonus = self.model.bonus_plus2 == name
+          and 2 or 0
+      end
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
@@ -176,7 +185,7 @@ draw_base_pane = function(self, dt)
         right_button = false
       end
 
-      ui.text("+ %d = %02d  (%d)", bonus, score, modifier)
+      ui.text("+ %d = %02d  (%s%d)", bonus, score, modifier > 0 and "+" or "", modifier)
 
       if left_button then
         self.model.points = self.model.points + (
