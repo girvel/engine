@@ -40,9 +40,9 @@ local finish_ability = function(fmt, ...)
 end
 
 fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
-  local class_data = self.model.class_data[total_level]
+  local data = self.model.pane_data[total_level]
 
-  local con_mod = abilities.get_modifier(self.model.base_data.abilities.con)
+  local con_mod = abilities.get_modifier(self.model.pane_data[0].abilities.con)
   local hp_bonus
   if total_level == 1 then
     -- NEXT implement this
@@ -56,14 +56,14 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
   ui.br()
 
   if class_level == 1 then
-    if not class_data.fighting_style then
-      class_data.fighting_style = FIGHTING_STYLES[1]
+    if not data.fighting_style then
+      data.fighting_style = FIGHTING_STYLES[1]
     end
 
     start_ability(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
-      ui.switch(FIGHTING_STYLES, class_data, "fighting_style", is_disabled)
-    finish_ability(class_data.fighting_style.description)
+      ui.switch(FIGHTING_STYLES, data, "fighting_style", is_disabled)
+    finish_ability(data.fighting_style.description)
 
     start_ability(gui_elements.second_wind)
       ui.text("Способность: Второе дыхание")
@@ -77,8 +77,8 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
       ui.text("Способность: Всплеск действий")
     finish_ability("Раз за бой даёт одно дополнительное действие")
   elseif class_level == 3 then
-    if not class_data.skill then
-      class_data.skill = SAMURAI_SKILLS[1]
+    if not data.skill then
+      data.skill = SAMURAI_SKILLS[1]
     end
 
     start_ability(gui_elements.fighting_spirit)
@@ -91,7 +91,7 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
     ui.start_line()
       ui.selector()
       ui.text("Навык:")
-      ui.switch(SAMURAI_SKILLS, class_data, "skill", is_disabled)
+      ui.switch(SAMURAI_SKILLS, data, "skill", is_disabled)
       -- NEXT how to detect skill collisions?
     ui.finish_line()
   end

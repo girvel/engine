@@ -72,26 +72,27 @@ creator.new = function(prev)
     model = State.player.creator_model
     if not model then
       model = {
-        base_data = {
-          abilities = abilities.new(8, 8, 8, 8, 8, 8),
-          points = 27,
-          race = RACES[1],
-          skill_1 = SKILLS[1],
-          skill_2 = SKILLS[2],
-          bonus_plus1_1 = ABILITIES[1],
-          bonus_plus1_2 = ABILITIES[2],
-          bonus_plus2 = ABILITIES[1],
-          feat = FEATS[1],
-        },
         classes = {},
-        class_data = {},
+        pane_data = {
+          [0] = {
+            abilities = abilities.new(8, 8, 8, 8, 8, 8),
+            points = 27,
+            race = RACES[1],
+            skill_1 = SKILLS[1],
+            skill_2 = SKILLS[2],
+            bonus_plus1_1 = ABILITIES[1],
+            bonus_plus1_2 = ABILITIES[2],
+            bonus_plus2 = ABILITIES[1],
+            feat = FEATS[1],
+          },
+        },
         total_level = total_level,
       }
     end
 
     for i = 1, total_level - current_level do
       model.classes[current_level + i] = model.classes[current_level] or CLASSES[1]
-      model.class_data[current_level + i] = {}
+      model.pane_data[current_level + i] = {}
     end
   end
 
@@ -122,7 +123,7 @@ methods.draw_gui = function(self, dt)
   end
 
   if ui.keyboard("return") then
-    if self.model.base_data.points > 0 then
+    if self.model.pane_data[0].points > 0 then
       State.mode:show_warning(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
@@ -189,7 +190,7 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_base_pane = function(self, dt)
-  local data = self.model.base_data
+  local data = self.model.pane_data[0]
   local column1_length = Fun.iter(ABILITIES)
     :map(function(name) return name:utf_len() end)
     :max()
@@ -368,10 +369,10 @@ draw_pane = function(self, dt)
   ui.finish_line()
   ui.br()
 
-  local class_data = self.model.class_data
-  local codename = "fighter_" .. class_level
-  if class_data[self.pane_i].type ~= codename then
-    class_data[self.pane_i] = {type = codename, groups = {}}
+  local pane_data = self.model.pane_data
+  local codename = "fighter_" .. class_level  -- NEXT hardcoded!!!
+  if pane_data[self.pane_i].type ~= codename then
+    pane_data[self.pane_i] = {type = codename, groups = {}}
   end
 
   CREATOR_CLASSES[self_classes[self.pane_i].codename]
@@ -387,7 +388,7 @@ submit = function(self)
     xp = State.player.xp - xp.for_level[self.model.total_level] + xp.for_level[State.player.level],
     perks = perks,
     creator_model = self.model,
-    base_abilities = self.model.base_data.abilities,
+    base_abilities = self.model.pane_data[0].abilities,
   })
   State.mode:close_menu()
 end
@@ -396,12 +397,7 @@ end
 --- @param key any
 --- @param group? string
 methods.switch = function(self, possible_values, key, group)
-  local container
-  if self.pane_i == 0 then
-    container = self.model.base_data  -- TODO join with class_data
-  else
-    container = self.model.class_data[self.pane_i]
-  end
+  local container = self.model.pane_data[self.pane_i]
   ui.switch(possible_values, container, key, is_disabled)
 end
 
