@@ -171,8 +171,7 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT make creator_classes.fighter use objects
-      -- NEXT implement submit
+      -- NEXT disable selectors in inactive creator
       -- NEXT display only the available actions in sidebar
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
@@ -381,7 +380,24 @@ end
 
 --- @param self state_mode_creator
 submit = function(self)
-  local perks = {}
+  local perks do
+    local data = self.model.pane_data[0]
+    perks = {
+      data.skill_1,
+      data.skill_2,
+    }
+
+    if data.race ~= races.human then
+      table.insert(perks, data.feat)
+    end
+  end
+
+  local class_levels = {}
+  for i = 1, self.model.total_level do
+    local codename = self.model.classes[i].codename
+    class_levels[codename] = (class_levels[codename] or 0) + 1
+    Table.extend(perks, CREATOR_CLASSES[codename].submit(self, i, i, class_levels[codename]))
+  end
 
   Table.extend(State.player, {
     level = self.model.total_level,

@@ -39,10 +39,11 @@ local finish_ability = function(fmt, ...)
   ui.br()
 end
 
-fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
-  local data = self.model.pane_data[total_level]
+--- @param creator state_mode_creator
+fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
+  local data = creator.model.pane_data[total_level]
 
-  local con_mod = abilities.get_modifier(self.model.pane_data[0].abilities.con)
+  local con_mod = abilities.get_modifier(creator.model.pane_data[0].abilities.con)
   local hp_bonus
   if total_level == 1 then
     -- NEXT implement this
@@ -67,7 +68,7 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
 
     start_ability(gui_elements.second_wind)
       ui.text("Способность: Второе дыхание")
-      local roll = fighter_class.second_wind:get_roll(self.model.total_level)
+      local roll = fighter_class.second_wind:get_roll(creator.model.total_level)
     finish_ability(
       "Раз за бой бонусным действием восстанавливает %d-%d здоровья",
       roll:min(), roll:max()
@@ -77,26 +78,33 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
       ui.text("Способность: Всплеск действий")
     finish_ability("Раз за бой даёт одно дополнительное действие")
   elseif class_level == 3 then
-    if not data.skill then
-      data.skill = SAMURAI_SKILLS[1]
-    end
-
     start_ability(gui_elements.fighting_spirit)
       ui.text("Способность: Боевой дух")
     finish_ability(
       "Три раза за игру бонусным действием даёт 5 ед. временного здоровья; атаки в этот ход " ..
       "попадают чаще."
     )
-
-    ui.start_line()
-      ui.selector()
-      ui.text("Навык:")
-      ui.switch(SAMURAI_SKILLS, data, "skill", is_disabled)
-      -- NEXT how to detect skill collisions?
-    ui.finish_line()
   end
 end
 
+--- @param creator state_mode_creator
+fighter.submit = function(creator, total_level, class_level)
+  local data = creator.model.pane_data[total_level]
+  local result = {
+    fighter_class.hit_dice,
+  }
+
+  if class_level == 1 then
+    table.insert(result, data.fighting_style)
+    table.insert(result, fighter_class.second_wind)
+  elseif class_level == 2 then
+    table.insert(result, fighter_class.action_surge)
+  elseif class_level == 3 then
+    table.insert(result, fighter_class.fighting_spirit)
+  end
+
+  return result
+end
 
 Ldump.mark(fighter, {}, ...)
 return fighter
