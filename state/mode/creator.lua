@@ -270,7 +270,13 @@ draw_base_pane = function(self, dt)
 
   ui.start_line()
     ui.text("  %s    ", ("Очки:"):ljust(column1_length))
-    ui.text("%02d", data.points)  -- NEXT color red on > 0
+    if data.points > 0 then
+      love.graphics.setColor(colors.red)
+    end
+    ui.text("%02d", data.points)
+    if data.points > 0 then
+      love.graphics.setColor(Vector.white)
+    end
   ui.finish_line()
 
   ui.br()
