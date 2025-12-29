@@ -75,11 +75,16 @@ creator.new = function(prev)
         classes = {},
         pane_data = {
           [0] = {
+            groups = {
+              skills = {
+                SKILLS[1],
+                SKILLS[2],
+              }
+            },
+
             abilities = abilities.new(8, 8, 8, 8, 8, 8),
             points = 27,
             race = RACES[1],
-            skill_1 = SKILLS[1],
-            skill_2 = SKILLS[2],
             bonus_plus1_1 = ABILITIES[1],
             bonus_plus1_2 = ABILITIES[2],
             bonus_plus2 = ABILITIES[1],
@@ -92,7 +97,7 @@ creator.new = function(prev)
 
     for i = 1, total_level - current_level do
       model.classes[current_level + i] = model.classes[current_level] or CLASSES[1]
-      model.pane_data[current_level + i] = {}
+      model.pane_data[current_level + i] = {groups = {}}
     end
   end
 
@@ -292,13 +297,13 @@ draw_base_pane = function(self, dt)
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, data, "skill_1", is_disabled, data.skill_2)
+    self:switch(SKILLS, 1, "skills")
   ui.finish_line()
 
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, data, "skill_2", is_disabled, data.skill_1)
+    self:switch(SKILLS, 2, "skills")
   ui.finish_line()
 
   if data.race == races.human then
@@ -398,7 +403,21 @@ end
 --- @param group? string
 methods.switch = function(self, possible_values, key, group)
   local container = self.model.pane_data[self.pane_i]
-  ui.switch(possible_values, container, key, is_disabled)
+  if group then
+    local collisions = {}
+    for _, pane_data in pairs(self.model.pane_data) do
+      local this_group = pane_data.groups[group]
+      if this_group then
+        for _, v in pairs(this_group) do
+          table.insert(collisions, v)
+        end
+      end
+    end
+
+    ui.switch(possible_values, container.groups[group], key, is_disabled, unpack(collisions))
+  else
+    ui.switch(possible_values, container, key, is_disabled)
+  end
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)
