@@ -350,7 +350,7 @@ draw_pane = function(self, dt)
         ui.text("## ")
       love.graphics.setColor(Vector.white)
       ui.text("Класс: ")
-      ui.switch(CLASSES, self_classes, self.pane_i)  -- NEXT hide switch buttons if # == 1
+      ui.switch(CLASSES, self_classes, self.pane_i)
       ui.text("(уровень %s)", class_level)
     ui.finish_font()
   ui.finish_line()

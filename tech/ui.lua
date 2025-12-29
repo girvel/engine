@@ -596,27 +596,42 @@ end
 --- @param ... string exceptions
 ui.switch = function(possible_values, container, key, ...)
   local value = container[key]
+  local is_scrollable = #possible_values - select("#", ...) > 1
   local length = max_length(possible_values)
   possible_values = Table.removed(possible_values, ...)
 
-  local left_button = ui.text_button(" < ")
+  local left_button
+  if is_scrollable then
+    left_button = ui.text_button(" < ").is_clicked
+  else
+    ui.text("   ")
+  end
+
   ui.text(tostring(value):cjust(length, " "))
-  local right_button = ui.text_button(" > ")
+
+  local right_button
+  if is_scrollable then
+    right_button = ui.text_button(" > ").is_clicked
+  else
+    ui.text("   ")
+  end
 
   local is_selected = model.selection.i == model.selection.max_i
   local index = Table.index_of(possible_values, value) or 1
 
-  local offset
-  if left_button.is_clicked or is_selected and ui.keyboard("left") then
-    offset = 1
-  end
+  if is_scrollable then
+    local offset
+    if left_button or is_selected and ui.keyboard("left") then
+      offset = 1
+    end
 
-  if right_button.is_clicked or is_selected and ui.keyboard("right") then
-    offset = -1
-  end
+    if right_button or is_selected and ui.keyboard("right") then
+      offset = -1
+    end
 
-  if offset then
-    container[key] = possible_values[Math.loopmod(index + offset, #possible_values)]
+    if offset then
+      container[key] = possible_values[Math.loopmod(index + offset, #possible_values)]
+    end
   end
 end
 
