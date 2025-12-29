@@ -1,3 +1,4 @@
+local translation = require("engine.tech.translation")
 local xp = require("engine.mech.xp")
 local action = require("engine.tech.action")
 local health = require("engine.mech.health")
@@ -44,8 +45,10 @@ end
 
 --- @param skill skill
 --- @return table
-class.skill_proficiency = function(skill)
+class.skill_proficiency = Memoize(function(skill)
+  --- @cast skill string
   return {
+    name = translation.skills[skill]:utf_capitalize(),
     codename = skill .. "_proficiency",
 
     modify_skill_score = function(self, entity, score, this_skill)
@@ -55,7 +58,7 @@ class.skill_proficiency = function(skill)
       return score
     end,
   }
-end
+end)
 
 --- @param ability ability
 --- @return table

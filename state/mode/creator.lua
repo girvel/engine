@@ -1,3 +1,5 @@
+local races = require("engine.mech.races")
+local class = require("engine.mech.class.init")
 local feats = require("engine.mech.class.feats")
 local gui_elements = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
@@ -19,13 +21,14 @@ local creator = {}
 local methods = {}
 creator.mt = {__index = methods}
 
-local SKILLS = Fun.iter(abilities.skill_bases)
-  :map(function(skill) return assert(translation.skills[skill]):utf_capitalize() end)
-  :totable()
-
 local ABILITIES = Fun.iter(abilities.list)
   :map(function(ability) return assert(translation.abilities[ability]):utf_capitalize() end)
   :totable()
+
+local SKILLS = Fun.iter(abilities.skill_bases)
+  :map(function(skill) return class.skill_proficiency(skill) end)
+  :totable()
+table.sort(SKILLS, function(a, b) return a.name < b.name end)
 
 local FEATS = Fun.pairs(feats)
   :map(function(k, v) return v end)
@@ -33,18 +36,14 @@ local FEATS = Fun.pairs(feats)
 table.sort(FEATS, function(a, b) return a.name < b.name end)
 
 local RACES = {
-  "Разносторонний человек",
-  "Альтернативный человек",
-  "Необычное происхождение",
+  races.human,
+  races.variant_human,
+  races.custom_lineage,
 }
 
-local CLASSES_DATA = {
+local CLASSES = {
   fighter,
 }
-
-local CLASSES = Fun.iter(CLASSES_DATA)
-  :map(function(cls) return assert(translation.classes[cls.codename]):utf_capitalize() end)
-  :totable()
 
 --- @param prev state_mode_game
 --- @return state_mode_creator
@@ -209,9 +208,9 @@ draw_base_pane = function(self, dt)
       local name = translation.abilities[codename]:utf_capitalize()
       local raw_score = data.abilities[codename]
       local bonus
-      if data.race == RACES[1] then
+      if data.race == races.human then
         bonus = 1
-      elseif data.race == RACES[2] then
+      elseif data.race == races.variant_human then
         bonus = (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
           and 1 or 0
       else
@@ -300,10 +299,10 @@ draw_base_pane = function(self, dt)
     ui.switch(SKILLS, data, "skill_2", is_disabled, data.skill_1)
   ui.finish_line()
 
-  if data.race == RACES[1] then
+  if data.race == races.human then
     ui.text("  +1 ко всем характеристикам")
   else
-    if data.race == RACES[3] then
+    if data.race == races.custom_lineage then
       ui.start_line()
         ui.selector()
         ui.text("+2: ")
@@ -415,6 +414,7 @@ local description = function(fmt, ...)
   ui.br()
 end
 
+-- NEXT do state.mode.creator_races
 draw_fighter_pane = function(self, dt, total_level, class_level)
   local codename = "fighter_" .. class_level
   if self.model.class_data[total_level].type ~= codename then
