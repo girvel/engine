@@ -125,7 +125,7 @@ methods.draw_gui = function(self, dt)
 
   if ui.keyboard("return") then
     if self.model.pane_data[0].points > 0 then
-      State.mode:show_warning(
+      State.mode:show_confirmation(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
     else
@@ -174,7 +174,6 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT disable selectors in inactive creator
       -- NEXT display only the available actions in sidebar
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
@@ -224,7 +223,7 @@ draw_base_pane = function(self, dt)
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
-      local is_selected = ui.selector()
+      local is_selected = self:selector()
       ui.text("%s ", name:ljust(column1_length))
 
       local left_button
@@ -281,7 +280,7 @@ draw_base_pane = function(self, dt)
 
   ui.start_line()
   ui.start_font(30)
-    ui.selector()
+    self:selector()
     love.graphics.setColor(colors.white_dim)
       ui.text("## ")
     love.graphics.setColor(Vector.white)
@@ -292,13 +291,13 @@ draw_base_pane = function(self, dt)
   ui.br()
 
   ui.start_line()
-    ui.selector()
+    self:selector()
     ui.text("Навык: ")
     ui.switch(SKILLS, data, "skill_1", is_disabled, data.skill_2)
   ui.finish_line()
 
   ui.start_line()
-    ui.selector()
+    self:selector()
     ui.text("Навык: ")
     ui.switch(SKILLS, data, "skill_2", is_disabled, data.skill_1)
   ui.finish_line()
@@ -308,19 +307,19 @@ draw_base_pane = function(self, dt)
   else
     if data.race == races.custom_lineage then
       ui.start_line()
-        ui.selector()
+        self:selector()
         ui.text("+2: ")
         ui.switch(ABILITIES, data, "bonus_plus2", is_disabled)
       ui.finish_line()
     else
       ui.start_line()
-        ui.selector()
+        self:selector()
         ui.text("+1: ")
         ui.switch(ABILITIES, data, "bonus_plus1_1", is_disabled, data.bonus_plus1_2)
       ui.finish_line()
 
       ui.start_line()
-        ui.selector()
+        self:selector()
         ui.text("+1: ")
         ui.switch(ABILITIES, data, "bonus_plus1_2", is_disabled, data.bonus_plus1_1)
       ui.finish_line()
@@ -328,7 +327,7 @@ draw_base_pane = function(self, dt)
 
     ui.br()
     ui.start_line()
-      ui.selector()
+      self:selector()
       ui.text("Черта: ")
       ui.switch(FEATS, data, "feat", is_disabled)
     ui.finish_line()
@@ -359,7 +358,7 @@ draw_pane = function(self, dt)
   ui.br()
 
   ui.start_line()
-    ui.selector()
+    self:selector()
     ui.start_font(36)
       love.graphics.setColor(colors.white_dim)
         ui.text("## ")
@@ -419,6 +418,40 @@ methods.switch = function(self, possible_values, key, group)
   local container = self.model.pane_data[self.pane_i]
   ui.switch(possible_values, container, key, is_disabled)
 end
+
+methods.selector = function(self)
+  if is_disabled then
+    ui.text("  ")
+    return false
+  else
+    return ui.selector()
+  end
+end
+
+methods.start_ability = function(self, image, selector)
+  ui.start_line()
+  if selector then
+    self:selector()
+  else
+    ui.text("  ")
+  end
+  ui.image(image, 2)
+  ui.start_font(32)
+  ui.text(" ")
+end
+
+methods.finish_ability = function(self, fmt, ...)
+  ui.finish_font()
+  ui.finish_line()
+
+  ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
+    ui.text(fmt, ...)
+    local y = ui.get_frame().y
+  ui.finish_frame()
+  ui.get_frame().y = y
+  ui.br()
+end
+
 
 Ldump.mark(creator, {mt = "const"}, ...)
 return creator

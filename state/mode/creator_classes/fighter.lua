@@ -15,30 +15,6 @@ local SAMURAI_SKILLS = {
   class.skill_proficiency("insight"),
 }
 
-local start_ability = function(image, selector)
-  ui.start_line()
-  if selector then
-    ui.selector()
-  else
-    ui.text("  ")
-  end
-  ui.image(image, 2)
-  ui.start_font(32)
-  ui.text(" ")
-end
-
-local finish_ability = function(fmt, ...)
-  ui.finish_font()
-  ui.finish_line()
-
-  ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
-    ui.text(fmt, ...)
-    local y = ui.get_frame().y
-  ui.finish_frame()
-  ui.get_frame().y = y
-  ui.br()
-end
-
 --- @param creator state_mode_creator
 fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   local data = creator.model.pane_data[total_level]
@@ -64,26 +40,26 @@ fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
       data.fighting_style = FIGHTING_STYLES[1]
     end
 
-    start_ability(gui_elements.fighting_styles, true)
+    creator:start_ability(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
       ui.switch(FIGHTING_STYLES, data, "fighting_style", is_disabled)
-    finish_ability(data.fighting_style.description)
+    creator:finish_ability(data.fighting_style.description)
 
-    start_ability(gui_elements.second_wind)
+    creator:start_ability(gui_elements.second_wind)
       ui.text("Способность: Второе дыхание")
       local roll = fighter_class.second_wind:get_roll(creator.model.total_level)
-    finish_ability(
+    creator:finish_ability(
       "Раз за бой бонусным действием восстанавливает %d-%d здоровья",
       roll:min(), roll:max()
     )
   elseif class_level == 2 then
-    start_ability(gui_elements.action_surge)
+    creator:start_ability(gui_elements.action_surge)
       ui.text("Способность: Всплеск действий")
-    finish_ability("Раз за бой даёт одно дополнительное действие")
+    creator:finish_ability("Раз за бой даёт одно дополнительное действие")
   elseif class_level == 3 then
-    start_ability(gui_elements.fighting_spirit)
+    creator:start_ability(gui_elements.fighting_spirit)
       ui.text("Способность: Боевой дух")
-    finish_ability(
+    creator:finish_ability(
       "Три раза за игру бонусным действием даёт 5 ед. временного здоровья; атаки в этот ход " ..
       "попадают чаще."
     )
@@ -106,8 +82,7 @@ fighter.submit = function(creator, total_level, class_level)
     table.insert(result, fighter_class.fighting_spirit)
   end
 
-  return result
-end
+  return result end
 
 Ldump.mark(fighter, {}, ...)
 return fighter
