@@ -1,5 +1,5 @@
 local races = require("engine.mech.races")
-local class = require("engine.mech.class.init")
+local class = require("engine.mech.class")
 local feats = require("engine.mech.class.feats")
 local gui_elements = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
@@ -171,8 +171,8 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT submit
-      -- NEXT link_color for ui.choice
+      -- NEXT make creator_classes.fighter use objects
+      -- NEXT implement submit
       -- NEXT display only the available actions in sidebar
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
@@ -180,6 +180,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT when warlock: kind of recognize the Nea
       -- NEXT distribute abilities randomly?
       -- NEXT more fighting styles
+      -- NEXT more feats
 
     ui.finish_font()
   tk.finish_window()
@@ -338,7 +339,7 @@ draw_base_pane = function(self, dt)
   end
 end
 
-local draw_fighter_pane
+local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
 
 --- @param self state_mode_creator
 --- @param dt number
@@ -367,120 +368,14 @@ draw_pane = function(self, dt)
   ui.finish_line()
   ui.br()
 
-  local class_i = Table.index_of(CLASSES, self_classes[self.pane_i])
-  if class_i == 1 then
-    draw_fighter_pane(self, dt, self.pane_i, class_level)
-  end
-end
-
-local FIGHTING_STYLES = Fun.iter(fighter.fighting_styles_list)
-  :map(function(style)
-    return assert(translation.fighting_styles[style.codename]):utf_capitalize()
-  end)
-  :totable()
-
-local FS_DESCRIPTIONS = {
-  "Удар оружием во второй руке наносит больше урона",
-  "+1 к классу брони при наличии шлема/доспеха",
-}
-
-local SAMURAI_SKILLS = Fun.iter {"performance", "history", "insight"}
-  :map(function(codename) return assert(translation.skills[codename]):utf_capitalize() end)
-  :totable()
-
-local start_icon_header = function(image, selector)
-  ui.start_line()
-  if selector then
-    ui.selector()
-  else
-    ui.text("  ")
-  end
-  ui.image(image, 2)
-  ui.start_font(32)
-  ui.text(" ")
-end
-
-local finish_icon_header = function()
-  ui.finish_font()
-  ui.finish_line()
-end
-
-local description = function(fmt, ...)
-  ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
-    ui.text(fmt, ...)
-    local y = ui.get_frame().y
-  ui.finish_frame()
-  ui.get_frame().y = y
-  ui.br()
-end
-
--- NEXT do state.mode.creator_races
-draw_fighter_pane = function(self, dt, total_level, class_level)
+  local class_data = self.model.class_data
   local codename = "fighter_" .. class_level
-  if self.model.class_data[total_level].type ~= codename then
-    self.model.class_data[total_level] = {type = codename}
-  end
-  local class_data = self.model.class_data[total_level]
-
-  local con_mod = abilities.get_modifier(self.model.base_data.abilities.con)
-  local hp_bonus
-  if total_level == 1 then
-    -- NEXT implement this
-    -- NEXT figure out how many skills & where
-    hp_bonus = 10
-  else
-    hp_bonus = 6
+  if class_data[self.pane_i].type ~= codename then
+    class_data[self.pane_i] = {type = codename}
   end
 
-  ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
-  ui.br()
-
-  if class_level == 1 then
-    if not class_data.fighting_style then
-      class_data.fighting_style = FIGHTING_STYLES[1]
-    end
-
-    start_icon_header(gui_elements.fighting_styles, true)
-      ui.text("Боевой стиль:")
-      ui.switch(FIGHTING_STYLES, class_data, "fighting_style", is_disabled)
-    finish_icon_header()
-
-    description(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
-
-    start_icon_header(gui_elements.second_wind)
-      ui.text("Способность: Второе дыхание")
-    finish_icon_header()
-
-    local roll = fighter.second_wind:get_roll(self.model.total_level)
-    description(
-      "Раз за бой бонусным действием восстанавливает %d-%d здоровья",
-      roll:min(), roll:max()
-    )
-  elseif class_level == 2 then
-    start_icon_header(gui_elements.action_surge)
-      ui.text("Способность: Всплеск действий")
-    finish_icon_header()
-    description("Раз за бой даёт одно дополнительное действие")
-  elseif class_level == 3 then
-    if not class_data.skill then
-      class_data.skill = SAMURAI_SKILLS[1]
-    end
-
-    start_icon_header(gui_elements.fighting_spirit)
-      ui.text("Способность: Боевой дух")
-    finish_icon_header()
-    description(
-      "Три раза за игру бонусным действием даёт 5 ед. временного здоровья; атаки в этот ход " ..
-      "попадают чаще."
-    )
-
-    ui.start_line()
-      ui.selector()
-      ui.text("Навык:")
-      ui.switch(SAMURAI_SKILLS, class_data, "skill", is_disabled)
-      -- NEXT how to detect skill collisions?
-    ui.finish_line()
-  end
+  CREATOR_CLASSES[self_classes[self.pane_i].codename]
+    .draw_pane(self, dt, is_disabled, self.pane_i, class_level)
 end
 
 --- @param self state_mode_creator
