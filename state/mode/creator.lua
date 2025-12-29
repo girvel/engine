@@ -98,7 +98,7 @@ creator.new = function(prev)
       }
     end
 
-    for i = 0, total_level - current_level do
+    for i = 1, total_level - current_level do
       model.classes[current_level + i] = model.classes[current_level] or CLASSES[1]
       model.class_data[current_level + i] = {}
     end
@@ -116,10 +116,10 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 local draw_base_pane, draw_pane
 
-local is_active
+local is_disabled
 
 methods.draw_gui = function(self, dt)
-  is_active = self.model.total_level > State.player.level
+  is_disabled = self.model.total_level <= State.player.level
 
   if ui.keyboard("escape") or ui.keyboard("n") then
     State.mode:close_menu()
@@ -168,7 +168,6 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT active/inactive
       -- NEXT change icon
       -- NEXT submit
       -- NEXT select the first unset pane by default
@@ -223,7 +222,7 @@ draw_base_pane = function(self, dt)
       ui.text("%s ", name:ljust(column1_length):utf_capitalize())
 
       local left_button
-      if raw_score > 8 then
+      if not is_disabled and raw_score > 8 then
         left_button = ui.text_button(" < ").is_clicked
           or is_selected and ui.keyboard("left")
       else
@@ -234,7 +233,8 @@ draw_base_pane = function(self, dt)
       ui.text("%02d", raw_score)
 
       local right_button
-      if raw_score < 15
+      if not is_disabled
+        and raw_score < 15
         and xp.point_buy[raw_score + 1] - xp.point_buy[raw_score] <= self.model.points
       then
         right_button = ui.text_button(" > ").is_clicked
@@ -274,7 +274,7 @@ draw_base_pane = function(self, dt)
       ui.text("## ")
     love.graphics.setColor(Vector.white)
     ui.text("Раса: ")
-    ui.switch(RACES, self.model, "race")
+    ui.switch(RACES, self.model, "race", is_disabled)
   ui.finish_font()
   ui.finish_line()
   ui.br()
@@ -282,13 +282,13 @@ draw_base_pane = function(self, dt)
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, self.model, "skill_1", self.model.skill_2)
+    ui.switch(SKILLS, self.model, "skill_1", is_disabled, self.model.skill_2)
   ui.finish_line()
 
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, self.model, "skill_2", self.model.skill_1)
+    ui.switch(SKILLS, self.model, "skill_2", is_disabled, self.model.skill_1)
   ui.finish_line()
 
   if self.model.race == RACES[1] then
@@ -298,19 +298,19 @@ draw_base_pane = function(self, dt)
       ui.start_line()
         ui.selector()
         ui.text("+2: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus2")
+        ui.switch(ABILITIES, self.model, "bonus_plus2", is_disabled)
       ui.finish_line()
     else
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus1_1", self.model.bonus_plus1_2)
+        ui.switch(ABILITIES, self.model, "bonus_plus1_1", is_disabled, self.model.bonus_plus1_2)
       ui.finish_line()
 
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus1_2", self.model.bonus_plus1_1)
+        ui.switch(ABILITIES, self.model, "bonus_plus1_2", is_disabled, self.model.bonus_plus1_1)
       ui.finish_line()
     end
 
@@ -318,7 +318,7 @@ draw_base_pane = function(self, dt)
     ui.start_line()
       ui.selector()
       ui.text("Черта: ")
-      ui.switch(FEATS, self.model, "feat")
+      ui.switch(FEATS, self.model, "feat", is_disabled)
     ui.finish_line()
 
     ui.start_frame(ui.get_font():getWidth("w") * 4)
@@ -350,7 +350,7 @@ draw_pane = function(self, dt)
         ui.text("## ")
       love.graphics.setColor(Vector.white)
       ui.text("Класс: ")
-      ui.switch(CLASSES, self_classes, self.pane_i)
+      ui.switch(CLASSES, self_classes, self.pane_i, is_disabled)
       ui.text("(уровень %s)", class_level)
     ui.finish_font()
   ui.finish_line()
@@ -426,7 +426,7 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
 
     start_icon_header(gui_elements.fighting_styles)
       ui.text("Боевой стиль:")
-      ui.switch(FIGHTING_STYLES, class_data, "fighting_style")
+      ui.switch(FIGHTING_STYLES, class_data, "fighting_style", is_disabled)
     finish_icon_header()
 
     description(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
@@ -461,7 +461,7 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
     ui.start_line()
       ui.selector()
       ui.text("Навык:")
-      ui.switch(SAMURAI_SKILLS, class_data, "skill")
+      ui.switch(SAMURAI_SKILLS, class_data, "skill", is_disabled)
       -- NEXT how to detect skill collisions?
     ui.finish_line()
   end
