@@ -46,27 +46,69 @@ local RACES = {
   "Необычное происхождение",
 }
 
+local CLASSES_DATA = {
+  fighter,
+}
+
+local CLASSES = Fun.iter(CLASSES_DATA)
+  :map(function(cls) return assert(translation.classes[cls.codename]):utf_capitalize() end)
+  :totable()
+
 --- @param prev state_mode_game
 --- @return state_mode_creator
 creator.new = function(prev)
+  local current_level = State.player.level
+
+  local total_level, pane_i do
+    total_level = current_level
+    local xp_remains = State.player.xp
+    while true  do
+      local delta = xp.for_level[total_level + 1] - xp.for_level[total_level]
+      if xp_remains < delta then break end
+      xp_remains = xp_remains - delta
+      total_level = total_level + 1
+    end
+
+    if current_level == 0 then
+      pane_i = 0
+    elseif total_level > current_level then
+      pane_i = current_level + 1
+    else
+      pane_i = total_level
+    end
+  end
+
+  local model do
+    model = State.player.creator_model
+    if not model then
+      model = {
+        -- NEXT group pane 0's data (like .base_data)
+        abilities = abilities.new(8, 8, 8, 8, 8, 8),
+        points = 27,
+        race = RACES[1],
+        skill_1 = SKILLS[1],
+        skill_2 = SKILLS[2],
+        bonus_plus1_1 = ABILITIES[1],
+        bonus_plus1_2 = ABILITIES[2],
+        bonus_plus2 = ABILITIES[1],
+        feat = FEATS[1],
+        classes = {},
+        class_data = {},
+        total_level = total_level,
+      }
+    end
+
+    for i = 0, total_level - current_level do
+      model.classes[current_level + i] = model.classes[current_level] or CLASSES[1]
+      model.class_data[current_level + i] = {}
+    end
+  end
+
   return setmetatable({
     type = "creator",
     _prev = prev,
-    model = {
-      abilities = abilities.new(8, 8, 8, 8, 8, 8),
-      points = 27,
-      race = RACES[1],
-      skill_1 = SKILLS[1],
-      skill_2 = SKILLS[2],
-      bonus_plus1_1 = ABILITIES[1],
-      bonus_plus1_2 = ABILITIES[2],
-      bonus_plus2 = ABILITIES[1],
-      feat = FEATS[1],
-      classes = {},
-      class_data = Fun.range(3):map(function() return {} end):totable(),
-      total_level = 3,
-    },
-    pane_i = 0,
+    model = model,
+    pane_i = pane_i,
   }, creator.mt)
 end
 
@@ -74,7 +116,11 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 local draw_base_pane, draw_pane
 
+local is_active
+
 methods.draw_gui = function(self, dt)
+  is_active = self.model.total_level > State.player.level
+
   if ui.keyboard("escape") or ui.keyboard("n") then
     State.mode:close_menu()
   end
@@ -99,7 +145,7 @@ methods.draw_gui = function(self, dt)
         end
 
         ui.text("Уровень: ")
-        for i = 0, self.model.total_level do
+        for i = 0, self.model.total_level do  -- NEXT highlight new levels
           if i > 0 then
             ui.text(">")
           end
@@ -130,6 +176,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT when warlock: kind of recognize the Nea
       -- NEXT distribute abilities randomly?
       -- NEXT more fighting styles
+      -- NEXT bonus don't work
 
     ui.finish_font()
   tk.finish_window()
@@ -278,26 +325,15 @@ draw_base_pane = function(self, dt)
   end
 end
 
-local CLASSES_DATA = {
-  fighter,
-}
-
-local CLASSES = Fun.iter(CLASSES_DATA)
-  :map(function(cls) return assert(translation.classes[cls.codename]):utf_capitalize() end)
-  :totable()
-
 local draw_fighter_pane
 
 --- @param self state_mode_creator
 --- @param dt number
 draw_pane = function(self, dt)
   local self_classes = self.model.classes
-  if not self_classes[self.pane_i] then
-    self_classes[self.pane_i] = self_classes[self.pane_i - 1] or CLASSES[1]
-  end
 
   local class_level = 0
-  for i = self.pane_i, 1, -1 do  -- NEXT initialize in the start, scrolling backwards breaks stuff
+  for i = self.pane_i, 1, -1 do
     if self_classes[i] == self_classes[self.pane_i] then
       class_level = class_level + 1
     end

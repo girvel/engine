@@ -17,6 +17,7 @@ local base = {}
 --- @field is_memory_enabled boolean
 --- @field is_blind boolean
 --- @field is_deaf boolean
+--- @field creator_model table?
 
 --- @alias dialogue_line plain_dialogue_line | dialogue_options
 
@@ -48,6 +49,8 @@ base.mixin = function()
         State.level.grid_size * Constants.cell_size * State.perspective.SCALE
       ))
     end,
+
+    creator_model = nil,
   })
 
   return result

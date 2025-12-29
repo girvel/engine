@@ -22,7 +22,8 @@
 --- @field cues table<cue_slot, fun(): item> [CONST] Cue overrides (see item.set_cue)
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
---- @field level integer
+--- @field level integer character level
+--- @field xp integer experience points (after .level)
 --- @field resources table<string, integer> resources to spend on actions
 --- @field inventory table<inventory_slot, item>
 --- @field hp integer current health points
