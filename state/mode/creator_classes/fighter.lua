@@ -47,13 +47,16 @@ fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   local hp_bonus
   if total_level == 1 then
     -- NEXT implement this
-    -- NEXT figure out how many skills & where
     hp_bonus = 10
   else
     hp_bonus = 6
   end
 
-  ui.text("  +%d %s %d (Телосложение) = %+d здоровья", hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod)
+  -- NEXT consider race bonus
+  ui.text(
+    "  +%d %s %d (Телосложение) = %+d здоровья",
+    hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod
+  )
   ui.br()
 
   if class_level == 1 then

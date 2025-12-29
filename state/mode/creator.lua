@@ -368,14 +368,14 @@ draw_pane = function(self, dt)
   ui.finish_line()
   ui.br()
 
+  local codename = self_classes[self.pane_i].codename
   local pane_data = self.model.pane_data
-  local codename = "fighter_" .. class_level  -- NEXT hardcoded!!!
-  if pane_data[self.pane_i].type ~= codename then
-    pane_data[self.pane_i] = {type = codename, groups = {}}
+  local type = codename .. "_" .. class_level
+  if pane_data[self.pane_i].type ~= type then
+    pane_data[self.pane_i] = {type = type, groups = {}}
   end
 
-  CREATOR_CLASSES[self_classes[self.pane_i].codename]
-    .draw_pane(self, dt, is_disabled, self.pane_i, class_level)
+  CREATOR_CLASSES[codename].draw_pane(self, dt, is_disabled, self.pane_i, class_level)
 end
 
 --- @param self state_mode_creator
