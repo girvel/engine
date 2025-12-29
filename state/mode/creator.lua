@@ -1,7 +1,6 @@
 local races = require("engine.mech.races")
 local class = require("engine.mech.class")
 local feats = require("engine.mech.class.feats")
-local gui_elements = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 local xp = require("engine.mech.xp")
 local translation = require("engine.tech.translation")
@@ -181,6 +180,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT distribute abilities randomly?
       -- NEXT more fighting styles
       -- NEXT more feats
+      -- NEXT LSP for model
 
     ui.finish_font()
   tk.finish_window()
@@ -283,7 +283,7 @@ draw_base_pane = function(self, dt)
       ui.text("## ")
     love.graphics.setColor(Vector.white)
     ui.text("Раса: ")
-    ui.switch(RACES, data, "race", is_disabled)
+    self:switch(RACES, "race")
   ui.finish_font()
   ui.finish_line()
   ui.br()
@@ -371,7 +371,7 @@ draw_pane = function(self, dt)
   local class_data = self.model.class_data
   local codename = "fighter_" .. class_level
   if class_data[self.pane_i].type ~= codename then
-    class_data[self.pane_i] = {type = codename}
+    class_data[self.pane_i] = {type = codename, groups = {}}
   end
 
   CREATOR_CLASSES[self_classes[self.pane_i].codename]
@@ -390,6 +390,19 @@ submit = function(self)
     base_abilities = self.model.base_data.abilities,
   })
   State.mode:close_menu()
+end
+
+--- @param possible_values any[]
+--- @param key any
+--- @param group? string
+methods.switch = function(self, possible_values, key, group)
+  local container
+  if self.pane_i == 0 then
+    container = self.model.base_data  -- TODO join with class_data
+  else
+    container = self.model.class_data[self.pane_i]
+  end
+  ui.switch(possible_values, container, key, is_disabled)
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)
