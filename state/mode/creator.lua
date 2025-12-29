@@ -168,7 +168,6 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT change icon
       -- NEXT submit
       -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator

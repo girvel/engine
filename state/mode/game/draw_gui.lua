@@ -1,3 +1,4 @@
+local xp = require("engine.mech.xp")
 local colors = require("engine.tech.colors")
 local animated = require("engine.tech.animated")
 local sound = require("engine.tech.sound")
@@ -203,8 +204,13 @@ draw_keyboard_action_grid = function(self)
     ui.offset(4)
 
     do
-      -- TODO active/inactive icons
-      local button = ui.key_button(gui.creator, "n")
+      local creator_image = (
+        State.player.xp >= xp.for_level[State.player.level + 1] - xp.for_level[State.player.level]
+          and gui.creator
+          or gui.creator_inactive
+      )
+
+      local button = ui.key_button(creator_image, "n")
       if button.is_clicked then
         State.mode:open_creator()
       end
