@@ -16,6 +16,7 @@ local STATES = {
   exit_confirmation = require("engine.state.mode.exit_confirmation"),
   ending = require("engine.state.mode.ending"),
   creator = require("engine.state.mode.creator"),
+  warning = require("engine.state.mode.warning"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -130,6 +131,11 @@ methods.attempt_exit = function(self)
   end
   self:_set_mode(STATES.exit_confirmation.new(self._mode))
   return true
+end
+
+--- @param message string
+methods.show_warning = function(self, message)
+  self:_set_mode(STATES.warning.new(self._mode, message))
 end
 
 mode.new = function()

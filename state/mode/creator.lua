@@ -130,6 +130,14 @@ methods.draw_gui = function(self, dt)
     State.mode:open_journal()
   end
 
+  if ui.keyboard("return") then
+    if self.model.points > 0 then
+      State.mode:show_warning(
+        "Редактирование персонажа не закончено: не все очки способностей израсходованы"
+      )
+    end
+  end
+
   tk.start_window("center", "center", 700, 620)
     ui.h1("Персонаж")
     ui.start_font(24)
@@ -169,6 +177,8 @@ methods.draw_gui = function(self, dt)
       end
 
       -- NEXT submit
+      -- NEXT link_color for ui.choice
+      -- NEXT display only the available actions in sidebar
       -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
@@ -376,9 +386,13 @@ local SAMURAI_SKILLS = Fun.iter {"performance", "history", "insight"}
   :map(function(codename) return assert(translation.skills[codename]):utf_capitalize() end)
   :totable()
 
-local start_icon_header = function(image)
+local start_icon_header = function(image, selector)
   ui.start_line()
-  ui.selector()
+  if selector then
+    ui.selector()
+  else
+    ui.text("  ")
+  end
   ui.image(image, 2)
   ui.start_font(32)
   ui.text(" ")
@@ -423,7 +437,7 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
       class_data.fighting_style = FIGHTING_STYLES[1]
     end
 
-    start_icon_header(gui_elements.fighting_styles)
+    start_icon_header(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
       ui.switch(FIGHTING_STYLES, class_data, "fighting_style", is_disabled)
     finish_icon_header()

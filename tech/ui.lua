@@ -597,7 +597,7 @@ end
 --- @param ... string exceptions
 ui.switch = function(possible_values, container, key, disabled, ...)
   local value = container[key]
-  local is_scrollable = not disabled and #possible_values - select("#", exceptions) > 1
+  local is_scrollable = not disabled and #possible_values - select("#", ...) > 1
   local length = max_length(possible_values)
   possible_values = Table.removed(possible_values, ...)
 
