@@ -47,12 +47,13 @@ local CLASSES = {
 --- @param prev state_mode_game
 --- @return state_mode_creator
 creator.new = function(prev)
+  ui.handle_selection_reset()
   local current_level = State.player.level
 
   local total_level, pane_i do
     total_level = current_level
     local xp_remains = State.player.xp
-    while true  do
+    while true do
       local delta = xp.for_level[total_level + 1] - xp.for_level[total_level]
       if xp_remains < delta then break end
       xp_remains = xp_remains - delta
@@ -128,8 +129,10 @@ methods.draw_gui = function(self, dt)
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
     else
-      -- NEXT confirmation
-      submit(self)
+      State.mode:confirm(
+        "Закончить создание персонажа?",
+        function() submit(self) end
+      )
     end
   end
 

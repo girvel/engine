@@ -1,5 +1,7 @@
 local ui = require("engine.tech.ui")
 local tk = require("engine.state.mode.tk")
+
+
 local warning = {}
 
 --- @class state_mode_warning
@@ -28,7 +30,7 @@ methods.draw_gui = function(self)
     ui.text(self.message)
     ui.br()
 
-    local n = ui.choice({"OK"})
+    local n = ui.choice({"OK  "})
 
     if n == 1 or ui.keyboard("escape") then
       State.mode:close_menu()

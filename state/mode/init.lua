@@ -17,6 +17,7 @@ local STATES = {
   ending = require("engine.state.mode.ending"),
   creator = require("engine.state.mode.creator"),
   warning = require("engine.state.mode.warning"),
+  confirmation = require("engine.state.mode.confirmation"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -136,6 +137,12 @@ end
 --- @param message string
 methods.show_warning = function(self, message)
   self:_set_mode(STATES.warning.new(self._mode, message))
+end
+
+--- @param message string
+--- @param f fun()
+methods.confirm = function(self, message, f)
+  self:_set_mode(STATES.confirmation.new(self._mode, message, f))
 end
 
 mode.new = function()
