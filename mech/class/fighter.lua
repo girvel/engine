@@ -114,6 +114,8 @@ fighter.fighting_spirit = Table.extend({
 fighter.fighting_styles = {}
 
 fighter.fighting_styles.two_weapon_fighting = {
+  name = "Бой двумя оружиями",
+  description = "Удар оружием во второй руке наносит больше урона",
   codename = "two_weapon_fighting",
 
   modify_damage_roll = function(self, entity, roll, slot)
@@ -125,6 +127,8 @@ fighter.fighting_styles.two_weapon_fighting = {
 }
 
 fighter.fighting_styles.defence = {
+  name = "Оборона",
+  description = "+1 к классу брони при наличии шлема/доспеха",
   codename = "defence",
 
   modify_armor = function(self, entity, value)

@@ -1,26 +1,19 @@
+local class = require("engine.mech.class.init")
 local fighter_class = require("engine.mech.class.fighter")
 local gui_elements = require("engine.state.mode.gui_elements")
 local abilities = require("engine.mech.abilities")
 local ui = require("engine.tech.ui")
-local translation = require("engine.tech.translation")
 
 
 local fighter = {}
 
-local FIGHTING_STYLES = Fun.iter(fighter_class.fighting_styles_list)
-  :map(function(style)
-    return assert(translation.fighting_styles[style.codename]):utf_capitalize()
-  end)
-  :totable()
+local FIGHTING_STYLES = fighter_class.fighting_styles_list
 
-local FS_DESCRIPTIONS = {
-  "Удар оружием во второй руке наносит больше урона",
-  "+1 к классу брони при наличии шлема/доспеха",
+local SAMURAI_SKILLS = {
+  class.skill_proficiency("performance"),
+  class.skill_proficiency("history"),
+  class.skill_proficiency("insight"),
 }
-
-local SAMURAI_SKILLS = Fun.iter {"performance", "history", "insight"}
-  :map(function(codename) return assert(translation.skills[codename]):utf_capitalize() end)
-  :totable()
 
 local start_ability = function(image, selector)
   ui.start_line()
@@ -70,7 +63,7 @@ fighter.draw_pane = function(self, dt, is_disabled, total_level, class_level)
     start_ability(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
       ui.switch(FIGHTING_STYLES, class_data, "fighting_style", is_disabled)
-    finish_ability(FS_DESCRIPTIONS[Table.index_of(FIGHTING_STYLES, class_data.fighting_style)])
+    finish_ability(class_data.fighting_style.description)
 
     start_ability(gui_elements.second_wind)
       ui.text("Способность: Второе дыхание")
