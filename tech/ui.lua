@@ -623,11 +623,11 @@ ui.switch = function(possible_values, container, key, disabled, ...)
   if is_scrollable then
     local offset
     if left_button or is_selected and ui.keyboard("left") then
-      offset = 1
+      offset = -1
     end
 
     if right_button or is_selected and ui.keyboard("right") then
-      offset = -1
+      offset = 1
     end
 
     if offset then

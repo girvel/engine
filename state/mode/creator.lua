@@ -82,16 +82,17 @@ creator.new = function(prev)
     model = State.player.creator_model
     if not model then
       model = {
-        -- NEXT group pane 0's data (like .base_data)
-        abilities = abilities.new(8, 8, 8, 8, 8, 8),
-        points = 27,
-        race = RACES[1],
-        skill_1 = SKILLS[1],
-        skill_2 = SKILLS[2],
-        bonus_plus1_1 = ABILITIES[1],
-        bonus_plus1_2 = ABILITIES[2],
-        bonus_plus2 = ABILITIES[1],
-        feat = FEATS[1],
+        base_data = {
+          abilities = abilities.new(8, 8, 8, 8, 8, 8),
+          points = 27,
+          race = RACES[1],
+          skill_1 = SKILLS[1],
+          skill_2 = SKILLS[2],
+          bonus_plus1_1 = ABILITIES[1],
+          bonus_plus1_2 = ABILITIES[2],
+          bonus_plus2 = ABILITIES[1],
+          feat = FEATS[1],
+        },
         classes = {},
         class_data = {},
         total_level = total_level,
@@ -131,7 +132,7 @@ methods.draw_gui = function(self, dt)
   end
 
   if ui.keyboard("return") then
-    if self.model.points > 0 then
+    if self.model.base_data.points > 0 then
       State.mode:show_warning(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
@@ -179,14 +180,12 @@ methods.draw_gui = function(self, dt)
       -- NEXT submit
       -- NEXT link_color for ui.choice
       -- NEXT display only the available actions in sidebar
-      -- NEXT select the first unset pane by default
       -- NEXT really highlight the updated creator
       -- NEXT highlight the updated journal
       -- NEXT task for never: setting to disable annoying highlights
       -- NEXT when warlock: kind of recognize the Nea
       -- NEXT distribute abilities randomly?
       -- NEXT more fighting styles
-      -- NEXT bonus don't work
 
     ui.finish_font()
   tk.finish_window()
@@ -195,6 +194,7 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_base_pane = function(self, dt)
+  local data = self.model.base_data
   local column1_length = Fun.iter(ABILITIES)
     :map(function(name) return name:utf_len() end)
     :max()
@@ -211,24 +211,23 @@ draw_base_pane = function(self, dt)
 
   for _, codename in ipairs(abilities.list) do
     ui.start_line()
-      local name = translation.abilities[codename]
-      local raw_score = self.model.abilities[codename]
+      local name = translation.abilities[codename]:utf_capitalize()
+      local raw_score = data.abilities[codename]
       local bonus
-      if self.model.race == RACES[1] then
+      if data.race == RACES[1] then
         bonus = 1
-      elseif self.model.race == RACES[2] then
-        bonus = self.model.bonus_plus1_1 == name
-          or self.model.bonus_plus1_2 == name
+      elseif data.race == RACES[2] then
+        bonus = (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
           and 1 or 0
       else
-        bonus = self.model.bonus_plus2 == name
+        bonus = data.bonus_plus2 == name
           and 2 or 0
       end
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
       local is_selected = ui.selector()
-      ui.text("%s ", name:ljust(column1_length):utf_capitalize())
+      ui.text("%s ", name:ljust(column1_length))
 
       local left_button
       if not is_disabled and raw_score > 8 then
@@ -244,7 +243,7 @@ draw_base_pane = function(self, dt)
       local right_button
       if not is_disabled
         and raw_score < 15
-        and xp.point_buy[raw_score + 1] - xp.point_buy[raw_score] <= self.model.points
+        and xp.point_buy[raw_score + 1] - xp.point_buy[raw_score] <= data.points
       then
         right_button = ui.text_button(" > ").is_clicked
           or is_selected and ui.keyboard("right")
@@ -256,22 +255,22 @@ draw_base_pane = function(self, dt)
       ui.text("+ %d = %02d  (%+d)", bonus, score, modifier)
 
       if left_button then
-        self.model.points = self.model.points + (
+        data.points = data.points + (
           xp.point_buy[raw_score] - xp.point_buy[raw_score - 1]
         )
-        self.model.abilities[codename] = raw_score - 1
+        data.abilities[codename] = raw_score - 1
       elseif right_button then
-        self.model.points = self.model.points - (
+        data.points = data.points - (
           xp.point_buy[raw_score + 1] - xp.point_buy[raw_score]
         )
-        self.model.abilities[codename] = raw_score + 1
+        data.abilities[codename] = raw_score + 1
       end
     ui.finish_line()
   end
 
   ui.start_line()
     ui.text("  %s    ", ("Очки:"):ljust(column1_length))
-    ui.text("%02d", self.model.points)  -- NEXT color red on > 0
+    ui.text("%02d", data.points)  -- NEXT color red on > 0
   ui.finish_line()
 
   ui.br()
@@ -283,7 +282,7 @@ draw_base_pane = function(self, dt)
       ui.text("## ")
     love.graphics.setColor(Vector.white)
     ui.text("Раса: ")
-    ui.switch(RACES, self.model, "race", is_disabled)
+    ui.switch(RACES, data, "race", is_disabled)
   ui.finish_font()
   ui.finish_line()
   ui.br()
@@ -291,35 +290,35 @@ draw_base_pane = function(self, dt)
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, self.model, "skill_1", is_disabled, self.model.skill_2)
+    ui.switch(SKILLS, data, "skill_1", is_disabled, data.skill_2)
   ui.finish_line()
 
   ui.start_line()
     ui.selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, self.model, "skill_2", is_disabled, self.model.skill_1)
+    ui.switch(SKILLS, data, "skill_2", is_disabled, data.skill_1)
   ui.finish_line()
 
-  if self.model.race == RACES[1] then
+  if data.race == RACES[1] then
     ui.text("  +1 ко всем характеристикам")
   else
-    if self.model.race == RACES[3] then
+    if data.race == RACES[3] then
       ui.start_line()
         ui.selector()
         ui.text("+2: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus2", is_disabled)
+        ui.switch(ABILITIES, data, "bonus_plus2", is_disabled)
       ui.finish_line()
     else
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus1_1", is_disabled, self.model.bonus_plus1_2)
+        ui.switch(ABILITIES, data, "bonus_plus1_1", is_disabled, data.bonus_plus1_2)
       ui.finish_line()
 
       ui.start_line()
         ui.selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, self.model, "bonus_plus1_2", is_disabled, self.model.bonus_plus1_1)
+        ui.switch(ABILITIES, data, "bonus_plus1_2", is_disabled, data.bonus_plus1_1)
       ui.finish_line()
     end
 
@@ -327,11 +326,11 @@ draw_base_pane = function(self, dt)
     ui.start_line()
       ui.selector()
       ui.text("Черта: ")
-      ui.switch(FEATS, self.model, "feat", is_disabled)
+      ui.switch(FEATS, data, "feat", is_disabled)
     ui.finish_line()
 
     ui.start_frame(ui.get_font():getWidth("w") * 4)
-      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, self.model.feat)])
+      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, data.feat)])
     ui.finish_frame()
   end
 end
@@ -419,7 +418,7 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
   end
   local class_data = self.model.class_data[total_level]
 
-  local con_mod = abilities.get_modifier(self.model.abilities.con)
+  local con_mod = abilities.get_modifier(self.model.base_data.abilities.con)
   local hp_bonus
   if total_level == 1 then
     -- NEXT implement this
