@@ -563,7 +563,7 @@ end
 --- @param values string[]
 local max_length = Memoize(function(values)
   return Fun.iter(values)
-    :map(function(v) return v:utf_len() end)
+    :map(function(v) return (type(v) == "string" and v or Name.game(v)):utf_len() end)
     :max()
 end)
 
@@ -590,7 +590,7 @@ ui.text_button = function(text, ...)
   return result
 end
 
---- @param possible_values string[]
+--- @param possible_values string[]|table[]
 --- @param container table
 --- @param key any
 --- @param disabled? boolean
@@ -600,6 +600,12 @@ ui.switch = function(possible_values, container, key, disabled, ...)
   local is_scrollable = not disabled and #possible_values - select("#", ...) > 1
   local length = max_length(possible_values)
   possible_values = Table.removed(possible_values, ...)
+  local index = Table.index_of(possible_values, value) or 1
+  if type(value) == "table" then
+    value = Name.game(value)
+  else
+    value = tostring(value)
+  end
 
   local left_button
   if is_scrollable then
@@ -608,7 +614,7 @@ ui.switch = function(possible_values, container, key, disabled, ...)
     ui.text("   ")
   end
 
-  ui.text(tostring(value):cjust(length, " "))
+  ui.text(value:cjust(length, " "))
 
   local right_button
   if is_scrollable then
@@ -618,7 +624,6 @@ ui.switch = function(possible_values, container, key, disabled, ...)
   end
 
   local is_selected = model.selection.i == model.selection.max_i
-  local index = Table.index_of(possible_values, value) or 1
 
   if is_scrollable then
     local offset

@@ -1,3 +1,4 @@
+local feats = require("engine.mech.class.feats")
 local gui_elements = require("engine.state.mode.gui_elements")
 local fighter = require("engine.mech.class.fighter")
 local xp = require("engine.mech.xp")
@@ -26,19 +27,10 @@ local ABILITIES = Fun.iter(abilities.list)
   :map(function(ability) return assert(translation.abilities[ability]):utf_capitalize() end)
   :totable()
 
-local FEAT_CODENAMES = {
-  "savage_attacker",
-  "great_weapon_master",
-}
-
-local FEATS = Fun.iter(FEAT_CODENAMES)
-  :map(function(feat) return assert(translation.feats[feat]):utf_capitalize() end)
+local FEATS = Fun.pairs(feats)
+  :map(function(k, v) return v end)
   :totable()
-
-local FEAT_DESCRIPTIONS = {
-  "Атаки наносят больше урона",
-  "Шанс попадания двуручным оружием меньше на 25%, урон выше на 10",
-}
+table.sort(FEATS, function(a, b) return a.name < b.name end)
 
 local RACES = {
   "Разносторонний человек",
@@ -115,7 +107,7 @@ end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
-local draw_base_pane, draw_pane
+local draw_base_pane, draw_pane, submit
 
 local is_disabled
 
@@ -136,6 +128,9 @@ methods.draw_gui = function(self, dt)
       State.mode:show_warning(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
+    else
+      -- NEXT confirmation
+      submit(self)
     end
   end
 
@@ -335,9 +330,12 @@ draw_base_pane = function(self, dt)
       ui.switch(FEATS, data, "feat", is_disabled)
     ui.finish_line()
 
-    ui.start_frame(ui.get_font():getWidth("w") * 4)
-      ui.text(FEAT_DESCRIPTIONS[Table.index_of(FEATS, data.feat)])
-    ui.finish_frame()
+    local description = data.feat.description
+    if description then
+      ui.start_frame(ui.get_font():getWidth("w") * 4)
+        ui.text(description)
+      ui.finish_frame()
+    end
   end
 end
 
@@ -483,6 +481,20 @@ draw_fighter_pane = function(self, dt, total_level, class_level)
       -- NEXT how to detect skill collisions?
     ui.finish_line()
   end
+end
+
+--- @param self state_mode_creator
+submit = function(self)
+  local perks = {}
+
+  Table.extend(State.player, {
+    level = self.model.total_level,
+    xp = State.player.xp - xp.for_level[self.model.total_level] + xp.for_level[State.player.level],
+    perks = perks,
+    creator_model = self.model,
+    base_abilities = self.model.base_data.abilities,
+  })
+  State.mode:close_menu()
 end
 
 Ldump.mark(creator, {mt = "const"}, ...)
