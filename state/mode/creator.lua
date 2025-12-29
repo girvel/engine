@@ -145,16 +145,18 @@ methods.draw_gui = function(self, dt)
         end
 
         ui.text("Уровень: ")
-        for i = 0, self.model.total_level do  -- NEXT highlight new levels
+        for i = 0, self.model.total_level do
           if i > 0 then
             ui.text(">")
           end
           if i == self.pane_i then
             ui.text(" [%s] ", i)
           else
+            if i > State.player.level then ui.start_styles({link_color = colors.golden}) end
             if ui.text_button(" [%s] ", i).is_clicked then
               self.pane_i = i
             end
+            if i > State.player.level then ui.finish_styles() end
           end
         end
       ui.finish_line()

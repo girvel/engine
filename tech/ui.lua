@@ -40,6 +40,8 @@ local model = {
   font_size = {},
   is_linear = {},
   line_last_h = {},
+  --- @type ui_styles[]
+  styles = {},
 }
 
 --- @enum (key) ui_cursor_type
@@ -77,6 +79,10 @@ ui.start = function()
   model.font_size = {20}
   model.is_linear = {false}
   model.line_last_h = {0}
+  model.styles = {{
+    link_color = colors.blue_high,
+    punctuation_color = colors.white_dim,
+  }}
 end
 
 ui.finish = function()
@@ -176,6 +182,23 @@ ui.finish_line = function()
   local old_frame = Table.last(model.frame)
   ui.finish_frame()
   Table.last(model.frame).y = old_frame.y + table.remove(model.line_last_h)
+end
+
+--- @class ui_styles
+--- @field link_color vector
+--- @field punctuation_color vector
+
+--- @class ui_styles_optional
+--- @field link_color? vector
+--- @field punctuation_color? vector
+
+--- @param styles ui_styles_optional
+ui.start_styles = function(styles)
+  table.insert(model.styles, Table.extend({}, Table.last(model.styles), styles))
+end
+
+ui.finish_styles = function()
+  table.remove(model.styles)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -551,13 +574,14 @@ ui.text_button = function(text, ...)
   -- TODO bug overlap when next to each other
   text = format(text, ...)
   local font = Table.last(model.font)
+  local styles = Table.last(model.styles)
   local prev_color = {love.graphics.getColor()}
 
   local result = button(font:getWidth("w") * text:utf_len(), font:getHeight())
   if result.is_mouse_over then
     ui.cursor("hand")
   else
-    love.graphics.setColor(colors.blue_high)
+    love.graphics.setColor(styles.link_color)
   end
   ui.text(text)
   if not result.is_mouse_over then
