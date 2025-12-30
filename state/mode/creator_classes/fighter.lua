@@ -19,8 +19,9 @@ local SAMURAI_SKILLS = {
 fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   local data = creator.model.pane_data[total_level]
 
-  local con_mod = abilities.get_modifier(creator.model.pane_data[0].abilities.con)
-    + creator:get_bonus("con")
+  local con_mod = abilities.get_modifier(
+    creator.model.pane_data[0].abilities.con + creator:get_bonus("con")
+  )
   local hp_bonus
   if total_level == 1 then
     -- NEXT actually implement this
