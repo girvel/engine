@@ -56,6 +56,7 @@ end
 --- | '"hp"'
 --- | '"outgoing_damage"'
 --- | '"saving_throw"'
+--- | '"light"'
 
 --- @param self entity
 --- @param modname creature_modification

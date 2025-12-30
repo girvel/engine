@@ -51,6 +51,10 @@ feats.dual_wielder = {
 
     return armor
   end,
+
+  modify_light = function(self, entity, value, item)
+    return not item.tags.two_handed
+  end,
 }
 
 Ldump.mark(feats, "const", ...)

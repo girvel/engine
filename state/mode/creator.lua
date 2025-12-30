@@ -76,8 +76,10 @@ creator.new = function(prev)
         classes = {},
         pane_data = {
           [0] = {
-            abilities = abilities.new(8, 8, 8, 8, 8, 8),
-            points = 27,
+            abilities = State.debug
+              and abilities.new(15, 15, 15, 8, 8, 8)
+              or abilities.new(8, 8, 8, 8, 8, 8),
+            points = State.debug and 0 or 27,
             race = RACES[1],
             skill_1 = SKILLS[1],
             skill_2 = SKILLS[2],
@@ -183,6 +185,7 @@ methods.draw_gui = function(self, dt)
       -- NEXT more fighting styles
       -- NEXT more feats
       -- NEXT LSP for model
+      -- NEXT no submit for inactive creator
 
     ui.finish_font()
   tk.finish_window()
@@ -445,14 +448,15 @@ end
 
 --- @param ability ability
 methods.get_bonus = function(self, ability)
+  local name = translation.abilities[ability]:utf_capitalize()
   local data = self.model.pane_data[0]
   if data.race == races.human then
     return 1
   elseif data.race == races.variant_human then
-    return (data.bonus_plus1_1 == ability or data.bonus_plus1_2 == ability)
+    return (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
       and 1 or 0
   else
-    return data.bonus_plus2 == ability and 2 or 0
+    return data.bonus_plus2 == name and 2 or 0
   end
 end
 

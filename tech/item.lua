@@ -226,7 +226,7 @@ give_to_hands = function(entity, this_item)
     return item.drop(entity, "hand", "offhand"), "hand"
   end
 
-  if not this_item.tags.light then
+  if not entity:modify("light", this_item.tags.light, this_item) then
     if offhand and offhand.damage_roll then
       return item.drop(entity, "hand", "offhand"), "hand"
     else
@@ -236,11 +236,12 @@ give_to_hands = function(entity, this_item)
 
   if not hand then
     return not offhand
-      or (not offhand.tags.two_handed and (offhand.tags.light or not offhand.damage_roll))
+      or not offhand.tags.two_handed
+        and (entity:modify("light", offhand.tags.light, offhand) or not offhand.damage_roll)
       or item.drop(entity, "offhand"), "hand"
   end
 
-  if not hand.tags.light then
+  if not entity:modify("light", hand.tags.light, hand) then
     return item.drop(entity, "hand"), "hand"
   end
 
