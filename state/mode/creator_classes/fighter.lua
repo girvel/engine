@@ -1,4 +1,4 @@
-local class = require("engine.mech.class.init")
+local class = require("engine.mech.class")
 local fighter_class = require("engine.mech.class.fighter")
 local gui_elements = require("engine.state.mode.gui_elements")
 local abilities = require("engine.mech.abilities")
@@ -20,15 +20,15 @@ fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   local data = creator.model.pane_data[total_level]
 
   local con_mod = abilities.get_modifier(creator.model.pane_data[0].abilities.con)
+    + creator:get_bonus("con")
   local hp_bonus
   if total_level == 1 then
-    -- NEXT implement this
+    -- NEXT actually implement this
     hp_bonus = 10
   else
     hp_bonus = 6
   end
 
-  -- NEXT consider race bonus
   ui.text(
     "  +%d %s %d (Телосложение) = %+d здоровья",
     hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod

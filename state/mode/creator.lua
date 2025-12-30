@@ -206,20 +206,11 @@ draw_base_pane = function(self, dt)
   ui.text("  " .. header)
   ui.text("  " .. "-" * header:utf_len())
 
-  for _, codename in ipairs(abilities.list) do
+  for _, ability_name in ipairs(abilities.list) do
     ui.start_line()
-      local name = translation.abilities[codename]:utf_capitalize()
-      local raw_score = data.abilities[codename]
-      local bonus
-      if data.race == races.human then
-        bonus = 1
-      elseif data.race == races.variant_human then
-        bonus = (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
-          and 1 or 0
-      else
-        bonus = data.bonus_plus2 == name
-          and 2 or 0
-      end
+      local name = translation.abilities[ability_name]:utf_capitalize()
+      local raw_score = data.abilities[ability_name]
+      local bonus = self:get_bonus(ability_name)
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
@@ -255,12 +246,12 @@ draw_base_pane = function(self, dt)
         data.points = data.points + (
           xp.point_buy[raw_score] - xp.point_buy[raw_score - 1]
         )
-        data.abilities[codename] = raw_score - 1
+        data.abilities[ability_name] = raw_score - 1
       elseif right_button then
         data.points = data.points - (
           xp.point_buy[raw_score + 1] - xp.point_buy[raw_score]
         )
-        data.abilities[codename] = raw_score + 1
+        data.abilities[ability_name] = raw_score + 1
       end
     ui.finish_line()
   end
@@ -450,6 +441,19 @@ methods.finish_ability = function(self, fmt, ...)
   ui.finish_frame()
   ui.get_frame().y = y
   ui.br()
+end
+
+--- @param ability ability
+methods.get_bonus = function(self, ability)
+  local data = self.model.pane_data[0]
+  if data.race == races.human then
+    return 1
+  elseif data.race == races.variant_human then
+    return (data.bonus_plus1_1 == ability or data.bonus_plus1_2 == ability)
+      and 1 or 0
+  else
+    return data.bonus_plus2 == ability and 2 or 0
+  end
 end
 
 
