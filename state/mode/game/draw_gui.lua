@@ -276,13 +276,15 @@ draw_keyboard_action_grid = function(self)
     end
     ui.offset(4)
 
-    action_button(fighter.second_wind, "3")
-    ui.offset(4)
-
-    action_button(fighter.action_surge, "4")
-    ui.offset(4)
-
-    action_button(fighter.fighting_spirit, "5")
+    for i, action in ipairs(State.player:modify("additional_actions", {})) do
+      action_button(action, tostring(2 + i))
+      if i % 5 == 3 then
+        ui.finish_line()
+        ui.start_line()
+      else
+        ui.offset(4)
+      end
+    end
   ui.finish_line()
 end
 

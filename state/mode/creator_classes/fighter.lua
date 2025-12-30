@@ -15,6 +15,14 @@ local SAMURAI_SKILLS = {
   class.skill_proficiency("insight"),
 }
 
+fighter.init_data = function(class_level, total_level)
+  local data = {}
+  if class_level == 1 then
+    data.fighting_style = FIGHTING_STYLES[1]
+  end
+  return data
+end
+
 --- @param creator state_mode_creator
 fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   local data = creator.model.pane_data[total_level]
@@ -37,10 +45,6 @@ fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   ui.br()
 
   if class_level == 1 then
-    if not data.fighting_style then
-      data.fighting_style = FIGHTING_STYLES[1]
-    end
-
     creator:start_ability(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
       ui.switch(FIGHTING_STYLES, data, "fighting_style", is_disabled)
@@ -75,6 +79,7 @@ fighter.submit = function(creator, total_level, class_level)
   }
 
   if class_level == 1 then
+    Log.tracel(data)
     table.insert(result, data.fighting_style)
     table.insert(result, fighter_class.second_wind)
   elseif class_level == 2 then
@@ -83,7 +88,8 @@ fighter.submit = function(creator, total_level, class_level)
     table.insert(result, fighter_class.fighting_spirit)
   end
 
-  return result end
+  return result
+end
 
 Ldump.mark(fighter, {}, ...)
 return fighter

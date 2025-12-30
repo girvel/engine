@@ -44,6 +44,8 @@ local CLASSES = {
   fighter,
 }
 
+local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
+
 --- @param prev state_mode_game
 --- @return state_mode_creator
 creator.new = function(prev)
@@ -94,8 +96,10 @@ creator.new = function(prev)
     end
 
     for i = 1, total_level - current_level do
-      model.classes[current_level + i] = model.classes[current_level] or CLASSES[1]
-      model.pane_data[current_level + i] = {}
+      local this_class = model.classes[current_level] or CLASSES[1]
+      model.classes[current_level + i] = this_class
+      model.pane_data[current_level + i] = CREATOR_CLASSES[this_class.codename].init_data(current_level + i, current_level + i)
+      -- NEXT doesn't consider multiclassing; counting the level of this class is so repetitive; maybe it's better to 
     end
   end
 
@@ -335,8 +339,6 @@ draw_base_pane = function(self, dt)
   end
 end
 
-local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
-
 --- @param self state_mode_creator
 --- @param dt number
 draw_pane = function(self, dt)
@@ -366,10 +368,7 @@ draw_pane = function(self, dt)
 
   local codename = self_classes[self.pane_i].codename
   local pane_data = self.model.pane_data
-  local type = codename .. "_" .. class_level
-  if pane_data[self.pane_i].type ~= type then
-    pane_data[self.pane_i] = {type = type, groups = {}}
-  end
+  -- TODO here was class switching logic
 
   CREATOR_CLASSES[codename].draw_pane(self, dt, is_disabled, self.pane_i, class_level)
 end
@@ -392,16 +391,18 @@ submit = function(self)
   for i = 1, self.model.total_level do
     local codename = self.model.classes[i].codename
     class_levels[codename] = (class_levels[codename] or 0) + 1
-    Table.extend(perks, CREATOR_CLASSES[codename].submit(self, i, i, class_levels[codename]))
+    Table.concat(perks, CREATOR_CLASSES[codename].submit(self, i, class_levels[codename]))
   end
 
-  Table.extend(State.player, {
+  local mixin = {
     level = self.model.total_level,
     xp = State.player.xp - xp.for_level[self.model.total_level] + xp.for_level[State.player.level],
     perks = perks,
     creator_model = self.model,
     base_abilities = self.model.pane_data[0].abilities,
-  })
+  }
+  Log.info("Submitting a character build: %s", mixin)
+  Table.extend(State.player, mixin)
   State.mode:close_menu()
 end
 

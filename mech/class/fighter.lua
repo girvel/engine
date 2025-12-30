@@ -22,6 +22,11 @@ fighter.action_surge = Table.extend({
     return resources
   end,
 
+  modify_additional_actions = function(self, entity, list)
+    table.insert(list, self)
+    return list
+  end,
+
   cost = {
     actions = -1,
     action_surge = 1,
@@ -47,6 +52,11 @@ fighter.second_wind = Table.extend({
       resources.second_wind = (resources.second_wind or 0) + 1
     end
     return resources
+  end,
+
+  modify_additional_actions = function(self, entity, list)
+    table.insert(list, self)
+    return list
   end,
 
   cost = {
@@ -91,6 +101,11 @@ fighter.fighting_spirit = Table.extend({
       resources.fighting_spirit = (resources.fighting_spirit or 0) + 3
     end
     return resources
+  end,
+
+  modify_additional_actions = function(self, entity, list)
+    table.insert(list, self)
+    return list
   end,
 
   cost = {
