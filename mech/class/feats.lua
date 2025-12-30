@@ -37,5 +37,21 @@ feats.great_weapon_master = {
   end,
 }
 
+feats.dual_wielder = {
+  name = "Мастер двух оружий",
+  codename = "dual_wielder",
+  description = "Два оружия в руках дают +1 к броне, можно держать более тяжёлое оружие в двух руках",
+
+  modify_armor = function(self, entity, armor)
+    local hand = entity.inventory.hand
+    local offhand = entity.inventory.offhand
+    if hand and hand.damage_roll and offhand and offhand.damage_roll then
+      return armor + 1
+    end
+
+    return armor
+  end,
+}
+
 Ldump.mark(feats, "const", ...)
 return feats
