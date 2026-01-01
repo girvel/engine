@@ -366,14 +366,24 @@ draw_pane = function(self, dt)
     self.model.pane_data[0].abilities.con + self:get_bonus("con")
   )
 
+  local prev_hp = 0
+  for i = 1, self.pane_i - 1 do
+    local this_data = self.model.pane_data[i]
+    prev_hp = prev_hp + con_mod + (
+      i == 1
+        and this_data.class.hit_die
+        or math.floor(data.class.hit_die / 2) + 1
+    )
+  end
+
   local hp_bonus = data.total_level == 1
     and data.class.hit_die
     or (math.floor(data.class.hit_die / 2) + 1)
 
-  -- NEXT calculate total?
+  -- NEXT fix the end value
   ui.text(
-    "  +%d %s %d (Телосложение) = %+d здоровья",
-    hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod
+    "  %d + %d %s %d (Телосложение) = %d здоровья",
+    prev_hp, hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), prev_hp + hp_bonus + con_mod
   )
   ui.br()
 
