@@ -17,6 +17,7 @@ local creator = {}
 --- @field _prev state_mode_game
 --- @field model table
 --- @field pane_i integer
+--- @field is_disabled boolean
 local methods = {}
 creator.mt = {__index = methods}
 
@@ -108,6 +109,7 @@ creator.new = function(prev)
     _prev = prev,
     model = model,
     pane_i = pane_i,
+    is_disabled = model.total_level <= State.player.level,
   }, creator.mt)
 end
 
@@ -115,11 +117,7 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 local draw_base_pane, draw_pane, submit
 
-local is_disabled
-
 methods.draw_gui = function(self, dt)
-  is_disabled = self.model.total_level <= State.player.level
-
   if ui.keyboard("escape") or ui.keyboard("n") then
     State.mode:close_menu()
   end
@@ -129,7 +127,7 @@ methods.draw_gui = function(self, dt)
     State.mode:open_journal()
   end
 
-  if ui.keyboard("return") then
+  if not self.is_disabled and ui.keyboard("return") then
     if self.model.pane_data[0].points > 0 then
       State.mode:show_confirmation(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
@@ -217,7 +215,7 @@ draw_base_pane = function(self, dt)
       ui.text("%s ", name:ljust(column1_length))
 
       local left_button
-      if not is_disabled and raw_score > 8 then
+      if not self.is_disabled and raw_score > 8 then
         left_button = ui.text_button(" < ").is_clicked
           or is_selected and ui.keyboard("left")
       else
@@ -228,7 +226,7 @@ draw_base_pane = function(self, dt)
       ui.text("%02d", raw_score)
 
       local right_button
-      if not is_disabled
+      if not self.is_disabled
         and raw_score < 15
         and xp.point_buy[raw_score + 1] - xp.point_buy[raw_score] <= data.points
       then
@@ -283,13 +281,13 @@ draw_base_pane = function(self, dt)
   ui.start_line()
     self:selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, data, "skill_1", is_disabled, data.skill_2)
+    ui.switch(SKILLS, data, "skill_1", self.is_disabled, data.skill_2)
   ui.finish_line()
 
   ui.start_line()
     self:selector()
     ui.text("Навык: ")
-    ui.switch(SKILLS, data, "skill_2", is_disabled, data.skill_1)
+    ui.switch(SKILLS, data, "skill_2", self.is_disabled, data.skill_1)
   ui.finish_line()
 
   if data.race == races.human then
@@ -299,19 +297,19 @@ draw_base_pane = function(self, dt)
       ui.start_line()
         self:selector()
         ui.text("+2: ")
-        ui.switch(ABILITIES, data, "bonus_plus2", is_disabled)
+        ui.switch(ABILITIES, data, "bonus_plus2", self.is_disabled)
       ui.finish_line()
     else
       ui.start_line()
         self:selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, data, "bonus_plus1_1", is_disabled, data.bonus_plus1_2)
+        ui.switch(ABILITIES, data, "bonus_plus1_1", self.is_disabled, data.bonus_plus1_2)
       ui.finish_line()
 
       ui.start_line()
         self:selector()
         ui.text("+1: ")
-        ui.switch(ABILITIES, data, "bonus_plus1_2", is_disabled, data.bonus_plus1_1)
+        ui.switch(ABILITIES, data, "bonus_plus1_2", self.is_disabled, data.bonus_plus1_1)
       ui.finish_line()
     end
 
@@ -319,7 +317,7 @@ draw_base_pane = function(self, dt)
     ui.start_line()
       self:selector()
       ui.text("Черта: ")
-      ui.switch(FEATS, data, "feat", is_disabled)
+      ui.switch(FEATS, data, "feat", self.is_disabled)
     ui.finish_line()
 
     local description = data.feat.description
@@ -352,7 +350,7 @@ draw_pane = function(self, dt)
         ui.text("## ")
       love.graphics.setColor(Vector.white)
       ui.text("Класс: ")
-      ui.switch(CLASSES, self_classes, self.pane_i, is_disabled)
+      ui.switch(CLASSES, self_classes, self.pane_i, self.is_disabled)
       ui.text("(уровень %s)", class_level)
     ui.finish_font()
   ui.finish_line()
@@ -361,7 +359,7 @@ draw_pane = function(self, dt)
   local codename = self_classes[self.pane_i].codename
   -- TODO here was class switching logic
 
-  CREATOR_CLASSES[codename].draw_pane(self, dt, is_disabled, self.pane_i, class_level)
+  CREATOR_CLASSES[codename].draw_pane(self, dt, self.is_disabled, self.pane_i, class_level)
 end
 
 --- @param self state_mode_creator
@@ -403,11 +401,11 @@ end
 --- @param group? string
 methods.switch = function(self, possible_values, key, group)
   local container = self.model.pane_data[self.pane_i]
-  ui.switch(possible_values, container, key, is_disabled)
+  ui.switch(possible_values, container, key, self.is_disabled)
 end
 
 methods.selector = function(self)
-  if is_disabled then
+  if self.is_disabled then
     ui.text("  ")
     return false
   else
