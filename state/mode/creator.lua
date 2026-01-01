@@ -380,7 +380,6 @@ draw_pane = function(self, dt)
     and data.class.hit_die
     or (math.floor(data.class.hit_die / 2) + 1)
 
-  -- NEXT fix the end value
   ui.text(
     "  %d + %d %s %d (Телосложение) = %d здоровья",
     prev_hp, hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), prev_hp + hp_bonus + con_mod
@@ -399,8 +398,21 @@ submit = function(self)
       data.skill_2,
     }
 
-    if data.race ~= races.human then
+    if data.race == races.human then
+      table.insert(perks, races.human.ability_bonus)
+    elseif data.race == races.custom_lineage then
       table.insert(perks, data.feat)
+      table.insert(perks, races.custom_lineage:ability_bonus(
+        Table.key_of(translation.abilities, data.bonus_plus2:utf_lower())
+      ))
+    elseif data.race == races.variant_human then
+      table.insert(perks, data.feat)
+      table.insert(perks, races.variant_human:ability_bonus(
+        Table.key_of(translation.abilities, data.bonus_plus1_1:utf_lower()),
+        Table.key_of(translation.abilities, data.bonus_plus1_2:utf_lower())
+      ))
+    else
+      assert(false)
     end
   end
 

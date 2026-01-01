@@ -1,6 +1,5 @@
 local health = require("engine.mech.health")
 local action = require("engine.tech.action")
-local class  = require("engine.mech.class")
 local sound  = require("engine.tech.sound")
 local animated = require("engine.tech.animated")
 
