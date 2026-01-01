@@ -10,6 +10,7 @@ local fighter = {}
 fighter.name = "Воин"
 fighter.codename = "fighter"
 fighter.hit_dice = class.hit_dice(10)
+fighter.base_hit_dice = class.hit_dice(10, true)
 
 fighter.action_surge = Table.extend({
   name = "всплеск действий",

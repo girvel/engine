@@ -180,14 +180,6 @@ methods.draw_gui = function(self, dt)
         draw_pane(self, dt)
       end
 
-      -- NEXT display only the available actions in sidebar
-      -- NEXT really highlight the updated creator
-      -- NEXT highlight the updated journal
-      -- NEXT task for never: setting to disable annoying highlights
-      -- NEXT when warlock: kind of recognize the Nea
-      -- NEXT distribute abilities randomly?
-      -- NEXT more fighting styles
-      -- NEXT more feats
       -- NEXT LSP for model
       -- NEXT no submit for inactive creator
 
@@ -367,7 +359,6 @@ draw_pane = function(self, dt)
   ui.br()
 
   local codename = self_classes[self.pane_i].codename
-  local pane_data = self.model.pane_data
   -- TODO here was class switching logic
 
   CREATOR_CLASSES[codename].draw_pane(self, dt, is_disabled, self.pane_i, class_level)
@@ -375,6 +366,7 @@ end
 
 --- @param self state_mode_creator
 submit = function(self)
+  -- NEXT rest
   local perks do
     local data = self.model.pane_data[0]
     perks = {

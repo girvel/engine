@@ -32,12 +32,12 @@ fighter.draw_pane = function(creator, dt, is_disabled, total_level, class_level)
   )
   local hp_bonus
   if total_level == 1 then
-    -- NEXT actually implement this
     hp_bonus = 10
   else
     hp_bonus = 6
   end
 
+  -- NEXT move to the creator itself
   ui.text(
     "  +%d %s %d (Телосложение) = %+d здоровья",
     hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod
@@ -74,12 +74,15 @@ end
 --- @param creator state_mode_creator
 fighter.submit = function(creator, total_level, class_level)
   local data = creator.model.pane_data[total_level]
-  local result = {
-    fighter_class.hit_dice,
-  }
+  local result
+
+  if total_level == 1 then
+    result = {fighter_class.base_hit_dice}
+  else
+    result = {fighter_class.hit_dice}
+  end
 
   if class_level == 1 then
-    Log.tracel(data)
     table.insert(result, data.fighting_style)
     table.insert(result, fighter_class.second_wind)
   elseif class_level == 2 then

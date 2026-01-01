@@ -8,19 +8,24 @@ local sound  = require("engine.tech.sound")
 local class = {}
 
 --- @param die integer
+--- @param is_base? boolean
 --- @return action
-class.hit_dice = function(die)
+class.hit_dice = function(die, is_base)
   return Table.extend({
     name = "перевязать раны",
     codename = "hit_dice",
 
     modify_max_hp = function(self, entity, value)
-      return value + die + (math.floor(die / 2) + 1) * (entity.level - 1)
+      if is_base then
+        return value + die
+      else
+        return value + math.floor(die / 2) + 1
+      end
     end,
 
     modify_resources = function(self, entity, resources, rest_type)
       if rest_type == "long" then
-        resources.hit_dice = (resources.hit_dice or 0) + entity.level
+        resources.hit_dice = (resources.hit_dice or 0) + 1
       end
       return resources
     end,
