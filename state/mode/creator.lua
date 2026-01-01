@@ -13,7 +13,7 @@ local ui = require("engine.tech.ui")
 local creator = {}
 
 --- @class creator_base_pane
---- @field abilities abilities
+--- @field base_abilities abilities
 --- @field points integer
 --- @field race table
 --- @field skill_1 table
@@ -96,8 +96,7 @@ creator.new = function(prev)
     if not model then
       model = {
         [0] = {
-          -- NEXT rename to base_abilities
-          abilities = State.debug
+          base_abilities = State.debug
             and abilities.new(15, 15, 15, 8, 8, 8)
             or abilities.new(8, 8, 8, 8, 8, 8),
           points = State.debug and 0 or 27,
@@ -232,7 +231,7 @@ draw_base_pane = function(self, dt)
   for _, ability_name in ipairs(abilities.list) do
     ui.start_line()
       local name = translation.abilities[ability_name]:utf_capitalize()
-      local raw_score = data.abilities[ability_name]
+      local raw_score = data.base_abilities[ability_name]
       local bonus = self:get_bonus(ability_name)
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
@@ -269,12 +268,12 @@ draw_base_pane = function(self, dt)
         data.points = data.points + (
           xp.point_buy[raw_score] - xp.point_buy[raw_score - 1]
         )
-        data.abilities[ability_name] = raw_score - 1
+        data.base_abilities[ability_name] = raw_score - 1
       elseif right_button then
         data.points = data.points - (
           xp.point_buy[raw_score + 1] - xp.point_buy[raw_score]
         )
-        data.abilities[ability_name] = raw_score + 1
+        data.base_abilities[ability_name] = raw_score + 1
       end
     ui.finish_line()
   end
@@ -376,7 +375,7 @@ draw_pane = function(self, dt)
   ui.br()
 
   local con_mod = abilities.get_modifier(
-    self.model[0].abilities.con + self:get_bonus("con")
+    self.model[0].base_abilities.con + self:get_bonus("con")
   )
 
   local prev_hp = 0
@@ -439,7 +438,7 @@ submit = function(self)
     xp = State.player.xp - xp.for_level[#self.model] + xp.for_level[State.player.level],
     perks = perks,
     creator_model = self.model,
-    base_abilities = self.model[0].abilities,
+    base_abilities = self.model[0].base_abilities,
   }
   Log.info("Submitting a character build: %s", mixin)
   Table.extend(State.player, mixin)
