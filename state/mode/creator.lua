@@ -76,7 +76,6 @@ creator.new = function(prev)
     model = State.player.creator_model
     if not model then
       model = {
-        classes = {},
         pane_data = {
           [0] = {
             abilities = State.debug
@@ -96,11 +95,25 @@ creator.new = function(prev)
       }
     end
 
-    for i = 1, total_level - current_level do
-      local this_class = model.classes[current_level] or CLASSES[1]
-      model.classes[current_level + i] = this_class
-      model.pane_data[current_level + i] = CREATOR_CLASSES[this_class.codename].init_data(current_level + i, current_level + i)
-      -- NEXT doesn't consider multiclassing; counting the level of this class is so repetitive; maybe it's better to 
+    local class_levels = {}
+    for i = 1, total_level do
+      local this_class, class_level
+      if i > current_level then
+        this_class = model.pane_data[i - 1].class or CLASSES[1]
+        class_level = (class_levels[this_class] or 0) + 1
+
+        model.pane_data[i] = {
+          class = this_class,
+          class_level = class_level,
+          total_level = i,
+        }
+        CREATOR_CLASSES[this_class.codename].init_data(model.pane_data[i])
+      else
+        this_class = model.pane_data[i].class
+        class_level = model.pane_data[i].class_level
+      end
+
+      class_levels[this_class.codename] = class_level
     end
   end
 
@@ -179,7 +192,6 @@ methods.draw_gui = function(self, dt)
       end
 
       -- NEXT LSP for model
-      -- NEXT no submit for inactive creator
 
     ui.finish_font()
   tk.finish_window()
@@ -332,14 +344,7 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_pane = function(self, dt)
-  local self_classes = self.model.classes
-
-  local class_level = 0
-  for i = self.pane_i, 1, -1 do
-    if self_classes[i] == self_classes[self.pane_i] then
-      class_level = class_level + 1
-    end
-  end
+  local data = self.model.pane_data[self.pane_i]
 
   ui.br()
 
@@ -350,16 +355,13 @@ draw_pane = function(self, dt)
         ui.text("## ")
       love.graphics.setColor(Vector.white)
       ui.text("Класс: ")
-      ui.switch(CLASSES, self_classes, self.pane_i, self.is_disabled)
-      ui.text("(уровень %s)", class_level)
+      self:switch(CLASSES, "class")
+      ui.text("(уровень %s)", data.class_level)
     ui.finish_font()
   ui.finish_line()
   ui.br()
 
-  local codename = self_classes[self.pane_i].codename
-  -- TODO here was class switching logic
-
-  CREATOR_CLASSES[codename].draw_pane(self, dt, self.is_disabled, self.pane_i, class_level)
+  CREATOR_CLASSES[data.class.codename].draw_pane(self, dt, data)
 end
 
 --- @param self state_mode_creator
@@ -376,11 +378,9 @@ submit = function(self)
     end
   end
 
-  local class_levels = {}
   for i = 1, self.model.total_level do
-    local codename = self.model.classes[i].codename
-    class_levels[codename] = (class_levels[codename] or 0) + 1
-    Table.concat(perks, CREATOR_CLASSES[codename].submit(self, i, class_levels[codename]))
+    local data = self.model.pane_data[i]
+    Table.concat(perks, CREATOR_CLASSES[data.class.codename].submit(self, data))
   end
 
   local mixin = {
