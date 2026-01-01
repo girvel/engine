@@ -10,7 +10,7 @@ local class = {}
 --- @param die integer
 --- @param is_base? boolean
 --- @return action
-class.hit_dice = function(die, is_base)
+class.hit_dice = Memoize(function(die, is_base)
   return Table.extend({
     name = "перевязать раны",
     codename = "hit_dice",
@@ -46,7 +46,7 @@ class.hit_dice = function(die, is_base)
       return true
     end,
   }, action.base)
-end
+end)
 
 --- @param skill skill
 --- @return table

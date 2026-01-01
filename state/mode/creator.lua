@@ -1,3 +1,4 @@
+local class = require("engine.mech.class")
 local races = require("engine.mech.races")
 local class = require("engine.mech.class")
 local feats = require("engine.mech.class.feats")
@@ -361,6 +362,21 @@ draw_pane = function(self, dt)
   ui.finish_line()
   ui.br()
 
+  local con_mod = abilities.get_modifier(
+    self.model.pane_data[0].abilities.con + self:get_bonus("con")
+  )
+
+  local hp_bonus = data.total_level == 1
+    and data.class.hit_die
+    or (math.floor(data.class.hit_die / 2) + 1)
+
+  -- NEXT calculate total?
+  ui.text(
+    "  +%d %s %d (Телосложение) = %+d здоровья",
+    hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod
+  )
+  ui.br()
+
   CREATOR_CLASSES[data.class.codename].draw_pane(self, dt, data)
 end
 
@@ -380,6 +396,7 @@ submit = function(self)
 
   for i = 1, self.model.total_level do
     local data = self.model.pane_data[i]
+    table.insert(perks, class.hit_dice(data.class.hit_die, i == 1))
     Table.concat(perks, CREATOR_CLASSES[data.class.codename].submit(self, data))
   end
 

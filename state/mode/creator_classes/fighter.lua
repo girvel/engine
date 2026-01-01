@@ -24,24 +24,6 @@ end
 
 --- @param creator state_mode_creator
 fighter.draw_pane = function(creator, dt, data)
-  local con_mod = abilities.get_modifier(
-    creator.model.pane_data[0].abilities.con + creator:get_bonus("con")
-  )
-  local hp_bonus
-  if data.total_level == 1 then
-    hp_bonus = 10
-  else
-    hp_bonus = 6
-  end
-
-  -- NEXT move to the creator itself
-  -- NEXT calculate total?
-  ui.text(
-    "  +%d %s %d (Телосложение) = %+d здоровья",
-    hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), hp_bonus + con_mod
-  )
-  ui.br()
-
   if data.class_level == 1 then
     creator:start_ability(gui_elements.fighting_styles, true)
       ui.text("Боевой стиль:")
@@ -71,13 +53,7 @@ end
 
 --- @param creator state_mode_creator
 fighter.submit = function(creator, data)
-  local result
-
-  if data.total_level == 1 then
-    result = {fighter_class.base_hit_dice}
-  else
-    result = {fighter_class.hit_dice}
-  end
+  local result = {}
 
   if data.class_level == 1 then
     table.insert(result, data.fighting_style)

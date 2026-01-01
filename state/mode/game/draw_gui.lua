@@ -1,3 +1,4 @@
+local class = require("engine.mech.class")
 local xp = require("engine.mech.xp")
 local colors = require("engine.tech.colors")
 local animated = require("engine.tech.animated")
@@ -238,7 +239,8 @@ draw_keyboard_action_grid = function(self)
     action_button(actions.interact, "e")
     ui.offset(4)
 
-    action_button(fighter.hit_dice, "h")
+    -- TODO handle warlock hit die
+    action_button(class.hit_dice(fighter.hit_die), "h")
     ui.offset(4)
   ui.finish_line()
   ui.offset(0, 4)
