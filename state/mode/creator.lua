@@ -366,7 +366,6 @@ end
 
 --- @param self state_mode_creator
 submit = function(self)
-  -- NEXT rest
   local perks do
     local data = self.model.pane_data[0]
     perks = {
@@ -395,6 +394,7 @@ submit = function(self)
   }
   Log.info("Submitting a character build: %s", mixin)
   Table.extend(State.player, mixin)
+  State.player:rest("full")
   State.mode:close_menu()
 end
 
