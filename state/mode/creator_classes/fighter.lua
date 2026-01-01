@@ -1,7 +1,6 @@
 local class = require("engine.mech.class")
 local fighter_class = require("engine.mech.class.fighter")
 local gui_elements = require("engine.state.mode.gui_elements")
-local abilities = require("engine.mech.abilities")
 local ui = require("engine.tech.ui")
 
 
@@ -9,7 +8,7 @@ local fighter = {}
 
 local FIGHTING_STYLES = fighter_class.fighting_styles_list
 
-local SAMURAI_SKILLS = {
+local _SAMURAI_SKILLS = {
   class.skill_proficiency("performance"),
   class.skill_proficiency("history"),
   class.skill_proficiency("insight"),

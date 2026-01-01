@@ -12,10 +12,29 @@ local ui = require("engine.tech.ui")
 
 local creator = {}
 
+--- @class creator_base_pane
+--- @field abilities abilities
+--- @field points integer
+--- @field race table
+--- @field skill_1 table
+--- @field skill_2 table
+--- @field bonus_plus1_1 string
+--- @field bonus_plus1_2 string
+--- @field bonus_plus2 string
+--- @field feat table
+
+--- @alias creator_pane creator_pane_strict|table
+--- @class creator_pane_strict
+--- @field class table
+--- @field class_level integer
+--- @field total_level integer
+
+--- @alias creator_model {[0]: creator_base_pane, [1]: creator_pane, [2]: creator_pane, [3]: creator_pane, [4]: creator_pane, [5]: creator_pane, [6]: creator_pane, [7]: creator_pane, [8]: creator_pane, [9]: creator_pane}
+
 --- @class state_mode_creator
 --- @field type "creator"
 --- @field _prev state_mode_game
---- @field model table
+--- @field model creator_model
 --- @field pane_i integer
 --- @field is_disabled boolean
 local methods = {}
@@ -77,6 +96,7 @@ creator.new = function(prev)
     if not model then
       model = {
         [0] = {
+          -- NEXT rename to base_abilities
           abilities = State.debug
             and abilities.new(15, 15, 15, 8, 8, 8)
             or abilities.new(8, 8, 8, 8, 8, 8),
@@ -187,9 +207,6 @@ methods.draw_gui = function(self, dt)
       else
         draw_pane(self, dt)
       end
-
-      -- NEXT LSP for model
-
     ui.finish_font()
   tk.finish_window()
 end

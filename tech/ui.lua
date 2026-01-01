@@ -594,7 +594,7 @@ end
 --- @param container table
 --- @param key any
 --- @param disabled? boolean
---- @param ... string exceptions
+--- @param ... string|table exceptions
 ui.switch = function(possible_values, container, key, disabled, ...)
   local value = container[key]
   local is_scrollable = not disabled and #possible_values - select("#", ...) > 1
