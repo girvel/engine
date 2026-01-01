@@ -1,6 +1,5 @@
 local class = require("engine.mech.class")
 local races = require("engine.mech.races")
-local class = require("engine.mech.class")
 local feats = require("engine.mech.class.feats")
 local fighter = require("engine.mech.class.fighter")
 local xp = require("engine.mech.xp")
@@ -77,22 +76,19 @@ creator.new = function(prev)
     model = State.player.creator_model
     if not model then
       model = {
-        pane_data = {
-          [0] = {
-            abilities = State.debug
-              and abilities.new(15, 15, 15, 8, 8, 8)
-              or abilities.new(8, 8, 8, 8, 8, 8),
-            points = State.debug and 0 or 27,
-            race = RACES[1],
-            skill_1 = SKILLS[1],
-            skill_2 = SKILLS[2],
-            bonus_plus1_1 = ABILITIES[1],
-            bonus_plus1_2 = ABILITIES[2],
-            bonus_plus2 = ABILITIES[1],
-            feat = FEATS[1],
-          },
+        [0] = {
+          abilities = State.debug
+            and abilities.new(15, 15, 15, 8, 8, 8)
+            or abilities.new(8, 8, 8, 8, 8, 8),
+          points = State.debug and 0 or 27,
+          race = RACES[1],
+          skill_1 = SKILLS[1],
+          skill_2 = SKILLS[2],
+          bonus_plus1_1 = ABILITIES[1],
+          bonus_plus1_2 = ABILITIES[2],
+          bonus_plus2 = ABILITIES[1],
+          feat = FEATS[1],
         },
-        total_level = total_level,
       }
     end
 
@@ -100,18 +96,18 @@ creator.new = function(prev)
     for i = 1, total_level do
       local this_class, class_level
       if i > current_level then
-        this_class = model.pane_data[i - 1].class or CLASSES[1]
+        this_class = model[i - 1].class or CLASSES[1]
         class_level = (class_levels[this_class] or 0) + 1
 
-        model.pane_data[i] = {
+        model[i] = {
           class = this_class,
           class_level = class_level,
           total_level = i,
         }
-        CREATOR_CLASSES[this_class.codename].init_data(model.pane_data[i])
+        CREATOR_CLASSES[this_class.codename].init_data(model[i])
       else
-        this_class = model.pane_data[i].class
-        class_level = model.pane_data[i].class_level
+        this_class = model[i].class
+        class_level = model[i].class_level
       end
 
       class_levels[this_class.codename] = class_level
@@ -123,7 +119,7 @@ creator.new = function(prev)
     _prev = prev,
     model = model,
     pane_i = pane_i,
-    is_disabled = model.total_level <= State.player.level,
+    is_disabled = #model <= State.player.level or not State.player:can_act(),
   }, creator.mt)
 end
 
@@ -142,7 +138,7 @@ methods.draw_gui = function(self, dt)
   end
 
   if not self.is_disabled and ui.keyboard("return") then
-    if self.model.pane_data[0].points > 0 then
+    if self.model[0].points > 0 then
       State.mode:show_confirmation(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
@@ -160,16 +156,16 @@ methods.draw_gui = function(self, dt)
       ui.start_line()
         if ui.selector() then
           if ui.keyboard("left") then
-            self.pane_i = (self.pane_i - 1) % (self.model.total_level + 1)
+            self.pane_i = (self.pane_i - 1) % (#self.model + 1)
           end
 
           if ui.keyboard("right") then
-            self.pane_i = (self.pane_i + 1) % (self.model.total_level + 1)
+            self.pane_i = (self.pane_i + 1) % (#self.model + 1)
           end
         end
 
         ui.text("Уровень: ")
-        for i = 0, self.model.total_level do
+        for i = 0, #self.model do
           if i > 0 then
             ui.text(">")
           end
@@ -201,7 +197,7 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_base_pane = function(self, dt)
-  local data = self.model.pane_data[0]
+  local data = self.model[0]
   local column1_length = Fun.iter(ABILITIES)
     :map(function(name) return name:utf_len() end)
     :max()
@@ -345,7 +341,7 @@ end
 --- @param self state_mode_creator
 --- @param dt number
 draw_pane = function(self, dt)
-  local data = self.model.pane_data[self.pane_i]
+  local data = self.model[self.pane_i]
 
   ui.br()
 
@@ -363,12 +359,12 @@ draw_pane = function(self, dt)
   ui.br()
 
   local con_mod = abilities.get_modifier(
-    self.model.pane_data[0].abilities.con + self:get_bonus("con")
+    self.model[0].abilities.con + self:get_bonus("con")
   )
 
   local prev_hp = 0
   for i = 1, self.pane_i - 1 do
-    local this_data = self.model.pane_data[i]
+    local this_data = self.model[i]
     prev_hp = prev_hp + con_mod + (
       i == 1
         and this_data.class.hit_die
@@ -392,7 +388,7 @@ end
 --- @param self state_mode_creator
 submit = function(self)
   local perks do
-    local data = self.model.pane_data[0]
+    local data = self.model[0]
     perks = {
       data.skill_1,
       data.skill_2,
@@ -416,18 +412,17 @@ submit = function(self)
     end
   end
 
-  for i = 1, self.model.total_level do
-    local data = self.model.pane_data[i]
+  for i, data in ipairs(self.model) do
     table.insert(perks, class.hit_dice(data.class.hit_die, i == 1))
     Table.concat(perks, CREATOR_CLASSES[data.class.codename].submit(self, data))
   end
 
   local mixin = {
-    level = self.model.total_level,
-    xp = State.player.xp - xp.for_level[self.model.total_level] + xp.for_level[State.player.level],
+    level = #self.model,
+    xp = State.player.xp - xp.for_level[#self.model] + xp.for_level[State.player.level],
     perks = perks,
     creator_model = self.model,
-    base_abilities = self.model.pane_data[0].abilities,
+    base_abilities = self.model[0].abilities,
   }
   Log.info("Submitting a character build: %s", mixin)
   Table.extend(State.player, mixin)
@@ -439,7 +434,7 @@ end
 --- @param key any
 --- @param group? string
 methods.switch = function(self, possible_values, key, group)
-  local container = self.model.pane_data[self.pane_i]
+  local container = self.model[self.pane_i]
   ui.switch(possible_values, container, key, self.is_disabled)
 end
 
@@ -479,7 +474,7 @@ end
 --- @param ability ability
 methods.get_bonus = function(self, ability)
   local name = translation.abilities[ability]:utf_capitalize()
-  local data = self.model.pane_data[0]
+  local data = self.model[0]
   if data.race == races.human then
     return 1
   elseif data.race == races.variant_human then

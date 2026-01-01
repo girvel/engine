@@ -32,7 +32,7 @@ fighter.draw_pane = function(creator, dt, data)
 
     creator:start_ability(gui_elements.second_wind)
       ui.text("Способность: Второе дыхание")
-      local roll = fighter_class.second_wind:get_roll(creator.model.total_level)
+      local roll = fighter_class.second_wind:get_roll(#creator.model)
     creator:finish_ability(
       "Раз за бой бонусным действием восстанавливает %d-%d здоровья",
       roll:min(), roll:max()
