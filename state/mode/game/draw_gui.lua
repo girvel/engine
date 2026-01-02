@@ -142,7 +142,7 @@ draw_hp_bar = function()
       ui.text("%s/%s", player.hp, player:get_max_hp())
     ui.finish_font()
     ui.finish_alignment()
-  ui.finish_frame(true)
+  ui.finish_frame("push_frame")
 end
 
 draw_action_grid = function(self)

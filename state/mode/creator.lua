@@ -481,7 +481,7 @@ methods.finish_ability = function(self, fmt, ...)
 
   ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
     ui.text(fmt, ...)
-  ui.finish_frame()  -- NEXT push_y
+  ui.finish_frame("push_cursor")
   ui.br()
 end
 

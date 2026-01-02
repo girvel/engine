@@ -270,13 +270,15 @@ ui.start_frame = function(x, y, w, h)
 end
 
 --- NEXT non-boolean push_y
---- @param push_y? boolean
+--- @param push_y? "push_frame"|"push_cursor"
 ui.finish_frame = function(push_y)
   stack_pop("cursor_x")
-  stack_pop("cursor_y")
-  local prev = stack_pop("frame")
-  if push_y then
-    context.cursor_y = prev.y + prev.h
+  local prev_cursor_y = stack_pop("cursor_y")
+  local prev_frame = stack_pop("frame")
+  if push_y == "push_frame" then
+    context.cursor_y = prev_frame.y + prev_frame.h
+  elseif push_y == "push_cursor" then
+    context.cursor_y = prev_cursor_y
   end
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
