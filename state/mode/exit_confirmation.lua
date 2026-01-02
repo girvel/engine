@@ -22,8 +22,8 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self)
-  local W = 470
-  local H = 160
+  local W = 550
+  local H = 240
 
   if self._prev.has_saved == false then
     H = H + 60

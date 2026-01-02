@@ -26,7 +26,7 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self)
-  tk.start_window("center", "center", 470, 100)
+  tk.start_window("center", "center", 550, 180)
   ui.start_font(28)
   ui.start_alignment("center")
     ui.text(self.message)

@@ -47,7 +47,8 @@ methods.draw_gui = function()
 end
 
 display_tcod_error = function()
-  tk.start_window("center", "center", 470, 160)
+  -- NEXT use warning
+  tk.start_window("center", "center", 550, 240)
   ui.start_font(20)
   ui.start_alignment("center")
     ui.text("Невозможно загрузить библиотеку libtcod, поля зрения и поиск путей не будут работать")

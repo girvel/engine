@@ -169,7 +169,7 @@ methods.draw_gui = function(self, dt)
     end
   end
 
-  tk.start_window("center", "center", 700, 620)
+  tk.start_window("center", "center", 780, 700)
     ui.h1("Персонаж")
     ui.start_font(24)
       ui.start_line()

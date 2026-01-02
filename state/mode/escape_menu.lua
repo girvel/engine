@@ -24,8 +24,8 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
-  local W = 320
-  local H = 140
+  local W = 400
+  local H = 220
 
   tk.start_window("center", "center", W, H)
   ui.start_font(36)

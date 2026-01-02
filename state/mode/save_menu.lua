@@ -25,7 +25,8 @@ methods.draw_gui = function(self, dt)
   local in_combat = State.combat
   local in_cutscene = State.runner.locked_entities[State.player]
   if in_combat or in_cutscene then
-    tk.start_window("center", "center", 400, 120)
+    -- NEXT use warning
+    tk.start_window("center", "center", 480, 200)
     ui.start_font(28)
     ui.start_alignment("center")
       local reason = in_combat and "битвы" or "диалога"
