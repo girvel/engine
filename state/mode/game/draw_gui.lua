@@ -53,9 +53,9 @@ end
 
 local PADDING_LX = 48
 local PADDING_RX = 60
-local PADDING_Y = 40
+local SIDEBAR_INNER_W = 336
 
-local SIDEBAR_W = 344  -- (usable)
+local SIDEBAR_W = SIDEBAR_INNER_W + PADDING_LX + PADDING_RX
 
 draw_sidebar = function(self)
   if State.runner.locked_entities[State.player] then
@@ -63,15 +63,13 @@ draw_sidebar = function(self)
     return
   end
 
-  State.perspective.sidebar_w = SIDEBAR_W + PADDING_LX + PADDING_RX
+  State.perspective.sidebar_w = SIDEBAR_W
 
-  ui.start_frame(love.graphics.getWidth() - SIDEBAR_W - PADDING_LX - PADDING_RX)
-    ui.tile(gui.window_bg)
-  ui.finish_frame()
+  -- NEXT sidebar_w + centered windows
 
-  ui.start_frame(
-    love.graphics.getWidth() - SIDEBAR_W - PADDING_RX, PADDING_Y,
-    SIDEBAR_W, love.graphics.getHeight() - 2 * PADDING_Y
+  tk.start_window(
+    love.graphics.getWidth() - SIDEBAR_W, 0,
+    SIDEBAR_W, love.graphics.getHeight()
   )
     draw_hp_bar()
     draw_action_grid(self)
@@ -85,7 +83,7 @@ draw_sidebar = function(self)
         ui.text(hint:utf_capitalize())
       ui.finish_alignment()
     end
-  ui.finish_frame()
+  tk.finish_window()
 end
 
 action_button = function(action, hotkey)
@@ -102,7 +100,7 @@ action_button = function(action, hotkey)
   end
 end
 
-local HP_BAR_W = SIDEBAR_W - 64
+local HP_BAR_W = SIDEBAR_INNER_W - 64
 local HP_BAR_H = 10 * 4
 
 draw_hp_bar = function()
