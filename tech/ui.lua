@@ -104,12 +104,12 @@ local get_batch = Memoize(function(path)
   return batch, quads, cell_size
 end)
 
-local get_mouse_over = function(w, h)
+local get_mouse_over = function(x, y, w, h)
   return (
-    input.mouse.x > context.cursor_x
-    and input.mouse.y > context.cursor_y
-    and input.mouse.x <= context.cursor_x + w
-    and input.mouse.y <= context.cursor_y + h
+    input.mouse.x > x
+    and input.mouse.y > y
+    and input.mouse.x <= x + w
+    and input.mouse.y <= y + h
   )
 end
 
@@ -126,7 +126,7 @@ local button = function(w, h)
   local y = context.cursor_y
   local result = {
     is_clicked = false,
-    is_mouse_over = get_mouse_over(w, h),
+    is_mouse_over = get_mouse_over(x, y, w, h),
   }
 
   result.is_active = result.is_mouse_over and state.are_pressed:get(x, y, w, h)
@@ -828,8 +828,8 @@ end
 
 --- @param ... integer mouse button number (love-compatible)
 ui.mousedown = function(...)
-  --- NEXT get_mouse_over(w, h) -> ui.is_mouse_over() + frame
-  if not get_mouse_over(context.frame.w, context.frame.h) then return false end
+  local frame = context.frame
+  if not get_mouse_over(frame.x, frame.y, frame.w, frame.h) then return false end
   return ui.mousedown_anywhere(...)
 end
 
