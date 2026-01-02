@@ -33,8 +33,6 @@ methods.draw_gui = function(self, dt)
     return
   end
 
-  -- NEXT escape menu outside narration
-
   tk.start_window("center", "center", "read_max", "max")
   ui.start_font(24)
     ui.h1("Сохранить игру")

@@ -41,6 +41,10 @@ draw_gui = function(self, dt)
   draw_notification()
   draw_suggestion()
   use_mouse(self)
+
+  if ui.keyboard("escape") then
+    State.mode:open_menu("escape_menu")
+  end
 end
 
 draw_curtain = function()
@@ -491,10 +495,6 @@ draw_dialogue = function()
     end
   ui.finish_font()
   tk.finish_window()
-
-  if ui.keyboard("escape") then
-    State.mode:open_menu("escape_menu")
-  end
 end
 
 local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
