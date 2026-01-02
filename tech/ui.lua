@@ -884,6 +884,10 @@ ui.reset_selection = function()
   state.selection.i = 1
 end
 
+ui.get_height = function()
+  return context.cursor_y - context.frame.y
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Event handlers
 ----------------------------------------------------------------------------------------------------

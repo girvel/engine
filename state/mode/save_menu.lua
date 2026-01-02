@@ -25,21 +25,15 @@ methods.draw_gui = function(self, dt)
   local in_combat = State.combat
   local in_cutscene = State.runner.locked_entities[State.player]
   if in_combat or in_cutscene then
-    -- NEXT use warning
-    tk.start_window("center", "center", 480, 200)
-    ui.start_font(28)
-    ui.start_alignment("center")
-      local reason = in_combat and "битвы" or "диалога"
-      ui.text("Невозможно сохранить игру во время " .. reason)
-      ui.br()
-      if ui.choice({"OK"}) or ui.keyboard("escape") then
-        State.mode:close_menu()
-      end
-    ui.finish_alignment()
-    ui.finish_font()
-    tk.finish_window()
+    State.mode:close_menu()
+    State.mode:show_warning(
+      "Невозможно сохранить игру во время %s",
+      in_combat and "битвы" or "диалога"
+    )
     return
   end
+
+  -- NEXT escape menu outside narration
 
   tk.start_window("center", "center", "read_max", "max")
   ui.start_font(24)

@@ -134,9 +134,10 @@ methods.attempt_exit = function(self)
   return true
 end
 
---- @param message string
-methods.show_warning = function(self, message)
-  self:_set_mode(STATES.warning.new(self._mode, message))
+--- @param fmt string
+--- @param ... any
+methods.show_warning = function(self, fmt, ...)
+  self:_set_mode(STATES.warning.new(self._mode, fmt:format(...)))
 end
 
 --- @param message string

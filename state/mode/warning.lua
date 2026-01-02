@@ -23,8 +23,10 @@ end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
+local h = 100
+
 methods.draw_gui = function(self)
-  tk.start_window("center", "center", 550, 240)
+  tk.start_window("center", "center", 550, h + 2 * tk.WINDOW_PADDING)
   ui.start_font(28)
   ui.start_alignment("center")
     ui.text(self.message)
@@ -35,6 +37,8 @@ methods.draw_gui = function(self)
     if n == 1 or ui.keyboard("escape") then
       State.mode:close_menu()
     end
+
+    h = ui.get_height()
   ui.finish_alignment()
   ui.finish_font()
   tk.finish_window()
