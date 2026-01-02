@@ -7,6 +7,8 @@ local item = {}
 
 item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 
+-- TODO replace tags.heavy with like tag_heavy or flag_heavy
+
 --- @alias item item_strict|table
 
 --- @class item_strict: entity_strict

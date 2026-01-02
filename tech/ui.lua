@@ -9,8 +9,7 @@ local ui = {}
 -- [SECTION] Internal state
 ----------------------------------------------------------------------------------------------------
 
-local model = {
-  -- input state --
+local input = {
   mouse = {
     x = 0,
     y = 0,
@@ -21,28 +20,54 @@ local model = {
     pressed = {},
     input = "",
   },
+}
 
- -- accumulated state --
+local state = {
   selection = {
     i = 1, max_i = 0,
     is_pressed = false,
   },
   cursor = nil,
 
-  -- state --
   active_frames_t = CompositeMap.new("weak"),
   are_pressed = CompositeMap.new("weak"),
-
-  -- context --
-  frame = {},
-  alignment = {},
-  font = {},
-  font_size = {},
-  is_linear = {},
-  line_last_h = {},
-  --- @type ui_styles[]
-  styles = {},
 }
+
+--- @type table<string, table>
+local stack
+
+--- @type ui_context
+local context
+
+--- @class (exact) ui_context
+--- @field frame ui_frame
+--- @field alignment {x: ui_alignment_x, y: ui_alignment_y}
+--- @field font love.Font
+--- @field font_size integer
+--- @field is_linear boolean
+--- @field line_last_h integer
+--- @field styles ui_styles
+
+--- @class (exact) ui_styles
+--- @field link_color vector
+--- @field punctuation_color vector
+
+--- @class (exact) ui_styles_optional
+--- @field link_color? vector
+--- @field punctuation_color? vector
+
+--- @class (exact) ui_frame
+--- @field x integer
+--- @field y integer
+--- @field w integer
+--- @field h integer
+
+--- @alias ui_alignment_x "left"|"center"|"right"
+--- @alias ui_alignment_y "top"|"center"|"bottom"
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Internals
+----------------------------------------------------------------------------------------------------
 
 --- @enum (key) ui_cursor_type
 local CURSORS = {
@@ -55,48 +80,153 @@ local CURSORS = {
 local FRAME = "engine/assets/sprites/gui/button_frame.png"
 local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
-local SCALE = 4  -- TODO extract scale here
+local SCALE = 4  -- has its own scale constant
 local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
 
-local get_font, get_batch, get_mouse_over, button, format
+--- @param key string
+--- @param value any
+local stack_push = function(key, value)
+  table.insert(stack[key], context[key])
+  context[key] = value
+end
 
+--- @param key string
+--- @return any
+local stack_pop = function(key)
+  assert(#stack[key] > 0)
+  local prev = context[key]
+  context[key] = table.remove(stack[key])
+  return prev
+end
+
+local get_font = Memoize(function(size)
+  return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
+end)
+
+local get_batch = Memoize(function(path)
+  local image = love.graphics.newImage(path)
+  local batch = love.graphics.newSpriteBatch(image)
+  local w, h = image:getDimensions()
+  assert(w == h)
+  local cell_size = w / 3
+
+  local quads = {}
+  for i = 1, 9 do
+    quads[i] = sprite.utility.get_atlas_quad(i, cell_size, w, h)
+  end
+
+  return batch, quads, cell_size
+end)
+
+local get_mouse_over = function(w, h)
+  return (
+    input.mouse.x > context.frame.x
+    and input.mouse.y > context.frame.y
+    and input.mouse.x <= context.frame.x + w
+    and input.mouse.y <= context.frame.y + h
+  )
+end
+
+--- @class ui_button_out
+--- @field is_clicked boolean
+--- @field is_active boolean
+--- @field is_mouse_over boolean
+
+--- @param w integer
+--- @param h integer
+--- @return ui_button_out
+local button = function(w, h)
+  local x = context.frame.x
+  local y = context.frame.y
+  local result = {
+    is_clicked = false,
+    is_mouse_over = get_mouse_over(w, h),
+  }
+
+  result.is_active = result.is_mouse_over and state.are_pressed:get(x, y, w, h)
+
+  if result.is_mouse_over then
+    if Table.contains(input.mouse.button_pressed, 1) then
+      state.are_pressed:set(true, x, y, w, h)
+    end
+
+    if Table.contains(input.mouse.button_released, 1)
+      and state.are_pressed:get(x, y, w, h)
+    then
+      result.is_clicked = true
+      state.are_pressed:set(false, x, y, w, h)
+    end
+  else
+    if Table.contains(input.mouse.button_released, 1) then
+      state.are_pressed:set(false, x, y, w, h)
+    end
+  end
+
+  return result
+end
+
+--- @param fmt any
+--- @param ... any
+--- @return string
+local format = function(fmt, ...)
+  fmt = tostring(fmt)
+  if select("#", ...) > 0 then
+    fmt = fmt:format(...)
+  end
+  return fmt
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Context
 ----------------------------------------------------------------------------------------------------
 
 ui.start = function()
-  model.selection.max_i = 0
-  model.cursor = "normal"
-  model.frame = {{
-    x = 0,
-    y = 0,
-    w = love.graphics.getWidth(),
-    h = love.graphics.getHeight(),
-  }}
-  model.alignment = {{x = "left", y = "top"}}
-  model.font = {get_font(20)}
-  model.font_size = {20}
-  model.is_linear = {false}
-  model.line_last_h = {0}
-  model.styles = {{
-    link_color = colors.blue_high,
-    punctuation_color = colors.white_dim,
-  }}
+  state.selection.max_i = 0
+  state.cursor = "normal"
+
+  context = {
+    frame = {
+      x = 0,
+      y = 0,
+      w = love.graphics.getWidth(),
+      h = love.graphics.getHeight(),
+    },
+    alignment = {x = "left", y = "top"},
+    font = get_font(20),
+    font_size = 20,
+    is_linear = false,
+    line_last_h = 0,
+    styles = {
+      link_color = colors.blue_high,
+      punctuation_color = colors.white_dim,
+    },
+  }
+
+  stack = {}
+  for key in pairs(context) do
+    stack[key] = {}
+  end
 end
 
 ui.finish = function()
-  if #model.frame ~= 1 then
-    Error("Unclosed UI frame(s) (%s)", #model.frame)
-    model = {model.frame[1]}
+  do
+    local unclosed = {}
+    for k, v in pairs(stack) do
+      if #v > 0 then
+        table.insert(unclosed, ("%s of %s"):format(#v, k))
+      end
+    end
+    if #unclosed > 0 then
+      Error("Unclosed ui contexts: %s", table.concat(unclosed, ", "))
+    end
   end
 
-  model.selection.is_pressed = false
-  model.mouse.button_pressed = {}
-  model.mouse.button_released = {}
-  model.keyboard.pressed = {}
-  model.keyboard.input = ""
-  love.mouse.setCursor(CURSORS[model.cursor])
+  state.selection.is_pressed = false
+  input.mouse.button_pressed = {}
+  input.mouse.button_released = {}
+  input.keyboard.pressed = {}
+  input.keyboard.input = ""
+  love.mouse.setCursor(CURSORS[state.cursor])
 end
 
 --- @param x? integer?
@@ -104,7 +234,7 @@ end
 --- @param w? integer?
 --- @param h? integer?
 ui.start_frame = function(x, y, w, h)
-  local prev = Table.last(model.frame)
+  local prev = context.frame
   if not x then
     x = 0
   end
@@ -129,76 +259,68 @@ ui.start_frame = function(x, y, w, h)
     h = h,
   }
 
-  table.insert(model.frame, frame)
+  stack_push("frame", frame)
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
+--- NEXT non-boolean push_y
 --- @param push_y? boolean
 ui.finish_frame = function(push_y)
-  local pop = table.remove(model.frame)
-  local frame = Table.last(model.frame)
+  local prev = stack_pop("frame")
+  local current = context.frame
   if push_y then
-    local next_y = pop.y + pop.h
-    frame.h = frame.h - (next_y - frame.y)
-    frame.y = next_y
+    local next_y = prev.y + prev.h
+    current.h = current.h - (next_y - current.y)
+    current.y = next_y
   end
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
---- @param x? "left"|"center"|"right"
---- @param y? "top"|"center"|"bottom"
+--- @param x? ui_alignment_x
+--- @param y? ui_alignment_y
 ui.start_alignment = function(x, y)
-  local prev = Table.last(model.alignment)
-  table.insert(model.alignment, {x = x or prev.x, y = y or prev.y})
+  stack_push("alignment", {x = x or context.alignment.x, y = y or context.alignment.y})
 end
 
 ui.finish_alignment = function()
-  table.remove(model.alignment)
+  stack_pop("alignment")
 end
 
 --- @param size? integer
 ui.start_font = function(size)
   size = size or 20
   local font = get_font(size)
-  table.insert(model.font, font)
-  table.insert(model.font_size, size)
+  stack_push("font", font)
+  stack_push("font_size", size)
   love.graphics.setFont(font)
 end
 
 ui.finish_font = function()
-  table.remove(model.font)
-  table.remove(model.font_size)
-  love.graphics.setFont(Table.last(model.font))
+  stack_pop("font")
+  stack_pop("font_size")
+  love.graphics.setFont(context.font)
 end
 
 ui.start_line = function()
   ui.start_frame()
-  table.insert(model.is_linear, true)
-  table.insert(model.line_last_h, 0)
+  stack_push("is_linear", true)
+  stack_push("line_last_h", 0)
 end
 
 ui.finish_line = function()
-  table.remove(model.is_linear)
-  local old_frame = Table.last(model.frame)
+  stack_pop("is_linear")
+  local old_frame = context.frame
   ui.finish_frame()
-  Table.last(model.frame).y = old_frame.y + table.remove(model.line_last_h)
+  context.frame.y = old_frame.y + stack_pop("line_last_h")
 end
-
---- @class ui_styles
---- @field link_color vector
---- @field punctuation_color vector
-
---- @class ui_styles_optional
---- @field link_color? vector
---- @field punctuation_color? vector
 
 --- @param styles ui_styles_optional
 ui.start_styles = function(styles)
-  table.insert(model.styles, Table.extend({}, Table.last(model.styles), styles))
+  stack_push("styles", Table.extend({}, context.styles, styles))
 end
 
 ui.finish_styles = function()
-  table.remove(model.styles)
+  stack_pop("styles")
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -211,8 +333,8 @@ local wrap = function(text)
   if #text == 0 then return {""} end
 
   local max_w do
-    local effective_w = Table.last(model.frame).w
-    local font_w = Table.last(model.font):getWidth("w")
+    local effective_w = context.frame.w
+    local font_w = context.font:getWidth("w")
     max_w = math.floor(effective_w / font_w)
   end
 
@@ -243,10 +365,10 @@ end
 ui.text = function(text, ...)
   text = format(text, ...)
 
-  local frame = Table.last(model.frame)
-  local font = Table.last(model.font)
-  local alignment = Table.last(model.alignment)
-  local is_linear = Table.last(model.is_linear)
+  local frame = context.frame
+  local font = context.font
+  local alignment = context.alignment
+  local is_linear = context.is_linear
 
   local wrapped = wrap(text)
 
@@ -272,10 +394,7 @@ ui.text = function(text, ...)
     if alignment.y == "top" then
       if is_linear then
         frame.x = frame.x + font:getWidth("w") * text:utf_len()
-        model.line_last_h[#model.line_last_h] = math.max(
-          Table.last(model.line_last_h),
-          font:getHeight() * LINE_K
-        )
+        context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
       else
         frame.y = frame.y + font:getHeight() * LINE_K
         frame.h = frame.h - font:getHeight() * LINE_K
@@ -289,16 +408,12 @@ ui.br = function()
 end
 
 ui.separator = function()
-  local frame = Table.last(model.frame)
-  local font = Table.last(model.font)
-  ui.text("-" * math.floor(frame.w / font:getWidth("w")))
+  ui.text("-" * math.floor(context.frame.w / context.font:getWidth("w")))
 end
 
 --- @param text string
 ui.h1 = function(text)
-  local font_size = Table.last(model.font_size)
-
-  ui.start_font(font_size * 2)
+  ui.start_font(context.font_size * 2)
   ui.start_alignment("center")
     ui.text(text)
     ui.br()
@@ -309,9 +424,6 @@ end
 --- @param headers string[]
 --- @param content any[][]
 ui.table = function(headers, content)
-  local frame = Table.last(model.frame)
-  local font = Table.last(model.font)
-
   for y, row in ipairs(content) do
     for x, value in ipairs(row) do
       content[y][x] = tostring(value)
@@ -329,7 +441,7 @@ ui.table = function(headers, content)
     :totable()
 
   local original_w = Fun.iter(original_column_sizes):sum()
-  local total_w = math.floor(frame.w / font:getWidth("i"))
+  local total_w = math.floor(context.frame.w / context.font:getWidth("i"))
   local k = total_w / original_w
 
   local column_sizes = Fun.iter(original_column_sizes)
@@ -362,9 +474,9 @@ end
 --- @param image string|love.Image
 --- @param scale? integer
 ui.image = function(image, scale)
-  local frame = Table.last(model.frame)
-  local is_linear = Table.last(model.is_linear)
-  local alignment = Table.last(model.alignment)
+  local frame = context.frame
+  local is_linear = context.is_linear
+  local alignment = context.alignment
   scale = scale or SCALE
 
   image = get_image(image)
@@ -386,10 +498,7 @@ ui.image = function(image, scale)
   if is_linear then
     if alignment.x == "left" then
       frame.x = frame.x + image:getWidth() * scale
-      model.line_last_h[#model.line_last_h] = math.max(
-        Table.last(model.line_last_h),
-        image:getHeight() * scale
-      )
+      context.line_last_h = math.max(context.line_last_h, image:getHeight() * scale)
     end
   else
     if alignment.y == "top" then
@@ -413,18 +522,18 @@ ui.key_button = function(image, key, is_disabled)
   if is_disabled then
     result.is_clicked = false
   else
-    result.is_clicked = result.is_clicked or Table.contains(model.keyboard.pressed, key)
+    result.is_clicked = result.is_clicked or Table.contains(input.keyboard.pressed, key)
   end
 
   if result.is_mouse_over and not is_disabled then
-    model.cursor = "hand"
+    state.cursor = "hand"
   end
 
   if result.is_clicked then
-    model.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
+    state.active_frames_t:set(ACTIVE_FRAME_PERIOD, image, key)
   end
 
-  result.is_active = result.is_active or model.active_frames_t:get(image, key)
+  result.is_active = result.is_active or state.active_frames_t:get(image, key)
 
   local font_size, text, dy
   if key:utf_len() == 1 then
@@ -439,7 +548,7 @@ ui.key_button = function(image, key, is_disabled)
 
   ui.start_frame()
     ui.image(image)
-    local frame_image = Table.last(model.frame)
+    local frame_image = context.frame  -- NEXT use new push_y
   ui.finish_frame()
 
   if (result.is_mouse_over and not is_disabled) or result.is_active then
@@ -456,9 +565,8 @@ ui.key_button = function(image, key, is_disabled)
   ui.finish_frame()
   ui.finish_font()
 
-  local frame = Table.last(model.frame)
-  frame.x = frame_image.x
-  frame.y = frame_image.y
+  context.frame.x = frame_image.x
+  context.frame.y = frame_image.y
 
   return result
 end
@@ -468,12 +576,10 @@ ui.tile = function(path)
   local batch, quads, cell_size = get_batch(path)
   batch:clear()
 
-  local frame = Table.last(model.frame)
-
-  local cropped_w = math.ceil(frame.w / cell_size / SCALE) - 2
-  local cropped_h = math.ceil(frame.h / cell_size / SCALE) - 2
-  local end_x = frame.w / SCALE - cell_size
-  local end_y = frame.h / SCALE - cell_size
+  local cropped_w = math.ceil(context.frame.w / cell_size / SCALE) - 2
+  local cropped_h = math.ceil(context.frame.h / cell_size / SCALE) - 2
+  local end_x = context.frame.w / SCALE - cell_size
+  local end_y = context.frame.h / SCALE - cell_size
 
   for x = 0, cropped_w do
     for y = 0, cropped_h do
@@ -517,30 +623,31 @@ ui.tile = function(path)
 
   batch:add(quads[9], end_x, end_y)
 
-  love.graphics.draw(batch, frame.x, frame.y, 0, SCALE)
+  love.graphics.draw(batch, context.frame.x, context.frame.y, 0, SCALE)
 end
 
 --- @param x? integer
 --- @param y? integer
 ui.offset = function(x, y)
-  local frame = Table.last(model.frame)
+  local frame = context.frame
   frame.x = frame.x + (x or 0)
   frame.y = frame.y + (y or 0)
   frame.w = frame.w - (x or 0)
   frame.h = frame.h - (y or 0)
 end
 
+-- NEXT use switch-type reference
 --- @class ui_string_ref
 --- @field value string
 
 -- TODO consider suppressing ui.keyboard? or maybe on higher level?
 --- @param content ui_string_ref
 ui.field = function(content)
-  model.selection.max_i = model.selection.max_i + 1
+  state.selection.max_i = state.selection.max_i + 1
 
-  if model.selection.i == model.selection.max_i then
-    content.value = content.value .. model.keyboard.input
-    if Table.contains(model.keyboard.pressed, "backspace") then
+  if state.selection.i == state.selection.max_i then
+    content.value = content.value .. input.keyboard.input
+    if Table.contains(input.keyboard.pressed, "backspace") then
       content.value = content.value:utf_sub(1, -2)
     end
     ui.text("> " .. content.value)
@@ -551,13 +658,13 @@ end
 
 --- @return boolean is_selected
 ui.selector = function()
-  model.selection.max_i = model.selection.max_i + 1
-  if model.selection.i == model.selection.max_i then
+  state.selection.max_i = state.selection.max_i + 1
+  if state.selection.i == state.selection.max_i then
     ui.text("> ")
   else
     ui.text("  ")
   end
-  return model.selection.i == model.selection.max_i
+  return state.selection.i == state.selection.max_i
 end
 
 --- @param values string[]
@@ -573,15 +680,14 @@ end)
 ui.text_button = function(text, ...)
   -- TODO bug overlap when next to each other
   text = format(text, ...)
-  local font = Table.last(model.font)
-  local styles = Table.last(model.styles)
-  local prev_color = {love.graphics.getColor()}
+  local prev_color = {love.graphics.getColor()}  -- NEXT start_color
+  -- NEXT factor out all manual color changes
 
-  local result = button(font:getWidth("w") * text:utf_len(), font:getHeight())
+  local result = button(context.font:getWidth("w") * text:utf_len(), context.font:getHeight())
   if result.is_mouse_over then
     ui.cursor("hand")
   else
-    love.graphics.setColor(styles.link_color)
+    love.graphics.setColor(context.styles.link_color)
   end
   ui.text(text)
   if not result.is_mouse_over then
@@ -623,7 +729,7 @@ ui.switch = function(possible_values, container, key, disabled, ...)
     ui.text("   ")
   end
 
-  local is_selected = model.selection.i == model.selection.max_i
+  local is_selected = state.selection.i == state.selection.max_i
 
   if is_scrollable then
     local offset
@@ -645,20 +751,18 @@ end
 --- @return number?
 ui.choice = function(options)
   local is_selected = false
-  local font = Table.last(model.font)
-  local frame = Table.last(model.frame)
 
   for i, option in ipairs(options) do
-    local button_out = button(frame.w, font:getHeight() * LINE_K)
+    local button_out = button(context.frame.w, context.font:getHeight() * LINE_K)
 
     if button_out.is_mouse_over then
-      model.selection.i = model.selection.max_i + i
+      state.selection.i = state.selection.max_i + i
       is_selected = true
-      model.cursor = "hand"
+      state.cursor = "hand"
       love.graphics.setColor(.7, .7, .7)
     end
 
-    if model.selection.max_i + i == model.selection.i then
+    if state.selection.max_i + i == state.selection.i then
       is_selected = true
       if button_out.is_active then
         option = "- " .. option
@@ -676,14 +780,14 @@ ui.choice = function(options)
     end
 
     if button_out.is_clicked then
-      return model.selection.i
+      return state.selection.i
     end
   end
 
-  model.selection.max_i = model.selection.max_i + #options
+  state.selection.max_i = state.selection.max_i + #options
 
-  if model.selection.is_pressed and is_selected then
-    return model.selection.i
+  if state.selection.is_pressed and is_selected then
+    return state.selection.i
   end
 end
 
@@ -691,7 +795,7 @@ end
 --- @return boolean
 ui.keyboard = function(...)
   for i = 1, select("#", ...) do
-    if Table.contains(model.keyboard.pressed, select(i, ...)) then
+    if Table.contains(input.keyboard.pressed, select(i, ...)) then
       return true
     end
   end
@@ -700,15 +804,15 @@ end
 
 --- @param ... integer mouse button number (love-compatible)
 ui.mousedown = function(...)
-  local frame = Table.last(model.frame)
-  if not get_mouse_over(frame.w, frame.h) then return false end
+  --- NEXT get_mouse_over(w, h) -> ui.is_mouse_over() + frame
+  if not get_mouse_over(context.frame.w, context.frame.h) then return false end
   return ui.mousedown_anywhere(...)
 end
 
 --- @param ... integer mouse button number (love-compatible)
 ui.mousedown_anywhere = function(...)
   for i = 1, select("#", ...) do
-    if Table.contains(model.mouse.button_pressed, select(i, ...)) then
+    if Table.contains(input.mouse.button_pressed, select(i, ...)) then
       return true
     end
   end
@@ -718,10 +822,10 @@ end
 --- @param cursor_type? ui_cursor_type
 --- @return ui_button_out
 ui.mouse = function(cursor_type)
-  local frame = Table.last(model.frame)
-  local result = button(frame.w, frame.h)
+  --- NEXT w/h args for button seem wrong, think about it after cursor
+  local result = button(context.frame.w, context.frame.h)
   if cursor_type and result.is_mouse_over then
-    model.cursor = cursor_type
+    state.cursor = cursor_type
   end
   return result
 end
@@ -729,15 +833,16 @@ end
 --- @param cursor_type? ui_cursor_type
 ui.cursor = function(cursor_type)
   if not cursor_type then return end
-  model.cursor = cursor_type
+  state.cursor = cursor_type
 end
 
+--- NEXT context -> ui.context, remove these methods?
 ui.get_frame = function()
-  return Table.last(model.frame)
+  return context.frame
 end
 
 ui.get_font = function()
-  return Table.last(model.font)
+  return context.font
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -746,129 +851,46 @@ end
 
 ui.handle_keypress = function(key)
   if key == "up" then
-    model.selection.i = Math.loopmod(model.selection.i - 1, model.selection.max_i)
+    state.selection.i = Math.loopmod(state.selection.i - 1, state.selection.max_i)
   elseif key == "down" then
-    model.selection.i = Math.loopmod(model.selection.i + 1, model.selection.max_i)
+    state.selection.i = Math.loopmod(state.selection.i + 1, state.selection.max_i)
   elseif key == "return" then
-    model.selection.is_pressed = true
+    state.selection.is_pressed = true
   end
 
-  -- TODO remove everything besides this
-  table.insert(model.keyboard.pressed, key)
+  table.insert(input.keyboard.pressed, key)
 end
 
 ui.handle_textinput = function(text)
-  model.keyboard.input = model.keyboard.input .. text
+  input.keyboard.input = input.keyboard.input .. text
 end
 
 ui.handle_mousemove = function(x, y)
-  model.mouse.x = x
-  model.mouse.y = y
+  input.mouse.x = x
+  input.mouse.y = y
 end
 
 ui.handle_mousepress = function(button_i)
-  table.insert(model.mouse.button_pressed, button_i)
+  table.insert(input.mouse.button_pressed, button_i)
 end
 
 ui.handle_mouserelease = function(button_i)
-  table.insert(model.mouse.button_released, button_i)
+  table.insert(input.mouse.button_released, button_i)
 end
 
 ui.handle_update = function(dt)
-  for k, v in model.active_frames_t:iter() do
+  for k, v in state.active_frames_t:iter() do
     local next_v = v - dt
     if next_v <= 0 then
       next_v = nil
     end
-    model.active_frames_t:set(next_v, unpack(k))
+    state.active_frames_t:set(next_v, unpack(k))
   end
 end
 
+--- NEXT rename
 ui.handle_selection_reset = function()
-  model.selection.i = 1
-end
-
-----------------------------------------------------------------------------------------------------
--- [SECTION] Internals
-----------------------------------------------------------------------------------------------------
-
-get_font = Memoize(function(size)
-  return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
-end)
-
-get_batch = Memoize(function(path)
-  local image = love.graphics.newImage(path)
-  local batch = love.graphics.newSpriteBatch(image)
-  local w, h = image:getDimensions()
-  assert(w == h)
-  local cell_size = w / 3
-
-  local quads = {}
-  for i = 1, 9 do
-    quads[i] = sprite.utility.get_atlas_quad(i, cell_size, w, h)
-  end
-
-  return batch, quads, cell_size
-end)
-
-get_mouse_over = function(w, h)
-  local frame = Table.last(model.frame)
-  return (
-    model.mouse.x > frame.x
-    and model.mouse.y > frame.y
-    and model.mouse.x <= frame.x + w
-    and model.mouse.y <= frame.y + h
-  )
-end
-
---- @class ui_button_out
---- @field is_clicked boolean
---- @field is_active boolean
---- @field is_mouse_over boolean
-
---- @param w integer
---- @param h integer
---- @return ui_button_out
-button = function(w, h)
-  local frame = Table.last(model.frame)
-  local x = frame.x
-  local y = frame.y
-  local result = {
-    is_clicked = false,
-    is_mouse_over = get_mouse_over(w, h),
-  }
-
-  result.is_active = result.is_mouse_over and model.are_pressed:get(x, y, w, h)
-
-  if result.is_mouse_over then
-    if Table.contains(model.mouse.button_pressed, 1) then
-      model.are_pressed:set(true, x, y, w, h)
-    end
-
-    if Table.contains(model.mouse.button_released, 1)
-      and model.are_pressed:get(x, y, w, h)
-    then
-      result.is_clicked = true
-      model.are_pressed:set(false, x, y, w, h)
-    end
-  else
-    if Table.contains(model.mouse.button_released, 1) then
-      model.are_pressed:set(false, x, y, w, h)
-    end
-  end
-
-  return result
-end
-
---- @param fmt any
---- @param ... any
---- @return string
-format = function(fmt, ...)
-  fmt = tostring(fmt)
-  if select("#", ...) > 0 then
-    fmt = fmt:format(...)
-  end
-  return fmt
+  state.selection.i = 1
 end
 
 ----------------------------------------------------------------------------------------------------
