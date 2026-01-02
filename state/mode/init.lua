@@ -40,6 +40,10 @@ methods._set_mode = function(self, mode_value)
       return mode_value[id](mode_value, ...)
     end) or empty_f
   end
+
+  if State and getmetatable(self._mode) ~= STATES.game.mt then
+    State.perspective.sidebar_w = 0
+  end
 end
 
 methods.draw_gui = function(self, dt)

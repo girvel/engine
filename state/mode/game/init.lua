@@ -16,7 +16,7 @@ local methods = {
   postprocess = require("engine.state.mode.game.postprocess"),
 }
 
-local mt = {__index = methods}
+game.mt = {__index = methods}
 
 game.new = function()
   return setmetatable({
@@ -27,8 +27,8 @@ game.new = function()
       :tomap(),
     _temp_canvas = love.graphics.newCanvas(),
     _main_canvas = love.graphics.newCanvas(),
-  }, mt)
+  }, game.mt)
 end
 
-Ldump.mark(game, {}, ...)
+Ldump.mark(game, {mt = "const"}, ...)
 return game

@@ -20,7 +20,7 @@ local api         = require("engine.tech.api")
 --   internal state -> game mode fields
 
 -- Internal state
-local cost, hint, mouse_task, is_compact
+local cost, hint, mouse_task, is_compact, open_escape_menu
 
 -- Utility functions
 local action_button, set_mouse_task
@@ -34,6 +34,7 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 --- @param dt number
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
+  open_escape_menu = false
 
   draw_curtain()
   draw_sidebar(self)
@@ -42,7 +43,7 @@ draw_gui = function(self, dt)
   draw_suggestion()
   use_mouse(self)
 
-  if ui.keyboard("escape") then
+  if open_escape_menu or ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
   end
 end
@@ -68,8 +69,6 @@ draw_sidebar = function(self)
   end
 
   State.perspective.sidebar_w = SIDEBAR_W
-
-  -- NEXT sidebar_w + centered windows
 
   tk.start_window(
     love.graphics.getWidth() - SIDEBAR_W, 0,
@@ -186,7 +185,7 @@ draw_keyboard_action_grid = function(self)
     do
       local button = ui.key_button(gui.escape_menu, "escape")
       if button.is_clicked then
-        State.mode:open_menu("escape_menu")
+        open_escape_menu = true
       end
       if button.is_mouse_over then
         hint = "меню"
