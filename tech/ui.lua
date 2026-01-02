@@ -717,7 +717,6 @@ end)
 ui.text_button = function(text, ...)
   -- TODO bug overlap when next to each other
   text = format(text, ...)
-  -- NEXT factor out all manual color changes
 
   local result = button(context.font:getWidth("w") * text:utf_len(), context.font:getHeight())
   if result.is_mouse_over then
@@ -862,7 +861,6 @@ end
 --- @param cursor_type? ui_cursor_type
 --- @return ui_button_out
 ui.mouse = function(cursor_type)
-  --- NEXT w/h args for button seem wrong, think about it after cursor
   local result = button(context.frame.w, context.frame.h)
   if cursor_type and result.is_mouse_over then
     state.cursor = cursor_type
@@ -874,15 +872,6 @@ end
 ui.cursor = function(cursor_type)
   if not cursor_type then return end
   state.cursor = cursor_type
-end
-
---- NEXT context -> ui.context, remove these methods?
-ui.get_frame = function()
-  return context.frame
-end
-
-ui.get_font = function()
-  return context.font
 end
 
 ----------------------------------------------------------------------------------------------------

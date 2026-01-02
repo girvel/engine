@@ -154,7 +154,8 @@ tk.choose_save = function(show_new_save)
   end
 
   local nice_date = "%Y.%m.%d %H:%M  "
-  local char_w = math.floor(ui.get_frame().w / ui.get_font():getWidth("w")) - #os.date(nice_date)
+  local context = ui.get_context()
+  local char_w = math.floor(context.frame.w / context.font:getWidth("w")) - #os.date(nice_date)
 
   ui.start_frame()
   ui.start_alignment("right")

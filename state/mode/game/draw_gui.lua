@@ -421,7 +421,7 @@ draw_move_order = function()
     else
       local pivot = math.ceil(#list / 10) * 5
 
-      local frame = ui.get_frame()
+      local frame = ui.get_context().frame
       ui.start_frame(frame.w / 2)
         for i = pivot + 1, #list do
           draw_item(i, list[i])

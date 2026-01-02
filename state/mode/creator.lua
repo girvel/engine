@@ -347,7 +347,7 @@ draw_base_pane = function(self, dt)
 
     local description = data.feat.description
     if description then
-      ui.start_frame(ui.get_font():getWidth("w") * 4)
+      ui.start_frame(ui.get_context().font:getWidth("w") * 4)
         ui.text(description)
       ui.finish_frame()
     end
@@ -479,7 +479,7 @@ methods.finish_ability = function(self, fmt, ...)
   ui.finish_font()
   ui.finish_line()
 
-  ui.start_frame(32 + ui.get_font():getWidth("w") * 3)
+  ui.start_frame(32 + ui.get_context().font:getWidth("w") * 3)
     ui.text(fmt, ...)
   ui.finish_frame("push_cursor")
   ui.br()
