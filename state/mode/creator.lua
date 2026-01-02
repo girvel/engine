@@ -129,7 +129,7 @@ creator.new = function(prev)
         class_level = model[i].class_level
       end
 
-      class_levels[this_class.codename] = class_level
+      class_levels[this_class] = class_level
     end
   end
 
