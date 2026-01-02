@@ -332,7 +332,7 @@ draw_resources = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  local start = tk.start_block()
+  tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Ресурсы")
@@ -373,7 +373,7 @@ draw_resources = function()
       ::continue::
     end
     love.graphics.setColor(Vector.white)
-  tk.finish_block(start)
+  tk.finish_block()
 end
 
 local HOSTILITY_COLOR = {
@@ -387,7 +387,7 @@ draw_move_order = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  local start = tk.start_block()
+  tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Очередь ходов")
@@ -432,7 +432,7 @@ draw_move_order = function()
         draw_item(i, list[i])
       end
     end
-  tk.finish_block(start)
+  tk.finish_block()
 end
 
 draw_bag = function()
@@ -457,7 +457,7 @@ draw_bag = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  local start = tk.start_block()
+  tk.start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Сумка")
@@ -469,7 +469,7 @@ draw_bag = function()
       local k, v = unpack(t)
       ui.text("%s:%s %s", translation.bag[k] or k, " " * (max_length - k:utf_len()), v)
     end
-  tk.finish_block(start)  -- TODO UI make this stateless?
+  tk.finish_block()  -- TODO UI make this stateless?
 end
 
 local draw_line, draw_options

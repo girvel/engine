@@ -175,6 +175,11 @@ end
 --- @param key string
 --- @param value any
 ui.stack_push = function(key, value)
+  if not stack[key] then
+    stack[key] = {}
+    context[key] = value
+  end
+
   table.insert(stack[key], context[key])
   context[key] = value
 end
@@ -182,7 +187,16 @@ end
 --- @param key string
 --- @return any
 ui.stack_pop = function(key)
-  assert(#stack[key] > 0)
+  if not stack[key] then
+    Error("Can not pop tech.ui's stack: no stack key %q", key)
+    return
+  end
+
+  if #stack[key] == 0 then
+    Error("Can't pop tech.ui's stack: stack %q is empty", key)
+    return
+  end
+
   local prev = context[key]
   context[key] = table.remove(stack[key])
   return prev
@@ -349,7 +363,7 @@ local wrap = function(text)
 
   local initial_offset = context.cursor_x - context.frame.x
   local font_w = context.font:getWidth("w")
-  local max_w = math.floor(context.frame.w / font_w)
+  local max_w = math.max(1, math.floor(context.frame.w / font_w))
   local first_max_w = math.floor((context.frame.w - initial_offset) / font_w)
 
   local result = {}
@@ -411,8 +425,6 @@ ui.text = function(text, ...)
         if alignment.x == "left" then
           context.cursor_x = context.cursor_x + font:getWidth("w") * text:utf_len()
           context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
-        else
-          Error("Using x-alignment %s in linear mode", alignment.x)
         end
       else
         context.cursor_y = context.cursor_y + font:getHeight() * LINE_K

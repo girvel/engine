@@ -106,22 +106,19 @@ end
 
 local SIDEBAR_BLOCK_PADDING = 10
 
---- @nodiscard
 tk.start_block = function()
-  -- NEXT don't return
-  local start = ui.get_context().cursor_y
+  ui.stack_push("tk_block_start", ui.get_context().cursor_y)
   ui.start_frame(
     4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
     -2 * SIDEBAR_BLOCK_PADDING - 8
   )
-  return start
 end
 
-tk.finish_block = function(start)
+tk.finish_block = function()
   local finish = ui.get_context().cursor_y
-  local prev_frame = ui.finish_frame()  -- NEXT push?
+  local prev_frame = ui.finish_frame()
 
-  local h = finish - start + SIDEBAR_BLOCK_PADDING + 4
+  local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
   local k = Constants.cell_size
   ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
     ui.tile(gui_elements.sidebar_block_bg)
@@ -149,6 +146,7 @@ tk.choose_save = function(show_new_save)
       ::continue::
     end
 
+    --- NEXT (move) redraw water
     table.sort(options, function(a, b) return dates[a] > dates[b] end)
     if show_new_save then
       table.insert(options, 1, "<Новое сохранение>")
