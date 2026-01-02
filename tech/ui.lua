@@ -314,9 +314,9 @@ end
 
 ui.finish_line = function()
   stack_pop("is_linear")
-  local old_frame = context.frame
+  local old_cursor_y = context.cursor_y
   ui.finish_frame()
-  context.frame.y = old_frame.y + stack_pop("line_last_h")
+  context.cursor_y = old_cursor_y + stack_pop("line_last_h")
 end
 
 --- @param styles ui_styles_optional
