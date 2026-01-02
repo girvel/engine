@@ -30,7 +30,7 @@ methods.draw_gui = function(self)
     ui.text(self.message)
     ui.br()
 
-    local n = ui.choice({"OK  "})
+    local n = ui.choice({"OK"})
 
     if n == 1 or ui.keyboard("escape") then
       State.mode:close_menu()

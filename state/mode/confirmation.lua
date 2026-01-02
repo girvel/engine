@@ -32,7 +32,7 @@ methods.draw_gui = function(self)
     ui.text(self.message)
     ui.br()
 
-    local n = ui.choice({"OK  ", "Отмена  "})
+    local n = ui.choice({"OK", "Отмена"})
 
     if n == 1 then
       State.mode:close_menu()

@@ -43,8 +43,8 @@ methods.draw_gui = function(self)
     end
 
     local n = ui.choice({
-      "Вернуться  ",
-      "Выйти из игры  ",
+      "Вернуться",
+      "Выйти из игры",
     })
 
     if n == 1 or ui.keyboard("escape") then
