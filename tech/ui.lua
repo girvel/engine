@@ -386,8 +386,8 @@ local wrap = function(text)
     local not_last = i - 1 + line:utf_len() < text:utf_len()
 
     if not_last then
-      local str_break = line:find("%s%S*$")
-      if str_break and str_break > 1 then
+      local str_break = line:find("\n") or line:find("%s%S*$")
+      if str_break and (line:sub(str_break, str_break) == "\n" or str_break > 1) then
         line = line:sub(1, str_break - 1)
         i = i + 1
       end
