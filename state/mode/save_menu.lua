@@ -56,7 +56,7 @@ methods.draw_gui = function(self, dt)
     local escape_pressed = ui.keyboard("escape")
 
     if save or escape_pressed then
-      ui.handle_selection_reset()
+      ui.reset_selection()
       State.mode:close_menu()
     end
   ui.finish_font()

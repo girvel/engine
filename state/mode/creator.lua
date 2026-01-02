@@ -69,7 +69,7 @@ local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
 --- @param prev state_mode_game
 --- @return state_mode_creator
 creator.new = function(prev)
-  ui.handle_selection_reset()
+  ui.reset_selection()
   local current_level = State.player.level
 
   local total_level, pane_i do

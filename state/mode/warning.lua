@@ -13,7 +13,7 @@ warning.mt = {__index = methods}
 
 --- @return state_mode_warning
 warning.new = function(prev, message)
-  ui.handle_selection_reset()
+  ui.reset_selection()
   return setmetatable({
     type = "warning",
     message = message,

@@ -39,7 +39,7 @@ methods.draw_gui = function(self, dt)
     local escape_pressed = ui.keyboard("escape")
 
     if n or escape_pressed then
-      ui.handle_selection_reset()
+      ui.reset_selection()
     end
 
     if n == 1 or escape_pressed then

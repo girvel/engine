@@ -1,3 +1,4 @@
+local ui = require("engine.tech.ui")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
 local async = require("engine.tech.async")
@@ -280,6 +281,8 @@ api.options = function(options, remove_picked)
     type = "options",
     options = options,
   }
+
+  ui.reset_selection()
 
   while not State.player.speaks do
     coroutine.yield()

@@ -31,7 +31,7 @@ methods.draw_gui = function()
     })
 
     if choice then
-      ui.handle_selection_reset()
+      ui.reset_selection()
     end
 
     if choice == 1 then

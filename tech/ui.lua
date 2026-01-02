@@ -880,6 +880,10 @@ ui.cursor = function(cursor_type)
   state.cursor = cursor_type
 end
 
+ui.reset_selection = function()
+  state.selection.i = 1
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Event handlers
 ----------------------------------------------------------------------------------------------------
@@ -921,11 +925,6 @@ ui.handle_update = function(dt)
     end
     state.active_frames_t:set(next_v, unpack(k))
   end
-end
-
---- NEXT rename
-ui.handle_selection_reset = function()
-  state.selection.i = 1
 end
 
 ----------------------------------------------------------------------------------------------------

@@ -34,7 +34,7 @@ methods.draw_gui = function(self, dt)
     end
 
     if save or escape_pressed then
-      ui.handle_selection_reset()
+      ui.reset_selection()
       State.mode:close_menu()
     end
   ui.finish_font()
