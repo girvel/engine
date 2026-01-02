@@ -40,6 +40,8 @@ local stack
 local context
 
 --- @class (exact) ui_context
+--- @field cursor_x integer
+--- @field cursor_y integer
 --- @field frame ui_frame
 --- @field alignment {x: ui_alignment_x, y: ui_alignment_y}
 --- @field font love.Font
@@ -185,6 +187,8 @@ ui.start = function()
   state.cursor = "normal"
 
   context = {
+    cursor_x = 0,
+    cursor_y = 0,
     frame = {
       x = 0,
       y = 0,
@@ -260,18 +264,19 @@ ui.start_frame = function(x, y, w, h)
   }
 
   stack_push("frame", frame)
+  stack_push("cursor_x", frame.x)
+  stack_push("cursor_y", frame.y)
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
 --- NEXT non-boolean push_y
 --- @param push_y? boolean
 ui.finish_frame = function(push_y)
+  stack_pop("cursor_x")
+  stack_pop("cursor_y")
   local prev = stack_pop("frame")
-  local current = context.frame
   if push_y then
-    local next_y = prev.y + prev.h
-    current.h = current.h - (next_y - current.y)
-    current.y = next_y
+    context.cursor_y = prev.y + prev.h
   end
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
@@ -332,20 +337,19 @@ end
 local wrap = function(text)
   if #text == 0 then return {""} end
 
-  local max_w do
-    local effective_w = context.frame.w
-    local font_w = context.font:getWidth("w")
-    max_w = math.floor(effective_w / font_w)
-  end
+  local initial_offset = context.cursor_x - context.frame.x
+  local font_w = context.font:getWidth("w")
+  local max_w = math.floor(context.frame.w / font_w)
+  local first_max_w = math.floor((context.frame.w - initial_offset) / font_w)
 
   local result = {}
 
   local i = 1
   while true do
-    local line = text:utf_sub(i, i + max_w - 1)
-    local is_rough = i - 1 + line:utf_len() < text:utf_len()
+    local line = text:utf_sub(i, i + (i == 1 and first_max_w or max_w) - 1)
+    local not_last = i - 1 + line:utf_len() < text:utf_len()
 
-    if is_rough then
+    if not_last then
       local str_break = line:find("%s%S*$")
       if str_break and str_break > 1 then
         line = line:sub(1, str_break - 1)
@@ -355,7 +359,7 @@ local wrap = function(text)
     end
 
     table.insert(result, line)
-    if not is_rough then break end
+    if not not_last then break end
   end
 
   return result
@@ -368,36 +372,40 @@ ui.text = function(text, ...)
   local frame = context.frame
   local font = context.font
   local alignment = context.alignment
-  local is_linear = context.is_linear
 
   local wrapped = wrap(text)
 
-  if is_linear and #wrapped ~= 1 then
-    Error("Unable to do multiline text in linear mode; wrapped=%s", wrapped)
-  end
-
   for i, line in ipairs(wrapped) do
-    local dx = 0
-    local dy = 0
+    local x
     if alignment.x == "center" then
-      dx = (frame.w - font:getWidth(line)) / 2
+      x = frame.x + (frame.w - font:getWidth(line)) / 2
     elseif alignment.x == "right" then
-      dx = frame.w - font:getWidth(line)
+      x = frame.x + frame.w - font:getWidth(line)
+    else
+      x = context.cursor_x
     end
+
+    local y
     if alignment.y == "center" then
-      dy = (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
+      y = frame.y + (frame.h - font:getHeight() * #wrapped) / 2 + font:getHeight() * (i - 1)
     elseif alignment.y == "bottom" then
-      dy = frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
+      y = frame.y + frame.h - font:getHeight() * #wrapped + font:getHeight() * (i - 1)
+    else
+      y = context.cursor_y
     end
-    love.graphics.print(line, frame.x + dx, frame.y + dy)
+
+    love.graphics.print(line, x, y)
 
     if alignment.y == "top" then
-      if is_linear then
-        frame.x = frame.x + font:getWidth("w") * text:utf_len()
-        context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
+      if context.is_linear then
+        if alignment.x == "left" then
+          context.cursor_x = context.cursor_x + font:getWidth("w") * text:utf_len()
+          context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
+        else
+          Error("Using x-alignment %s in linear mode", alignment.x)
+        end
       else
-        frame.y = frame.y + font:getHeight() * LINE_K
-        frame.h = frame.h - font:getHeight() * LINE_K
+        context.cursor_y = context.cursor_y + font:getHeight() * LINE_K
       end
     end
   end
@@ -405,10 +413,6 @@ end
 
 ui.br = function()
   ui.text(" ")
-end
-
-ui.separator = function()
-  ui.text("-" * math.floor(context.frame.w / context.font:getWidth("w")))
 end
 
 --- @param text string
@@ -466,7 +470,7 @@ end
 
 local get_image = function(base)
   if type(base) == "string" then
-    return love.graphics.newImage(base)  -- NOTICE cached by kernel
+    return love.graphics.newImage(base)  -- cached by kernel
   end
   return base
 end
@@ -475,35 +479,39 @@ end
 --- @param scale? integer
 ui.image = function(image, scale)
   local frame = context.frame
-  local is_linear = context.is_linear
   local alignment = context.alignment
   scale = scale or SCALE
 
   image = get_image(image)
 
-  local dx = 0
-  local dy = 0
+  local x
   if alignment.x == "center" then
-    dx = (frame.w - image:getWidth() * scale) / 2
+    x = frame.x + (frame.w - image:getWidth() * scale) / 2
   elseif alignment.x == "right" then
-    dx = frame.w - image:getWidth() * scale
-  end
-  if alignment.y == "center" then
-    dy = (frame.h - image:getHeight() * scale) / 2
-  elseif alignment.y == "bottom" then
-    dy = frame.h - image:getHeight() * scale
+    x = frame.x + frame.w - image:getWidth() * scale
+  else
+    x = context.cursor_x
   end
 
-  love.graphics.draw(image, frame.x + dx, frame.y + dy, 0, scale)
-  if is_linear then
+  local y
+  if alignment.y == "center" then
+    y = frame.y + (frame.h - image:getHeight() * scale) / 2
+  elseif alignment.y == "bottom" then
+    y = frame.y + frame.h - image:getHeight() * scale
+  else
+    y = context.cursor_y
+  end
+
+  love.graphics.draw(image, x, y, 0, scale)
+
+  if context.is_linear then
     if alignment.x == "left" then
-      frame.x = frame.x + image:getWidth() * scale
+      context.cursor_x = context.cursor_x + image:getWidth() * scale
       context.line_last_h = math.max(context.line_last_h, image:getHeight() * scale)
     end
   else
     if alignment.y == "top" then
-      frame.y = frame.y + image:getHeight() * scale
-      frame.h = frame.h - image:getHeight() * scale
+      context.cursor_y = context.cursor_y + image:getHeight() * scale
     end
   end
 end
@@ -548,7 +556,8 @@ ui.key_button = function(image, key, is_disabled)
 
   ui.start_frame()
     ui.image(image)
-    local frame_image = context.frame  -- NEXT use new push_y
+    local image_cursor_x = context.cursor_x  -- NEXT use new push_y
+    local image_cursor_y = context.cursor_y
   ui.finish_frame()
 
   if (result.is_mouse_over and not is_disabled) or result.is_active then
@@ -565,8 +574,8 @@ ui.key_button = function(image, key, is_disabled)
   ui.finish_frame()
   ui.finish_font()
 
-  context.frame.x = frame_image.x
-  context.frame.y = frame_image.y
+  context.cursor_x = image_cursor_x
+  context.cursor_y = image_cursor_y
 
   return result
 end
@@ -629,11 +638,8 @@ end
 --- @param x? integer
 --- @param y? integer
 ui.offset = function(x, y)
-  local frame = context.frame
-  frame.x = frame.x + (x or 0)
-  frame.y = frame.y + (y or 0)
-  frame.w = frame.w - (x or 0)
-  frame.h = frame.h - (y or 0)
+  context.cursor_x = context.cursor_x + (x or 0)
+  context.cursor_y = context.cursor_y + (y or 0)
 end
 
 -- NEXT use switch-type reference
