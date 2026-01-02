@@ -122,10 +122,10 @@ end)
 
 local get_mouse_over = function(w, h)
   return (
-    input.mouse.x > context.frame.x
-    and input.mouse.y > context.frame.y
-    and input.mouse.x <= context.frame.x + w
-    and input.mouse.y <= context.frame.y + h
+    input.mouse.x > context.cursor_x
+    and input.mouse.y > context.cursor_y
+    and input.mouse.x <= context.cursor_x + w
+    and input.mouse.y <= context.cursor_y + h
   )
 end
 
@@ -138,8 +138,8 @@ end
 --- @param h integer
 --- @return ui_button_out
 local button = function(w, h)
-  local x = context.frame.x
-  local y = context.frame.y
+  local x = context.cursor_x
+  local y = context.cursor_y
   local result = {
     is_clicked = false,
     is_mouse_over = get_mouse_over(w, h),
