@@ -289,7 +289,6 @@ ui.start_frame = function(x, y, w, h)
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
---- NEXT non-boolean push_y
 --- @param push_y? "push_frame"|"push_cursor"
 --- @return ui_frame
 ui.finish_frame = function(push_y)
@@ -578,7 +577,7 @@ ui.key_button = function(image, key, is_disabled)
 
   ui.start_frame()
     ui.image(image)
-    local image_cursor_x = context.cursor_x  -- NEXT use new push_y
+    local image_cursor_x = context.cursor_x
     local image_cursor_y = context.cursor_y
   ui.finish_frame()
 
@@ -664,23 +663,20 @@ ui.offset = function(x, y)
   context.cursor_y = context.cursor_y + (y or 0)
 end
 
--- NEXT use switch-type reference
---- @class ui_string_ref
---- @field value string
-
 -- TODO consider suppressing ui.keyboard? or maybe on higher level?
---- @param content ui_string_ref
-ui.field = function(content)
+--- @param container table
+--- @param key any
+ui.field = function(container, key)
   state.selection.max_i = state.selection.max_i + 1
 
   if state.selection.i == state.selection.max_i then
-    content.value = content.value .. input.keyboard.input
+    container[key] = container[key] .. input.keyboard.input
     if Table.contains(input.keyboard.pressed, "backspace") then
-      content.value = content.value:utf_sub(1, -2)
+      container[key] = container[key]:utf_sub(1, -2)
     end
-    ui.text("> " .. content.value)
+    ui.text("> " .. container[key])
   else
-    ui.text(". " .. content.value)
+    ui.text(". " .. container[key])
   end
 end
 
