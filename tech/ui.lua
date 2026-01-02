@@ -39,7 +39,7 @@ local stack
 --- @type ui_context
 local context
 
---- @class (exact) ui_context
+--- @class ui_context
 --- @field cursor_x integer
 --- @field cursor_y integer
 --- @field frame ui_frame
@@ -50,15 +50,15 @@ local context
 --- @field line_last_h integer
 --- @field styles ui_styles
 
---- @class (exact) ui_styles
+--- @class ui_styles
 --- @field link_color vector
 --- @field punctuation_color vector
 
---- @class (exact) ui_styles_optional
+--- @class ui_styles_optional
 --- @field link_color? vector
 --- @field punctuation_color? vector
 
---- @class (exact) ui_frame
+--- @class ui_frame
 --- @field x integer
 --- @field y integer
 --- @field w integer
@@ -84,22 +84,6 @@ local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
 local SCALE = 4  -- has its own scale constant
 local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
-
---- @param key string
---- @param value any
-local stack_push = function(key, value)
-  table.insert(stack[key], context[key])
-  context[key] = value
-end
-
---- @param key string
---- @return any
-local stack_pop = function(key)
-  assert(#stack[key] > 0)
-  local prev = context[key]
-  context[key] = table.remove(stack[key])
-  return prev
-end
 
 local get_font = Memoize(function(size)
   return love.graphics.newFont("engine/assets/fonts/clacon2.ttf", size)
@@ -182,6 +166,28 @@ end
 -- [SECTION] Context
 ----------------------------------------------------------------------------------------------------
 
+--- @return ui_context
+--- @nodiscard
+ui.get_context = function()
+  return context
+end
+
+--- @param key string
+--- @param value any
+ui.stack_push = function(key, value)
+  table.insert(stack[key], context[key])
+  context[key] = value
+end
+
+--- @param key string
+--- @return any
+ui.stack_pop = function(key)
+  assert(#stack[key] > 0)
+  local prev = context[key]
+  context[key] = table.remove(stack[key])
+  return prev
+end
+
 ui.start = function()
   state.selection.max_i = 0
   state.cursor = "normal"
@@ -263,71 +269,73 @@ ui.start_frame = function(x, y, w, h)
     h = h,
   }
 
-  stack_push("frame", frame)
-  stack_push("cursor_x", frame.x)
-  stack_push("cursor_y", frame.y)
+  ui.stack_push("frame", frame)
+  ui.stack_push("cursor_x", frame.x)
+  ui.stack_push("cursor_y", frame.y)
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
 end
 
 --- NEXT non-boolean push_y
 --- @param push_y? "push_frame"|"push_cursor"
+--- @return ui_frame
 ui.finish_frame = function(push_y)
-  stack_pop("cursor_x")
-  local prev_cursor_y = stack_pop("cursor_y")
-  local prev_frame = stack_pop("frame")
+  ui.stack_pop("cursor_x")
+  local prev_cursor_y = ui.stack_pop("cursor_y")
+  local prev_frame = ui.stack_pop("frame")
   if push_y == "push_frame" then
     context.cursor_y = prev_frame.y + prev_frame.h
   elseif push_y == "push_cursor" then
     context.cursor_y = prev_cursor_y
   end
   -- love.graphics.setScissor(frame.x, frame.y, frame.w, frame.h)
+  return prev_frame
 end
 
 --- @param x? ui_alignment_x
 --- @param y? ui_alignment_y
 ui.start_alignment = function(x, y)
-  stack_push("alignment", {x = x or context.alignment.x, y = y or context.alignment.y})
+  ui.stack_push("alignment", {x = x or context.alignment.x, y = y or context.alignment.y})
 end
 
 ui.finish_alignment = function()
-  stack_pop("alignment")
+  ui.stack_pop("alignment")
 end
 
 --- @param size? integer
 ui.start_font = function(size)
   size = size or 20
   local font = get_font(size)
-  stack_push("font", font)
-  stack_push("font_size", size)
+  ui.stack_push("font", font)
+  ui.stack_push("font_size", size)
   love.graphics.setFont(font)
 end
 
 ui.finish_font = function()
-  stack_pop("font")
-  stack_pop("font_size")
+  ui.stack_pop("font")
+  ui.stack_pop("font_size")
   love.graphics.setFont(context.font)
 end
 
 ui.start_line = function()
   ui.start_frame()
-  stack_push("is_linear", true)
-  stack_push("line_last_h", 0)
+  ui.stack_push("is_linear", true)
+  ui.stack_push("line_last_h", 0)
 end
 
 ui.finish_line = function()
-  stack_pop("is_linear")
+  ui.stack_pop("is_linear")
   local old_cursor_y = context.cursor_y
   ui.finish_frame()
-  context.cursor_y = old_cursor_y + stack_pop("line_last_h")
+  context.cursor_y = old_cursor_y + ui.stack_pop("line_last_h")
 end
 
 --- @param styles ui_styles_optional
 ui.start_styles = function(styles)
-  stack_push("styles", Table.extend({}, context.styles, styles))
+  ui.stack_push("styles", Table.extend({}, context.styles, styles))
 end
 
 ui.finish_styles = function()
-  stack_pop("styles")
+  ui.stack_pop("styles")
 end
 
 ----------------------------------------------------------------------------------------------------

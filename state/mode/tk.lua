@@ -108,21 +108,22 @@ local SIDEBAR_BLOCK_PADDING = 10
 
 --- @nodiscard
 tk.start_block = function()
-  local frame = ui.get_frame()
+  -- NEXT don't return
+  local start = ui.get_context().cursor_y
   ui.start_frame(
     4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
     -2 * SIDEBAR_BLOCK_PADDING - 8
   )
-  return frame
+  return start
 end
 
 tk.finish_block = function(start)
-  local finish = ui.get_frame()
-  ui.finish_frame()
+  local finish = ui.get_context().cursor_y
+  local prev_frame = ui.finish_frame()  -- NEXT push?
 
-  local h = finish.y - start.y + SIDEBAR_BLOCK_PADDING + 4
+  local h = finish - start + SIDEBAR_BLOCK_PADDING + 4
   local k = Constants.cell_size
-  ui.start_frame(-k, -k, start.w + 2*k, h + 2*k)
+  ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
     ui.tile(gui_elements.sidebar_block_bg)
   ui.finish_frame()
   ui.offset(0, h)
