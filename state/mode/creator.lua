@@ -69,7 +69,6 @@ local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
 --- @param prev state_mode_game
 --- @return state_mode_creator
 creator.new = function(prev)
-  ui.reset_selection()
   local current_level = State.player.level
 
   local total_level, pane_i do
@@ -153,7 +152,7 @@ methods.draw_gui = function(self, dt)
 
   if ui.keyboard("j") then
     State.mode:close_menu()
-    State.mode:open_journal()
+    State.mode:open_menu("journal")
   end
 
   if not self.is_disabled and ui.keyboard("return") then

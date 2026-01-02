@@ -182,7 +182,7 @@ draw_keyboard_action_grid = function(self)
     do
       local button = ui.key_button(gui.escape_menu, "escape")
       if button.is_clicked then
-        State.mode:open_escape_menu()
+        State.mode:open_menu("escape_menu")
       end
       if button.is_mouse_over then
         hint = "меню"
@@ -194,7 +194,7 @@ draw_keyboard_action_grid = function(self)
       local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
       local button = ui.key_button(journal_image, "j")
       if button.is_clicked then
-        State.mode:open_journal()
+        State.mode:open_menu("journal")
       end
       if button.is_mouse_over then
         hint = "журнал"
@@ -211,7 +211,7 @@ draw_keyboard_action_grid = function(self)
 
       local button = ui.key_button(creator_image, "n")
       if button.is_clicked then
-        State.mode:open_creator()
+        State.mode:open_menu("creator")
       end
       if button.is_mouse_over then
         hint = "персонаж"
@@ -493,7 +493,7 @@ draw_dialogue = function()
   tk.finish_window()
 
   if ui.keyboard("escape") then
-    State.mode:open_escape_menu()
+    State.mode:open_menu("escape_menu")
   end
 end
 

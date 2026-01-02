@@ -25,7 +25,6 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 local h = 100
 
--- NEXT mode:open_menu
 methods.draw_gui = function(self)
   tk.start_window("center", "center", 550, h + 2 * tk.WINDOW_PADDING)
   ui.start_font(28)

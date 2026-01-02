@@ -1,3 +1,4 @@
+local ui = require("engine.tech.ui")
 local animated = require("engine.tech.animated")
 local level    = require("engine.tech.level")
 local sound    = require("engine.tech.sound")
@@ -73,38 +74,22 @@ methods.start_game_finish = function(self)
   self:_set_mode(STATES.game.new())
 end
 
-methods.open_escape_menu = function(self)
-  Log.info("Opening escape menu")
-  self:_set_mode(STATES.escape_menu.new(self._mode --[[@as state_mode_game]]))
-end
-
-methods.open_journal = function(self)
-  Log.info("Opening journal")
-  self:_set_mode(STATES.journal.new(self._mode --[[@as state_mode_game]]))
-  OPEN_JOURNAL:play()
-end
-
-methods.open_creator = function(self)
-  Log.info("Opening creator")
-  self:_set_mode(STATES.creator.new(self._mode --[[@as state_mode_game]]))
-  OPEN_JOURNAL:play()
-end
-
-methods.open_save_menu = function(self)
-  Log.info("Opening save menu")
-  self:_set_mode(STATES.save_menu.new(self._mode))
-end
-
-methods.open_load_menu = function(self)
-  Log.info("Opening load menu")
-  self:_set_mode(STATES.load_menu.new(self._mode))
+--- @param kind "escape_menu"|"journal"|"creator"|"save_menu"|"load_menu"
+methods.open_menu = function(self, kind)
+  Log.info("Opening %s", kind)
+  if kind == "journal" or kind == "creator" then
+    OPEN_JOURNAL:play()
+  end
+  ui.reset_selection()
+  self:_set_mode(STATES[kind].new(self._mode))
 end
 
 methods.close_menu = function(self)
   Log.info("Closing %s", self._mode.type)
-  if self._mode.type == "journal" then
+  if self._mode.type == "journal" or self._mode.type == "creator" then
     CLOSE_JOURNAL:play()
   end
+  ui.reset_selection()
   self:_set_mode(assert(self._mode._prev))
 end
 

@@ -31,7 +31,7 @@ methods.draw_gui = function(self, dt)
   if ui.keyboard("n") then
     State.quests:new_content_is_read()
     State.mode:close_menu()
-    State.mode:open_creator()
+    State.mode:open_menu("creator")
   end
 
   tk.start_window("center", "center", "read_max", "max")

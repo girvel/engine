@@ -782,8 +782,6 @@ ui.switch = function(possible_values, container, key, disabled, ...)
   end
 end
 
--- NEXT use button color
-
 --- @param options string[]
 --- @return number?
 ui.choice = function(options)

@@ -38,16 +38,12 @@ methods.draw_gui = function(self, dt)
 
     local escape_pressed = ui.keyboard("escape")
 
-    if n or escape_pressed then
-      ui.reset_selection()
-    end
-
     if n == 1 or escape_pressed then
       State.mode:close_menu()
     elseif n == 2 then
-      State.mode:open_save_menu()
+      State.mode:open_menu("save_menu")
     elseif n == 3 then
-      State.mode:open_load_menu()
+      State.mode:open_menu("load_menu")
     elseif n == 4 then
       State.mode:attempt_exit()
     end

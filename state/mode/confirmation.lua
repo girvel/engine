@@ -14,7 +14,6 @@ confirmation.mt = {__index = methods}
 
 --- @return state_mode_confirmation
 confirmation.new = function(prev, message, f)
-  ui.reset_selection()
   return setmetatable({
     type = "confirmation",
     message = message,
