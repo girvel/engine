@@ -16,11 +16,18 @@ start_menu.new = function()
   }, mt)
 end
 
-local display_tcod_error
-local is_displaying_tcod_error = not tcod.ok
+local display_tcod_error = not tcod.ok
 
 methods.draw_gui = function()
-  if is_displaying_tcod_error then return display_tcod_error() end
+  if display_tcod_error then
+    display_tcod_error = false
+    State.mode:show_warning(
+      "Невозможно загрузить библиотеку libtcod, поля зрения и поиск путей не будут работать." ..
+      "\n\nВозможно, путь к папке с игрой содержит русские символы. Попробуйте " ..
+      "переместить её в другое место."
+    )
+    return
+  end
 
   ui.start_font(48)
   ui.start_frame(200, 200, 500, 500)
@@ -44,23 +51,6 @@ methods.draw_gui = function()
     end
   ui.finish_frame()
   ui.finish_font()
-end
-
-display_tcod_error = function()
-  -- NEXT use warning
-  tk.start_window("center", "center", 550, 240)
-  ui.start_font(20)
-  ui.start_alignment("center")
-    ui.text("Невозможно загрузить библиотеку libtcod, поля зрения и поиск путей не будут работать")
-    ui.br()
-    ui.text("Возможно, путь к папке с игрой содержит не-английские символы. Попробуйте переместить её в другое место.")
-    ui.br()
-    if ui.choice({"ОК"}) then
-      is_displaying_tcod_error = false
-    end
-  ui.finish_alignment()
-  ui.finish_font()
-  tk.finish_window()
 end
 
 Ldump.mark(start_menu, {}, ...)
