@@ -257,8 +257,8 @@ ui.start_frame = function(x, y, w, h)
   end
 
   local frame = {
-    x = prev.x + x,
-    y = prev.y + y,
+    x = context.cursor_x + x,
+    y = context.cursor_y + y,
     w = w,
     h = h,
   }
