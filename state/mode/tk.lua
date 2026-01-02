@@ -158,7 +158,7 @@ tk.choose_save = function(show_new_save)
 
   ui.start_frame()
   ui.start_alignment("right")
-  love.graphics.setColor(colors.white_dim)
+  ui.start_color(colors.white_dim)
     for i, option in ipairs(options) do
       if show_new_save and i == 1 then
         ui.br()
@@ -166,7 +166,7 @@ tk.choose_save = function(show_new_save)
         ui.text("." * (char_w - option:utf_len()) .. os.date(nice_date, dates[option]))
       end
     end
-  love.graphics.setColor(Vector.white)
+  ui.finish_color()
   ui.finish_alignment()
   ui.finish_frame()
 

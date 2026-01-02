@@ -43,15 +43,15 @@ methods.draw_gui = function(self, dt)
 
       ui.start_font(36)
         ui.start_line()
-          love.graphics.setColor(colors.white_dim)
+          ui.start_color(colors.white_dim)
           ui.text("# ")
 
           if quest.status == "new" or quest.status == "active" then
-            love.graphics.setColor(colors.white)
+            ui.finish_color()
             ui.text(quest.name)
           else
             ui.text(quest.name)
-            love.graphics.setColor(colors.white)
+            ui.finish_color()
           end
         ui.finish_line()
       ui.finish_font()
@@ -61,13 +61,13 @@ methods.draw_gui = function(self, dt)
         local prefix
         local needs_color_reset = true
         if objective.status == "done" then
-          love.graphics.setColor(colors.white_dim)
+          ui.start_color(colors.white_dim)
           prefix = "+ "
         elseif objective.status == "failed" then
-          love.graphics.setColor(colors.white_dim)
+          ui.start_color(colors.white_dim)
           prefix = "x "
         elseif objective.status == "new" then
-          love.graphics.setColor(colors.golden)
+          ui.start_color(colors.golden)
           prefix = "- "
         else
           prefix = "- "
@@ -77,16 +77,14 @@ methods.draw_gui = function(self, dt)
         ui.text(prefix .. objective.text)
 
         if needs_color_reset then
-          love.graphics.setColor(colors.white)
+          ui.finish_color()
         end
-
       end
       ui.br()
       ui.br()
 
       ::continue::
     end
-    love.graphics.setColor(Vector.white)
   tk.finish_window()
 end
 

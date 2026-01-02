@@ -46,9 +46,9 @@ end
 draw_curtain = function()
   if State.player.curtain_color == Vector.transparent then return end
   local w, h = love.graphics.getDimensions()
-  love.graphics.setColor(State.player.curtain_color)
+  ui.start_color(State.player.curtain_color)
     love.graphics.rectangle("fill", 0, 0, w, h)
-  love.graphics.setColor(Vector.white)
+  ui.finish_color()
 end
 
 local PADDING_LX = 48
@@ -511,9 +511,9 @@ draw_line = function(line)
     local offset = 0
     if line.source then
       local name = Name.game(line.source)
-      love.graphics.setColor(line.source.sprite.color)
+      ui.start_color(line.source.sprite.color)
         ui.text(name)
-      love.graphics.setColor(Vector.white)
+      ui.finish_color()
       ui.text(": ")
       offset = offset + name:utf_len() + 2
     end
@@ -531,9 +531,9 @@ draw_line = function(line)
       end
 
       if highlighted then
-        love.graphics.setColor(color)
+        ui.start_color(color)
           ui.text(highlighted)
-        love.graphics.setColor(Vector.white)
+        ui.finish_color()
         offset = offset + highlighted:utf_len()
         text = text:sub(j + 1)
       end

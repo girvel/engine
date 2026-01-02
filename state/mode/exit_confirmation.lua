@@ -36,10 +36,10 @@ methods.draw_gui = function(self)
     ui.br()
 
     if self._prev.has_saved == false then
-      love.graphics.setColor(colors.red)
-      ui.text("Игра не сохранена")
-      ui.br()
-      love.graphics.setColor(Vector.white)
+      ui.start_color(colors.red)
+        ui.text("Игра не сохранена")
+        ui.br()
+      ui.finish_color()
     end
 
     local n = ui.choice({

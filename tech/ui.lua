@@ -788,6 +788,7 @@ end
 ui.choice = function(options)
   local is_selected = false
 
+  local result
   for i, option in ipairs(options) do
     local button_out = button(context.frame.w, context.font:getHeight() * LINE_K)
 
@@ -816,9 +817,12 @@ ui.choice = function(options)
     end
 
     if button_out.is_clicked then
-      return state.selection.i
+      result = state.selection.i
+      break
     end
   end
+
+  if result then return result end
 
   state.selection.max_i = state.selection.max_i + #options
 

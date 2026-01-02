@@ -50,7 +50,6 @@ end
 draw_points = function(points)
   ui.start_font(12)
   for k, point in pairs(points) do
-    love.graphics.setColor(point.color)
     local v
     if point.view == "grid" then
       v = point.position * 4 * Constants.cell_size + State.perspective.camera_offset
@@ -61,11 +60,13 @@ draw_points = function(points)
     else
       assert(false)
     end
+
+    love.graphics.setColor(point.color)
     local x, y = unpack(v)
     love.graphics.circle("fill", x, y, 3)
     love.graphics.print(tostring(k), x, y)
-    love.graphics.setColor(Vector.white)
   end
+  love.graphics.setColor(Vector.white)
   ui.finish_font()
 end
 
