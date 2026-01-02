@@ -49,6 +49,7 @@ local context
 --- @field is_linear boolean
 --- @field line_last_h integer
 --- @field styles ui_styles
+--- @field color vector
 
 --- @class ui_styles
 --- @field link_color vector
@@ -224,6 +225,7 @@ ui.start = function()
       link_color = colors.blue_high,
       punctuation_color = colors.white_dim,
     },
+    color = Vector.white,
   }
 
   stack = {}
@@ -349,6 +351,17 @@ end
 
 ui.finish_styles = function()
   ui.stack_pop("styles")
+end
+
+--- @param color vector
+ui.start_color = function(color)
+  ui.stack_push("color", color)
+  love.graphics.setColor(color)
+end
+
+ui.finish_color = function()
+  ui.stack_pop("color")
+  love.graphics.setColor(context.color)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -704,18 +717,17 @@ end)
 ui.text_button = function(text, ...)
   -- TODO bug overlap when next to each other
   text = format(text, ...)
-  local prev_color = {love.graphics.getColor()}  -- NEXT start_color
   -- NEXT factor out all manual color changes
 
   local result = button(context.font:getWidth("w") * text:utf_len(), context.font:getHeight())
   if result.is_mouse_over then
     ui.cursor("hand")
   else
-    love.graphics.setColor(context.styles.link_color)
+    ui.start_color(context.styles.link_color)
   end
   ui.text(text)
   if not result.is_mouse_over then
-    love.graphics.setColor(prev_color)
+    ui.finish_color()
   end
   return result
 end
