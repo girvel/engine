@@ -1,5 +1,5 @@
 return function(msg)
-  Log.fatal(debug.traceback(msg))
+  Log.fatal(debug.traceback(msg, 2))
   Kernel:report()
   -- saves.write({State}, "last_crash.ldump.gz")
   -- love.window.requestAttention()
