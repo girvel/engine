@@ -26,7 +26,7 @@ local cost, hint, mouse_task, is_compact, open_escape_menu
 local action_button, set_mouse_task
 
 -- Render functions
-local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, draw_move_order,
+local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, draw_move_order,
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, use_mouse, draw_curtain
 
@@ -35,6 +35,7 @@ local draw_gui, draw_sidebar, draw_hp_bar, draw_action_grid, draw_resources, dra
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
   open_escape_menu = false
+  hint = nil
 
   draw_curtain()
   draw_sidebar(self)
@@ -74,7 +75,7 @@ draw_sidebar = function(self)
     love.graphics.getWidth() - SIDEBAR_W, 0,
     SIDEBAR_W, love.graphics.getHeight()
   )
-    draw_hp_bar()
+    draw_top_bars()
     draw_action_grid(self)
     draw_resources()
     draw_move_order()
@@ -106,12 +107,16 @@ end
 local HP_BAR_W = SIDEBAR_INNER_W - 64
 local HP_BAR_H = 10 * 4
 
-draw_hp_bar = function()
+draw_top_bars = function()
   local player = State.player
 
   ui.start_frame(HP_BAR_W + 8, -4, 64, 64)
+    if ui.mouse().is_mouse_over then
+      hint = "броня"
+    end
     ui.image("engine/assets/sprites/gui/shield.png")
   ui.finish_frame()
+
   ui.start_frame(HP_BAR_W + 8, -4, 64, 64)
   ui.start_alignment("center", "center")
   ui.start_font(32)
@@ -120,19 +125,27 @@ draw_hp_bar = function()
   ui.finish_alignment()
   ui.finish_frame()
 
-  tk.bar(
+  tk.start_bar(
     HP_BAR_W, HP_BAR_H,
     player.hp, player:get_max_hp(),
     gui.hp_bar, gui.hp_bar_min, gui.hp_bar_extra
   )
+    if ui.mouse().is_mouse_over then
+      hint = "здоровье"
+    end
+  tk.finish_bar()
 
   ui.offset(0, 12)
 
-  tk.bar(
+  tk.start_bar(
     SIDEBAR_INNER_W, 24,
     player.xp, xp.to_reach(State.player.level + 1),
     gui.xp_bar, gui.xp_bar_min, gui.hp_bar_extra
   )
+    if ui.mouse().is_mouse_over then
+      hint = "опыт"
+    end
+  tk.finish_bar()
 end
 
 draw_action_grid = function(self)
@@ -140,7 +153,6 @@ draw_action_grid = function(self)
   if not is_compact then ui.br() end
 
   cost = nil
-  hint = nil
 
   ui.start_frame(-16, -4)
     ui.image("engine/assets/sprites/gui/action_grid_bg.png")

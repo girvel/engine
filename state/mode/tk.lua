@@ -133,36 +133,38 @@ end
 --- @param bar string
 --- @param bar_small string
 --- @param bar_extra string
-tk.bar = function(w, h, value, max, bar, bar_small, bar_extra)
+tk.start_bar = function(w, h, value, max, bar, bar_small, bar_extra)
   ui.start_frame(nil, nil, w, h + 16)
-    ui.tile(gui_elements.bar_bg)
 
-    local saturation = value / max
-    local base_saturation = math.min(saturation, 1)
-    local extra_saturation = saturation > 1 and (1 - 1 / saturation)
-    local bar_w = math.floor((w - 16) * base_saturation / ui.SCALE) * ui.SCALE
+  ui.tile(gui_elements.bar_bg)
 
-    if bar_w > 0 then
-      ui.start_frame(8, 8, bar_w, h)
-        ui.tile(bar_w > 16 and bar or bar_small)
+  local saturation = value / max
+  local base_saturation = math.min(saturation, 1)
+  local extra_saturation = saturation > 1 and (1 - 1 / saturation)
+  local bar_w = math.floor((w - 16) * base_saturation / ui.SCALE) * ui.SCALE
+
+  if bar_w > 0 then
+    ui.start_frame(8, 8, bar_w, h)
+      ui.tile(bar_w > 16 and bar or bar_small)
+    ui.finish_frame()
+
+    if extra_saturation then
+      ui.start_frame(8, 8, math.floor((w - 16) * extra_saturation / ui.SCALE) * ui.SCALE, h)
+        ui.tile(bar_extra)
       ui.finish_frame()
-
-      if extra_saturation then
-        ui.start_frame(8, 8, math.floor((w - 16) * extra_saturation / ui.SCALE) * ui.SCALE, h)
-          ui.tile(bar_extra)
-        ui.finish_frame()
-      end
     end
+  end
 
-    ui.start_alignment("center", "center")
-    ui.start_font(math.floor(h * .8))
-      ui.text("%s/%s", value, max)
-    ui.finish_font()
-    ui.finish_alignment()
-  ui.finish_frame("push_frame")
+  ui.start_alignment("center", "center")
+  ui.start_font(math.floor(h * .8))
+    ui.text("%s/%s", value, max)
+  ui.finish_font()
+  ui.finish_alignment()
 end
 
--- NEXT hover on HP, XP, armor
+tk.finish_bar = function()
+  ui.finish_frame("push_frame")
+end
 
 tk.choose_save = function(show_new_save)
   local options, dates do

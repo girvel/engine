@@ -118,12 +118,12 @@ end
 --- @field is_active boolean
 --- @field is_mouse_over boolean
 
+--- @param x integer
+--- @param y integer
 --- @param w integer
 --- @param h integer
 --- @return ui_button_out
-local button = function(w, h)
-  local x = context.cursor_x
-  local y = context.cursor_y
+local button = function(x, y, w, h)
   local result = {
     is_clicked = false,
     is_mouse_over = get_mouse_over(x, y, w, h),
@@ -560,7 +560,7 @@ ui.key_button = function(image, key, is_disabled)
   image = get_image(image)
   local w = image:getWidth() * ui.SCALE
   local h = image:getHeight() * ui.SCALE
-  local result = button(w, h)
+  local result = button(context.cursor_x, context.cursor_y, w, h)
 
   if is_disabled then
     result.is_clicked = false
@@ -719,7 +719,11 @@ ui.text_button = function(text, ...)
   -- TODO bug overlap when next to each other
   text = format(text, ...)
 
-  local result = button(context.font:getWidth("w") * text:utf_len(), context.font:getHeight())
+  local result = button(
+    context.cursor_x, context.cursor_y,
+    context.font:getWidth("w") * text:utf_len(), context.font:getHeight()
+  )
+
   if result.is_mouse_over then
     ui.cursor("hand")
   else
@@ -790,7 +794,10 @@ ui.choice = function(options)
 
   local result
   for i, option in ipairs(options) do
-    local button_out = button(context.frame.w, context.font:getHeight() * LINE_K)
+    local button_out = button(
+      context.cursor_x, context.cursor_y,
+      context.frame.w, context.font:getHeight() * LINE_K
+    )
 
     if button_out.is_mouse_over then
       state.selection.i = state.selection.max_i + i
@@ -866,7 +873,7 @@ end
 --- @param cursor_type? ui_cursor_type
 --- @return ui_button_out
 ui.mouse = function(cursor_type)
-  local result = button(context.frame.w, context.frame.h)
+  local result = button(context.frame.x, context.frame.y, context.frame.w, context.frame.h)
   if cursor_type and result.is_mouse_over then
     state.cursor = cursor_type
   end
