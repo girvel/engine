@@ -649,7 +649,10 @@ use_mouse = function(self)
     set_mouse_task()
   end
 
-  if not State.player:can_act() then return end
+  if not State.player:can_act() then
+    State.runner:stop(mouse_task, false, true)
+    return
+  end
 
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.perspective.sidebar_w)
     ui.cursor(self.input_mode == "target" and "target_inactive" or nil)
