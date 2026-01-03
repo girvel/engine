@@ -269,12 +269,12 @@ ui.start_frame = function(x, y, w, h)
   end
   if not w then
     w = prev.w - x
-  elseif w <= 0 then
+  elseif w < 0 then
     w = prev.w + w
   end
   if not h then
     h = prev.h - y
-  elseif h <= 0 then
+  elseif h < 0 then
     h = prev.h + h
   end
 

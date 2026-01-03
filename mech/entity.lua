@@ -23,7 +23,7 @@
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer character level
---- @field xp integer experience points (after .level)
+--- @field xp integer experience points (from .level to .level + 1)
 --- @field resources table<string, integer> resources to spend on actions
 --- @field inventory table<inventory_slot, item>
 --- @field hp integer current health points

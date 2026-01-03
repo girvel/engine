@@ -120,30 +120,19 @@ draw_hp_bar = function()
   ui.finish_alignment()
   ui.finish_frame()
 
-  ui.start_frame(nil, nil, HP_BAR_W, HP_BAR_H + 16)
-    ui.tile(gui.hp_bg)
+  tk.bar(
+    HP_BAR_W, HP_BAR_H,
+    player.hp, player:get_max_hp(),
+    gui.hp_bar, gui.hp_bar_min, gui.hp_bar_extra
+  )
 
-    local saturation = player.hp / player:get_max_hp()
-    local base_saturation = math.min(saturation, 1)
-    local extra_saturation = saturation > 1 and (1 - 1 / saturation)
+  ui.offset(0, 12)
 
-    local bar_w = math.floor((HP_BAR_W - 16) * base_saturation / 4)
-    ui.start_frame(8, 8, bar_w * 4, HP_BAR_H)
-      ui.tile(bar_w > 3 and gui.hp_bar or gui.hp_bar_min)
-    ui.finish_frame()
-
-    if extra_saturation then
-      ui.start_frame(8, 8, math.floor((HP_BAR_W - 16) * extra_saturation / 4) * 4, HP_BAR_H)
-        ui.tile(gui.hp_bar_extra)
-      ui.finish_frame()
-    end
-
-    ui.start_alignment("center", "center")
-    ui.start_font(32)
-      ui.text("%s/%s", player.hp, player:get_max_hp())
-    ui.finish_font()
-    ui.finish_alignment()
-  ui.finish_frame("push_frame")
+  tk.bar(
+    SIDEBAR_INNER_W, 24,
+    player.xp, xp.for_level[player.level + 1] - xp.for_level[player.level],
+    gui.xp_bar, gui.xp_bar_min, gui.hp_bar_extra
+  )
 end
 
 draw_action_grid = function(self)

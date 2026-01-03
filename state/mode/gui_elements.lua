@@ -51,10 +51,12 @@ local gui_elements = {
   fighting_styles = nth(49),
 
   window_bg = "engine/assets/sprites/gui/window_bg.png",
-  hp_bg = "engine/assets/sprites/gui/hp_bg.png",
+  bar_bg = "engine/assets/sprites/gui/bar_bg.png",
   hp_bar = "engine/assets/sprites/gui/hp_bar.png",
   hp_bar_min = "engine/assets/sprites/gui/hp_bar_min.png",
   hp_bar_extra = "engine/assets/sprites/gui/hp_bar_extra.png",
+  xp_bar = "engine/assets/sprites/gui/xp_bar.png",
+  xp_bar_min = "engine/assets/sprites/gui/xp_bar_min.png",
   sidebar_block_bg = "engine/assets/sprites/gui/sidebar_block_bg.png",
 }
 
