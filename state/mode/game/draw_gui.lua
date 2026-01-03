@@ -130,7 +130,7 @@ draw_hp_bar = function()
 
   tk.bar(
     SIDEBAR_INNER_W, 24,
-    player.xp, xp.for_level[player.level + 1] - xp.for_level[player.level],
+    player.xp, xp.to_reach(State.player.level + 1),
     gui.xp_bar, gui.xp_bar_min, gui.hp_bar_extra
   )
 end
@@ -196,7 +196,7 @@ draw_keyboard_action_grid = function(self)
 
     do
       local creator_image = (
-        State.player.xp >= xp.for_level[State.player.level + 1] - xp.for_level[State.player.level]
+        State.player.xp >= xp.to_reach(State.player.level + 1)
           and gui.creator
           or gui.creator_inactive
       )

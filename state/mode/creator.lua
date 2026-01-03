@@ -75,8 +75,9 @@ creator.new = function(prev)
     total_level = current_level
     local xp_remains = State.player.xp
     while true do
-      local delta = xp.for_level[total_level + 1] - xp.for_level[total_level]
+      local delta = xp.to_reach(total_level + 1)
       if xp_remains < delta then break end
+
       xp_remains = xp_remains - delta
       total_level = total_level + 1
     end
