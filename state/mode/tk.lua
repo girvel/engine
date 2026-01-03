@@ -137,18 +137,18 @@ tk.bar = function(w, h, value, max, bar, bar_small, bar_extra)
   ui.start_frame(nil, nil, w, h + 16)
     ui.tile(gui_elements.bar_bg)
 
-    if value > 0 then
-      local saturation = value / max
-      local base_saturation = math.min(saturation, 1)
-      local extra_saturation = saturation > 1 and (1 - 1 / saturation)
+    local saturation = value / max
+    local base_saturation = math.min(saturation, 1)
+    local extra_saturation = saturation > 1 and (1 - 1 / saturation)
+    local bar_w = math.floor((w - 16) * base_saturation / ui.SCALE) * ui.SCALE
 
-      local bar_w = math.floor((w - 16) * base_saturation / 4) * 4  -- NEXT ui.SCALE
+    if bar_w > 0 then
       ui.start_frame(8, 8, bar_w, h)
         ui.tile(bar_w > 16 and bar or bar_small)
       ui.finish_frame()
 
       if extra_saturation then
-        ui.start_frame(8, 8, math.floor((w - 16) * extra_saturation / 4) * 4, h)
+        ui.start_frame(8, 8, math.floor((w - 16) * extra_saturation / ui.SCALE) * ui.SCALE, h)
           ui.tile(bar_extra)
         ui.finish_frame()
       end

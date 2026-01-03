@@ -83,7 +83,6 @@ local CURSORS = {
 local FRAME = "engine/assets/sprites/gui/button_frame.png"
 local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
 
-local SCALE = 4  -- has its own scale constant
 local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
 
 local get_font = Memoize(function(size)
@@ -166,6 +165,8 @@ end
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Context
 ----------------------------------------------------------------------------------------------------
+
+ui.SCALE = 4  -- has its own scale constant
 
 --- @return ui_context
 --- @nodiscard
@@ -514,7 +515,7 @@ end
 ui.image = function(image, scale)
   local frame = context.frame
   local alignment = context.alignment
-  scale = scale or SCALE
+  scale = scale or ui.SCALE
 
   image = get_image(image)
 
@@ -557,8 +558,8 @@ local ACTIVE_FRAME_PERIOD = .1
 --- @return ui_button_out
 ui.key_button = function(image, key, is_disabled)
   image = get_image(image)
-  local w = image:getWidth() * SCALE
-  local h = image:getHeight() * SCALE
+  local w = image:getWidth() * ui.SCALE
+  local h = image:getHeight() * ui.SCALE
   local result = button(w, h)
 
   if is_disabled then
@@ -581,7 +582,7 @@ ui.key_button = function(image, key, is_disabled)
   if key:utf_len() == 1 then
     font_size = 32
     text = key:utf_upper()
-    dy = SCALE
+    dy = ui.SCALE
   else
     font_size = 20
     text = key
@@ -595,13 +596,13 @@ ui.key_button = function(image, key, is_disabled)
   ui.finish_frame()
 
   if (result.is_mouse_over and not is_disabled) or result.is_active then
-    ui.start_frame(-SCALE, -SCALE, w + SCALE * 2, h + SCALE * 2)
+    ui.start_frame(-ui.SCALE, -ui.SCALE, w + ui.SCALE * 2, h + ui.SCALE * 2)
       ui.tile(result.is_active and ACTIVE_FRAME or FRAME)
     ui.finish_frame()
   end
 
   ui.start_font(font_size)
-  ui.start_frame(nil, nil, w - SCALE, h + dy)
+  ui.start_frame(nil, nil, w - ui.SCALE, h + dy)
   ui.start_alignment("right", "bottom")
     ui.text(text)
   ui.finish_alignment()
@@ -619,10 +620,10 @@ ui.tile = function(path)
   local batch, quads, cell_size = get_batch(path)
   batch:clear()
 
-  local cropped_w = math.ceil(context.frame.w / cell_size / SCALE) - 2
-  local cropped_h = math.ceil(context.frame.h / cell_size / SCALE) - 2
-  local end_x = context.frame.w / SCALE - cell_size
-  local end_y = context.frame.h / SCALE - cell_size
+  local cropped_w = math.ceil(context.frame.w / cell_size / ui.SCALE) - 2
+  local cropped_h = math.ceil(context.frame.h / cell_size / ui.SCALE) - 2
+  local end_x = context.frame.w / ui.SCALE - cell_size
+  local end_y = context.frame.h / ui.SCALE - cell_size
 
   for x = 0, cropped_w do
     for y = 0, cropped_h do
@@ -666,7 +667,7 @@ ui.tile = function(path)
 
   batch:add(quads[9], end_x, end_y)
 
-  love.graphics.draw(batch, context.frame.x, context.frame.y, 0, SCALE)
+  love.graphics.draw(batch, context.frame.x, context.frame.y, 0, ui.SCALE)
 end
 
 --- @param x? integer
