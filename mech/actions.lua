@@ -279,7 +279,7 @@ actions.shove = Table.extend({
         if not level.slow_move(target, next_p) and
           (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
         then
-          health.damage(target, D(2 + remains * 2):roll(), false)
+          health.damage(target, D(2 + remains * 2):roll(), entity, false)
           break
         end
       end

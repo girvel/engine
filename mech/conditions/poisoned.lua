@@ -35,7 +35,7 @@ methods.update = function(self, entity, dt)
   local next_t = self._t + dt
   local d = math.floor(next_t / 6) - math.floor(self._t / 6)
   if d > 0 then
-    health.damage(entity, d)
+    health.damage(entity, d)  -- TODO damage source
   end
   self._t = next_t
 end

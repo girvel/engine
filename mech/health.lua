@@ -26,9 +26,9 @@ end
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target entity
 --- @param amount number
+--- @param source? entity
 --- @param is_critical? boolean whether to display damage as critical
---- @return nil
-health.damage = function(target, amount, is_critical)
+health.damage = function(target, amount, source, is_critical)
   amount = math.max(0, amount)
   Log.debug("%s damage to %s", amount, Name.code(target))
 
@@ -39,13 +39,19 @@ health.damage = function(target, amount, is_critical)
 
   State:add(floater.new(repr, target.position, health.COLOR_DAMAGE))
 
-  health.set_hp(target, target.hp - amount)
+  if health.set_hp(target, target.hp - amount)
+    and source
+    and source.xp
+    and target.xp_reward
+  then
+    source.xp = source.xp + target.xp_reward
+  end
 end
 
 --- Set HP, update blood cue, handle modifiers
 --- @param target entity
 --- @param value integer
---- @return nil
+--- @return boolean is_dead
 health.set_hp = function(target, value)
   if target.modify then
     value = target:modify("hp", value)
@@ -63,7 +69,7 @@ health.set_hp = function(target, value)
     if target.on_half_hp and before and before > half and target.hp <= half then
       target:on_half_hp()
     end
-    return
+    return false
   end
 
   if (before or before > 0) and target.on_death then
@@ -72,7 +78,7 @@ health.set_hp = function(target, value)
 
   if target.player_flag then
     State.mode:player_has_died()
-    return
+    return false
   end
 
   if target.essential_flag then
@@ -80,7 +86,7 @@ health.set_hp = function(target, value)
     if State:in_combat(target) then
       State:remove_from_combat(target)
     end
-    return
+    return false
   end
 
   if target.inventory then
@@ -98,6 +104,7 @@ health.set_hp = function(target, value)
   if not target.boring_flag then
     Log.info(Name.code(target) .. " is killed")
   end
+  return true
 end
 
 --- Attacks with given attack/damage rolls
@@ -131,7 +138,7 @@ health.attack = function(source, target, attack_roll, damage_roll)
   if source.modify then
     damage_amount = source:modify("outgoing_damage", damage_amount, target, is_critical)
   end
-  health.damage(target, damage_amount, is_critical)
+  health.damage(target, damage_amount, source, is_critical)
   return true
 end
 
