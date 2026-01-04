@@ -217,5 +217,14 @@ tk.choose_save = function(show_new_save)
   return options[i]
 end
 
+local highlight_entity
+
+tk.highlight = function()
+  if not highlight_entity then
+    highlight_entity = State:add(item.cues.highlight())
+  end
+  ui.image(highlight_entity.sprite.image)
+end
+
 Ldump.mark(tk, {}, ...)
 return tk

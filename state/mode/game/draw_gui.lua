@@ -197,6 +197,10 @@ draw_keyboard_action_grid = function(self)
     do
       local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
       local button = ui.key_button(journal_image, "j")
+      if State.quests.has_new_content then
+        ui.offset(-64)
+        tk.highlight()
+      end
       if button.is_clicked then
         State.mode:open_menu("journal")
       end
@@ -207,13 +211,16 @@ draw_keyboard_action_grid = function(self)
     ui.offset(4)
 
     do
-      local creator_image = (
-        State.player.xp >= xp.to_reach(State.player.level + 1)
+      local is_active = State.player.xp >= xp.to_reach(State.player.level + 1)
+      local button = ui.key_button(
+        is_active
           and gui.creator
-          or gui.creator_inactive
+          or gui.creator_inactive, "n"
       )
-
-      local button = ui.key_button(creator_image, "n")
+      if is_active then
+        ui.offset(-64)
+        tk.highlight()
+      end
       if button.is_clicked then
         State.mode:open_menu("creator")
       end
