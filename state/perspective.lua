@@ -33,6 +33,15 @@ methods.immediate_center = function(self)
   self.camera_offset = V(self:_center(unpack((self.target_override or State.player).position)))
 end
 
+--- @param gx number
+--- @param gy number
+--- @return number sx, number sy
+methods.game_to_screen = function(self, gx, gy)
+  local dx, dy = unpack(self.camera_offset)
+  local k = State.perspective.SCALE * Constants.cell_size
+  return dx + k * gx, dy + k * gy
+end
+
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Implementation

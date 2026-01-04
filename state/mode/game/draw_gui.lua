@@ -47,6 +47,10 @@ draw_gui = function(self, dt)
   if open_escape_menu or ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
   end
+
+  if State.debug then  -- NEXT RM
+    tk.popup(State.player.position, "You notice that the developer wanted to test popups, so now you have a large black box above your damned head.")
+  end
 end
 
 draw_curtain = function()

@@ -371,13 +371,12 @@ end
 
 --- @param text string
 --- @return string[]
-local wrap = function(text)
+local wrap = Memoize(function(text, font, initial_offset, width)
   if #text == 0 then return {""} end
 
-  local initial_offset = context.cursor_x - context.frame.x
-  local font_w = context.font:getWidth("w")
-  local max_w = math.max(1, math.floor(context.frame.w / font_w))
-  local first_max_w = math.floor((context.frame.w - initial_offset) / font_w)
+  local font_w = font:getWidth("w")
+  local max_w = math.max(1, math.floor(width / font_w))
+  local first_max_w = math.floor((width - initial_offset) / font_w)
 
   local result = {}
 
@@ -400,6 +399,14 @@ local wrap = function(text)
   end
 
   return result
+end)
+
+--- @param text string
+--- @param max_w integer
+--- @return integer h
+ui.predict_text_size = function(text, max_w)
+  local wrapped = wrap(text, context.font, 0, max_w)
+  return #wrapped * context.font:getHeight() * LINE_K
 end
 
 --- @param text any
@@ -410,7 +417,7 @@ ui.text = function(text, ...)
   local font = context.font
   local alignment = context.alignment
 
-  local wrapped = wrap(text)
+  local wrapped = wrap(text, context.font, context.cursor_x - context.frame.x, context.frame.w)
 
   for i, line in ipairs(wrapped) do
     local x

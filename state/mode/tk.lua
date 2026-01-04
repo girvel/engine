@@ -226,5 +226,22 @@ tk.highlight = function()
   ui.image(highlight_entity.sprite.image)
 end
 
+--- @param position vector in-game
+--- @param text string
+tk.popup = function(position, text)
+  local gx, gy = unpack(position)
+  local sx, sy = State.perspective:game_to_screen(gx + .5, gy - .25)
+  local w = 150
+  local padding = ui.SCALE
+  local h = ui.predict_text_size(text, w)
+
+  ui.start_frame(sx - w/2 - padding, sy - h - padding, w + padding, h + padding)
+    ui.tile("engine/assets/sprites/gui/black_bg.png")
+    ui.start_frame(padding, padding)
+      ui.text(text)
+    ui.finish_frame()
+  ui.finish_frame()
+end
+
 Ldump.mark(tk, {}, ...)
 return tk
