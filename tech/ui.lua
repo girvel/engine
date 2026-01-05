@@ -440,16 +440,31 @@ ui.text = function(text, ...)
 
     love.graphics.print(line, x, y)
 
-    if alignment.y == "top" then
-      if context.is_linear then
-        if alignment.x == "left" then
-          context.cursor_x = context.cursor_x + font:getWidth("w") * text:utf_len()
-          context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
-        end
+    if context.is_linear then
+      if i < #wrapped then
+        context.cursor_y = context.cursor_y + math.max(context.line_last_h, font:getHeight() * LINE_K)
+        context.cursor_x = context.frame.x
+        context.line_last_h = 0
       else
+        context.cursor_x = context.cursor_x + font:getWidth("w") * text:utf_len()
+        context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
+      end
+    else
+      if alignment.y == "top" then
         context.cursor_y = context.cursor_y + font:getHeight() * LINE_K
+        context.cursor_x = context.frame.x
       end
     end
+    -- if alignment.y == "top" then
+    --   if context.is_linear then
+    --     if alignment.x == "left" then
+    --       context.cursor_x = context.cursor_x + font:getWidth("w") * text:utf_len()
+    --       context.line_last_h = math.max(context.line_last_h, font:getHeight() * LINE_K)
+    --     end
+    --   else
+    --     context.cursor_y = context.cursor_y + font:getHeight() * LINE_K
+    --   end
+    -- end
   end
 end
 

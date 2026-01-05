@@ -49,7 +49,7 @@ draw_gui = function(self, dt)
   end
 
   if State.debug then  -- NEXT RM
-    tk.popup(State.player.position, "You notice that the developer wanted to test popups, so now you have a large black box above your damned head.")
+  --   tk.popup(State.player.position, "You notice that the developer wanted to test popups, so now you have a large black box above your damned head.")
   end
 end
 
@@ -517,14 +517,12 @@ draw_line = function(line)
   local text = line.text
   ui.start_frame()
   ui.start_line()
-    local offset = 0
     if line.source then
       local name = Name.game(line.source)
       ui.start_color(line.source.sprite.color)
         ui.text(name)
       ui.finish_color()
       ui.text(": ")
-      offset = offset + name:utf_len() + 2
     end
 
     do
@@ -543,15 +541,12 @@ draw_line = function(line)
         ui.start_color(color)
           ui.text(highlighted)
         ui.finish_color()
-        offset = offset + highlighted:utf_len()
         text = text:sub(j + 1)
       end
     end
-
-    text = (" " * offset) .. text
+    ui.text(text)
   ui.finish_line()
   ui.finish_frame()
-  ui.text(text)
 
   if ui.keyboard("space") or ui.mousedown_anywhere(1) then
     State.player.hears = nil
