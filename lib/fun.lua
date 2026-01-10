@@ -331,6 +331,7 @@ local nth = function(n, gen_x, param_x, state_x)
     end
     return return_if_not_empty(gen_x(param_x, state_x))
 end
+--- @type fun(self: fun_iter, n: integer): any
 methods.nth = method1(nth)
 exports.nth = export1(nth)
 
@@ -580,6 +581,7 @@ end
 local filter = function(fun, gen, param, state)
     return wrap(filter_gen, {fun, gen, param}, state)
 end
+--- @type fun(self: fun_iter, predicate: fun(...): boolean): fun_iter
 methods.filter = method1(filter)
 exports.filter = export1(filter)
 methods.remove_if = methods.filter
@@ -845,6 +847,7 @@ end
 local map = function(fun, gen, param, state)
     return wrap(map_gen, {gen, param, fun}, state)
 end
+--- @type fun(self: fun_iter, f: fun(...): any): fun_iter
 methods.map = method1(map)
 exports.map = export1(map)
 
