@@ -690,24 +690,24 @@ use_mouse = function(self)
         end
       end
     else
+      -- TODO OPT cache with mouse_x, mouse_y and invalidate on tcod map changes
+      --   (or maybe it would be even slower, idk)
+      local path = not solid and api.build_path(State.player.position, position, PATH_MAX_LENGTH)
       if interaction_target then
         ui.cursor("hand")
-      elseif not solid then
+      elseif path then
         ui.cursor("walk")
       end
 
-      if rmb and not solid or lmb and interaction_target then
-        local path = api.build_path(State.player.position, position)
-        if path and #path <= PATH_MAX_LENGTH then
-          animated.add_fx("engine/assets/sprites/animations/mouse_travel", position)
-          set_mouse_task(function()
-            local ok = api.follow_path(State.player, path, false, 8)
-            api.rotate(State.player, position)
-            if ok and interaction_target then
-              actions.interact:act(State.player)
-            end
-          end)
-        end
+      if path and (rmb and not solid or lmb and interaction_target) then
+        animated.add_fx("engine/assets/sprites/animations/mouse_travel", position)
+        set_mouse_task(function()
+          local ok = api.follow_path(State.player, path, false, 8)
+          api.rotate(State.player, position)
+          if ok and interaction_target then
+            actions.interact:act(State.player)
+          end
+        end)
       end
 
       local is_a_potential_target
@@ -732,17 +732,14 @@ use_mouse = function(self)
       local hand = State.player.inventory.hand
       if hand and hand.damage_roll and is_a_potential_target then
         ui.cursor("target_active")
-        if rmb and actions.hand_attack:enough_resources(State.player) then
-          local path = api.build_path(State.player.position, position)
-          if path and #path <= PATH_MAX_LENGTH then
-            set_mouse_task(function()
-              local ok = api.follow_path(State.player, path, false, 8)
-              api.rotate(State.player, position)
-              if ok then
-                actions.hand_attack:act(State.player)
-              end
-            end)
-          end
+        if rmb and path and actions.hand_attack:enough_resources(State.player) then
+          set_mouse_task(function()
+            local ok = api.follow_path(State.player, path, false, 8)
+            api.rotate(State.player, position)
+            if ok then
+              actions.hand_attack:act(State.player)
+            end
+          end)
         end
       end
     end
