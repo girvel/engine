@@ -169,22 +169,26 @@ api.build_path = function(start, destination, max_length)
   destination = api.to_vector(destination)
   max_length = max_length or math.huge
 
-  local possible_destinations = {unpack(Vector.directions)}
-  table.sort(possible_destinations, function(a, b)
-    local abs_a = a:abs2()
-    local abs_b = b:abs2()
-    if abs_a == abs_b then
-      return (start - destination - a):abs2() < (start - destination - b):abs2()
-    end
+  local possible_offsets
+  if State.grids.solids:slow_get(destination, true) then
+    possible_offsets = {unpack(Vector.directions)}
+    table.sort(possible_offsets, function(a, b)
+      local abs_a = a:abs2()
+      local abs_b = b:abs2()
+      if abs_a == abs_b then
+        return (start - destination - a):abs2() < (start - destination - b):abs2()
+      end
 
-    return abs_a < abs_b
-  end)
-  table.insert(possible_destinations, 1, Vector.zero)
+      return abs_a < abs_b
+    end)
+  else
+    possible_offsets = {Vector.zero}
+  end
 
   local path
-  for _, d in ipairs(possible_destinations) do
+  for _, d in ipairs(possible_offsets) do
     local p = destination + d
-    if p == start then return {} end
+    if p == start then return end
     if State.grids.solids:can_fit(p) then
       path = State._travel_map:find_path(start, destination + d)
       if #path > 0 and #path < max_length then

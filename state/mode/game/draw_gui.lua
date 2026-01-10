@@ -770,10 +770,10 @@ use_mouse = function(self)
 end
 
 -- NEXT display movement counter
--- NEXT bug: with movement = 0, neighbour cells still have "walk" cursor
 -- NEXT fix hand attack
 -- NEXT FX for interacting/attacking
 -- NEXT khaned scene crashes & burns if Khaned comes to help vs a boar
+-- NEXT creator should be inactive when the player is in combat
 
 --- @param path vector[]
 render_path = function(path, persistent)
