@@ -217,11 +217,11 @@ tk.choose_save = function(show_new_save)
   return options[i]
 end
 
-local highlight_entity
+local highlight_entity = item.cues.highlight()
 
 tk.highlight = function()
-  if not highlight_entity then
-    highlight_entity = State:add(item.cues.highlight())
+  if not State:exists(highlight_entity) then
+    State:add(highlight_entity)
   end
   ui.image(highlight_entity.sprite.image)
 end
