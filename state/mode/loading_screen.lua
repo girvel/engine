@@ -44,10 +44,15 @@ methods.draw_gui = function(self)
     frame = Math.median(1, math.ceil(value * #bar_animation), #bar_animation)
   end
 
+  local bar_y = love.graphics.getHeight() * 4 / 5
+
   ui.start_alignment("center")
-  ui.start_frame(nil, love.graphics.getHeight() * 4 / 5)
-    ui.image(bar_animation[frame].image)
-  ui.finish_frame()
+    ui.start_frame(nil, bar_y - 8)
+      ui.image("engine/assets/sprites/gui/loading_bar_bg.png")
+    ui.finish_frame()
+    ui.start_frame(nil, bar_y)
+      ui.image(bar_animation[frame].image)
+    ui.finish_frame()
   ui.finish_alignment()
 
   if coroutine.status(self._loading_coroutine) == "dead" then
