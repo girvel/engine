@@ -755,15 +755,31 @@ use_mouse = function(self)
       local hand = State.player.inventory.hand
       if hand and hand.damage_roll and is_a_potential_target then
         ui.cursor("target_active")
-        if rmb and (path or api.distance(position, State.player) == 1) and actions.hand_attack:enough_resources(State.player) then
-          set_mouse_task(function()
-            animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
-            local ok = not path or api.follow_path(State.player, path, false, 8)
-            api.rotate(State.player, position)
-            if ok then
-              actions.hand_attack:act(State.player)
-            end
-          end, path)
+        if rmb and (path or api.distance(position, State.player) == 1) then
+          local potential_attacking_actions = {
+            actions.hand_attack,
+            actions.offhand_attack,
+            actions.shove,
+          }
+
+          if Fun.iter(potential_attacking_actions)
+            :any(function(a) return a:enough_resources(State.player) end)
+          then
+            set_mouse_task(function()
+              animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
+              local ok = not path or api.follow_path(State.player, path, false, 8)
+              api.rotate(State.player, position)
+              if ok then
+                local action = Fun.iter(potential_attacking_actions)
+                  :filter(function(a) return a:is_available(State.player) end)
+                  :nth(1)
+
+                if action then
+                  action:act(State.player)
+                end
+              end
+            end, path)
+          end
         end
       end
     end
