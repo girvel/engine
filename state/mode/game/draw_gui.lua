@@ -755,9 +755,10 @@ use_mouse = function(self)
       local hand = State.player.inventory.hand
       if hand and hand.damage_roll and is_a_potential_target then
         ui.cursor("target_active")
-        if rmb and path and actions.hand_attack:enough_resources(State.player) then
+        if rmb and (path or api.distance(position, State.player) == 1) and actions.hand_attack:enough_resources(State.player) then
           set_mouse_task(function()
-            local ok = api.follow_path(State.player, path, false, 8)
+            animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
+            local ok = not path or api.follow_path(State.player, path, false, 8)
             api.rotate(State.player, position)
             if ok then
               actions.hand_attack:act(State.player)
