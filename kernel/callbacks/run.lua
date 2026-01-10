@@ -12,9 +12,39 @@ return function()
   love.timer.step()
   local dt = 0
   local KEY_REPETITION_DELAY = .3
+  local serialization_coroutine
 
   Kernel.start_time = love.timer.getTime()
   return function()
+    if Kernel._save then
+      serialization_coroutine = coroutine.create(function()
+        saves.write(State, Kernel._save)
+      end)
+      Kernel._save = nil
+    end
+
+    if serialization_coroutine then
+      love.event.pump()
+      for name in love.event.poll() do
+        if name == "quit" then
+          return 0
+        end
+      end
+
+      love.graphics.origin()
+      love.graphics.clear()
+        love.graphics.print("Saving" .. "." * math.floor((love.timer.getTime() * 4) % 4), 100, 100)
+      love.graphics.present()
+
+      coroutine.resume(serialization_coroutine)
+      love.timer.step()
+      if coroutine.status(serialization_coroutine) == "dead" then
+        serialization_coroutine = nil
+      else
+        return
+      end
+    end
+
     if Kernel._load then
       local t = love.timer.getTime()
         State = saves.read(Kernel._load)  --[[@as state]]
@@ -67,13 +97,6 @@ return function()
     do
       local t = love.timer.getTime()
         love.graphics.present()
-      Kernel.cpu_time = math.max(0, Kernel.cpu_time - (love.timer.getTime() - t))
-    end
-
-    if Kernel._save then
-      local t = love.timer.getTime()
-        saves.write(State, Kernel._save)
-        Kernel._save = nil
       Kernel.cpu_time = math.max(0, Kernel.cpu_time - (love.timer.getTime() - t))
     end
   end

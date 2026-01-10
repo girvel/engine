@@ -1,9 +1,15 @@
+local async = require("engine.tech.async")
+
+
+local sometimes = async.sometimes()
+
 local old_serialize = getmetatable(Ldump.serializer).__call
 Ldump.serializer = setmetatable({
   handlers = Ldump.serializer.handlers,
 }, {
   __call = function(self, x)
     local a, b = old_serialize(self, x)
+    sometimes:yield()
     if a then
       return a, b
     end
