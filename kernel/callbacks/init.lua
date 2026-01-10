@@ -1,19 +1,3 @@
-local systems = require("engine.systems")
-
-
-for callback_name, _ in pairs(
-  Fun.iter(systems):reduce(function(acc, system)
-    acc[system.base_callback] = true
-    return acc
-  end, {})
-) do
-  love[callback_name] = function(...)
-    if Kernel._is_active then
-      State._world:update(function(_, system) return system.base_callback == callback_name end, ...)
-    end
-  end
-end
-
 love.load = require("engine.kernel.callbacks.load")
 love.quit = require("engine.kernel.callbacks.quit")
 love.errorhandler = require("engine.kernel.callbacks.errorhandler")

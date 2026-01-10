@@ -1,6 +1,11 @@
 local saves = require "engine.kernel.saves"
 
 
+local handle_event = function(event, ...)
+  if not Kernel._is_active then return end
+  State._world:update(function(_, system) return system.base_callback == event end, ...)
+end
+
 return function()
   love.load(love.arg.parseGameArguments(arg), arg)
 
@@ -35,7 +40,7 @@ return function()
       elseif name == "keyreleased" then
         Kernel._delays[b] = nil
       end
-      love.handlers[name](a,b,c,d,e,f)
+      handle_event(name, a,b,c,d,e,f)
     end
 
     dt = love.timer.step()
@@ -45,19 +50,19 @@ return function()
     for k, v in pairs(Kernel._delays) do
       Kernel._delays[k] = math.max(0, v - dt)
       if Kernel._delays[k] == 0 then
-        love.keypressed(nil, k, true)
+        handle_event("keypressed", nil, k, true)
         Kernel._delays[k] = 1 / Kernel:get_key_rate(k)
       end
     end
 
-    love.update(dt)
+    handle_event("update", dt)
 
     if Kernel._is_active then
       love.graphics.origin()
       love.graphics.clear(love.graphics.getBackgroundColor())
     end
 
-    love.draw(dt)
+    handle_event("draw", dt)
 
     do
       local t = love.timer.getTime()
