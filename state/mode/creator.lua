@@ -138,7 +138,7 @@ creator.new = function(prev)
     _prev = prev,
     model = model,
     pane_i = pane_i,
-    is_disabled = #model <= State.player.level or not State.player:can_act(),
+    is_disabled = #model <= State.player.level or not State.player:is_free(),
   }, creator.mt)
 end
 

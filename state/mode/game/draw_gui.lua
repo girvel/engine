@@ -770,9 +770,6 @@ use_mouse = function(self)
   ui.finish_frame()
 end
 
--- NEXT FX for interacting/attacking
--- NEXT khaned scene crashes & burns if Khaned comes to help vs a boar
--- NEXT creator should be inactive when the player is in combat
 -- NEXT push/second hand attack on the second attacking click
 
 --- @param path vector[]

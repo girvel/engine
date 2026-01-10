@@ -310,8 +310,14 @@ methods.get_initiative_roll = function(self)
   return self:modify("initiative_roll", D(20) + self:get_modifier("dex"))
 end
 
+--- Whether the entity can use actions at this moment
 methods.can_act = function(self)
   return not State.runner.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
+end
+
+--- Whether the entity is free from cutscenes/combat
+methods.is_free = function(self)
+  return not State.runner.locked_entities[self] and not (State.combat and State:in_combat(self))
 end
 
 Ldump.mark(creature, {
