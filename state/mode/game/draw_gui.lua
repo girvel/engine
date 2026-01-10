@@ -705,12 +705,13 @@ use_mouse = function(self)
           max_length = 0
         end
 
-        path = not solid and api.build_path(State.player.position, position, max_length)
+        -- NEXT the last 1 movement is not rendered
+        path = api.build_path(State.player.position, position, max_length)
       end
 
       if interaction_target then
         ui.cursor("hand")
-      elseif path then
+      elseif not solid and path then
         ui.cursor("walk")
       end
 
@@ -762,7 +763,7 @@ use_mouse = function(self)
             if ok then
               actions.hand_attack:act(State.player)
             end
-          end)
+          end, path)
         end
       end
     end
@@ -770,7 +771,6 @@ use_mouse = function(self)
 end
 
 -- NEXT display movement counter
--- NEXT fix hand attack
 -- NEXT FX for interacting/attacking
 -- NEXT khaned scene crashes & burns if Khaned comes to help vs a boar
 -- NEXT creator should be inactive when the player is in combat

@@ -167,6 +167,7 @@ end
 --- @return vector[]?
 api.build_path = function(start, destination, max_length)
   destination = api.to_vector(destination)
+  if start == destination then return end
   max_length = max_length or math.huge
 
   local possible_offsets
