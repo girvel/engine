@@ -1,6 +1,6 @@
 local async = {}
 
-async.lag_threshold = .1
+async.lag_threshold = 1
 
 --- @param coroutine_ thread
 --- @param ... any

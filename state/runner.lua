@@ -164,13 +164,7 @@ methods.update = function(self, dt)
   -- State.runner:stop may change this collection
 
   for _, run in ipairs(runs_copy) do
-    if run.base_scene.lag_flag then
-      State.period:push_key(async, "lag_threshold", .5)
-    end
     async.resume(run.coroutine)
-    if run.base_scene.lag_flag then
-      State.period:pop_key(async, "lag_threshold")
-    end
 
     if coroutine.status(run.coroutine) == "dead" then
       to_remove[run] = true
