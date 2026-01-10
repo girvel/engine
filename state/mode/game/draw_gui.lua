@@ -20,7 +20,7 @@ local api         = require("engine.tech.api")
 --   internal state -> game mode fields
 
 -- Internal state
-local cost, hint, mouse_task, is_compact, open_escape_menu
+local cost, hint, mouse_task, mouse_task_path, is_compact, open_escape_menu
 
 -- Utility functions
 local action_button, set_mouse_task
@@ -46,10 +46,6 @@ draw_gui = function(self, dt)
 
   if open_escape_menu or ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
-  end
-
-  if State.debug then  -- NEXT RM
-  --   tk.popup(State.player.position, "You notice that the developer wanted to test popups, so now you have a large black box above your damned head.")
   end
 end
 
@@ -642,11 +638,17 @@ draw_suggestion = function()
 end
 
 --- @param task? fun(scene: any, characters: any)
-set_mouse_task = function(task)
+--- @param path? vector[]
+set_mouse_task = function(task, path)
   State.runner:stop(mouse_task, false, true)
   if task then
-    _, mouse_task = State.runner:run_task(task)
+    local promise
+    promise, mouse_task = State.runner:run_task(task)
+    promise:next(function()
+      mouse_task_path = nil
+    end)
   end
+  mouse_task_path = path
 end
 
 local PATH_MAX_LENGTH = 50
@@ -710,20 +712,25 @@ use_mouse = function(self)
         ui.cursor("hand")
       elseif path then
         ui.cursor("walk")
-        if State.combat then
-          render_path(path)
+      end
+
+      if State.combat then
+        if mouse_task_path then
+          render_path(mouse_task_path, true)
+        elseif path then
+          render_path(path, false)
         end
       end
 
       if path and (rmb and not solid or lmb and interaction_target) then
-        animated.add_fx("engine/assets/sprites/animations/mouse_travel", position)
+        animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
         set_mouse_task(function()
           local ok = api.follow_path(State.player, path, false, 8)
           api.rotate(State.player, position)
           if ok and interaction_target then
             actions.interact:act(State.player)
           end
-        end)
+        end, path)
       end
 
       local is_a_potential_target
@@ -762,15 +769,32 @@ use_mouse = function(self)
   ui.finish_frame()
 end
 
--- NEXT render for the current movement
 -- NEXT display movement counter
 -- NEXT bug: with movement = 0, neighbour cells still have "walk" cursor
+-- NEXT fix hand attack
+-- NEXT FX for interacting/attacking
+-- NEXT khaned scene crashes & burns if Khaned comes to help vs a boar
 
 --- @param path vector[]
-render_path = function(path)
+render_path = function(path, persistent)
+  local start_i
+  if persistent then
+    for i, e in ipairs(path) do
+      if e == State.player.position then
+        start_i = i + 1
+        goto found
+      end
+    end
+  end
+  start_i = 1
+
+  ::found::
   local px, py = State.perspective:game_to_screen(unpack(State.player.position))
-  for i, e in ipairs(path) do
+
+  for i = start_i, #path do
+    local e = path[i]
     local sx, sy = State.perspective:game_to_screen(unpack(e))
+
     local postfix
     if i == 1 and e.y - State.player.position.y == -1 then
       postfix = "vertical_part"
@@ -778,6 +802,10 @@ render_path = function(path)
       postfix = "vertical"
     else
       postfix = "horizontal"
+    end
+
+    if persistent then
+      postfix = "persistent_" .. postfix
     end
 
     ui.start_frame(math.min(px, sx), math.min(py, sy))
