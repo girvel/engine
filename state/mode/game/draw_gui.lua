@@ -662,7 +662,7 @@ use_mouse = function(self)
   end
 
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.perspective.sidebar_w)
-    ui.cursor(self.input_mode == "target" and "target_inactive" or nil)
+    if self.input_mode == "target" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
       :sub_mut(State.perspective.camera_offset)
@@ -692,6 +692,8 @@ use_mouse = function(self)
     else
       if interaction_target then
         ui.cursor("hand")
+      elseif not solid then
+        ui.cursor("walk")
       end
 
       if rmb and not solid or lmb and interaction_target then

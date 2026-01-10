@@ -75,8 +75,9 @@ local context
 --- @enum (key) ui_cursor_type
 local CURSORS = {
   normal = love.mouse.newCursor("engine/assets/sprites/gui/cursor/normal.png"),
-  target_active = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_active.png"),
-  target_inactive = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_inactive.png"),
+  target_active = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_active.png", 8, 8),
+  target_inactive = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_inactive.png", 8, 8),
+  walk = love.mouse.newCursor("engine/assets/sprites/gui/cursor/walk.png", 8, 8),
   hand = love.mouse.getSystemCursor("hand"),
 }
 
@@ -902,9 +903,10 @@ ui.mouse = function(cursor_type)
   return result
 end
 
---- @param cursor_type? ui_cursor_type
+--- @param cursor_type ui_cursor_type
 ui.cursor = function(cursor_type)
-  if not cursor_type then return end
+  local fr = context.frame
+  if not get_mouse_over(fr.x, fr.y, fr.w, fr.h) then return end
   state.cursor = cursor_type
 end
 
