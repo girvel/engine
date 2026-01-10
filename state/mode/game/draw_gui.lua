@@ -695,8 +695,7 @@ use_mouse = function(self)
     else
       -- TODO OPT cache with mouse_x, mouse_y and invalidate on tcod map changes
       --   (or maybe it would be even slower, idk)
-      local path do
-        local max_length
+      local path, max_length do
         if not State.combat then
           max_length = PATH_MAX_LENGTH
         elseif State.player:can_act() then
@@ -717,9 +716,9 @@ use_mouse = function(self)
 
       if State.combat then
         if mouse_task_path then
-          render_path(mouse_task_path, true)
+          render_path(mouse_task_path)
         elseif path then
-          render_path(path, false)
+          render_path(path, max_length)
         end
       end
 
@@ -770,15 +769,16 @@ use_mouse = function(self)
   ui.finish_frame()
 end
 
--- NEXT display movement counter
 -- NEXT FX for interacting/attacking
 -- NEXT khaned scene crashes & burns if Khaned comes to help vs a boar
 -- NEXT creator should be inactive when the player is in combat
+-- NEXT push/second hand attack on the second attacking click
 
 --- @param path vector[]
-render_path = function(path, persistent)
+--- @param max_length? integer present only if the path is planned
+render_path = function(path, max_length)
   local start_i
-  if persistent then
+  if not max_length then
     for i, e in ipairs(path) do
       if e == State.player.position then
         start_i = i + 1
@@ -804,7 +804,7 @@ render_path = function(path, persistent)
       postfix = "horizontal"
     end
 
-    if persistent then
+    if not max_length then
       postfix = "persistent_" .. postfix
     end
 
@@ -814,6 +814,15 @@ render_path = function(path, persistent)
 
     px = sx
     py = sy
+  end
+
+  if max_length then
+    local n = State.perspective.SCALE * Constants.cell_size
+    ui.start_frame(px, py, n, n)
+    ui.start_alignment("center", "bottom")
+      ui.text("%s/%s", #path, max_length)
+    ui.finish_alignment()
+    ui.finish_frame()
   end
 end
 
