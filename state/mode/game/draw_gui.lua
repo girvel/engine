@@ -704,7 +704,6 @@ use_mouse = function(self)
           max_length = 0
         end
 
-        -- NEXT the last 1 movement is not rendered
         path = api.build_path(State.player.position, position, max_length)
       end
 
@@ -786,8 +785,6 @@ use_mouse = function(self)
   ui.finish_frame()
 end
 
--- NEXT push/second hand attack on the second attacking click
-
 --- @param path vector[]
 --- @param max_length? integer present only if the path is planned
 render_path = function(path, max_length)
@@ -832,7 +829,7 @@ render_path = function(path, max_length)
 
   if max_length then
     local n = State.perspective.SCALE * Constants.cell_size
-    ui.start_frame(px, py, n, n)
+    ui.start_frame(px, py, n, n - 4)
     ui.start_alignment("center", "bottom")
       ui.text("%s/%s", #path, max_length)
     ui.finish_alignment()

@@ -192,7 +192,7 @@ api.build_path = function(start, destination, max_length)
     if p == start then return end
     if State.grids.solids:can_fit(p) then
       path = State._travel_map:find_path(start, destination + d)
-      if #path > 0 and #path < max_length then
+      if #path > 0 and #path <= max_length then
         return path
       end
     end
