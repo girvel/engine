@@ -650,6 +650,7 @@ set_mouse_task = function(task)
 end
 
 local PATH_MAX_LENGTH = 50
+local render_path
 
 use_mouse = function(self)
   if ui.mousedown(1) then
@@ -692,11 +693,26 @@ use_mouse = function(self)
     else
       -- TODO OPT cache with mouse_x, mouse_y and invalidate on tcod map changes
       --   (or maybe it would be even slower, idk)
-      local path = not solid and api.build_path(State.player.position, position, PATH_MAX_LENGTH)
+      local path do
+        local max_length
+        if not State.combat then
+          max_length = PATH_MAX_LENGTH
+        elseif State.player:can_act() then
+          max_length = State.player.resources.movement
+        else
+          max_length = 0
+        end
+
+        path = not solid and api.build_path(State.player.position, position, max_length)
+      end
+
       if interaction_target then
         ui.cursor("hand")
       elseif path then
         ui.cursor("walk")
+        if State.combat then
+          render_path(path)
+        end
       end
 
       if path and (rmb and not solid or lmb and interaction_target) then
@@ -744,6 +760,33 @@ use_mouse = function(self)
       end
     end
   ui.finish_frame()
+end
+
+-- NEXT render for the current movement
+-- NEXT display movement counter
+-- NEXT bug: with movement = 0, neighbour cells still have "walk" cursor
+
+--- @param path vector[]
+render_path = function(path)
+  local px, py = State.perspective:game_to_screen(unpack(State.player.position))
+  for i, e in ipairs(path) do
+    local sx, sy = State.perspective:game_to_screen(unpack(e))
+    local postfix
+    if i == 1 and e.y - State.player.position.y == -1 then
+      postfix = "vertical_part"
+    elseif px - sx == 0 then
+      postfix = "vertical"
+    else
+      postfix = "horizontal"
+    end
+
+    ui.start_frame(math.min(px, sx), math.min(py, sy))
+      ui.image(("engine/assets/sprites/gui/path_%s.png"):format(postfix))
+    ui.finish_frame()
+
+    px = sx
+    py = sy
+  end
 end
 
 Ldump.mark(draw_gui, {}, ...)
