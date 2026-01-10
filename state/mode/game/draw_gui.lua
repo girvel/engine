@@ -47,6 +47,10 @@ draw_gui = function(self, dt)
   if open_escape_menu or ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
   end
+
+  if State.debug then  -- NEXT RM
+  --   tk.popup(State.player.position, "You notice that the developer wanted to test popups, so now you have a large black box above your damned head.")
+  end
 end
 
 draw_curtain = function()
@@ -197,6 +201,10 @@ draw_keyboard_action_grid = function(self)
     do
       local journal_image = State.quests.has_new_content and gui.journal or gui.journal_inactive
       local button = ui.key_button(journal_image, "j")
+      if State.quests.has_new_content then
+        ui.offset(-64)
+        tk.highlight()
+      end
       if button.is_clicked then
         State.mode:open_menu("journal")
       end
@@ -207,13 +215,16 @@ draw_keyboard_action_grid = function(self)
     ui.offset(4)
 
     do
-      local creator_image = (
-        State.player.xp >= xp.to_reach(State.player.level + 1)
+      local is_active = State.player.xp >= xp.to_reach(State.player.level + 1)
+      local button = ui.key_button(
+        is_active
           and gui.creator
-          or gui.creator_inactive
+          or gui.creator_inactive, "n"
       )
-
-      local button = ui.key_button(creator_image, "n")
+      if is_active then
+        ui.offset(-64)
+        tk.highlight()
+      end
       if button.is_clicked then
         State.mode:open_menu("creator")
       end
@@ -506,14 +517,12 @@ draw_line = function(line)
   local text = line.text
   ui.start_frame()
   ui.start_line()
-    local offset = 0
     if line.source then
       local name = Name.game(line.source)
       ui.start_color(line.source.sprite.color)
         ui.text(name)
       ui.finish_color()
       ui.text(": ")
-      offset = offset + name:utf_len() + 2
     end
 
     do
@@ -532,15 +541,12 @@ draw_line = function(line)
         ui.start_color(color)
           ui.text(highlighted)
         ui.finish_color()
-        offset = offset + highlighted:utf_len()
         text = text:sub(j + 1)
       end
     end
-
-    text = (" " * offset) .. text
+    ui.text(text)
   ui.finish_line()
   ui.finish_frame()
-  ui.text(text)
 
   if ui.keyboard("space") or ui.mousedown_anywhere(1) then
     State.player.hears = nil
