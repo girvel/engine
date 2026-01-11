@@ -9,6 +9,7 @@ local kernel = {}
 --- @field frame_n integer
 --- @field cpu_time number
 --- @field start_time number
+--- @field screenshot love.Canvas
 local methods = {}
 local mt = {__index = methods}
 
@@ -21,6 +22,7 @@ kernel.new = function()
     cpu_time = 0,
     start_time = 0,
     _is_active = false,
+    screenshot = love.graphics.newCanvas(),
   }, mt)
 end
 

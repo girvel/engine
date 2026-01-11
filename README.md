@@ -17,7 +17,7 @@
 ```bash
 git init
 git submodule add https://github.com/girvel/engine
-echo 'require("engine/kernel/main.lua")' | tee main.lua
+echo 'require("engine.kernel.main")' | tee main.lua
 love .
 ```
 

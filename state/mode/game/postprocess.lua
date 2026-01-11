@@ -10,7 +10,7 @@ local postprocess = function(self, dt)
     love.graphics.draw(self._main_canvas, unpack(-State.perspective.camera_offset))
   end
 
-  love.graphics.setCanvas()
+  love.graphics.setCanvas(Kernel.screenshot)
   if State.player.is_memory_enabled then
     love.graphics.setShader(memory.love_shader)
     love.graphics.draw(State.player.memory, unpack(State.perspective.camera_offset))

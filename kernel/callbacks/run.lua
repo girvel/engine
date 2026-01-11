@@ -1,3 +1,4 @@
+local memory = require("engine.tech.shaders.memory")
 local saves = require "engine.kernel.saves"
 
 
@@ -21,7 +22,9 @@ return function()
         saves.write(State, Kernel._save)
       end)
       Kernel._save = nil
+      Kernel._delays = {}
     end
+    --- NEXT manual saves don't work
 
     if serialization_coroutine then
       love.event.pump()
@@ -33,6 +36,10 @@ return function()
 
       love.graphics.origin()
       love.graphics.clear()
+        love.graphics.setShader(memory.love_shader)
+          love.graphics.draw(Kernel.screenshot)
+        love.graphics.setShader()
+
         love.graphics.print("Saving" .. "." * math.floor((love.timer.getTime() * 4) % 4), 100, 100)
       love.graphics.present()
 
@@ -88,11 +95,21 @@ return function()
     handle_event("update", dt)
 
     if Kernel._is_active then
+      if V(love.graphics.getDimensions()) ~= V(Kernel.screenshot:getDimensions()) then
+        Kernel.screenshot = love.graphics.newCanvas()
+      end
+
+      love.graphics.setCanvas(Kernel.screenshot)
       love.graphics.origin()
       love.graphics.clear(love.graphics.getBackgroundColor())
     end
 
     handle_event("draw", dt)
+
+    if Kernel._is_active then
+      love.graphics.setCanvas()
+      love.graphics.draw(Kernel.screenshot)
+    end
 
     do
       local t = love.timer.getTime()
