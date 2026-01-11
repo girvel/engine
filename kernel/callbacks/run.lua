@@ -14,17 +14,34 @@ return function()
   local dt = 0
   local KEY_REPETITION_DELAY = .3
   local serialization_coroutine
+  local coroutine_type
 
   Kernel.start_time = love.timer.getTime()
   return function()
     if Kernel._save then
+      local path = Kernel._save  --[[@as string]]
       serialization_coroutine = coroutine.create(function()
-        saves.write(State, Kernel._save)
+        saves.write(State, path)
       end)
+
+      coroutine_type = "сохранение"
       Kernel._save = nil
       Kernel._delays = {}
+
+    elseif Kernel._load then
+      local path = Kernel._load  --[[@as string]]
+      serialization_coroutine = coroutine.create(function()
+        State = saves.read(path)  --[[@as state]]
+        if State.mode._mode.type == "escape_menu" then
+          State.mode:close_menu()
+        end
+        State.runner:handle_loading()
+      end)
+
+      coroutine_type = "загрузка"
+      Kernel._load = nil
+      Kernel._delays = {}
     end
-    --- NEXT manual saves don't work
 
     if serialization_coroutine then
       love.event.pump()
@@ -40,7 +57,7 @@ return function()
           love.graphics.draw(Kernel.screenshot)
         love.graphics.setShader()
 
-        love.graphics.print("Saving" .. "." * math.floor((love.timer.getTime() * 4) % 4), 100, 100)
+        love.graphics.print(coroutine_type:utf_capitalize() .. "." * math.floor((love.timer.getTime() * 4) % 4), 100, 100)
       love.graphics.present()
 
       coroutine.resume(serialization_coroutine)
@@ -50,17 +67,6 @@ return function()
       else
         return
       end
-    end
-
-    if Kernel._load then
-      local t = love.timer.getTime()
-        State = saves.read(Kernel._load)  --[[@as state]]
-        if State.mode._mode.type == "escape_menu" then
-          State.mode:close_menu()
-        end
-        Kernel._load = nil
-        State.runner:handle_loading()
-      Kernel.cpu_time = math.max(Kernel.cpu_time - (love.timer.getTime() - t))
     end
 
     Kernel._is_active = love.window.isVisible()

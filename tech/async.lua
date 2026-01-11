@@ -37,20 +37,22 @@ end
 
 --- @class async_sometimes
 --- @field counter integer
+--- @field k integer
 --- @field last_t number
 local sometimes_methods = {}
 async.sometimes_mt = {__index = sometimes_methods}
 
-async.sometimes = function()
+async.sometimes = function(k)
   return setmetatable({
     counter = 0,
+    k = k or 100,
     last_t = love.timer.getTime(),
   }, async.sometimes_mt)
 end
 
 sometimes_methods.yield = function(self, ...)
   self.counter = self.counter + 1
-  if self.counter % 100 ~= 0 then return end
+  if self.counter % self.k ~= 0 then return end
 
   local now = love.timer.getTime()
   if now - self.last_t >= Constants.yield_period then

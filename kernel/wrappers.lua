@@ -2,6 +2,8 @@ local async = require("engine.tech.async")
 
 
 local sometimes = async.sometimes()
+local sometimes_deser = async.sometimes(1)
+local counter = 0
 
 local old_serialize = getmetatable(Ldump.serializer).__call
 Ldump.serializer = setmetatable({
@@ -11,6 +13,15 @@ Ldump.serializer = setmetatable({
     local a, b = old_serialize(self, x)
     sometimes:yield()
     if a then
+      if type(a) == "function" then
+        counter = counter + 1
+        if counter % 50 == 0 then
+          return function()
+            sometimes_deser:yield()
+            return a()
+          end
+        end
+      end
       return a, b
     end
 
