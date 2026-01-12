@@ -295,6 +295,9 @@ end
 --- @param self entity
 --- @return d
 methods.get_ranged_attack_roll = function(self, slot)
+  -- TODO already knows the slot => kind of excessive
+  --   maybe a good generalized version of this method (+ damage method) is :get_attack_roll(item)?
+  --   also redo the modification signature
   return self:modify("attack_roll", D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level), slot)
 end
 

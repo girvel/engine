@@ -160,8 +160,21 @@ fighter.fighting_styles.archery = {
 
   modify_attack_roll = function(self, entity, roll, slot)
     local weapon = entity.inventory[slot]
-    Log.tracel(weapon)
     if weapon and weapon.tags.ranged then
+      return roll + 2
+    end
+    return roll
+  end,
+}
+
+fighter.fighting_styles.duelist = {
+  name = "Дуэлянт",
+  description = "+2 к урону единственным одноручным оружием",
+  codename = "duelist",
+
+  modify_damage_roll = function(self, entity, roll, slot)
+    local other_weapon = entity.inventory[slot == "hand" and "offhand" or "hand"]
+    if not other_weapon or not other_weapon.damage_roll then
       return roll + 2
     end
     return roll
