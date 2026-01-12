@@ -19,6 +19,7 @@ local STATES = {
   creator = require("engine.state.mode.creator"),
   warning = require("engine.state.mode.warning"),
   confirmation = require("engine.state.mode.confirmation"),
+  appearance_editor = require("engine.state.mode.appearance_editor"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -78,7 +79,7 @@ methods.start_game_finish = function(self)
   self:_set_mode(STATES.game.new())
 end
 
---- @param kind "escape_menu"|"journal"|"creator"|"save_menu"|"load_menu"
+--- @param kind "escape_menu"|"journal"|"creator"|"save_menu"|"load_menu"|"appearance_editor"
 methods.open_menu = function(self, kind)
   Log.info("Opening %s", kind)
   if kind == "journal" or kind == "creator" then
