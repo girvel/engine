@@ -187,6 +187,19 @@ methods.set = function(self, value)
   return self
 end
 
+--- @param ... integer
+methods.assign_reroll = function(self, ...)
+  for i = 1, select("#", ...) do
+    local to_reroll = select(i, ...)
+    for _, die in ipairs(self.dice) do
+      if not Table.contains(die.reroll, to_reroll) then
+        table.insert(die.reroll, to_reroll)
+      end
+    end
+  end
+  return self
+end
+
 --- @generic T: d
 --- @param self T
 --- @return T

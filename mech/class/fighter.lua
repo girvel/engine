@@ -181,5 +181,22 @@ fighter.fighting_styles.duelist = {
   end,
 }
 
+fighter.fighting_styles.great_weapon_master = {
+  name = "Бой двуручным оружием",
+  description = "Увеличенный средний урон двуручным оружием",
+  codename = "great_weapon_master",
+
+  modify_damage_roll = function(self, entity, roll, slot)
+    if slot ~= "hand" then return roll end
+
+    local hand = entity.inventory.hand
+    local offhand = entity.inventory.offhand
+    if hand and not offhand and (hand.tags.two_handed or hand.tags.versatile) then
+      return roll:assign_reroll(1, 2)
+    end
+    return roll
+  end,
+}
+
 Ldump.mark(fighter, "const", ...)
 return fighter
