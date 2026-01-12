@@ -57,5 +57,25 @@ feats.dual_wielder = {
   end,
 }
 
+-- NEXT creator: include into bonus, HP calculations
+-- NEXT (move) 4th level 
+feats.durable = {
+  name = "Стойкий",
+  codename = "durable",
+  description = "+1 к Телосложению, перевязывание ран работает стабильнее",
+
+  modify_hit_dice_result = function(self, entity, value)
+    local con = entity:get_modifier("con")
+    return math.max(con * 2, value)
+  end,
+
+  modify_ability_score = function(self, entity, score, ability)
+    if ability == "con" then
+      return score + 1
+    end
+    return score
+  end,
+}
+
 Ldump.mark(feats, "const", ...)
 return feats

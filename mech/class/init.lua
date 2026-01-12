@@ -42,7 +42,8 @@ class.hit_dice = Memoize(function(die, is_base)
 
     _act = function(self, entity)
       self.sounds:play_at(entity.position)
-      health.heal(entity, (D(die) + entity:get_modifier("con")):roll())
+      local to_heal_raw = (D(die) + entity:get_modifier("con")):roll()
+      health.heal(entity, entity:modify("hit_dice_result", to_heal_raw))
       return true
     end,
   }, action.base)

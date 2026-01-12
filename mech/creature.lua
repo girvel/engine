@@ -58,6 +58,7 @@ end
 --- | '"saving_throw"'
 --- | '"light"'
 --- | '"additional_actions"'
+--- | '"hit_dice_result"'
 
 --- @param self entity
 --- @param modname creature_modification
