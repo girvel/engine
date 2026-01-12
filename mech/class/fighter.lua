@@ -153,9 +153,19 @@ fighter.fighting_styles.defence = {
   end,
 }
 
-fighter.fighting_styles_list = {
-  fighter.fighting_styles.two_weapon_fighting,
-  fighter.fighting_styles.defence,
+fighter.fighting_styles.archery = {
+  name = "Стрельба",
+  description = "+10% к попаданию дальнобойным оружием",
+  codename = "archery",
+
+  modify_attack_roll = function(self, entity, roll, slot)
+    local weapon = entity.inventory[slot]
+    Log.tracel(weapon)
+    if weapon and weapon.tags.ranged then
+      return roll + 2
+    end
+    return roll
+  end,
 }
 
 Ldump.mark(fighter, "const", ...)

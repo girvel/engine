@@ -6,7 +6,10 @@ local ui = require("engine.tech.ui")
 
 local fighter = {}
 
-local FIGHTING_STYLES = fighter_class.fighting_styles_list
+local FIGHTING_STYLES = Fun.pairs(fighter_class.fighting_styles)
+  :map(function(k, v) return v end)
+  :totable()
+table.sort(FIGHTING_STYLES, function(a, b) return Name.game(a) < Name.game(b) end)
 
 local _SAMURAI_SKILLS = {
   class.skill_proficiency("performance"),

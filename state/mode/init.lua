@@ -133,6 +133,7 @@ end
 --- @param message string
 --- @param f fun()
 methods.confirm = function(self, message, f)
+  ui.reset_selection()
   self:_set_mode(STATES.confirmation.new(self._mode, message, f))
 end
 

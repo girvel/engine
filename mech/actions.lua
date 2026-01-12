@@ -378,7 +378,7 @@ actions.bow_attack = function(target)
           return
         end
 
-        local attack_roll = entity:get_ranged_attack_roll()
+        local attack_roll = entity:get_ranged_attack_roll("offhand")
         local damage_roll = entity:get_ranged_damage_roll()
 
         self.sounds:play_at(entity.position, "medium")

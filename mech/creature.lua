@@ -294,8 +294,8 @@ end
 
 --- @param self entity
 --- @return d
-methods.get_ranged_attack_roll = function(self)
-  return self:modify("attack_roll", D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level))
+methods.get_ranged_attack_roll = function(self, slot)
+  return self:modify("attack_roll", D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level), slot)
 end
 
 --- @param self entity
