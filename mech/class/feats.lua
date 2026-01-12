@@ -76,5 +76,15 @@ feats.durable = {
   end,
 }
 
+feats.tough = {
+  name = "Крепкий",
+  codename = "tough",
+  description = "+2 ХП за уровень",
+
+  modify_max_hp = function(self, entity, value)
+    return value + entity.level * 2
+  end,
+}
+
 Ldump.mark(feats, "const", ...)
 return feats

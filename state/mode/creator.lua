@@ -377,11 +377,13 @@ draw_pane = function(self, dt)
   local con_mod = abilities.get_modifier(
     self.model[0].base_abilities.con + self:get_bonus("con")
   )
+  local is_tough = self:has_feat(feats.tough)
+  local tough_bonus = is_tough and 2 or 0
 
   local prev_hp = 0
   for i = 1, self.pane_i - 1 do
     local this_data = self.model[i]
-    prev_hp = prev_hp + con_mod + (
+    prev_hp = prev_hp + con_mod + tough_bonus + (
       i == 1
         and this_data.class.hit_die
         or math.floor(data.class.hit_die / 2) + 1
@@ -393,8 +395,13 @@ draw_pane = function(self, dt)
     or (math.floor(data.class.hit_die / 2) + 1)
 
   ui.text(
-    "  %d + %d %s %d (Телосложение) = %d здоровья",
-    prev_hp, hp_bonus, con_mod >= 0 and "+" or "-", math.abs(con_mod), prev_hp + hp_bonus + con_mod
+    "  %d + %d %s %d (Телосложение)%s = %d здоровья",
+    prev_hp,
+    hp_bonus,
+    con_mod >= 0 and "+" or "-",
+    math.abs(con_mod),
+    is_tough and "+ 2 (Крепкий)" or "",
+    prev_hp + hp_bonus + con_mod + tough_bonus
   )
   ui.br()
 
@@ -500,10 +507,14 @@ methods.get_bonus = function(self, ability)
     bonus = data.bonus_plus2 == name and 2 or 0
   end
 
-  if data.race ~= races.human and data.feat == feats.durable and ability == "con" then
+  if self:has_feat(feats.durable) and ability == "con" then
     bonus = bonus + 1
   end
   return bonus
+end
+
+methods.has_feat = function(self, feat)
+  return self.model[0].race ~= races.human and self.model[0].feat == feat
 end
 
 
