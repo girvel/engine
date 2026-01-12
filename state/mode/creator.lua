@@ -489,14 +489,21 @@ end
 methods.get_bonus = function(self, ability)
   local name = translation.abilities[ability]:utf_capitalize()
   local data = self.model[0]
+
+  local bonus
   if data.race == races.human then
-    return 1
+    bonus = 1
   elseif data.race == races.variant_human then
-    return (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
+    bonus = (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
       and 1 or 0
   else
-    return data.bonus_plus2 == name and 2 or 0
+    bonus = data.bonus_plus2 == name and 2 or 0
   end
+
+  if data.race ~= races.human and data.feat == feats.durable and ability == "con" then
+    bonus = bonus + 1
+  end
+  return bonus
 end
 
 

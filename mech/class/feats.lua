@@ -57,7 +57,6 @@ feats.dual_wielder = {
   end,
 }
 
--- NEXT creator: include into bonus, HP calculations
 -- NEXT (move) 4th level 
 feats.durable = {
   name = "Стойкий",
