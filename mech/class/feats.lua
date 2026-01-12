@@ -37,6 +37,28 @@ feats.great_weapon_master = {
   end,
 }
 
+feats.sharpshooter = {
+  name = "Меткий стрелок",
+  codename = "sharpshooter",
+  description = "Шанс попадания дальнобойным оружием меньше на 25%, урон выше на 10",
+
+  modify_attack_roll = function(self, entity, roll, slot)
+    local item = entity.inventory[slot]
+    if item and item.tags.ranged then
+      return roll - 5
+    end
+    return roll
+  end,
+
+  modify_damage_roll = function(self, entity, roll, slot)
+    local item = entity.inventory[slot]
+    if item and item.tags.ranged then
+      return roll + 10
+    end
+    return roll
+  end,
+}
+
 feats.dual_wielder = {
   name = "Мастер двух оружий",
   codename = "dual_wielder",

@@ -296,7 +296,7 @@ end
 --- @param self entity
 --- @return d
 methods.get_ranged_attack_roll = function(self, slot)
-  -- TODO already knows the slot => kind of excessive
+  -- NEXT already knows the slot => kind of excessive
   --   maybe a good generalized version of this method (+ damage method) is :get_attack_roll(item)?
   --   also redo the modification signature
   return self:modify("attack_roll", D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level), slot)
@@ -306,7 +306,7 @@ end
 --- @return d
 methods.get_ranged_damage_roll = function(self)
   local bow = assert(self.inventory.offhand)
-  return bow.damage_roll + (bow.bonus or 0) + self:get_modifier("dex")
+  return self:modify("damage_roll", bow.damage_roll + (bow.bonus or 0) + self:get_modifier("dex"), "offhand")
 end
 
 --- @param self entity
