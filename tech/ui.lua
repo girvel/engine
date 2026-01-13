@@ -589,7 +589,7 @@ ui.key_button = function(image, key, is_disabled)
   if is_disabled then
     result.is_clicked = false
   else
-    result.is_clicked = result.is_clicked or Table.contains(input.keyboard.pressed, key)
+    result.is_clicked = result.is_clicked or ui.keyboard(key)
   end
 
   if result.is_mouse_over and not is_disabled then
@@ -709,11 +709,12 @@ ui.field = function(container, key)
   ui.text("%s%s", container[key], is_selected and state.time % 2 >= 1 and "█" or " ")
   if is_selected then
     container[key] = container[key] .. input.keyboard.input
-    if Table.contains(input.keyboard.pressed, "backspace") then
+    if input.keyboard.pressed.backspace then
       container[key] = container[key]:utf_sub(1, -2)
+      input.keyboard.pressed.backspace = nil
     end
     for char in input.keyboard.input:gmatch(".") do
-      Table.remove(input.keyboard.pressed, char)
+      input.keyboard.pressed[char] = nil
     end
   end
 end
@@ -873,7 +874,9 @@ end
 --- @return boolean
 ui.keyboard = function(...)
   for i = 1, select("#", ...) do
-    if Table.contains(input.keyboard.pressed, select(i, ...)) then
+    local key = select(i, ...)
+    if input.keyboard.pressed[key] then
+      input.keyboard.pressed[key] = nil
       return true
     end
   end
@@ -935,7 +938,7 @@ ui.handle_keypress = function(key)
     state.selection.is_pressed = true
   end
 
-  table.insert(input.keyboard.pressed, key)
+  input.keyboard.pressed[key] = true
 end
 
 ui.handle_textinput = function(text)

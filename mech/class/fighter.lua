@@ -140,7 +140,6 @@ fighter.fighting_styles.two_weapon_fighting = {
   end,
 }
 
--- NEXT 1 + esc opens esc menu
 -- NEXT Likka is attackable in cp1
 
 fighter.fighting_styles.defence = {

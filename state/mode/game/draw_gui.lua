@@ -44,7 +44,7 @@ draw_gui = function(self, dt)
   draw_suggestion()
   use_mouse(self)
 
-  if open_escape_menu or ui.keyboard("escape") then
+  if ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
   end
 end
@@ -181,7 +181,7 @@ draw_keyboard_action_grid = function(self)
     do
       local button = ui.key_button(gui.escape_menu, "escape")
       if button.is_clicked then
-        open_escape_menu = true
+        State.mode:open_menu("escape_menu")
       end
       if button.is_mouse_over then
         hint = "меню"
