@@ -91,7 +91,7 @@ tk.draw_entity = function(entity, x, y, scale)
   love.graphics.draw(entity.sprite.image, x, y, entity.rotation or 0, scale)
 
   if entity.inventory then
-    display_slot("tatoo")
+    display_slot("skin")
     display_slot("hair")
     display_slot("body")
     display_slot("head")

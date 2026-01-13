@@ -17,6 +17,12 @@ local HAIR_COLORS = {
 }
 -- NEXT same idiom for abilities in creator
 
+local SKIN = {
+  {codename = "none", name = "(Нет)"},
+  {codename = "cheek_scar", name = "Шрам на щеке"},
+  {codename = "snake_tatoo", name = "Татуировка змеи"},
+}
+
 local appearance_editor = {}
 
 --- @class state_mode_appearance_editor
@@ -32,9 +38,10 @@ appearance_editor.new = function(prev)
     type = "appearance_editor",
     _prev = prev,
     model = {
+      name = "Протагонист",
       hair_type = HAIR_TYPES[1],
       hair_color = HAIR_COLORS[2],
-      name = "Протагонист",
+      skin = SKIN[1],
     },
   }, appearance_editor.mt)
 end
@@ -42,6 +49,11 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
+  -- NEXT wasd rotation
+  -- if State.player.direction ~= Vector.left then
+  --   State.player:rotate(Vector.left)
+  -- end
+
   tk.start_window("center", "center", 780, 700)
     ui.h1("Внешность")
 
@@ -67,19 +79,38 @@ methods.draw_gui = function(self, dt)
         ui.text("Цвет волос:")
         local hair_color_changed = ui.switch(HAIR_COLORS, self.model, "hair_color")
       ui.finish_line()
+
+      ui.start_line()
+        ui.selector()
+        ui.text("Кожа:")
+        local skin_changed = ui.switch(SKIN, self.model, "skin")
+      ui.finish_line()
     ui.finish_font()
     ui.finish_frame()
 
+    local inventory = State.player.inventory
     if hair_type_changed or hair_color_changed then
-      local inventory = State.player.inventory
       local hair_type = self.model.hair_type.codename
       local hair_color = self.model.hair_color.codename
 
       if inventory.hair then
         State:remove(inventory.hair, true)
       end
+
       inventory.hair = hair_type ~= "none"
         and State:add(items_entities.hair(hair_type, hair_color))
+        or nil
+    end
+
+    if skin_changed then
+      local skin = self.model.skin.codename
+
+      if inventory.skin then
+        State:remove(inventory.skin, true)
+      end
+
+      inventory.skin = skin ~= "none"
+        and State:add(items_entities.skin(skin))
         or nil
     end
   tk.finish_window()
