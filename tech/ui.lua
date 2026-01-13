@@ -28,6 +28,7 @@ local state = {
     is_pressed = false,
   },
   cursor = nil,
+  time = love.timer.getTime(),
 
   active_frames_t = CompositeMap.new("weak"),
   are_pressed = CompositeMap.new("weak"),
@@ -704,16 +705,16 @@ end
 --- @param container table
 --- @param key any
 ui.field = function(container, key)
-  state.selection.max_i = state.selection.max_i + 1
-
-  if state.selection.i == state.selection.max_i then
+  local is_selected = state.selection.i == state.selection.max_i
+  ui.text("%s%s", container[key], is_selected and state.time % 2 >= 1 and "█" or " ")
+  if is_selected then
     container[key] = container[key] .. input.keyboard.input
     if Table.contains(input.keyboard.pressed, "backspace") then
       container[key] = container[key]:utf_sub(1, -2)
     end
-    ui.text("> " .. container[key])
-  else
-    ui.text(". " .. container[key])
+    for char in input.keyboard.input:gmatch(".") do
+      Table.remove(input.keyboard.pressed, char)
+    end
   end
 end
 
@@ -962,6 +963,7 @@ ui.handle_update = function(dt)
     end
     state.active_frames_t:set(next_v, unpack(k))
   end
+  state.time = love.timer.getTime()
 end
 
 ----------------------------------------------------------------------------------------------------

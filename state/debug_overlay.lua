@@ -181,8 +181,11 @@ local input = {value = ""}
 
 report_console = function()
   ui.br()
-  ui.text("[F6] Console")
-  ui.field(input, "value")
+  ui.text("[F6] Console:")
+  ui.start_line()
+    ui.selector()
+    ui.field(input, "value")
+  ui.finish_line()
 
   if ui.keyboard("return") then
     command(input.value)

@@ -34,6 +34,7 @@ appearance_editor.new = function(prev)
     model = {
       hair_type = HAIR_TYPES[1],
       hair_color = HAIR_COLORS[2],
+      name = "Протагонист",
     },
   }, appearance_editor.mt)
 end
@@ -49,6 +50,12 @@ methods.draw_gui = function(self, dt)
 
     ui.start_frame(256)
     ui.start_font(24)
+      ui.start_line()
+        ui.selector()
+        ui.text("Имя:  ")
+        ui.field(self.model, "name")
+      ui.finish_line()
+
       ui.start_line()
         ui.selector()
         ui.text("Тип волос:")
