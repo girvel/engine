@@ -4,6 +4,10 @@ local name = {}
 local NO_ENTITY = "<none>"
 local NO_NAME = "<no name>"
 
+--- @class name_pair
+--- @field name string
+--- @field codename string
+
 --- Get best possible in-game naming; prefers .name, then .codename, then the default value
 --- @param entity entity?
 --- @param ... any default value

@@ -15,10 +15,9 @@ local HAIR_COLORS = {
   {codename = "gray", name = "Седеющий"},
   {codename = "brown", name = "Русый"},
 }
--- NEXT same idiom for abilities in creator
 
 local SKIN = {
-  {codename = "none", name = "(Нет)"},
+  {codename = "none", name = "Чистая"},
   {codename = "cheek_scar", name = "Шрам на щеке"},
   {codename = "snake_tatoo", name = "Татуировка змеи"},
 }

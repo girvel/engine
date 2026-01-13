@@ -18,9 +18,9 @@ local creator = {}
 --- @field race table
 --- @field skill_1 table
 --- @field skill_2 table
---- @field bonus_plus1_1 string
---- @field bonus_plus1_2 string
---- @field bonus_plus2 string
+--- @field bonus_plus1_1 name_pair
+--- @field bonus_plus1_2 name_pair
+--- @field bonus_plus2 name_pair
 --- @field feat table
 
 --- @alias creator_pane creator_pane_strict|table
@@ -41,7 +41,10 @@ local methods = {}
 creator.mt = {__index = methods}
 
 local ABILITIES = Fun.iter(abilities.list)
-  :map(function(ability) return assert(translation.abilities[ability]):utf_capitalize() end)
+  :map(function(codename) return {
+    codename = codename,
+    name = assert(translation.abilities[codename]):utf_capitalize()
+  } end)
   :totable()
 
 local SKILLS = Fun.iter(abilities.skill_bases)
@@ -215,7 +218,7 @@ end
 draw_base_pane = function(self, dt)
   local data = self.model[0]
   local column1_length = Fun.iter(ABILITIES)
-    :map(function(name) return name:utf_len() end)
+    :map(function(ab) return ab.name:utf_len() end)
     :max()
 
   local column2_length = 16
@@ -228,11 +231,13 @@ draw_base_pane = function(self, dt)
   ui.text("  " .. header)
   ui.text("  " .. "-" * header:utf_len())
 
-  for _, ability_name in ipairs(abilities.list) do
+  for _, ability in ipairs(ABILITIES) do
     ui.start_line()
-      local name = translation.abilities[ability_name]:utf_capitalize()
-      local raw_score = data.base_abilities[ability_name]
-      local bonus = self:get_bonus(ability_name)
+      local codename = ability.codename
+      local name = ability.name
+
+      local raw_score = data.base_abilities[codename]
+      local bonus = self:get_bonus(codename)
       local score = raw_score + bonus
       local modifier = abilities.get_modifier(score)
 
@@ -268,12 +273,12 @@ draw_base_pane = function(self, dt)
         data.points = data.points + (
           xp.point_buy[raw_score] - xp.point_buy[raw_score - 1]
         )
-        data.base_abilities[ability_name] = raw_score - 1
+        data.base_abilities[codename] = raw_score - 1
       elseif right_button then
         data.points = data.points - (
           xp.point_buy[raw_score + 1] - xp.point_buy[raw_score]
         )
-        data.base_abilities[ability_name] = raw_score + 1
+        data.base_abilities[codename] = raw_score + 1
       end
     ui.finish_line()
   end
@@ -421,14 +426,11 @@ submit = function(self)
       table.insert(perks, races.human.ability_bonus)
     elseif data.race == races.custom_lineage then
       table.insert(perks, data.feat)
-      table.insert(perks, races.custom_lineage:ability_bonus(
-        Table.key_of(translation.abilities, data.bonus_plus2:utf_lower())
-      ))
+      table.insert(perks, races.custom_lineage:ability_bonus(data.bonus_plus2.codename))
     elseif data.race == races.variant_human then
       table.insert(perks, data.feat)
       table.insert(perks, races.variant_human:ability_bonus(
-        Table.key_of(translation.abilities, data.bonus_plus1_1:utf_lower()),
-        Table.key_of(translation.abilities, data.bonus_plus1_2:utf_lower())
+        data.bonus_plus1_1.codename, data.bonus_plus1_2.codename
       ))
     else
       assert(false)
@@ -494,17 +496,16 @@ end
 
 --- @param ability ability
 methods.get_bonus = function(self, ability)
-  local name = translation.abilities[ability]:utf_capitalize()
   local data = self.model[0]
 
   local bonus
   if data.race == races.human then
     bonus = 1
   elseif data.race == races.variant_human then
-    bonus = (data.bonus_plus1_1 == name or data.bonus_plus1_2 == name)
+    bonus = (data.bonus_plus1_1.codename == ability or data.bonus_plus1_2.codename == ability)
       and 1 or 0
   else
-    bonus = data.bonus_plus2 == name and 2 or 0
+    bonus = data.bonus_plus2.codename == ability and 2 or 0
   end
 
   if self:has_feat(feats.durable) and ability == "con" then
