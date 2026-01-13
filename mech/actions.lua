@@ -183,7 +183,7 @@ actions.hand_attack = Table.extend({
   get_hint = function(self, entity)
     return ("%s (%s)"):format(
       Name.game(self),
-      entity:get_melee_damage_roll("hand"):simplified()
+      entity:get_damage_roll("hand"):simplified()
     )
   end,
 }, action.base)
@@ -215,7 +215,7 @@ actions.offhand_attack = Table.extend({
   get_hint = function(self, entity)
     return ("%s (%s)"):format(
       Name.game(self),
-      entity:get_melee_damage_roll("offhand"):simplified()
+      entity:get_damage_roll("offhand"):simplified()
     )
   end,
 }, action.base)
@@ -305,8 +305,8 @@ base_attack = function(entity, slot)
     if not health.attack(
       entity,
       target,
-      entity:get_melee_attack_roll(slot),
-      entity:get_melee_damage_roll(slot)
+      entity:get_attack_roll(slot),
+      entity:get_damage_roll(slot)
     ) then return end
 
     if target and target.sounds and target.sounds.hit then
@@ -332,7 +332,7 @@ actions.bow_attack_base = Table.extend({
   get_hint = function(self, entity)
     return ("%s (%s)"):format(
       Name.game(self),
-      entity:get_ranged_damage_roll():simplified()
+      entity:get_damage_roll("offhand"):simplified()
     )
   end
 }, action.base)
@@ -378,8 +378,8 @@ actions.bow_attack = function(target)
           return
         end
 
-        local attack_roll = entity:get_ranged_attack_roll("offhand")
-        local damage_roll = entity:get_ranged_damage_roll()
+        local attack_roll = entity:get_attack_roll("offhand")
+        local damage_roll = entity:get_damage_roll("offhand")
 
         self.sounds:play_at(entity.position, "medium")
         projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()

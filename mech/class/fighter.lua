@@ -133,12 +133,15 @@ fighter.fighting_styles.two_weapon_fighting = {
   codename = "two_weapon_fighting",
 
   modify_damage_roll = function(self, entity, roll, slot)
-    if slot ~= "offhand" or not entity.inventory.offhand then
-      return roll
-    end
-    return roll + entity:get_melee_modifier(slot)
+    if slot ~= "offhand" then return roll end
+    local offhand = entity.inventory.offhand
+    if not offhand or offhand.tags.ranged then return roll end
+    return roll + entity:get_combat_modifier(offhand)
   end,
 }
+
+-- NEXT 1 + esc opens esc menu
+-- NEXT Likka is attackable in cp1
 
 fighter.fighting_styles.defence = {
   name = "Оборона",

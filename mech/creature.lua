@@ -232,28 +232,32 @@ methods.saving_throw = function(self, to_check, dc)
 end
 
 --- @param self entity
---- @param slot string
+--- @param weapon item?
 --- @return integer
-methods.get_melee_modifier = function(self, slot)
-  local weapon = self.inventory[slot]
-  if weapon and weapon.tags and weapon.tags.finesse then
-    return math.max(
-      self:get_modifier("str"),
-      self:get_modifier("dex")
-    )
+methods.get_combat_modifier = function(self, weapon)
+  local str = self:get_modifier("str")
+  if not weapon then return str end
+
+  if weapon.tags.ranged then
+    return self:get_modifier("dex")
   end
-  return self:get_modifier("str")
+
+  if weapon.tags.finesse then
+    return math.max(str, self:get_modifier("dex"))
+  end
+
+  return str
 end
 
 --- @param self entity
 --- @param slot string
 --- @return d
-methods.get_melee_attack_roll = function(self, slot)
+methods.get_attack_roll = function(self, slot)
+  local weapon = self.inventory[slot]
   local roll = D(20)
     + xp.get_proficiency_bonus(self.level)
-    + self:get_melee_modifier(slot)
+    + self:get_combat_modifier(weapon)
 
-  local weapon = self.inventory[slot]
   if weapon then
     roll = roll + (weapon.bonus or 0)
   end
@@ -264,7 +268,7 @@ end
 --- @param self entity
 --- @param slot string
 --- @return d
-methods.get_melee_damage_roll = function(self, slot)
+methods.get_damage_roll = function(self, slot)
   local weapon = self.inventory[slot]
   if not weapon then
     return D.new({}, self:get_modifier("str") + 1)
@@ -279,34 +283,11 @@ methods.get_melee_damage_roll = function(self, slot)
 
   roll = roll + (weapon.bonus or 0)
 
-  if slot == "hand" then
-    roll = roll + self:get_melee_modifier(slot)
+  if slot == "hand" or weapon.tags.ranged then
+    roll = roll + self:get_combat_modifier(weapon)
   end
 
   return self:modify("damage_roll", roll, slot)
-end
-
--- local bow = entity.inventory.offhand
--- local dex_modifier = entity:get_modifier("dex")
--- health.attack(
---   target,
---   D(20) + dex_modifier + xp.get_proficiency_bonus(entity.level),
---   bow.damage_roll + (bow.bonus or 0) + dex_modifier
-
---- @param self entity
---- @return d
-methods.get_ranged_attack_roll = function(self, slot)
-  -- NEXT already knows the slot => kind of excessive
-  --   maybe a good generalized version of this method (+ damage method) is :get_attack_roll(item)?
-  --   also redo the modification signature
-  return self:modify("attack_roll", D(20) + self:get_modifier("dex") + xp.get_proficiency_bonus(self.level), slot)
-end
-
---- @param self entity
---- @return d
-methods.get_ranged_damage_roll = function(self)
-  local bow = assert(self.inventory.offhand)
-  return self:modify("damage_roll", bow.damage_roll + (bow.bonus or 0) + self:get_modifier("dex"), "offhand")
 end
 
 --- @param self entity
