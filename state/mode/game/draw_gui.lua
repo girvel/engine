@@ -168,12 +168,7 @@ draw_action_grid = function(self)
   ui.finish_frame()
   ui.offset(0, 208)
 
-  for key, direction in pairs {
-    w = Vector.up,
-    a = Vector.left,
-    s = Vector.down,
-    d = Vector.right,
-  } do
+  for key, direction in pairs(Vector.wasd) do
     if ui.keyboard(key) then
       set_mouse_task()
       State.player.ai:plan_action(actions.move(direction))

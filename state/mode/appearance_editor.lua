@@ -49,11 +49,6 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
-  -- NEXT wasd rotation
-  -- if State.player.direction ~= Vector.left then
-  --   State.player:rotate(Vector.left)
-  -- end
-
   tk.start_window("center", "center", 780, 700)
     ui.h1("Внешность")
 
@@ -114,6 +109,12 @@ methods.draw_gui = function(self, dt)
         or nil
     end
   tk.finish_window()
+
+  for key, dir in pairs(Vector.wasd) do
+    if ui.keyboard(key) then
+      State.player:rotate(dir)
+    end
+  end
 end
 
 Ldump.mark(appearance_editor, {mt = "const"}, ...)

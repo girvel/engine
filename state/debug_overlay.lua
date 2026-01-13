@@ -152,9 +152,9 @@ end
 
 --- @param code string
 local command = function(code)
-  local f, err1 = loadstring("return " .. code, code)
-  if f then
-    local ok, result = pcall(f)
+  local f1, err1 = loadstring("return " .. code, code)
+  if f1 then
+    local ok, result = pcall(f1)
     if ok then
       Log.info("Shell: %s\n  %s", code, Inspect(result))
     else
@@ -163,9 +163,9 @@ local command = function(code)
     return
   end
 
-  local f, err2 = loadstring(code, code)
-  if f then
-    local ok, msg = pcall(f)
+  local f2, err2 = loadstring(code, code)
+  if f2 then
+    local ok, msg = pcall(f2)
     if ok then
       Log.info("Shell: %s", code)
     else

@@ -62,6 +62,13 @@ vector.down = vector.new(0, 1)
 vector.left = vector.new(-1, 0)
 vector.right = vector.new(1, 0)
 
+vector.wasd = {
+  w = vector.up,
+  a = vector.left,
+  s = vector.down,
+  d = vector.right,
+}
+
 vector.white = vector.new(1, 1, 1, 1)
 vector.black = vector.new(0, 0, 0, 1)
 vector.transparent = vector.new(0, 0, 0, 0)
