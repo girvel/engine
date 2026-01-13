@@ -140,9 +140,14 @@ methods.rest = function(self, rest_type)
 end
 
 --- @param self entity
---- @param direction vector
+--- @param direction? vector
 methods.rotate = function(self, direction)
-  self.direction = direction
+  if direction then
+    self.direction = direction
+  else
+    direction = self.direction
+  end
+
   for _, item in pairs(self.inventory) do
     item.direction = direction
   end

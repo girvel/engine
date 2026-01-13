@@ -161,7 +161,7 @@ methods.draw_gui = function(self, dt)
 
   if not self.is_disabled and ui.keyboard("return") then
     if self.model[0].points > 0 then
-      State.mode:show_confirmation(
+      State.mode:show_warning(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
     else

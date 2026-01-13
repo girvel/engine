@@ -140,6 +140,8 @@ fighter.fighting_styles.two_weapon_fighting = {
   end,
 }
 
+-- NEXT click on text field
+-- NEXT better design
 -- NEXT Likka is attackable in cp1
 
 fighter.fighting_styles.defence = {

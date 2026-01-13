@@ -48,6 +48,13 @@ end
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
+  if ui.keyboard("return") then
+    State.mode:confirm(
+      "Закончить редактирование внешности персонажа?",
+      function() State.mode:close_menu() end
+    )
+  end
+
   tk.start_window("center", "center", 780, 700)
     ui.h1("Внешность")
 
@@ -94,6 +101,8 @@ methods.draw_gui = function(self, dt)
       inventory.hair = hair_type ~= "none"
         and State:add(items_entities.hair(hair_type, hair_color))
         or nil
+
+      State.player:rotate()
     end
 
     if skin_changed then
@@ -106,6 +115,8 @@ methods.draw_gui = function(self, dt)
       inventory.skin = skin ~= "none"
         and State:add(items_entities.skin(skin))
         or nil
+
+      State.player:rotate()
     end
   tk.finish_window()
 
