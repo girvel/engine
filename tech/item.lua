@@ -21,7 +21,7 @@ item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 --- @field no_drop_flag? true
 --- @field animated_independently_flag? true
 
---- @alias inventory_slot "hand"|"offhand"|"head"|"right_pocket"|"tatoo"|"body"|"bag"|cue_slot
+--- @alias inventory_slot "hand"|"offhand"|"head"|"right_pocket"|"hair"|"tatoo"|"body"|"bag"|cue_slot
 --- @alias item_slot "hands"|inventory_slot
 
 item.mixin = function(animation_path)

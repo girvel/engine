@@ -764,6 +764,7 @@ end
 --- @param key any
 --- @param disabled? boolean
 --- @param ... string|table exceptions
+--- @return boolean did_change
 ui.switch = function(possible_values, container, key, disabled, ...)
   local value = container[key]
   local is_scrollable = not disabled and #possible_values - select("#", ...) > 1
@@ -806,8 +807,10 @@ ui.switch = function(possible_values, container, key, disabled, ...)
 
     if offset then
       container[key] = possible_values[Math.loopmod(index + offset, #possible_values)]
+      return true
     end
   end
+  return false
 end
 
 --- @param options string[]
