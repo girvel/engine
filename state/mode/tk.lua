@@ -22,7 +22,7 @@ end
 tk.WINDOW_PADDING = 40
 local MAX_READABLE_W = 800
 
---- @param x integer|"center"
+--- @param x integer|"center"|"right"
 --- @param y integer|"center"
 --- @param w integer|"max"|"read_max"
 --- @param h integer|"max"
@@ -39,6 +39,8 @@ tk.start_window = function(x, y, w, h)
 
   if x == "center" then
     x = (love.graphics.getWidth() - w) / 2
+  elseif x == "right" then
+    x = love.graphics.getWidth() - w
   end --- @cast x integer
 
   if y == "center" then

@@ -47,6 +47,7 @@ end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
+-- NEXT (move) textfield messing up window size
 methods.draw_gui = function(self, dt)
   if ui.keyboard("return") then
     State.mode:confirm(
@@ -55,13 +56,10 @@ methods.draw_gui = function(self, dt)
     )
   end
 
-  tk.start_window("center", "center", 780, 700)
+  local w = 500
+  local parent_w = love.graphics.getWidth()
+  tk.start_window(parent_w - w - 20, "center", w, 300)
     ui.h1("Внешность")
-
-    local context = ui.get_context()
-    tk.draw_entity(State.player, context.cursor_x, context.cursor_y, 16)
-
-    ui.start_frame(256)
     ui.start_font(24)
       ui.start_line()
         ui.selector()
@@ -87,38 +85,37 @@ methods.draw_gui = function(self, dt)
         local skin_changed = ui.switch(SKIN, self.model, "skin")
       ui.finish_line()
     ui.finish_font()
-    ui.finish_frame()
-
-    local inventory = State.player.inventory
-    if hair_type_changed or hair_color_changed then
-      local hair_type = self.model.hair_type.codename
-      local hair_color = self.model.hair_color.codename
-
-      if inventory.hair then
-        State:remove(inventory.hair, true)
-      end
-
-      inventory.hair = hair_type ~= "none"
-        and State:add(items_entities.hair(hair_type, hair_color))
-        or nil
-
-      State.player:rotate()
-    end
-
-    if skin_changed then
-      local skin = self.model.skin.codename
-
-      if inventory.skin then
-        State:remove(inventory.skin, true)
-      end
-
-      inventory.skin = skin ~= "none"
-        and State:add(items_entities.skin(skin))
-        or nil
-
-      State.player:rotate()
-    end
   tk.finish_window()
+
+  local inventory = State.player.inventory
+  if hair_type_changed or hair_color_changed then
+    local hair_type = self.model.hair_type.codename
+    local hair_color = self.model.hair_color.codename
+
+    if inventory.hair then
+      State:remove(inventory.hair, true)
+    end
+
+    inventory.hair = hair_type ~= "none"
+      and State:add(items_entities.hair(hair_type, hair_color))
+      or nil
+
+    State.player:rotate()
+  end
+
+  if skin_changed then
+    local skin = self.model.skin.codename
+
+    if inventory.skin then
+      State:remove(inventory.skin, true)
+    end
+
+    inventory.skin = skin ~= "none"
+      and State:add(items_entities.skin(skin))
+      or nil
+
+    State.player:rotate()
+  end
 
   for key, dir in pairs(Vector.wasd) do
     if ui.keyboard(key) then
