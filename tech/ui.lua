@@ -708,14 +708,13 @@ ui.field = function(container, key)
   local is_selected = state.selection.i == state.selection.max_i
   ui.text("%s%s", container[key], is_selected and state.time % 2 >= 1 and "█" or " ")
   if is_selected then
-    container[key] = container[key] .. input.keyboard.input
     if input.keyboard.pressed.backspace then
       container[key] = container[key]:utf_sub(1, -2)
       input.keyboard.pressed.backspace = nil
     end
-    for char in input.keyboard.input:gmatch(".") do
-      input.keyboard.pressed[char] = nil
-    end
+
+    container[key] = container[key] .. input.keyboard.input
+    input.keyboard.pressed = {}
   end
 end
 
