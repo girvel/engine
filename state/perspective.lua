@@ -107,8 +107,8 @@ end
 methods._center = function(self, x, y)
   local k = Constants.cell_size * self.SCALE
   return
-    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - x * k),
-    math.floor(love.graphics.getHeight() / 2 - y * k)
+    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - (x + .5) * k),
+    math.floor(love.graphics.getHeight() / 2 - (y + .5) * k)
 end
 
 local SPRING_STIFFNESS = 100

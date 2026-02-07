@@ -47,6 +47,9 @@ end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
+appearance_editor.w = 500
+appearance_editor.padding = 20
+
 -- NEXT (move) textfield messing up window size
 methods.draw_gui = function(self, dt)
   if ui.keyboard("return") then
@@ -56,9 +59,11 @@ methods.draw_gui = function(self, dt)
     )
   end
 
-  local w = 500
   local parent_w = love.graphics.getWidth()
-  tk.start_window(parent_w - w - 20, "center", w, 300)
+  tk.start_window(
+    parent_w - appearance_editor.w - appearance_editor.padding, "center",
+    appearance_editor.w, 300
+  )
     ui.h1("Внешность")
     ui.start_font(24)
       ui.start_line()
