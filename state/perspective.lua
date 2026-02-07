@@ -5,6 +5,8 @@ local perspective = {}
 -- [SECTION] API
 ----------------------------------------------------------------------------------------------------
 
+-- NEXT rename to State.camera
+
 --- @class state_perspective
 --- @field target_override entity?
 --- @field is_camera_following boolean
