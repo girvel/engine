@@ -69,7 +69,7 @@ methods.draw_gui = function(self, dt)
       ui.start_line()
         ui.selector()
         ui.text("Имя:  ")
-        ui.field(self.model, "name")
+        ui.field(self.model, "name", 22)
       ui.finish_line()
 
       ui.start_line()
