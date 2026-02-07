@@ -43,7 +43,7 @@ methods._set_mode = function(self, mode_value)
   end
 
   if State and getmetatable(self._mode) ~= STATES.game.mt then
-    State.perspective.sidebar_w = 0
+    State.camera.sidebar_w = 0
   end
 end
 

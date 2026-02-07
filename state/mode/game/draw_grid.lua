@@ -33,8 +33,8 @@ local draw_grid = function(self, layer, grid, dt)
     sprite_batch:clear()
   end
 
-  for x = State.perspective.vision_start.x, State.perspective.vision_end.x do
-    for y = State.perspective.vision_start.y, State.perspective.vision_end.y do
+  for x = State.camera.vision_start.x, State.camera.vision_end.x do
+    for y = State.camera.vision_start.y, State.camera.vision_end.y do
       if not vision_map:is_visible_unsafe(x, y)
         or is_blind_for(x, y)
       then goto continue end

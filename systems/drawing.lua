@@ -16,7 +16,7 @@ return Tiny.sortedProcessingSystem {
 
   preProcess = function(_, dt)
     if State.is_loaded then
-      State.perspective:_update(dt)
+      State.camera:_update(dt)
     end
 
     love.graphics.clear(colors.black)

@@ -369,23 +369,23 @@ end
 --- @return promise, scene
 api.move_camera = function(position)
   return State.runner:run_task(function()
-    State.perspective.is_camera_following = true
+    State.camera.is_camera_following = true
     --- @diagnostic disable-next-line
-    State.perspective.target_override = {position = position}
+    State.camera.target_override = {position = position}
     coroutine.yield()
-    while State.perspective.is_moving do coroutine.yield() end
-    State.perspective.target_override = nil
-    State.perspective.is_camera_following = false
+    while State.camera.is_moving do coroutine.yield() end
+    State.camera.target_override = nil
+    State.camera.is_camera_following = false
   end, "move_camera")
 end
 
 api.free_camera = function()
   return State.runner:run_task(function()
     --- @diagnostic disable-next-line
-    State.perspective.target_override = nil
-    State.perspective.is_camera_following = true
+    State.camera.target_override = nil
+    State.camera.is_camera_following = true
     coroutine.yield()
-    while State.perspective.is_moving do coroutine.yield() end
+    while State.camera.is_moving do coroutine.yield() end
   end, "free_camera")
 end
 
@@ -489,8 +489,8 @@ api.is_visible = function(target)
   target = api.to_vector(target):map(math.floor)
 
   if not (
-    State.perspective.vision_start <= target
-    and target <= State.perspective.vision_end
+    State.camera.vision_start <= target
+    and target <= State.camera.vision_end
   ) then
     return false
   end

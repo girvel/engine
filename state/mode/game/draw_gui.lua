@@ -65,11 +65,11 @@ local SIDEBAR_W = SIDEBAR_INNER_W + PADDING_LX + PADDING_RX
 
 draw_sidebar = function(self)
   if State.runner.locked_entities[State.player] then
-    State.perspective.sidebar_w = 0
+    State.camera.sidebar_w = 0
     return
   end
 
-  State.perspective.sidebar_w = SIDEBAR_W
+  State.camera.sidebar_w = SIDEBAR_W
 
   tk.start_window(
     love.graphics.getWidth() - SIDEBAR_W, 0,
@@ -659,11 +659,11 @@ use_mouse = function(self)
     return
   end
 
-  ui.start_frame(nil, nil, love.graphics.getWidth() - State.perspective.sidebar_w)
+  ui.start_frame(nil, nil, love.graphics.getWidth() - State.camera.sidebar_w)
     if self.input_mode == "target" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
-      :sub_mut(State.perspective.camera_offset)
+      :sub_mut(State.camera.camera_offset)
       :div_mut(Constants.cell_size * 4)
       :map_mut(math.floor)
     local solid = State.grids.solids:slow_get(position)
@@ -795,11 +795,11 @@ render_path = function(path, max_length)
   start_i = 1
 
   ::found::
-  local px, py = State.perspective:game_to_screen(unpack(State.player.position))
+  local px, py = State.camera:game_to_screen(unpack(State.player.position))
 
   for i = start_i, #path do
     local e = path[i]
-    local sx, sy = State.perspective:game_to_screen(unpack(e))
+    local sx, sy = State.camera:game_to_screen(unpack(e))
 
     local postfix
     if i == 1 and e.y - State.player.position.y == -1 then
@@ -823,7 +823,7 @@ render_path = function(path, max_length)
   end
 
   if max_length then
-    local n = State.perspective.SCALE * Constants.cell_size
+    local n = State.camera.SCALE * Constants.cell_size
     ui.start_frame(px, py, n, n - 4)
     ui.start_alignment("center", "bottom")
       ui.text("%s/%s", #path, max_length)

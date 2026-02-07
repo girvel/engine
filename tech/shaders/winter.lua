@@ -3,7 +3,7 @@ local constants = require("engine.tech.constants")
 
 local winter = {}
 
-local K = State.perspective.SCALE * constants.cell_size
+local K = State.camera.SCALE * constants.cell_size
 
 --- @param tint vector 3-dimensional
 --- @param intensity number
@@ -79,7 +79,7 @@ winter.new = function()
 end
 
 methods.update = function(self, dt)
-  self.love_shader:send("offset", -State.perspective.camera_offset)
+  self.love_shader:send("offset", -State.camera.camera_offset)
 end
 
 Ldump.mark(winter, "const", ...)

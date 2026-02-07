@@ -10,8 +10,8 @@ local draw_entity = function(self, entity, dt)
   end
 
   local x, y = unpack(entity.position)
-  local dx, dy = unpack(State.perspective.camera_offset)
-  local k = State.perspective.SCALE * Constants.cell_size
+  local dx, dy = unpack(State.camera.camera_offset)
+  local k = State.camera.SCALE * Constants.cell_size
   x = dx + x * k
   y = dy + y * k
 
@@ -35,15 +35,15 @@ local draw_entity = function(self, entity, dt)
   if sprite.type == "image"
     or (sprite.type == "atlas" and (entity.shader or entity.inventory or entity.layer))
   then
-    tk.draw_entity(entity, x, y, State.perspective.SCALE)
+    tk.draw_entity(entity, x, y, State.camera.SCALE)
   elseif sprite.type == "atlas" then
-    self._sprite_batches[entity.grid_layer]:add(sprite.quad, x, y, 0, State.perspective.SCALE)
+    self._sprite_batches[entity.grid_layer]:add(sprite.quad, x, y, 0, State.camera.SCALE)
   elseif sprite.type == "text" then
     love.graphics.setFont(sprite.font)
     love.graphics.print({sprite.color, sprite.text}, x, y)
   elseif sprite.type == "rendered" then
     local drawable = sprite:render(entity, dt)
-    love.graphics.draw(drawable, x, y, 0, State.perspective.SCALE)
+    love.graphics.draw(drawable, x, y, 0, State.camera.SCALE)
   else
     Error("Unknown sprite type %q", sprite.type)
   end

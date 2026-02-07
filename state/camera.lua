@@ -1,13 +1,11 @@
-local perspective = {}
+local camera = {}
 
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] API
 ----------------------------------------------------------------------------------------------------
 
--- NEXT rename to State.camera
-
---- @class state_perspective
+--- @class state_camera
 --- @field target_override entity?
 --- @field is_camera_following boolean
 --- @field is_moving boolean (internally set)
@@ -17,9 +15,9 @@ local perspective = {}
 --- @field sidebar_w integer sidebar width in screen pixels
 --- @field SCALE integer
 local methods = {}
-perspective.mt = {__index = methods}
+camera.mt = {__index = methods}
 
-perspective.new = function()
+camera.new = function()
   return setmetatable({
     is_moving = false,
     is_camera_following = true,
@@ -28,7 +26,7 @@ perspective.new = function()
     vision_end = Vector.zero,
     sidebar_w = 0,
     SCALE = 4,
-  }, perspective.mt)
+  }, camera.mt)
 end
 
 methods.immediate_center = function(self)
@@ -40,7 +38,7 @@ end
 --- @return number sx, number sy
 methods.game_to_screen = function(self, gx, gy)
   local dx, dy = unpack(self.camera_offset)
-  local k = State.perspective.SCALE * Constants.cell_size
+  local k = State.camera.SCALE * Constants.cell_size
   return dx + k * gx, dy + k * gy
 end
 
@@ -90,7 +88,7 @@ methods._update = function(self, dt)
 
   do
     local total_scale = self.SCALE * Constants.cell_size
-    self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
+    self.vision_start = -(State.camera.camera_offset / total_scale):map(math.ceil)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
       :map_mut(math.ceil)
@@ -120,7 +118,7 @@ smooth_camera_offset = {
   vx = 0,
   vy = 0,
   next = function(self, tx, ty, px, py, dt)
-    local dest_x, dest_y = State.perspective:_center(tx, ty)
+    local dest_x, dest_y = State.camera:_center(tx, ty)
 
     local dx = dest_x - px
     local dy = dest_y - py
@@ -137,5 +135,5 @@ smooth_camera_offset = {
   end,
 }
 
-Ldump.mark(perspective, {mt = "const"}, ...)
-return perspective
+Ldump.mark(camera, {mt = "const"}, ...)
+return camera

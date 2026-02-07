@@ -11,7 +11,7 @@ local state = {}
 --- @class state
 --- @field mode state_mode
 --- @field runner state_runner
---- @field perspective state_perspective
+--- @field camera state_camera
 --- @field combat state_combat?
 --- @field quests state_quests
 --- @field hostility state_hostility
@@ -41,7 +41,7 @@ state.mt = {__index = methods}
 local replace_modules = function(self)
   self.mode = require("engine.state.mode").new()
   self.runner = require("engine.state.runner").new()
-  self.perspective = require("engine.state.perspective").new()
+  self.camera = require("engine.state.camera").new()
   self.quests = require("engine.state.quests").new()
   self.hostility = require("engine.state.hostility").new()
   self.audio = require("engine.state.audio").new()
@@ -212,7 +212,7 @@ methods.load_level = function(self, path)
     end
   end
 
-  self.perspective:immediate_center()
+  self.camera:immediate_center()
 
   coroutine.yield("add", 1)
   local add_t = love.timer.getTime()
