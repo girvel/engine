@@ -52,9 +52,9 @@ draw_points = function(points)
   for k, point in pairs(points) do
     local v
     if point.view == "grid" then
-      v = point.position * 4 * Constants.cell_size + State.camera.camera_offset
+      v = point.position * 4 * Constants.cell_size + State.camera.offset
     elseif point.view == "absolute" then
-      v = point.position + State.camera.camera_offset
+      v = point.position + State.camera.offset
     elseif point.view == "gui" then
       v = point.position
     else

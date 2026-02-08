@@ -10,7 +10,7 @@ local draw_entity = function(self, entity, dt)
   end
 
   local x, y = unpack(entity.position)
-  local dx, dy = unpack(State.camera.camera_offset)
+  local dx, dy = unpack(State.camera.offset)
   local k = State.camera.SCALE * Constants.cell_size
   x = dx + x * k
   y = dy + y * k

@@ -9,7 +9,7 @@ local camera = {}
 --- @field target_override entity?
 --- @field is_camera_following boolean
 --- @field is_moving boolean (internally set)
---- @field camera_offset vector (internally set) offset in pixels relative to the grid start
+--- @field offset vector (internally set) offset in pixels relative to the grid start
 --- @field vision_start vector (internally set)
 --- @field vision_end vector (internally set)
 --- @field sidebar_w integer sidebar width in screen pixels
@@ -30,14 +30,14 @@ camera.new = function()
 end
 
 methods.immediate_center = function(self)
-  self.camera_offset = V(self:_center(unpack((self.target_override or State.player).position)))
+  self.offset = V(self:_center(unpack((self.target_override or State.player).position)))
 end
 
 --- @param gx number
 --- @param gy number
 --- @return number sx, number sy
 methods.game_to_screen = function(self, gx, gy)
-  local dx, dy = unpack(self.camera_offset)
+  local dx, dy = unpack(self.offset)
   local k = State.camera.SCALE * Constants.cell_size
   return dx + k * gx, dy + k * gy
 end
@@ -55,13 +55,13 @@ methods._update = function(self, dt)
   end
 
   if self.is_camera_following then
-    local prev_offset = self.camera_offset
+    local prev_offset = self.offset
 
     if dt >= .05 then
       self:immediate_center()
     else
       local target = self.target_override or State.player
-      local px, py = unpack(self.camera_offset)
+      local px, py = unpack(self.offset)
       local tx, ty = unpack(target.position)
 
       if target == State.player
@@ -78,17 +78,17 @@ methods._update = function(self, dt)
           - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
       end
 
-      self.camera_offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
+      self.offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
     end
 
-    self.is_moving = prev_offset ~= self.camera_offset
+    self.is_moving = prev_offset ~= self.offset
   else
     self.is_moving = false
   end
 
   do
     local total_scale = self.SCALE * Constants.cell_size
-    self.vision_start = -(State.camera.camera_offset / total_scale):map(math.ceil)
+    self.vision_start = -(State.camera.offset / total_scale):map(math.ceil)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
       :map_mut(math.ceil)
