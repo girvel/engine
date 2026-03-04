@@ -22,6 +22,21 @@ api.to_vector = function(x)
   return x
 end
 
+api.scale = function(scale, duration)
+  duration = duration or .5
+  return State.runner:run_task(function()
+    local start = love.timer.getTime()
+    while true do
+      local now = love.timer.getTime()
+      local delta = now - start
+      if delta > duration then break end
+      State.perspective.SCALE = 4 + (scale - 4) * delta / duration
+      State.perspective:immediate_center()
+      coroutine.yield()
+    end
+  end)
+end
+
 local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
 local HIT = sound.multiple("engine/assets/sounds/hit/body", .3)
 
