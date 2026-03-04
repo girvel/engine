@@ -61,7 +61,7 @@ methods.report = function(self)
   end
 
   Log.info("Play time %s s, average FPS is %.2f", math.floor(love.timer.getTime() - self.start_time), self.frame_n / self.cpu_time)
-  Log.info("Saved log to %s%s", love.filesystem.getRealDirectory(Log.outfile), Log.outfile)
+  Log.info("Saved log to %s/%s", love.filesystem.getRealDirectory(Log.outfile), Log.outfile)
   Log.report()
 end
 

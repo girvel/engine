@@ -82,8 +82,8 @@ rain.render = function(self, entity, dt)
   end
 
   local start, finish do
-    local original_start = State.perspective.vision_start * Constants.cell_size
-    local original_finish = (State.perspective.vision_end + Vector.one) * Constants.cell_size
+    local original_start = State.camera.vision_start * Constants.cell_size
+    local original_finish = (State.camera.vision_end + Vector.one) * Constants.cell_size
 
     local d = (original_finish - original_start)
     start = original_finish - d * BUFFER_K

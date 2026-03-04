@@ -704,7 +704,7 @@ end
 -- TODO consider suppressing ui.keyboard? or maybe on higher level?
 --- @param container table
 --- @param key any
-ui.field = function(container, key)
+ui.field = function(container, key, max_length)
   local is_selected = state.selection.i == state.selection.max_i
   ui.text("%s%s", container[key], is_selected and state.time % 2 >= 1 and "█" or " ")
   if is_selected then
@@ -714,6 +714,9 @@ ui.field = function(container, key)
     end
 
     container[key] = container[key] .. input.keyboard.input
+    if max_length then
+      container[key] = container[key]:utf_sub(1, max_length)
+    end
     input.keyboard.pressed = {}
   end
 end

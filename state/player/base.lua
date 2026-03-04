@@ -46,7 +46,7 @@ base.mixin = function()
     is_deaf = false,
     on_add = function(self)
       self.memory = love.graphics.newCanvas(unpack(
-        State.level.grid_size * Constants.cell_size * State.perspective.SCALE
+        State.level.grid_size * Constants.cell_size * State.camera.SCALE
       ))
     end,
 

@@ -1,23 +1,23 @@
-local perspective = {}
+local camera = {}
 
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] API
 ----------------------------------------------------------------------------------------------------
 
---- @class state_perspective
+--- @class state_camera
 --- @field target_override entity?
 --- @field is_camera_following boolean
 --- @field is_moving boolean (internally set)
---- @field camera_offset vector (internally set) offset in pixels relative to the grid start
+--- @field offset vector (internally set) offset in pixels relative to the grid start
 --- @field vision_start vector (internally set)
 --- @field vision_end vector (internally set)
 --- @field sidebar_w integer sidebar width in screen pixels
 --- @field SCALE integer
 local methods = {}
-perspective.mt = {__index = methods}
+camera.mt = {__index = methods}
 
-perspective.new = function()
+camera.new = function()
   return setmetatable({
     is_moving = false,
     is_camera_following = true,
@@ -26,19 +26,19 @@ perspective.new = function()
     vision_end = Vector.zero,
     sidebar_w = 0,
     SCALE = 4,
-  }, perspective.mt)
+  }, camera.mt)
 end
 
 methods.immediate_center = function(self)
-  self.camera_offset = V(self:_center(unpack((self.target_override or State.player).position)))
+  self.offset = V(self:_center(unpack((self.target_override or State.player).position)))
 end
 
 --- @param gx number
 --- @param gy number
 --- @return number sx, number sy
 methods.game_to_screen = function(self, gx, gy)
-  local dx, dy = unpack(self.camera_offset)
-  local k = State.perspective.SCALE * Constants.cell_size
+  local dx, dy = unpack(self.offset)
+  local k = State.camera.SCALE * Constants.cell_size
   return dx + k * gx, dy + k * gy
 end
 
@@ -55,13 +55,13 @@ methods._update = function(self, dt)
   end
 
   if self.is_camera_following then
-    local prev_offset = self.camera_offset
+    local prev_offset = self.offset
 
     if dt >= .05 then
       self:immediate_center()
     else
       local target = self.target_override or State.player
-      local px, py = unpack(self.camera_offset)
+      local px, py = unpack(self.offset)
       local tx, ty = unpack(target.position)
 
       if target == State.player
@@ -78,17 +78,17 @@ methods._update = function(self, dt)
           - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
       end
 
-      self.camera_offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
+      self.offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
     end
 
-    self.is_moving = prev_offset ~= self.camera_offset
+    self.is_moving = prev_offset ~= self.offset
   else
     self.is_moving = false
   end
 
   do
     local total_scale = self.SCALE * Constants.cell_size
-    self.vision_start = -(State.perspective.camera_offset / total_scale):map(math.ceil)
+    self.vision_start = -(State.camera.offset / total_scale):map(math.ceil)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
       :map_mut(math.ceil)
@@ -107,8 +107,8 @@ end
 methods._center = function(self, x, y)
   local k = Constants.cell_size * self.SCALE
   return
-    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - x * k),
-    math.floor(love.graphics.getHeight() / 2 - y * k)
+    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - (x + .5) * k),
+    math.floor(love.graphics.getHeight() / 2 - (y + .5) * k)
 end
 
 local SPRING_STIFFNESS = 100
@@ -118,7 +118,7 @@ smooth_camera_offset = {
   vx = 0,
   vy = 0,
   next = function(self, tx, ty, px, py, dt)
-    local dest_x, dest_y = State.perspective:_center(tx, ty)
+    local dest_x, dest_y = State.camera:_center(tx, ty)
 
     local dx = dest_x - px
     local dy = dest_y - py
@@ -135,5 +135,5 @@ smooth_camera_offset = {
   end,
 }
 
-Ldump.mark(perspective, {mt = "const"}, ...)
-return perspective
+Ldump.mark(camera, {mt = "const"}, ...)
+return camera

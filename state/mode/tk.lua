@@ -232,7 +232,7 @@ end
 --- @param text string
 tk.popup = function(position, text)
   local gx, gy = unpack(position)
-  local sx, sy = State.perspective:game_to_screen(gx + .5, gy - .25)
+  local sx, sy = State.camera:game_to_screen(gx + .5, gy - .25)
   local w = 150
   local padding = ui.SCALE
   local h = ui.predict_text_size(text, w)
