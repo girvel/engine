@@ -30,8 +30,8 @@ api.scale = function(scale, duration)
       local now = love.timer.getTime()
       local delta = now - start
       if delta > duration then break end
-      State.perspective.SCALE = 4 + (scale - 4) * delta / duration
-      State.perspective:immediate_center()
+      State.camera.SCALE = 4 + (scale - 4) * delta / duration
+      State.camera:immediate_center()
       coroutine.yield()
     end
   end)
