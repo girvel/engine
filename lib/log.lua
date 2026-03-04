@@ -227,56 +227,61 @@ pretty = function(...)
 end
 
 if love then
-  local log_directory = "logs"
-  local log_directory_abs = love.filesystem.getSaveDirectory() .. "/" .. log_directory
-  if not love.filesystem.getInfo(log_directory_abs) then
-    love.filesystem.createDirectory(log_directory)
-  end
-  log.outfile = log_directory .. "/" .. os.date("%Y-%m-%d_%H-%M-%S") .. ".txt"
+  local ok, res = pcall(function()
+    local log_directory = "logs"
+    local log_directory_abs = love.filesystem.getSaveDirectory() .. "/" .. log_directory
+    if not love.filesystem.getInfo(log_directory_abs) then
+      love.filesystem.createDirectory(log_directory)
+    end
+    log.outfile = log_directory .. "/" .. os.date("%Y-%m-%d_%H-%M-%S") .. ".txt"
 
-  local MB = 1024 * 1024
-  local MAX_FILE_SIZE = 1 * MB
-  local MAX_FOLDER_SIZE = 16 * MB
+    local MB = 1024 * 1024
+    local MAX_FILE_SIZE = 1 * MB
+    local MAX_FOLDER_SIZE = 16 * MB
 
-  local existing_logs = love.filesystem.getDirectoryItems(log_directory)
-  log.tracel(existing_logs)
-  table.sort(existing_logs)
+    local existing_logs = love.filesystem.getDirectoryItems(log_directory)
+    table.sort(existing_logs)
 
-  local total_size = 0
-  for _, filename in ipairs(existing_logs) do
-    local full_path = log_directory .. "/" .. filename
-    local info = love.filesystem.getInfo(full_path, "file")
-    if not info then goto continue end
+    local total_size = 0
+    for _, filename in ipairs(existing_logs) do
+      local full_path = log_directory .. "/" .. filename
+      local info = love.filesystem.getInfo(full_path, "file")
+      if not info then goto continue end
 
-    if info.size <= MAX_FILE_SIZE then
-      total_size = total_size + info.size
-    else
-      local content = love.filesystem.read(full_path)
-      local half = MAX_FILE_SIZE / 2
-      local placeholder = "\n[truncated]\n"
-      love.filesystem.write(
-        full_path,
-        content:sub(1, half - #placeholder) .. placeholder .. content:sub(info.size - half)
-      )
+      if info.size <= MAX_FILE_SIZE then
+        total_size = total_size + info.size
+      else
+        local content = love.filesystem.read(full_path)
+        local half = MAX_FILE_SIZE / 2
+        local placeholder = "\n[truncated]\n"
+        local content_truncated = content:sub(1, half - #placeholder - 1)
+          .. placeholder
+          .. content:sub(info.size - half)
+        love.filesystem.write(full_path, content_truncated)
 
-      log.info("Truncated %s from %.2f MB to 1.00 MB", full_path, info.size / MB)
-      total_size = total_size + MB
+        log.info("Truncated %s from %.2ff MB to 1.00 MB", full_path, #content / MB)
+        total_size = total_size + MB
+      end
+
+      ::continue::
     end
 
-    ::continue::
+    for _, filename in ipairs(existing_logs) do
+      if total_size <= MAX_FOLDER_SIZE then break end
+
+      local full_path = log_directory .. "/" .. filename
+      local size = love.filesystem.getInfo(full_path, "file").size
+      love.filesystem.remove(full_path)
+      log.info("Removed %s", full_path)
+      total_size = total_size - size
+    end
+
+    log.info("Log folder is %.2f MB", total_size / MB)
+  end)
+
+  if not ok then
+    log.error("Log cleanup error: %s", res)
   end
-
-  for _, filename in ipairs(existing_logs) do
-    if total_size <= MAX_FOLDER_SIZE then break end
-
-    local full_path = log_directory_abs .. "/" .. filename
-    local size = love.filesystem.getInfo(full_path).size
-    love.filesystem.remove(full_path)
-    log.info("Removed %s", full_path)
-    total_size = total_size - size
-  end
-
-  log.info("Log folder is %.2f MB", total_size / MB)
 end
 
 return log

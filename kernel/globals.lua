@@ -82,6 +82,7 @@ V = Vector.new
 Ldump.mark_module("engine.lib.vector", "const")
 
 -- assert & Error are assigned in engine/kernel/callbacks/load.lua
+-- TODO they shouldn't be, debug mode & CLI args are kernel level data
 Error = function(msg, ...) error(msg:format(...)) end  -- placeholder
 
 Log.info("Initialized globals")
