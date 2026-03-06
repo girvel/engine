@@ -23,6 +23,7 @@ api.to_vector = function(x)
 end
 
 api.scale = function(scale, duration)
+  scale = scale or 4
   duration = duration or .5
   return State.runner:run_task(function()
     local start = love.timer.getTime()

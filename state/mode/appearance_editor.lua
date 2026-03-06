@@ -50,7 +50,6 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 appearance_editor.w = 500
 appearance_editor.padding = 20
 
--- NEXT (move) textfield messing up window size
 methods.draw_gui = function(self, dt)
   if ui.keyboard("return") then
     State.mode:confirm(

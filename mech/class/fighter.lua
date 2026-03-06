@@ -142,6 +142,7 @@ fighter.fighting_styles.two_weapon_fighting = {
 
 -- NEXT click on text field
 -- NEXT Likka is attackable in cp1
+-- NEXT <esc> in appearance_editor
 
 fighter.fighting_styles.defence = {
   name = "Оборона",
