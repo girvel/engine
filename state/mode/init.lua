@@ -68,7 +68,7 @@ methods.start_game = function(self)
   assert(self._mode.type == "start_menu")
   Log.info("Starting new game...")
   self:_set_mode(STATES.loading_screen.new(
-    coroutine.create(function() return State:load_level("levels/main") end),
+    coroutine.create(function() return State:load_level("level") end),
     function() return self:start_game_finish() end
   ))
 end

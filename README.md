@@ -23,7 +23,7 @@ love .
 
 ## Hooks
 
-- `levels.main` is the default level to load
+- `level` is the default level to load
 - `player` LuaLS type is user-defined
 - each level expects `solids` grid layer and relies on `items`, `tiles`, `on_solids`
 

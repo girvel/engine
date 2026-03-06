@@ -34,7 +34,7 @@ end
 
 methods._act = function(self, entity)
   -- TODO remove reference to game code by extracting commonly used monsters & items
-  local npcs = require("levels.main.palette.npcs")
+  local npcs = require("level.palette.npcs")
   local position = State.grids.solids:find_free_position(self.target.position)
   if not position then return false end
 

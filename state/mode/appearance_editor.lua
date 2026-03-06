@@ -1,4 +1,4 @@
-local items_entities = require("levels.main.palette.items_entities")
+local items_entities = require("level.palette.items_entities")
 local ui = require("engine.tech.ui")
 local tk = require("engine.state.mode.tk")
 
