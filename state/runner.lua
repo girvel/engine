@@ -271,11 +271,19 @@ end
 
 --- @param scene string|scene
 methods.remove = function(self, scene)
-  local key = type(scene) ~= "table" and scene or Table.key_of(self.scenes, scene)
+  local key, scene_itself
+  if type(scene) == "table" then
+    key = Table.key_of(self.scenes, scene)
+    scene_itself = scene
+  else
+    key = scene
+    scene_itself = self.scenes[key]
+  end
+
   if not key then return end
   self.scenes[key] = nil
 
-  if not scene.boring_flag then
+  if not scene_itself.boring_flag then
     Log.info("Removed scene %s", key)
   end
 end

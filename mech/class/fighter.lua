@@ -145,6 +145,7 @@ fighter.fighting_styles.two_weapon_fighting = {
 -- NEXT <esc> in appearance_editor
 -- NEXT rotate with the mouse
 -- NEXT smooth descaling
+-- NEXT fix cheek scar anchor & lying
 
 fighter.fighting_styles.defence = {
   name = "Оборона",
