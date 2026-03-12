@@ -19,6 +19,7 @@ local HAIR_COLORS = {
 local SKIN = {
   {codename = "none", name = "Чистая"},
   {codename = "cheek_scar", name = "Шрам на щеке"},
+  {codename = "eye_scar", name = "Шрам у глаза"},
   {codename = "snake_tatoo", name = "Татуировка змеи"},
 }
 
