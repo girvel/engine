@@ -79,7 +79,6 @@ feats.dual_wielder = {
   end,
 }
 
--- NEXT (move) 4th level 
 feats.durable = {
   name = "Стойкий",
   codename = "durable",

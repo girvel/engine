@@ -140,14 +140,6 @@ fighter.fighting_styles.two_weapon_fighting = {
   end,
 }
 
--- NEXT click on text field
--- NEXT Likka is attackable in cp1
--- NEXT <esc> in appearance_editor
--- NEXT rotate with the mouse
--- NEXT smooth descaling
--- NEXT fix cheek scar anchor & lying
--- NEXT clicking outside appearance editor sets selection index = 0? or not?
-
 fighter.fighting_styles.defence = {
   name = "Оборона",
   description = "+1 к классу брони при наличии шлема/доспеха",
