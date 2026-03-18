@@ -3,7 +3,6 @@
 + Implement
 + Add more hair types & scars
 + Ensure lying versions for all
-- Having khaned's scar/gatherer tatoo affects dialogue
-- Allow <esc> in editor
++ Allow <esc> in editor
 - Turn with the mouse
 - Smooth api.scale(4)

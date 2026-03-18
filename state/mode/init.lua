@@ -45,6 +45,8 @@ methods._set_mode = function(self, mode_value)
   if State and getmetatable(self._mode) ~= STATES.game.mt then
     State.camera.sidebar_w = 0
   end
+
+  ui.reset_selection()
 end
 
 methods.draw_gui = function(self, dt)
@@ -77,6 +79,8 @@ methods.start_game_finish = function(self)
   assert(self._mode.type == "loading_screen")
   Log.info("Game started")
   self:_set_mode(STATES.game.new())
+  -- TODO .new() for states not needed, they should be static like draw_gui.lua, and history
+  --   preserved here
 end
 
 --- @param kind "escape_menu"|"journal"|"creator"|"save_menu"|"load_menu"|"appearance_editor"
@@ -85,7 +89,6 @@ methods.open_menu = function(self, kind)
   if kind == "journal" or kind == "creator" then
     OPEN_JOURNAL:play()
   end
-  ui.reset_selection()
   self:_set_mode(STATES[kind].new(self._mode))
 end
 
@@ -94,7 +97,6 @@ methods.close_menu = function(self)
   if self._mode.type == "journal" or self._mode.type == "creator" then
     CLOSE_JOURNAL:play()
   end
-  ui.reset_selection()
   self:_set_mode(assert(self._mode._prev))
 end
 
@@ -133,7 +135,6 @@ end
 --- @param message string
 --- @param f fun()
 methods.confirm = function(self, message, f)
-  ui.reset_selection()
   self:_set_mode(STATES.confirmation.new(self._mode, message, f))
 end
 

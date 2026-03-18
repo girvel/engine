@@ -59,6 +59,10 @@ methods.draw_gui = function(self, dt)
     )
   end
 
+  if ui.keyboard("escape") then
+    State.mode:open_menu("escape_menu")
+  end
+
   local parent_w = love.graphics.getWidth()
   tk.start_window(
     parent_w - appearance_editor.w - appearance_editor.padding, "center",
