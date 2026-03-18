@@ -1,8 +1,8 @@
-  RELEASE 2.0-rc.1
+  RELEASE 2.0
 
 Better gameplay experience (XP, creator), finishing up.
 
-+ ./2.0-rc.1-essential-bugfixes
++ ./2.0-essential-bugfixes
 - ./appearance-editor
 - ./xp
 - ./credits
@@ -11,4 +11,4 @@ Better gameplay experience (XP, creator), finishing up.
 - ./export-outcome
 - ./manual_test
 - ./dimas-test
-- ./2.0-rc.1-release
+- ./2.0-release
