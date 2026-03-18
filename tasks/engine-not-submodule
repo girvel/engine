@@ -1,0 +1,25 @@
+  ENGINE NOT BEING A SUBMODULE
+
+I wonder if it would be better to stop with engine as a submodule and instead just do engine as a folder.
+
+It seems I can prevent losing any history with "git subtree"; I can join dot and engine, rename the project to "the_fallen", and keep the history for part one in the same project as part two.
+
+Actually, no, you can not because of the subsubmodules like "ldump" and "moonspeak". There are only two options:
+
+
+  NEW PROJECT, CLEAN HISTORY, ENGINE AS A FOLDER
+
++ fresh start
++ separate page for a separate game
++ history will not be fucked
+- fragmented history
+
+
+  OLD PROJECT, PRESERVE HISTORY, ENGINE AS A FOLDER
+
+- fragmented history
++ the least important part (dot's history) is not fragmented
++ history will not be fucked anymore
+
+
+New clean project seems like a clearly better idea. There is no way I make engine a plain folder AND meaningfully preserve history. That's a shame, but that's alright.
