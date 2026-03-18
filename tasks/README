@@ -1,7 +1,20 @@
   PLAIN TEXT TASK MANAGEMENT (EXPERIMENTAL)
 
+A little experiment for one milestone to see if text format would be more convenient.
+
 - plan text
 - single flat folder
 - each task's ID is their short name in kebab-case
 - references are in form "./kebab-case"
 - all tasks belong to the engine project/repo
+
+
+  PROS
+
+- Easy conversion of NEXT/TODO task to a tracked one
+- Easy editing of tasks
+
+
+  CONS
+
+- Github issues are pretty
